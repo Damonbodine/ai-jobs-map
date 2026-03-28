@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     // Determine sort
     let orderClause = 'o.title ASC';
     if (sort === 'ai_opportunities') {
-      orderClause = 'ai_count DESC, o.title ASC';
+      orderClause = 'ai_opportunities_count DESC, o.title ASC';
     }
 
     // Get total count
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
          o.title,
          o.slug,
          o.major_category,
-         o.minor_category,
+         o.sub_category,
          COALESCE(ao_count.count, 0) as ai_opportunities_count,
          COALESCE(mt_count.count, 0) as micro_tasks_count
        FROM occupations o

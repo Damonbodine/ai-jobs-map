@@ -117,7 +117,7 @@ export default function BrowsePage() {
         {/* Page Title */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Browse Occupations</h1>
-          <p className="text-slate-400">Explore {total.toLocaleString()} occupations and their AI opportunities</p>
+          <p className="text-slate-400">Explore {(total || 0).toLocaleString()} occupations and their AI opportunities</p>
         </div>
 
         {/* Filters */}
@@ -255,7 +255,7 @@ export default function BrowsePage() {
 
         {/* Page Info */}
         <div className="text-center text-slate-500 mt-4">
-          Showing {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, total)} of {total.toLocaleString()} occupations
+          Showing {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, total || 0)} of {(total || 0).toLocaleString()} occupations
         </div>
       </main>
 

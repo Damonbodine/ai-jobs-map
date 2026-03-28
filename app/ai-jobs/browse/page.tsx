@@ -71,9 +71,9 @@ export default function BrowsePage() {
       const response = await fetch(`/api/ai-jobs/browse?${params}`);
       const data: BrowseResponse = await response.json();
       
-      setOccupations(data.occupations);
-      setTotal(data.total);
-      setTotalPages(data.totalPages);
+      setOccupations(data.occupations || []);
+      setTotal(data.total || 0);
+      setTotalPages(data.totalPages || 1);
     } catch (error) {
       console.error('Error fetching occupations:', error);
     } finally {
@@ -174,7 +174,7 @@ export default function BrowsePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {occupations.map((occ) => (
+            {(occupations || []).map((occ) => (
               <Link
                 key={occ.id}
                 href={`/ai-jobs/${occ.slug}`}

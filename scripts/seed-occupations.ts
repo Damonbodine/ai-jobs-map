@@ -52,7 +52,7 @@ async function seed() {
   });
   await client.connect();
 
-  const csvPath = path.join(process.cwd(), '../../bls_occupations.csv');
+  const csvPath = path.join(process.cwd(), 'bls_occupations.csv');
   const csvContent = fs.readFileSync(csvPath, 'utf-8');
   const records = parse(csvContent, {
     columns: true,

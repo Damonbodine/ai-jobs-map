@@ -82,6 +82,9 @@ export default function AIJobsLanding() {
             <Link href="/ai-jobs/browse" className="text-slate-300 hover:text-white transition-colors">
               Browse
             </Link>
+            <Link href="/factory" className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity">
+              AI Factory
+            </Link>
             <Link href="/ai-jobs/about" className="text-slate-300 hover:text-white transition-colors">
               About
             </Link>
@@ -193,7 +196,7 @@ export default function AIJobsLanding() {
           {majorCategories.map((category) => (
             <Link
               key={category.slug}
-              href={`/ai-jobs/${category.slug}`}
+              href={`/ai-jobs/category/${category.slug}`}
               className="group bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-6 transition-all hover:shadow-lg hover:shadow-emerald-500/10"
             >
               <div className="text-4xl mb-3">{category.icon}</div>

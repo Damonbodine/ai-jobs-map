@@ -96,6 +96,7 @@ export const occupations = pgTable(
 
 export const occupationRelations = relations(occupations, ({ many }) => ({
   opportunities: many(aiOpportunities),
+  microTasks: many(jobMicroTasks),
 }));
 
 export const aiOpportunities = pgTable(
@@ -157,9 +158,133 @@ export const skillRecommendationRelations = relations(skillRecommendations, ({ o
   }),
 }));
 
+// Micro-tasks table - stores specific tasks for each occupation with AI mapping
+export const jobMicroTasks = pgTable(
+  'job_micro_tasks',
+  {
+    id: serial('id').primaryKey(),
+    occupationId: integer('occupation_id')
+      .notNull()
+      .references(() => occupations.id, { onDelete: 'cascade' }),
+    taskName: text('task_name').notNull(),
+    taskDescription: text('task_description').notNull(),
+    frequency: text('frequency').notNull(), // daily, weekly, monthly, as-needed
+    aiApplicable: boolean('ai_applicable').default(true).notNull(),
+    aiHowItHelps: text('ai_how_it_helps'),
+    aiImpactLevel: integer('ai_impact_level'), // 1-5
+    aiEffortToImplement: integer('ai_effort_to_implement'), // 1-5
+    aiCategory: text('ai_category', {
+      enum: ['task_automation', 'decision_support', 'research_discovery', 'communication', 'creative_assistance', 'data_analysis', 'learning_education'],
+    }),
+    aiTools: text('ai_tools'), // suggested AI tools
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('job_micro_tasks_occupation_idx').on(table.occupationId),
+    index('job_micro_tasks_ai_applicable_idx').on(table.aiApplicable),
+  ]
+);
+
+export const jobMicroTaskRelations = relations(jobMicroTasks, ({ one }) => ({
+  occupation: one(occupations, {
+    fields: [jobMicroTasks.occupationId],
+    references: [occupations.id],
+  }),
+}));
+
+// O*NET Task Statements - official government task data
+export const onetTasks = pgTable(
+  'onet_tasks',
+  {
+    id: serial('id').primaryKey(),
+    onetSocCode: text('onet_soc_code').notNull(),
+    taskId: text('task_id'),
+    taskTitle: text('task_title').notNull(),
+    taskDescription: text('task_description').notNull(),
+    taskType: text('task_type'), // "Core" or "Supplemental"
+    occupationId: integer('occupation_id').references(() => occupations.id),
+    // AI scoring fields
+    aiAutomatable: boolean('ai_automatable'),
+    aiAutomationScore: integer('ai_automation_score'), // 0-100
+    aiDifficulty: text('ai_difficulty'), // easy, medium, hard
+    estimatedTimeSavedPercent: integer('estimated_time_saved_percent'), // 0-100
+    aiTools: text('ai_tools'), // JSON array of applicable AI tools
+    // DWA grouping
+    dwaId: text('dwa_id'),
+    dwaTitle: text('dwa_title'),
+    iwaId: text('iwa_id'),
+    gwaTitle: text('gwa_title'), // General Work Activity
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('onet_tasks_soc_idx').on(table.onetSocCode),
+    index('onet_tasks_occupation_idx').on(table.occupationId),
+    index('onet_tasks_dwa_idx').on(table.dwaId),
+    index('onet_tasks_ai_automatable_idx').on(table.aiAutomatable),
+  ]
+);
+
+// DWA (Detailed Work Activities) - reusable automation templates
+export const detailedWorkActivities = pgTable(
+  'detailed_work_activities',
+  {
+    id: serial('id').primaryKey(),
+    dwaId: text('dwa_id').notNull().unique(),
+    dwaTitle: text('dwa_title').notNull(),
+    iwaId: text('iwa_id'),
+    iwaTitle: text('iwa_title'),
+    gwaTitle: text('gwa_title'),
+    // Automation metadata
+    automationTemplate: text('automation_template'), // JSON template for automation
+    applicableTools: text('applicable_tools'), // JSON array
+    occupationCount: integer('occupation_count').default(0), // How many occupations use this DWA
+    avgAutomationScore: integer('avg_automation_score'), // Average automation score across occupations
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('dwa_iwa_idx').on(table.iwaId),
+    index('dwa_automation_idx').on(table.avgAutomationScore),
+  ]
+);
+
+// Tasks to DWAs mapping (for tracking cross-occupation patterns)
+export const tasksToDwas = pgTable(
+  'tasks_to_dwas',
+  {
+    id: serial('id').primaryKey(),
+    taskId: text('task_id').notNull(),
+    onetSocCode: text('onet_soc_code').notNull(),
+    dwaId: text('dwa_id').notNull(),
+    occupationId: integer('occupation_id').references(() => occupations.id),
+  },
+  (table) => [
+    index('ttd_dwa_idx').on(table.dwaId),
+    index('ttd_soc_idx').on(table.onetSocCode),
+  ]
+);
+
+export const onetTaskRelations = relations(onetTasks, ({ one }) => ({
+  occupation: one(occupations, {
+    fields: [onetTasks.occupationId],
+    references: [occupations.id],
+  }),
+}));
+
+export const dwaRelations = relations(detailedWorkActivities, ({ many }) => ({
+  tasks: many(onetTasks),
+}));
+
 export type Occupation = typeof occupations.$inferSelect;
 export type NewOccupation = typeof occupations.$inferInsert;
 export type AiOpportunity = typeof aiOpportunities.$inferSelect;
 export type NewAiOpportunity = typeof aiOpportunities.$inferInsert;
 export type SkillRecommendation = typeof skillRecommendations.$inferSelect;
 export type NewSkillRecommendation = typeof skillRecommendations.$inferInsert;
+export type JobMicroTask = typeof jobMicroTasks.$inferSelect;
+export type NewJobMicroTask = typeof jobMicroTasks.$inferInsert;
+export type OnetTask = typeof onetTasks.$inferSelect;
+export type NewOnetTask = typeof onetTasks.$inferInsert;
+export type DetailedWorkActivity = typeof detailedWorkActivities.$inferSelect;
+export type NewDetailedWorkActivity = typeof detailedWorkActivities.$inferInsert;

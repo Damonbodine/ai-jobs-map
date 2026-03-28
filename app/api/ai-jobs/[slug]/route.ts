@@ -1,7 +1,9 @@
-import { neon } from '@neondatabase/serverless';
 import { NextRequest, NextResponse } from 'next/server';
+import { Pool } from 'pg';
 
-const sql = neon(process.env.DATABASE_URL!);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 export async function GET(
   request: NextRequest,
@@ -10,8 +12,8 @@ export async function GET(
   const { slug } = await params;
 
   try {
-    const occupationResult = await sql`
-      SELECT 
+    const occupationResult = await pool.query(
+      `SELECT 
         id,
         title,
         slug,
@@ -21,22 +23,22 @@ export async function GET(
         hourly_wage,
         annual_wage
       FROM occupations
-      WHERE slug = ${slug}
-      LIMIT 1
-    `;
+      WHERE slug = $1
+      LIMIT 1`,
+      [slug]
+    );
 
-    if (occupationResult.length === 0) {
+    if (occupationResult.rows.length === 0) {
       return NextResponse.json(
         { error: 'Occupation not found' },
         { status: 404 }
       );
     }
 
-    const occupation = occupationResult[0];
+    const occupation = occupationResult.rows[0];
 
-    // Get AI opportunities for this occupation
-    const opportunitiesResult = await sql`
-      SELECT 
+    const opportunitiesResult = await pool.query(
+      `SELECT 
         id,
         title,
         description,
@@ -46,14 +48,14 @@ export async function GET(
         is_ai_generated,
         is_approved
       FROM ai_opportunities
-      WHERE occupation_id = ${occupation.id}
+      WHERE occupation_id = $1
         AND is_approved = TRUE
-      ORDER BY impact_level DESC, effort_level ASC
-    `;
+      ORDER BY impact_level DESC, effort_level ASC`,
+      [occupation.id]
+    );
 
-    // Get skill recommendations
-    const skillsResult = await sql`
-      SELECT 
+    const skillsResult = await pool.query(
+      `SELECT 
         id,
         skill_name,
         skill_description,
@@ -61,26 +63,26 @@ export async function GET(
         learning_resources,
         priority
       FROM skill_recommendations
-      WHERE occupation_id = ${occupation.id}
-      ORDER BY priority DESC
-    `;
+      WHERE occupation_id = $1
+      ORDER BY priority DESC`,
+      [occupation.id]
+    );
 
-    // Calculate AI readiness score
-    const readinessScore = opportunitiesResult.length > 0
+    const readinessScore = opportunitiesResult.rows.length > 0
       ? Math.round(
-          (opportunitiesResult.reduce((sum, o) => sum + o.impact_level, 0) / 
-           opportunitiesResult.length) * 20
+          (opportunitiesResult.rows.reduce((sum: number, o: any) => sum + o.impact_level, 0) / 
+           opportunitiesResult.rows.length) * 20
         )
       : 0;
 
     return NextResponse.json({
       occupation,
-      opportunities: opportunitiesResult,
-      skills: skillsResult,
+      opportunities: opportunitiesResult.rows,
+      skills: skillsResult.rows,
       stats: {
-        opportunityCount: opportunitiesResult.length,
+        opportunityCount: opportunitiesResult.rows.length,
         readinessScore,
-        categoryBreakdown: opportunitiesResult.reduce((acc, o) => {
+        categoryBreakdown: opportunitiesResult.rows.reduce((acc: Record<string, number>, o: any) => {
           acc[o.category] = (acc[o.category] || 0) + 1;
           return acc;
         }, {} as Record<string, number>),

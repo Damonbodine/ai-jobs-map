@@ -1,9 +1,11 @@
-import { neon } from '@neondatabase/serverless';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { Pool } from 'pg';
 
-const sql = neon(process.env.DATABASE_URL!);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 const opportunityCategoryConfig: Record<string, { label: string; color: string; icon: string }> = {
   task_automation: { label: 'Task Automation', color: 'bg-blue-500', icon: '🤖' },
@@ -26,54 +28,42 @@ interface PageProps {
 }
 
 async function getOccupation(slug: string) {
-  const occupation = await sql`
-    SELECT 
-      id,
-      title,
-      slug,
-      major_category,
-      sub_category,
-      employment,
-      hourly_wage,
-      annual_wage
-    FROM occupations
-    WHERE slug = ${slug}
-    LIMIT 1
-  `;
-  return occupation[0] || null;
+  const result = await pool.query(
+    `SELECT id, title, slug, major_category, sub_category, employment, hourly_wage, annual_wage
+     FROM occupations WHERE slug = $1 LIMIT 1`,
+    [slug]
+  );
+  return result.rows[0] || null;
 }
 
 async function getOpportunities(occupationId: number) {
-  return await sql`
-    SELECT 
-      id,
-      title,
-      description,
-      category,
-      impact_level,
-      effort_level,
-      is_ai_generated,
-      is_approved
-    FROM ai_opportunities
-    WHERE occupation_id = ${occupationId}
-      AND is_approved = TRUE
-    ORDER BY impact_level DESC, effort_level ASC
-  `;
+  const result = await pool.query(
+    `SELECT id, title, description, category, impact_level, effort_level, is_ai_generated, is_approved
+     FROM ai_opportunities WHERE occupation_id = $1
+     ORDER BY impact_level DESC, effort_level ASC`,
+    [occupationId]
+  );
+  return result.rows;
 }
 
 async function getSkills(occupationId: number) {
-  return await sql`
-    SELECT 
-      id,
-      skill_name,
-      skill_description,
-      difficulty,
-      learning_resources,
-      priority
-    FROM skill_recommendations
-    WHERE occupation_id = ${occupationId}
-    ORDER BY priority DESC
-  `;
+  const result = await pool.query(
+    `SELECT id, skill_name, skill_description, difficulty, learning_resources, priority
+     FROM skill_recommendations WHERE occupation_id = $1 ORDER BY priority DESC`,
+    [occupationId]
+  );
+  return result.rows;
+}
+
+async function getMicroTasks(occupationId: number) {
+  const result = await pool.query(
+    `SELECT id, task_name, task_description, frequency, ai_applicable, ai_how_it_helps, 
+            ai_impact_level, ai_effort_to_implement, ai_category, ai_tools
+     FROM job_micro_tasks WHERE occupation_id = $1
+     ORDER BY ai_impact_level DESC NULLS LAST, ai_effort_to_implement ASC NULLS LAST`,
+    [occupationId]
+  );
+  return result.rows;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -100,11 +90,14 @@ export default async function OccupationPage({ params }: PageProps) {
 
   const opportunities = await getOpportunities(occupation.id);
   const skills = await getSkills(occupation.id);
+  const microTasks = await getMicroTasks(occupation.id);
 
-  const readinessScore = opportunities.length > 0
+  // Calculate AI readiness based on micro-tasks with AI
+  const aiApplicableTasks = microTasks.filter((t: any) => t.ai_applicable && t.ai_impact_level);
+  const readinessScore = aiApplicableTasks.length > 0
     ? Math.round(
-        (opportunities.reduce((sum: number, o: any) => sum + o.impact_level, 0) / 
-         opportunities.length) * 20
+        (aiApplicableTasks.reduce((sum: number, t: any) => sum + (t.ai_impact_level || 0), 0) / 
+         aiApplicableTasks.length) * 20
       )
     : null;
 
@@ -169,59 +162,98 @@ export default async function OccupationPage({ params }: PageProps) {
 
       {/* Main Content */}
       <main className="px-4 max-w-7xl mx-auto">
-        {/* AI Opportunities */}
+        {/* Micro-Tasks with AI Mapping */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-            <span className="text-2xl">💡</span>
-            AI Opportunities
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+              <span className="text-2xl">📋</span>
+              Day-to-Day Tasks & AI Opportunities
+            </h2>
+            <div className="text-sm text-slate-400">
+              {microTasks.length} tasks • {microTasks.filter((t: any) => t.ai_applicable).length} AI-enabled
+            </div>
+          </div>
           
-          {opportunities.length > 0 ? (
-            <div className="grid gap-4">
-              {opportunities.map((opp: any) => {
-                const config = opportunityCategoryConfig[opp.category] || {
-                  label: opp.category,
+          {microTasks.length > 0 ? (
+            <div className="space-y-4">
+              {microTasks.map((task: any) => {
+                const config = opportunityCategoryConfig[task.ai_category || 'task_automation'] || {
+                  label: 'Task Automation',
                   color: 'bg-gray-500',
                   icon: '✨'
                 };
+                const frequencyColors: Record<string, string> = {
+                  daily: 'text-green-400 bg-green-400/20',
+                  weekly: 'text-blue-400 bg-blue-400/20',
+                  monthly: 'text-purple-400 bg-purple-400/20',
+                  'as-needed': 'text-slate-400 bg-slate-400/20',
+                };
+                
                 return (
                   <div 
-                    key={opp.id}
-                    className="bg-slate-800/80 border border-slate-700 rounded-xl p-6"
+                    key={task.id}
+                    className={`border rounded-xl p-5 transition-all ${
+                      task.ai_applicable 
+                        ? 'bg-slate-800/80 border-slate-700 hover:border-emerald-500/30' 
+                        : 'bg-slate-800/40 border-slate-700/50 opacity-75'
+                    }`}
                   >
-                    <div className="flex items-start justify-between gap-4 mb-4">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{config.icon}</span>
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">{opp.title}</h3>
-                          <span className={`inline-block px-2 py-0.5 rounded text-xs text-white ${config.color}`}>
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-lg font-semibold text-white">{task.task_name}</h3>
+                          <span className={`px-2 py-0.5 rounded text-xs ${frequencyColors[task.frequency] || frequencyColors['as-needed']}`}>
+                            {task.frequency}
+                          </span>
+                        </div>
+                        <p className="text-slate-400 text-sm">{task.task_description}</p>
+                      </div>
+                      {task.ai_applicable && (
+                        <div className="flex gap-3 text-sm shrink-0">
+                          <div className="text-center">
+                            <div className="text-emerald-400 font-semibold">{task.ai_impact_level}/5</div>
+                            <div className="text-slate-500">Impact</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-orange-400 font-semibold">{task.ai_effort_to_implement}/5</div>
+                            <div className="text-slate-500">Effort</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {task.ai_applicable && task.ai_how_it_helps && (
+                      <div className="mt-3 pt-3 border-t border-slate-700">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-lg">{config.icon}</span>
+                          <span className={`px-2 py-0.5 rounded text-xs text-white ${config.color}`}>
                             {config.label}
                           </span>
                         </div>
+                        <p className="text-emerald-300/80 text-sm mb-2">{task.ai_how_it_helps}</p>
+                        {task.ai_tools && (
+                          <p className="text-slate-500 text-xs">
+                            <span className="text-slate-400">Tools:</span> {task.ai_tools}
+                          </p>
+                        )}
                       </div>
-                      <div className="flex gap-4 text-sm">
-                        <div className="text-center">
-                          <div className="text-emerald-400 font-semibold">{opp.impact_level}/5</div>
-                          <div className="text-slate-500">Impact</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-orange-400 font-semibold">{opp.effort_level}/5</div>
-                          <div className="text-slate-500">Effort</div>
-                        </div>
+                    )}
+                    
+                    {!task.ai_applicable && (
+                      <div className="mt-2 text-slate-500 text-sm italic">
+                        AI does not apply to this task
                       </div>
-                    </div>
-                    <p className="text-slate-300">{opp.description}</p>
+                    )}
                   </div>
                 );
               })}
             </div>
           ) : (
             <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-12 text-center">
-              <div className="text-4xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold text-white mb-2">AI Opportunities Coming Soon</h3>
+              <div className="text-4xl mb-4">🤖</div>
+              <h3 className="text-xl font-semibold text-white mb-2">Micro-Task Analysis Coming Soon</h3>
               <p className="text-slate-400 max-w-md mx-auto">
-                We&apos;re analyzing this occupation to identify the best AI opportunities.
-                Check back soon or help us by suggesting opportunities!
+                We&apos;re analyzing the day-to-day tasks for this occupation to identify specific AI opportunities.
               </p>
             </div>
           )}

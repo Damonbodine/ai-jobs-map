@@ -1,7 +1,9 @@
-import { neon } from '@neondatabase/serverless';
 import { NextRequest, NextResponse } from 'next/server';
+import { Pool } from 'pg';
 
-const sql = neon(process.env.DATABASE_URL!);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 interface Occupation {
   id: number;
@@ -29,65 +31,58 @@ export async function GET(request: NextRequest) {
     let total: number;
 
     if (query) {
-      // Fuzzy search using trigram similarity and ILIKE
-      const searchTerms = query.toLowerCase().split(/\s+/);
-      const searchPattern = searchTerms.map(term => `%${term}%`).join('');
-
-      // Search with ranking based on match position
-      const searchResults = await sql`
-        SELECT 
+      const searchResults = await pool.query(
+        `SELECT 
           id, 
           title, 
           slug, 
-          major_category,
-          -- Priority match: title starts with query
-          CASE 
-            WHEN LOWER(title) LIKE ${query.toLowerCase() + '%'} THEN 1
-            WHEN LOWER(title) LIKE ${'%' + query.toLowerCase() + '%'} THEN 2
-            ELSE 3
-          END as match_priority,
-          -- Length penalty (shorter titles often more relevant)
-          LENGTH(title) as title_length
+          major_category
         FROM occupations
-        WHERE LOWER(title) ILIKE ${'%' + query.toLowerCase() + '%'}
-           OR LOWER(title) % ${query.toLowerCase()}
+        WHERE LOWER(title) ILIKE $1
         ORDER BY 
-          match_priority ASC,
-          title_length ASC
-        LIMIT ${limit}
-        OFFSET ${offset}
-      `;
+          CASE 
+            WHEN LOWER(title) LIKE $2 THEN 1
+            WHEN LOWER(title) LIKE $3 THEN 2
+            ELSE 3
+          END,
+          LENGTH(title) ASC
+        LIMIT $4
+        OFFSET $5`,
+        [
+          `%${query.toLowerCase()}%`,
+          `${query.toLowerCase()}%`,
+          `%${query.toLowerCase()}%`,
+          limit,
+          offset
+        ]
+      );
 
-      results = searchResults;
+      results = searchResults.rows;
 
-      // Get total count
-      const countResult = await sql`
-        SELECT COUNT(*) as count
-        FROM occupations
-        WHERE LOWER(title) ILIKE ${'%' + query.toLowerCase() + '%'}
-           OR LOWER(title) % ${query.toLowerCase()}
-      `;
-      total = Number(countResult[0].count);
+      const countResult = await pool.query(
+        `SELECT COUNT(*) as count FROM occupations WHERE LOWER(title) ILIKE $1`,
+        [`%${query.toLowerCase()}%`]
+      );
+      total = parseInt(countResult.rows[0].count);
 
     } else if (category) {
-      // Category filter
-      const categoryResults = await sql`
-        SELECT id, title, slug, major_category
+      const categoryResults = await pool.query(
+        `SELECT id, title, slug, major_category
         FROM occupations
-        WHERE major_category = ${category}
+        WHERE major_category = $1
         ORDER BY title ASC
-        LIMIT ${limit}
-        OFFSET ${offset}
-      `;
+        LIMIT $2
+        OFFSET $3`,
+        [category, limit, offset]
+      );
 
-      results = categoryResults;
+      results = categoryResults.rows;
 
-      const countResult = await sql`
-        SELECT COUNT(*) as count
-        FROM occupations
-        WHERE major_category = ${category}
-      `;
-      total = Number(countResult[0].count);
+      const countResult = await pool.query(
+        `SELECT COUNT(*) as count FROM occupations WHERE major_category = $1`,
+        [category]
+      );
+      total = parseInt(countResult.rows[0].count);
     } else {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }

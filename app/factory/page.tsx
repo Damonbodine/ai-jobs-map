@@ -317,13 +317,15 @@ export default function FactoryPage() {
                 </div>
               </div>
 
-              {coverageResult.recommendedPackages.length > 0 && (
+              {coverageResult.recommendedPackages && coverageResult.recommendedPackages.length > 0 && coverageResult.recommendedPackages[0] && (
                 <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
                   <div className="text-emerald-400 font-medium mb-2">Recommended Package:</div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-white font-medium">{coverageResult.recommendedPackages[0].package_name}</div>
-                      <div className="text-slate-400 text-sm">${coverageResult.recommendedPackages[0].base_price.toLocaleString()} + ${coverageResult.recommendedPackages[0].monthly_price}/mo</div>
+                      <div className="text-white font-medium">{coverageResult.recommendedPackages[0].package_name || coverageResult.recommendedPackages[0].name || 'Package'}</div>
+                      <div className="text-slate-400 text-sm">
+                        ${(coverageResult.recommendedPackages[0].base_price || 0).toLocaleString()} + ${(coverageResult.recommendedPackages[0].monthly_price || 0).toLocaleString()}/mo
+                      </div>
                     </div>
                     <button className="px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-600">
                       Get Quote

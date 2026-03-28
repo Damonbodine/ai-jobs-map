@@ -59,6 +59,9 @@ export default function FactoryPage() {
   const [coverageSearch, setCoverageSearch] = useState('');
   const [coverageResult, setCoverageResult] = useState<CoverageResult | null>(null);
   const [isSearchingCoverage, setIsSearchingCoverage] = useState(false);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
 
   // Intake form state
   const [formData, setFormData] = useState({
@@ -122,34 +125,86 @@ export default function FactoryPage() {
     });
   }
 
-  async function searchCoverage() {
-    if (!coverageSearch.trim()) return;
+  // Fetch autocomplete suggestions
+  async function fetchSuggestions(query: string) {
+    if (query.length < 1) {
+      // Show top occupations when empty
+      const res = await fetch('/api/ai-jobs/autocomplete?limit=8');
+      const data = await res.json();
+      setSuggestions(data.results || []);
+      setShowSuggestions(true);
+      return;
+    }
     
-    setIsSearchingCoverage(true);
     try {
-      // First find the occupation
-      const searchRes = await fetch(`/api/ai-jobs/search?q=${encodeURIComponent(coverageSearch)}&limit=1`);
-      const searchData = await searchRes.json();
-      
-      if (searchData.results && searchData.results.length > 0) {
-        const occ = searchData.results[0];
-        // Get coverage data
-        const recRes = await fetch(`/api/factory/recommend?occupation=${occ.slug}`);
-        const recData = await recRes.json();
-        
-        setCoverageResult({
-          occupation: { title: occ.title, category: occ.major_category },
-          coverage: recData.coverage || { percent: 0, estimatedDailyHoursSaved: 0, estimatedWeeklyHoursSaved: 0, estimatedYearlyValue: 0 },
-          recommendedPackages: recData.recommendedPackages || [],
-        });
-      } else {
-        setCoverageResult(null);
-      }
+      const res = await fetch(`/api/ai-jobs/autocomplete?q=${encodeURIComponent(query)}&limit=8`);
+      const data = await res.json();
+      setSuggestions(data.results || []);
+      setShowSuggestions(true);
     } catch (error) {
-      console.error('Coverage search error:', error);
-      setCoverageResult(null);
+      console.error('Autocomplete error:', error);
+      setSuggestions([]);
+    }
+  }
+
+  // Handle input change with debounce
+  function handleCoverageInputChange(value: string) {
+    setCoverageSearch(value);
+    setHighlightedIndex(-1);
+    
+    // Debounce suggestions fetch
+    const timeoutId = setTimeout(() => {
+      fetchSuggestions(value);
+    }, 150);
+    
+    return () => clearTimeout(timeoutId);
+  }
+
+  // Select an occupation from suggestions
+  async function selectOccupation(occ: any) {
+    setCoverageSearch(occ.title);
+    setShowSuggestions(false);
+    setCoverageResult(null);
+    setIsSearchingCoverage(true);
+    
+    try {
+      const recRes = await fetch(`/api/factory/recommend?occupation=${occ.slug}`);
+      const recData = await recRes.json();
+      
+      setCoverageResult({
+        occupation: { title: occ.title, category: occ.major_category },
+        coverage: recData.coverage || { percent: 0, estimatedDailyHoursSaved: 0, estimatedWeeklyHoursSaved: 0, estimatedYearlyValue: 0 },
+        recommendedPackages: recData.recommendedPackages || [],
+      });
+    } catch (error) {
+      console.error('Coverage fetch error:', error);
     } finally {
       setIsSearchingCoverage(false);
+    }
+  }
+
+  // Keyboard navigation
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (!showSuggestions || suggestions.length === 0) return;
+    
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightedIndex(prev => Math.min(prev + 1, suggestions.length - 1));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightedIndex(prev => Math.max(prev - 1, 0));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (highlightedIndex >= 0 && suggestions[highlightedIndex]) {
+          selectOccupation(suggestions[highlightedIndex]);
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        break;
     }
   }
 
@@ -274,22 +329,63 @@ export default function FactoryPage() {
           <h3 className="text-xl font-semibold text-white mb-2">Check Your Job Coverage</h3>
           <p className="text-slate-400 text-sm mb-6">See what percentage of your job can be automated</p>
           
-          <div className="flex gap-3 mb-6">
-            <input
-              type="text"
-              value={coverageSearch}
-              onChange={(e) => setCoverageSearch(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && searchCoverage()}
-              placeholder="Enter your job title (e.g., 'Accountant', 'Project Manager')"
-              className="flex-1 px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500"
-            />
-            <button
-              onClick={searchCoverage}
-              disabled={isSearchingCoverage}
-              className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-            >
-              {isSearchingCoverage ? 'Searching...' : 'Check'}
-            </button>
+          <div className="relative mb-6">
+            <div className="flex gap-3">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={coverageSearch}
+                  onChange={(e) => handleCoverageInputChange(e.target.value)}
+                  onFocus={() => { fetchSuggestions(coverageSearch); setShowSuggestions(true); }}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Start typing your job title..."
+                  className="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  autoComplete="off"
+                />
+                
+                {/* Autocomplete Dropdown */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-50 max-h-80 overflow-y-auto">
+                    {suggestions.map((occ, index) => (
+                      <button
+                        key={occ.id}
+                        onClick={() => selectOccupation(occ)}
+                        onMouseEnter={() => setHighlightedIndex(index)}
+                        className={`w-full px-4 py-3 text-left flex items-center justify-between transition-colors ${
+                          index === highlightedIndex ? 'bg-emerald-500/20' : 'hover:bg-slate-700/50'
+                        }`}
+                      >
+                        <div>
+                          <div className="text-white font-medium">{occ.title}</div>
+                          <div className="text-sm text-slate-400">{occ.major_category}</div>
+                        </div>
+                        {occ.coverage_percent && (
+                          <div className="text-right">
+                            <div className="text-emerald-400 font-semibold">{parseFloat(occ.coverage_percent).toFixed(0)}%</div>
+                            <div className="text-xs text-slate-500">automatable</div>
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => suggestions.length > 0 && selectOccupation(suggestions[0])}
+                disabled={isSearchingCoverage || suggestions.length === 0}
+                className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {isSearchingCoverage ? '...' : 'Check'}
+              </button>
+            </div>
+            
+            {/* Loading indicator */}
+            {isSearchingCoverage && (
+              <div className="absolute right-24 top-1/2 -translate-y-1/2">
+                <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
           </div>
 
           {coverageResult && (

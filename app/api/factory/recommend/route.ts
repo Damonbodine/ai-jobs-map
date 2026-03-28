@@ -61,25 +61,27 @@ export async function GET(request: NextRequest) {
     const workflowsResult = await pool.query(`
       SELECT DISTINCT
         aw.*,
-        COUNT(DISTINCT aa.id) as matching_actions
+        (SELECT COUNT(*) FROM unnest(aw.action_ids) aid WHERE aid = ANY($1)) as matching_actions
       FROM automation_workflows aw
-      JOIN automation_actions aa ON aa.action_code = ANY(
-        SELECT jsonb_array_elements_text(aw.action_ids::jsonb)
+      WHERE aw.id IN (
+        SELECT DISTINCT aw2.id
+        FROM automation_workflows aw2
+        CROSS JOIN unnest(aw2.action_ids) as aid
+        WHERE aid = ANY($1)
       )
-      WHERE aa.id = ANY($1)
-      GROUP BY aw.id
       ORDER BY matching_actions DESC, aw.base_price ASC
+      LIMIT 5
     `, [actionIds]);
 
     // Get recommended packages
+    const workflowIds = workflowsResult.rows.map((w: any) => w.id);
     const packagesResult = await pool.query(`
-      SELECT DISTINCT
-        ap.*,
-        COUNT(DISTINCT aw.id) as matching_workflows
+      SELECT ap.*,
+        (SELECT COUNT(*) FROM unnest(ap.workflow_ids) wid WHERE wid = ANY($1)) as matching_workflows
       FROM automation_packages ap
-      JOIN automation_workflows aw ON aw.id = ANY(ap.workflow_ids)
-      WHERE aw.id = ANY($1)
-      GROUP BY ap.id
+      WHERE EXISTS (
+        SELECT 1 FROM unnest(ap.workflow_ids) wid WHERE wid = ANY($1)
+      )
       ORDER BY 
         CASE ap.tier 
           WHEN 'starter' THEN 1 
@@ -87,17 +89,7 @@ export async function GET(request: NextRequest) {
           WHEN 'enterprise' THEN 3 
         END,
         ap.base_price ASC
-    `, [workflowsResult.rows.map((w: any) => w.id)]);
-
-    // Calculate estimated ROI using coverage data
-    const coverageHours = coverageStats.rows[0] ? parseFloat(coverageStats.rows[0].estimated_daily_hours_saved) : 0;
-    const avgTimeSaved = coverageHours || workflowsResult.rows.reduce(
-      (sum: number, w: any) => sum + parseFloat(w.estimated_time_saved_per_day || 0), 
-      0
-    );
-    const workDaysPerYear = 250;
-    const hourlyRate = 75; // Conservative estimate
-    const yearlyValue = Math.min(avgTimeSaved, 4) * workDaysPerYear * hourlyRate;
+    `, [workflowIds]);
 
     // Get O*NET task stats
     const taskStats = await pool.query(`
@@ -123,6 +115,16 @@ export async function GET(request: NextRequest) {
     `, [occupation.id]);
     
     const coverage = coverageStats.rows[0] || {};
+
+    // Calculate estimated ROI using coverage data
+    const coverageHours = parseFloat(coverage.estimated_daily_hours_saved) || 0;
+    const avgTimeSaved = coverageHours || workflowsResult.rows.reduce(
+      (sum: number, w: any) => sum + parseFloat(w.estimated_time_saved_per_day || 0), 
+      0
+    );
+    const workDaysPerYear = 250;
+    const hourlyRate = 75; // Conservative estimate
+    const yearlyValue = Math.min(avgTimeSaved, 4) * workDaysPerYear * hourlyRate;
 
     return NextResponse.json({
       occupation: {

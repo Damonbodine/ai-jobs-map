@@ -89,14 +89,15 @@ export async function GET(request: NextRequest) {
         ap.base_price ASC
     `, [workflowsResult.rows.map((w: any) => w.id)]);
 
-    // Calculate estimated ROI
-    const avgTimeSaved = workflowsResult.rows.reduce(
+    // Calculate estimated ROI using coverage data
+    const coverageHours = coverageStats.rows[0] ? parseFloat(coverageStats.rows[0].estimated_daily_hours_saved) : 0;
+    const avgTimeSaved = coverageHours || workflowsResult.rows.reduce(
       (sum: number, w: any) => sum + parseFloat(w.estimated_time_saved_per_day || 0), 
       0
     );
     const workDaysPerYear = 250;
     const hourlyRate = 75; // Conservative estimate
-    const yearlyValue = Math.min(avgTimeSaved, 3) * workDaysPerYear * hourlyRate;
+    const yearlyValue = Math.min(avgTimeSaved, 4) * workDaysPerYear * hourlyRate;
 
     // Get O*NET task stats
     const taskStats = await pool.query(`
@@ -108,12 +109,34 @@ export async function GET(request: NextRequest) {
       WHERE occupation_id = $1
     `, [occupation.id]);
 
+    // Get coverage data from occupation_coverage table
+    const coverageStats = await pool.query(`
+      SELECT 
+        coverage_percent,
+        covered_tasks,
+        estimated_daily_hours_saved,
+        top_actions,
+        top_workflows,
+        recommended_packages
+      FROM occupation_coverage
+      WHERE occupation_id = $1
+    `, [occupation.id]);
+    
+    const coverage = coverageStats.rows[0] || {};
+
     return NextResponse.json({
       occupation: {
         id: occupation.id,
         title: occupation.title,
         slug: occupation.slug,
         category: occupation.major_category,
+      },
+      coverage: {
+        percent: parseFloat(coverage.coverage_percent) || 0,
+        coveredTasks: parseInt(coverage.covered_tasks) || 0,
+        estimatedDailyHoursSaved: parseFloat(coverage.estimated_daily_hours_saved) || 0,
+        estimatedWeeklyHoursSaved: Math.round((parseFloat(coverage.estimated_daily_hours_saved) || 0) * 5),
+        estimatedYearlyValue: Math.round((parseFloat(coverage.estimated_daily_hours_saved) || 0) * 250 * 75),
       },
       analysis: {
         totalTasks: parseInt(taskStats.rows[0].total_tasks) || 0,

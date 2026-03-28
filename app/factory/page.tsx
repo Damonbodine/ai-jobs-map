@@ -42,12 +42,23 @@ const tierBadges: Record<string, string> = {
   enterprise: 'bg-orange-500/20 text-orange-400',
 };
 
+interface CoverageResult {
+  occupation: { title: string; category: string };
+  coverage: { percent: number; estimatedDailyHoursSaved: number; estimatedWeeklyHoursSaved: number; estimatedYearlyValue: number };
+  recommendedPackages: any[];
+}
+
 export default function FactoryPage() {
   const [packages, setPackages] = useState<Package[]>([]);
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [selectedTier, setSelectedTier] = useState<string>('all');
   const [showIntake, setShowIntake] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Coverage lookup state
+  const [coverageSearch, setCoverageSearch] = useState('');
+  const [coverageResult, setCoverageResult] = useState<CoverageResult | null>(null);
+  const [isSearchingCoverage, setIsSearchingCoverage] = useState(false);
 
   // Intake form state
   const [formData, setFormData] = useState({
@@ -109,6 +120,37 @@ export default function FactoryPage() {
       paybackDays,
       yearlyROI,
     });
+  }
+
+  async function searchCoverage() {
+    if (!coverageSearch.trim()) return;
+    
+    setIsSearchingCoverage(true);
+    try {
+      // First find the occupation
+      const searchRes = await fetch(`/api/ai-jobs/search?q=${encodeURIComponent(coverageSearch)}&limit=1`);
+      const searchData = await searchRes.json();
+      
+      if (searchData.results && searchData.results.length > 0) {
+        const occ = searchData.results[0];
+        // Get coverage data
+        const recRes = await fetch(`/api/factory/recommend?occupation=${occ.slug}`);
+        const recData = await recRes.json();
+        
+        setCoverageResult({
+          occupation: { title: occ.title, category: occ.major_category },
+          coverage: recData.coverage || { percent: 0, estimatedDailyHoursSaved: 0, estimatedWeeklyHoursSaved: 0, estimatedYearlyValue: 0 },
+          recommendedPackages: recData.recommendedPackages || [],
+        });
+      } else {
+        setCoverageResult(null);
+      }
+    } catch (error) {
+      console.error('Coverage search error:', error);
+      setCoverageResult(null);
+    } finally {
+      setIsSearchingCoverage(false);
+    }
   }
 
   const painPointOptions = [
@@ -223,6 +265,72 @@ export default function FactoryPage() {
                   <div className="text-sm text-slate-400">Year 1 ROI</div>
                 </div>
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* Job Coverage Lookup */}
+        <div className="max-w-xl mx-auto bg-slate-800/50 border border-slate-700 rounded-2xl p-8 mt-8">
+          <h3 className="text-xl font-semibold text-white mb-2">Check Your Job Coverage</h3>
+          <p className="text-slate-400 text-sm mb-6">See what percentage of your job can be automated</p>
+          
+          <div className="flex gap-3 mb-6">
+            <input
+              type="text"
+              value={coverageSearch}
+              onChange={(e) => setCoverageSearch(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && searchCoverage()}
+              placeholder="Enter your job title (e.g., 'Accountant', 'Project Manager')"
+              className="flex-1 px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500"
+            />
+            <button
+              onClick={searchCoverage}
+              disabled={isSearchingCoverage}
+              className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {isSearchingCoverage ? 'Searching...' : 'Check'}
+            </button>
+          </div>
+
+          {coverageResult && (
+            <div className="space-y-4">
+              <div className="text-center p-6 bg-slate-900/50 rounded-xl">
+                <div className="text-sm text-emerald-400 mb-1">{coverageResult.occupation.title}</div>
+                <div className="text-6xl font-bold text-white mb-2">
+                  {coverageResult.coverage.percent.toFixed(0)}%
+                </div>
+                <div className="text-slate-400">of your job can be automated</div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-slate-900/30 rounded-lg">
+                  <div className="text-2xl font-bold text-emerald-400">{coverageResult.coverage.estimatedDailyHoursSaved.toFixed(1)}h</div>
+                  <div className="text-xs text-slate-400">saved/day</div>
+                </div>
+                <div className="text-center p-4 bg-slate-900/30 rounded-lg">
+                  <div className="text-2xl font-bold text-cyan-400">{coverageResult.coverage.estimatedWeeklyHoursSaved}h</div>
+                  <div className="text-xs text-slate-400">saved/week</div>
+                </div>
+                <div className="text-center p-4 bg-slate-900/30 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-400">${coverageResult.coverage.estimatedYearlyValue.toLocaleString()}</div>
+                  <div className="text-xs text-slate-400">value/year</div>
+                </div>
+              </div>
+
+              {coverageResult.recommendedPackages.length > 0 && (
+                <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+                  <div className="text-emerald-400 font-medium mb-2">Recommended Package:</div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-white font-medium">{coverageResult.recommendedPackages[0].package_name}</div>
+                      <div className="text-slate-400 text-sm">${coverageResult.recommendedPackages[0].base_price.toLocaleString()} + ${coverageResult.recommendedPackages[0].monthly_price}/mo</div>
+                    </div>
+                    <button className="px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-600">
+                      Get Quote
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

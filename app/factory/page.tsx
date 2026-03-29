@@ -243,6 +243,12 @@ export default function FactoryPage() {
             <Link href="/ai-jobs/browse" className="text-slate-300 hover:text-white transition-colors">
               Browse
             </Link>
+            <Link href="/factory/case-studies" className="text-slate-300 hover:text-white transition-colors">
+              Case Studies
+            </Link>
+            <Link href="/factory/roi" className="text-slate-300 hover:text-white transition-colors">
+              ROI Dashboard
+            </Link>
             <button 
               onClick={() => setShowIntake(true)}
               className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity"

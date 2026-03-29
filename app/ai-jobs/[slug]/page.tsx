@@ -66,6 +66,40 @@ async function getMicroTasks(occupationId: number) {
   return result.rows;
 }
 
+async function getGranularSkills(occupationId: number) {
+  // Get skill breakdown from task_skill_mapping
+  const result = await pool.query(
+    `SELECT 
+       ms.id,
+       ms.skill_code,
+       ms.skill_name,
+       ms.category,
+       ms.difficulty_level,
+       COUNT(tsm.id) as task_count,
+       AVG(tsm.skill_proficiency_level) as avg_proficiency,
+       MAX(tsm.is_core_skill) as has_core,
+       MAX(tsm.is_differentiator_skill) as has_differentiator,
+       AVG(tsm.ai_dependence_score) as avg_ai_dependence
+     FROM task_skill_mapping tsm
+     JOIN micro_skills ms ON tsm.micro_skill_id = ms.id
+     JOIN onet_tasks ot ON tsm.onet_task_id = ot.id
+     WHERE ot.occupation_id = $1
+     GROUP BY ms.id, ms.skill_code, ms.skill_name, ms.category, ms.difficulty_level
+     ORDER BY task_count DESC
+     LIMIT 20`,
+    [occupationId]
+  );
+  return result.rows;
+}
+
+async function getSkillProfile(occupationId: number) {
+  const result = await pool.query(
+    `SELECT * FROM occupation_skill_profile WHERE occupation_id = $1`,
+    [occupationId]
+  );
+  return result.rows[0] || null;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const occupation = await getOccupation(slug);
@@ -91,6 +125,8 @@ export default async function OccupationPage({ params }: PageProps) {
   const opportunities = await getOpportunities(occupation.id);
   const skills = await getSkills(occupation.id);
   const microTasks = await getMicroTasks(occupation.id);
+  const granularSkills = await getGranularSkills(occupation.id);
+  const skillProfile = await getSkillProfile(occupation.id);
 
   // Calculate AI readiness based on micro-tasks with AI
   const aiApplicableTasks = microTasks.filter((t: any) => t.ai_applicable && t.ai_impact_level);
@@ -258,6 +294,105 @@ export default async function OccupationPage({ params }: PageProps) {
             </div>
           )}
         </section>
+
+        {/* Granular Skill Breakdown */}
+        {granularSkills.length > 0 && (
+          <section className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                <span className="text-2xl">🔍</span>
+                Deep Skill Analysis
+              </h2>
+              <div className="text-sm text-slate-400">
+                {granularSkills.length} unique skills • {granularSkills.filter((s: any) => s.has_differentiator).length} human differentiators
+              </div>
+            </div>
+
+            {/* Skill Profile Summary */}
+            {skillProfile && (
+              <div className="grid md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/30 rounded-xl p-4">
+                  <div className="text-3xl font-bold text-emerald-400">{skillProfile.total_unique_skills || granularSkills.length}</div>
+                  <div className="text-slate-400 text-sm">Total Skills</div>
+                </div>
+                <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/30 rounded-xl p-4">
+                  <div className="text-3xl font-bold text-blue-400">{skillProfile.core_skills_count || granularSkills.filter((s: any) => s.has_core).length}</div>
+                  <div className="text-slate-400 text-sm">Core Skills</div>
+                </div>
+                <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/30 rounded-xl p-4">
+                  <div className="text-3xl font-bold text-purple-400">{skillProfile.automatable_skills_count || granularSkills.filter((s: any) => parseFloat(s.avg_ai_dependence || 0) > 0.5).length}</div>
+                  <div className="text-slate-400 text-sm">AI Automatable</div>
+                </div>
+                <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/10 border border-orange-500/30 rounded-xl p-4">
+                  <div className="text-3xl font-bold text-orange-400">{skillProfile.human_differentiator_skills_count || granularSkills.filter((s: any) => s.has_differentiator).length}</div>
+                  <div className="text-slate-400 text-sm">Human Differentiators</div>
+                </div>
+              </div>
+            )}
+            
+            {/* Skills by Category */}
+            <div className="space-y-6">
+              {['Technical', 'Analytical', 'Management', 'Communication', 'Soft Skills', 'Financial', 'Sales and Marketing'].map(category => {
+                const categorySkills = granularSkills.filter((s: any) => s.category === category);
+                if (categorySkills.length === 0) return null;
+                
+                return (
+                  <div key={category} className="bg-slate-800/80 border border-slate-700 rounded-xl p-5">
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <span className="text-lg">
+                        {category === 'Technical' ? '💻' : 
+                         category === 'Analytical' ? '📊' :
+                         category === 'Management' ? '📈' :
+                         category === 'Communication' ? '💬' :
+                         category === 'Soft Skills' ? '🧠' :
+                         category === 'Financial' ? '💰' : '🎯'}
+                      </span>
+                      {category}
+                      <span className="text-slate-500 text-sm font-normal">({categorySkills.length} skills)</span>
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {categorySkills.map((skill: any) => {
+                        const aiDep = parseFloat(skill.avg_ai_dependence || 0);
+                        const isCore = skill.has_core;
+                        const isDiff = skill.has_differentiator;
+                        
+                        return (
+                          <div 
+                            key={skill.id}
+                            className={`px-3 py-2 rounded-lg border ${
+                              isDiff 
+                                ? 'bg-orange-500/10 border-orange-500/30' 
+                                : aiDep > 0.5 
+                                  ? 'bg-emerald-500/10 border-emerald-500/30'
+                                  : 'bg-slate-700/50 border-slate-600'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-white text-sm font-medium">{skill.skill_name}</span>
+                              {isCore && <span className="text-xs bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded">core</span>}
+                              {isDiff && <span className="text-xs bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded">human</span>}
+                            </div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="w-16 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full ${aiDep > 0.5 ? 'bg-emerald-400' : 'bg-slate-500'}`}
+                                  style={{ width: `${aiDep * 100}%` }}
+                                />
+                              </div>
+                              <span className="text-xs text-slate-500">{Math.round(aiDep * 100)}% AI</span>
+                              <span className="text-xs text-slate-500">•</span>
+                              <span className="text-xs text-slate-500">Prof: {Math.round(skill.avg_proficiency || 0)}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Skill Recommendations */}
         <section className="mb-12">

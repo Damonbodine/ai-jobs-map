@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accountant | The Sanctuary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --font-heading: 'Newsreader', serif;
+            --font-body: 'Manrope', sans-serif;
+            --bg-sanctuary: #F7F7F2;
+            --color-coral: #F87171;
+            --color-slate: #1A1C1B;
+        }
+        body {
+            background-color: var(--bg-sanctuary);
+            color: var(--color-slate);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        .text-ghost {
+            color: rgba(26, 28, 27, 0.04);
+            letter-spacing: -0.05em;
+        }
+        .arc-gradient {
+            background: linear-gradient(135deg, var(--color-coral) 0%, #FB923C 100%);
+        }
+    </style>
+</head>
+<body class="selection:bg-coral-100 italic font-heading">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 p-12 flex justify-between items-center z-50">
+        <a href="sanctuary.html" class="group flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity">
+            <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+            Back to Sanctuary
+        </a>
+        <div class="text-[9px] font-black uppercase tracking-[0.4em] text-[#F87171]">
+            Occupation Prototype v1.2
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="max-w-6xl mx-auto pt-40 pb-60 px-12 relative overflow-visible">
+        
+        <!-- Large Ghost Title -->
+        <h1 class="text-[12rem] md:text-[18rem] font-black absolute -top-10 -left-10 z-0 text-ghost select-none">
+            Accountant
+        </h1>
+
+        <div class="relative z-10 space-y-32">
+            
+            <!-- Hero Header -->
+            <section class="max-w-3xl">
+                <div class="inline-flex items-center gap-2 mb-8 text-[#F87171] font-black uppercase tracking-widest text-[11px] bg-white/50 px-4 py-1.5 rounded-full border border-white">
+                    93% AI Exposure Synthesis
+                </div>
+                <h2 class="text-8xl font-black tracking-tighter leading-[0.95] mb-12 text-slate-900 line-clamp-2">
+                    The Architecture of <br><span class="text-[#F87171]">Personal Time.</span>
+                </h2>
+                <p class="text-3xl leading-relaxed italic opacity-80 max-w-2xl text-slate-600">
+                    For the modern Accountant, the 'close' is no longer a weekend-stealing marathon. Through deep task automation, we are carving out a sanctuary for what actually matters.
+                </p>
+            </section>
+
+            <!-- Key Metrics Grid -->
+            <section class="grid md:grid-cols-3 gap-16 relative">
+                
+                <!-- Draggable Recovery Orb -->
+                <div id="orb" class="absolute -right-20 -top-40 z-40 cursor-move hidden md:block">
+                    <div class="w-72 h-72 rounded-full bg-white shadow-[0_40px_100px_rgba(248,113,113,0.1)] border border-[#F87171]/10 flex flex-col items-center justify-center text-center p-12 backdrop-blur-xl bg-white/60">
+                        <div class="text-[10px] font-black uppercase tracking-[0.3em] text-[#F87171] mb-2">Recovery Index</div>
+                        <div class="text-7xl font-black text-slate-800 tracking-tighter leading-none mb-1 italic">93%</div>
+                        <div class="text-[10px] font-black uppercase tracking-widest opacity-30">Synthesized Effort</div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 pt-12">
+                    <div class="text-[10px] font-black uppercase tracking-widest opacity-30 mb-2">Automation Capacity</div>
+                    <div class="text-4xl font-black tracking-tighter italic text-slate-800">High Impact</div>
+                    <div class="w-12 h-1 bg-[#F87171] rounded-full"></div>
+                </div>
+                <div class="space-y-4 pt-12">
+                    <div class="text-[10px] font-black uppercase tracking-widest opacity-30 mb-2">Validated Tasks</div>
+                    <div class="text-4xl font-black tracking-tighter italic text-slate-800">67 Actions</div>
+                    <div class="w-12 h-1 bg-slate-200 rounded-full"></div>
+                </div>
+                <div class="space-y-4 pt-12">
+                    <div class="text-[10px] font-black uppercase tracking-widest opacity-30 mb-2">Human Value Index</div>
+                    <div class="text-4xl font-black tracking-tighter italic text-slate-800">Elite Level</div>
+                    <div class="w-12 h-1 bg-slate-200 rounded-full"></div>
+                </div>
+            </section>
+
+            <!-- ROI Section -->
+            <section class="p-20 bg-white rounded-[4rem] shadow-[0_60px_100px_rgba(0,0,0,0.025)] border border-white relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-coral-50/20 to-transparent"></div>
+                <div class="relative z-10 grid md:grid-cols-2 gap-20 items-center">
+                    <div>
+                        <h3 class="text-4xl font-black tracking-tighter italic mb-8 text-slate-900">Your Reclaimed Afternoon</h3>
+                        <p class="text-xl leading-relaxed text-slate-500 opacity-90 italic">
+                            By offloading the rhythmic verification of ledger entries and tax reconciliation, you gain 60 to 90 minutes of daily quiet. 
+                            That is the time for a slow coffee, a story read to your child, or a midday walk.
+                        </p>
+                        <div class="mt-12 flex gap-4">
+                            <button class="bg-[#1A1C1B] text-white px-10 py-5 rounded-3xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-transform">
+                                Begin Audit
+                            </button>
+                            <button class="border border-slate-100 bg-white px-10 py-5 rounded-3xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-50 transition-colors">
+                                View Tasks
+                            </button>
+                        </div>
+                    </div>
+                    <div class="relative flex flex-col items-center">
+                        <div class="text-[100px] md:text-[140px] font-black tracking-tighter italic text-[#F87171] leading-none mb-4">60m</div>
+                        <div class="text-[10px] font-black uppercase tracking-[0.4em] opacity-30">Bedtime Minutes Gained</div>
+                        
+                        <!-- Visual Recovery Scale -->
+                        <div class="mt-12 w-full h-px bg-slate-100 relative">
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-slate-200"></div>
+                            <div class="absolute left-[60%] top-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-4 border-white bg-[#F87171] shadow-xl"></div>
+                            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-slate-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Task Mapping Teaser -->
+            <section class="max-w-2xl">
+                <h4 class="text-sm font-black uppercase tracking-widest text-[#F87171] mb-8 italic">02. The Task Pipeline</h4>
+                <div class="space-y-6">
+                    {[
+                        'Financial Statement Reconciliation', 
+                        'Tax Compliance Reporting', 
+                        'Audit Trail Synthesis'
+                    ].map((task, i) => (
+                        <div key={i} class="flex items-center justify-between p-8 rounded-3xl bg-white/40 border border-white hover:bg-white transition-all cursor-pointer group">
+                            <span class="text-2xl font-black italic tracking-tight text-slate-700">{task}</span>
+                            <div class="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center group-hover:bg-[#F87171] group-hover:border-[#F87171] transition-all">
+                                <svg class="w-4 h-4 text-slate-400 group-hover:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // Draggable Recovery Orb
+        const orb = document.getElementById('orb');
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+        orb.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offset.x = e.clientX - orb.offsetLeft;
+            offset.y = e.clientY - orb.offsetTop;
+            orb.style.zIndex = 100;
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            orb.style.left = (e.clientX - offset.x) + 'px';
+            orb.style.top = (e.clientY - offset.y) + 'px';
+        });
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+    </script>
+
+</body>
+</html>

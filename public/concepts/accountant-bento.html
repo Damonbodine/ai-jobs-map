@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accountant | High-End Bento Concept</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --font-heading: 'Newsreader', serif;
+            --font-body: 'Manrope', sans-serif;
+            --bg-neutral: #F1F4F8;
+            --surface-glass: rgba(255, 255, 255, 0.7);
+            --primary: #004ae8;
+        }
+        body {
+            background-color: var(--bg-neutral);
+            color: #1a1c1e;
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        .bento-card {
+            background: var(--surface-glass);
+            backdrop-filter: blur(24px);
+            border-radius: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.82);
+            box-shadow: 0 20px 40px rgba(0, 74, 232, 0.02);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+        }
+        .bento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 30px 60px rgba(0, 74, 232, 0.04);
+        }
+        .text-editorial {
+            font-family: var(--font-heading);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="selection:bg-blue-100 italic font-heading">
+
+    <nav class="fixed top-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 bento-card rounded-full flex gap-12 text-[9px] font-black uppercase tracking-[0.3em] opacity-80 backdrop-blur-3xl">
+        <a href="sanctuary.html" class="hover:text-blue-600 transition-colors">The Vault</a>
+        <a href="#" class="text-blue-600">Accountant</a>
+        <a href="#" class="opacity-30 hover:opacity-100 transition-opacity">Task Map</a>
+    </nav>
+
+    <main class="max-w-6xl mx-auto pt-48 pb-60 px-8 space-y-8 relative">
+        
+        <!-- Header / Hero Bento -->
+        <div class="grid md:grid-cols-12 gap-6">
+            <div class="md:col-span-8 p-16 bento-card sky-gradient overflow-hidden relative min-h-[500px] flex flex-col justify-end">
+                <div class="absolute top-0 right-0 p-12 text-[20rem] font-black italic text-blue-600/5 select-none leading-none -translate-y-20">AI</div>
+                <div class="relative z-10 max-w-xl">
+                    <div class="inline-flex items-center gap-2 mb-6 px-4 py-1.5 bg-blue-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest leading-none">
+                        Occupational Health Score: High Impact
+                    </div>
+                    <h1 class="text-7xl font-black tracking-tighter leading-[0.9] text-slate-900 mb-8 font-editorial">
+                        The Accountant's <br><span class="text-blue-600">Recovery</span> Protocol.
+                    </h1>
+                    <p class="text-lg text-slate-500 opacity-80 max-w-md italic font-editorial leading-relaxed">
+                        Redefining precision through synthesized intelligence. 60 minutes regained for human context and strategy.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="md:col-span-4 grid gap-6">
+                <div class="bento-card p-10 flex flex-col items-center justify-center text-center bg-blue-600 text-white">
+                    <div class="text-[10px] uppercase font-black tracking-[0.4em] opacity-60 mb-2">Exposure</div>
+                    <div class="text-7xl font-black italic tracking-tighter">93%</div>
+                    <div class="mt-8 px-5 py-2 rounded-full border border-white/20 text-[9px] font-black uppercase tracking-widest">Synthesis Mode Active</div>
+                </div>
+                <div class="bento-card p-10 flex flex-col items-center justify-center text-center bg-white">
+                    <div class="text-[10px] uppercase font-black tracking-[0.4em] opacity-30 mb-2 text-slate-900">Task Complexity</div>
+                    <div class="text-5xl font-black italic tracking-tighter text-slate-900">Elite</div>
+                    <div class="text-[10px] font-black uppercase tracking-widest mt-4 opacity-20 text-slate-900">67 Validated Actions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric Bento Row -->
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="bento-card p-12 bg-white flex flex-col justify-between">
+                <div>
+                   <div class="text-[9px] font-black uppercase tracking-widest opacity-30 mb-10">Economic Impact</div>
+                   <h3 class="text-3xl font-black italic tracking-tighter text-slate-900 mb-6">High Potential</h3>
+                   <p class="text-sm italic text-slate-400 font-editorial leading-relaxed">Automation of repetitive ledger flows creates immediate capacity for high-value client advisory.</p>
+                </div>
+                <div class="mt-12 w-12 h-1 bg-blue-600 rounded-full"></div>
+            </div>
+
+            <div class="md:col-span-2 bento-card p-12 bg-white flex items-center justify-between gap-12">
+               <div class="max-w-xs">
+                   <div class="text-[9px] font-black uppercase tracking-widest opacity-30 mb-8 italic">The Recovery Arc</div>
+                   <h3 class="text-5xl font-black italic tracking-tighter text-slate-900 mb-6 leading-none">60 to 90m</h3>
+                   <p class="text-lg italic text-slate-500 font-editorial leading-relaxed">Bedtime minutes regained by automating daily financial close operations.</p>
+               </div>
+               <div class="flex-1 h-32 relative">
+                    <!-- Dynamic Sparkline simulation -->
+                    <svg viewBox="0 0 400 100" class="w-full h-full">
+                        <path d="M 0 80 Q 50 10 100 60 T 200 20 T 300 70 T 400 10" fill="none" stroke="#004ae8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" class="opacity-20"/>
+                        <circle cx="400" cy="10" r="6" fill="#004ae8" />
+                    </svg>
+               </div>
+            </div>
+        </div>
+
+        <!-- The Manuscript Drawer (Task Complexity) -->
+        <div class="bento-card p-24 bg-white relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-50 to-transparent pointer-events-none opacity-40"></div>
+            <div class="relative z-10 flex flex-col items-center text-center mb-20">
+                <div class="text-[9px] font-black uppercase tracking-[0.5em] opacity-40 mb-8 animate-pulse">Scanning the Task Map</div>
+                <h2 class="text-5xl font-black italic tracking-tighter leading-tight text-slate-900 max-w-2xl mb-12">
+                    Curing the density of <span class="text-blue-600">67 professional actions</span> through curated intelligence.
+                </h2>
+                <div class="h-12 w-px bg-slate-100"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-12 relative z-10 font-editorial">
+                {[
+                    { cat: 'Intake', name: 'Transaction Sorting', impact: '94%' },
+                    { cat: 'Analysis', name: 'Risk Assessment', impact: '82%' },
+                    { cat: 'Documentation', name: 'Tax Compliance', impact: '90%' },
+                    { cat: 'Coordination', name: 'Vendor Syncing', impact: '75%' },
+                    { cat: 'Exceptions', name: 'Fraud Detection', impact: '88%' },
+                    { cat: 'Analysis', name: 'Ledger Audit', impact: '96%' }
+                ].map((task, i) => (
+                    <div key={i} class="p-8 hover:bg-slate-50/50 rounded-3xl transition-all cursor-pointer border border-transparent hover:border-slate-100 flex flex-col gap-6">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[8px] font-black uppercase tracking-widest opacity-30">{task.cat}</span>
+                            <span class="text-[10px] font-black text-blue-600 italic">{task.impact} Efficiency</span>
+                        </div>
+                        <h4 class="text-2xl font-black text-slate-700 tracking-tight leading-none">{task.name}</h4>
+                        <p class="text-[11px] text-slate-400 italic font-editorial">Synthesizing raw data into decision-ready outcomes.</p>
+                    </div>
+                ))}
+            </div>
+
+            <div class="mt-20 flex justify-center">
+                <button class="bg-slate-950 text-white px-12 py-6 rounded-full font-black uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all">
+                    Expand Full Task Manuscript (67)
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="fixed bottom-12 left-0 right-0 flex justify-center p-8 z-50 pointer-events-none">
+        <div class="p-2 bento-card rounded-full pointer-events-auto shadow-2xl">
+            <button class="bg-blue-600 text-white px-16 py-6 rounded-full font-black uppercase tracking-widest text-[10px] hover:bg-blue-700 transition-all">
+                Initiate AI Evolution
+            </button>
+        </div>
+    </div>
+
+</body>
+</html>

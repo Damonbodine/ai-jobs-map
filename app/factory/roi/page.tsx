@@ -1,7 +1,20 @@
-import Link from 'next/link';
+'use client';
+
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { StatCard } from '@/components/ui/StatCard';
+import { 
+  Clock, 
+  CircleDollarSign, 
+  CheckCircle2, 
+  Bot, 
+  AlertTriangle,
+  Activity,
+  Zap,
+  ShieldCheck
+} from 'lucide-react';
 
 export default function ROIDashboard() {
-  // This would be dynamic in production based on user data
   const demoData = {
     userName: "Demo User",
     plan: "Growth Engine",
@@ -33,201 +46,254 @@ export default function ROIDashboard() {
 
   const maxHours = Math.max(...demoData.weeklyData.map(d => d.hours));
   
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  interface StatCardProps {
+    title: string;
+    value: string | number;
+    description: string;
+    icon?: React.ReactNode;
+  }
+
+  const itemVariants: any = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", bounce: 0, duration: 0.5 } }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-900">
-      {/* Header */}
-      <header className="border-b border-slate-700/50 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/factory" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">AI</span>
-            </div>
-            <span className="text-white font-semibold text-lg">AI Jobs Factory</span>
-          </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/factory" className="text-slate-300 hover:text-white transition-colors">
-              Packages
-            </Link>
-            <Link href="/factory/roi" className="text-emerald-400 font-medium">
-              ROI Dashboard
-            </Link>
-          </nav>
-        </div>
-      </header>
+    <div className="min-h-screen bg-slate-950 text-slate-50 relative selection:bg-cyan-500/30 overflow-x-hidden">
+      {/* Background glow effects */}
+      <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-emerald-600/10 blur-[150px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDuration: '7s' }} />
+      <div className="absolute bottom-[-20%] left-[-10%] w-[40%] h-[40%] bg-cyan-600/10 blur-[150px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDuration: '9s' }} />
 
-      <main className="px-4 py-8 max-w-7xl mx-auto">
-        {/* Welcome Banner */}
-        <div className="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 rounded-2xl p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-white mb-1">
-                Welcome back, {demoData.userName}!
-              </h1>
-              <p className="text-slate-400">
-                {demoData.plan} • Active for {demoData.daysActive} days
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-slate-400">Payback Progress</div>
-              <div className="text-3xl font-bold text-emerald-400">32%</div>
-              <div className="text-xs text-slate-500">of $7,497 investment</div>
-            </div>
-          </div>
-          <div className="mt-4 h-2 bg-slate-700 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-emerald-400 to-cyan-500"
-              style={{ width: '32%' }}
-            />
-          </div>
-          <p className="text-xs text-slate-500 mt-2">
-            At current pace, you'll have paid back your investment in ~60 more days
-          </p>
-        </div>
-
-        {/* Key Metrics */}
-        <div className="grid md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-400 text-sm">This Week</span>
-              <span className="text-2xl">⏱️</span>
-            </div>
-            <div className="text-3xl font-bold text-white">{demoData.metrics.hoursSavedThisWeek}h</div>
-            <div className="text-emerald-400 text-sm">hours saved</div>
-            <div className="text-slate-500 text-xs mt-1">+15% vs last week</div>
-          </div>
-          
-          <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-400 text-sm">Total Saved</span>
-              <span className="text-2xl">💰</span>
-            </div>
-            <div className="text-3xl font-bold text-emerald-400">${demoData.metrics.moneySavedTotal.toLocaleString()}</div>
-            <div className="text-slate-400 text-sm">value recovered</div>
-            <div className="text-emerald-400 text-xs mt-1">3.2× your investment</div>
-          </div>
-          
-          <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-400 text-sm">Success Rate</span>
-              <span className="text-2xl">✅</span>
-            </div>
-            <div className="text-3xl font-bold text-white">{demoData.metrics.successRate}%</div>
-            <div className="text-slate-400 text-sm">automation success</div>
-            <div className="text-emerald-400 text-xs mt-1">Self-healing working</div>
-          </div>
-          
-          <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-400 text-sm">Errors Fixed</span>
-              <span className="text-2xl">🤖</span>
-            </div>
-            <div className="text-3xl font-bold text-white">{demoData.metrics.errorsResolved}</div>
-            <div className="text-slate-400 text-sm">auto-recovered</div>
-            <div className="text-slate-500 text-xs mt-1">{demoData.metrics.avgRecoveryTime}s avg recovery</div>
-          </div>
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {/* Hours Saved Chart */}
-          <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-6">
-            <h2 className="text-lg font-bold text-white mb-4">Hours Saved Per Week</h2>
-            <div className="flex items-end gap-3 h-48">
-              {demoData.weeklyData.map((week, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center">
-                  <div 
-                    className="w-full bg-gradient-to-t from-emerald-500 to-cyan-500 rounded-t-lg"
-                    style={{ height: `${(week.hours / maxHours) * 100}%` }}
-                  />
-                  <div className="text-xs text-slate-500 mt-2">{week.week}</div>
-                  <div className="text-sm text-white font-medium">{week.hours}h</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Money Saved Chart */}
-          <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-6">
-            <h2 className="text-lg font-bold text-white mb-4">Value Recovered Per Week</h2>
-            <div className="flex items-end gap-3 h-48">
-              {demoData.weeklyData.map((week, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center">
-                  <div 
-                    className="w-full bg-gradient-to-t from-purple-500 to-pink-500 rounded-t-lg"
-                    style={{ height: `${(week.money / 700) * 100}%` }}
-                  />
-                  <div className="text-xs text-slate-500 mt-2">{week.week}</div>
-                  <div className="text-sm text-white font-medium">${week.money}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Top Automations */}
-        <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-6 mb-8">
-          <h2 className="text-lg font-bold text-white mb-4">Your Active Automations</h2>
-          <div className="space-y-3">
-            {demoData.topAutomations.map((auto, i) => (
-              <div 
-                key={i}
-                className={`flex items-center justify-between p-4 rounded-lg border ${
-                  auto.status === 'needs_attention' 
-                    ? 'bg-orange-500/10 border-orange-500/30' 
-                    : 'bg-slate-700/50 border-slate-600'
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`w-3 h-3 rounded-full ${auto.status === 'active' ? 'bg-emerald-400' : 'bg-orange-400'}`} />
+      <main className="px-4 py-12 md:py-16 max-w-7xl mx-auto relative z-10">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="space-y-8"
+        >
+          {/* Welcome Banner */}
+          <motion.div variants={itemVariants}>
+            <Card className="bg-slate-900/60 backdrop-blur-md overflow-hidden border-emerald-500/20 shadow-xl shadow-cyan-900/10">
+              <CardContent className="p-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div>
-                    <div className="text-white font-medium">{auto.name}</div>
-                    <div className="text-slate-500 text-sm">{auto.runs} runs this month</div>
+                    <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">
+                      Welcome back, {demoData.userName}!
+                    </h1>
+                    <div className="flex items-center gap-3 text-slate-400 font-medium">
+                      <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 shadow-inner">
+                        <Zap className="w-4 h-4 text-emerald-400" />
+                        {demoData.plan}
+                      </span>
+                      <span>Active for {demoData.daysActive} days</span>
+                    </div>
+                  </div>
+                  
+                  <div className="text-left md:text-right bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+                    <div className="text-sm font-medium text-slate-400 mb-1">Payback Progress</div>
+                    <div className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                      32%
+                    </div>
+                    <div className="text-xs text-slate-500 mt-1 font-medium tracking-wide">
+                      of $7,497 investment
+                    </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-emerald-400 font-semibold">{auto.timeSaved}h saved</div>
-                  <div className="text-slate-500 text-xs">
-                    {auto.status === 'needs_attention' ? '⚠️ Needs attention' : '✓ Running smoothly'}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Self-Healing Status */}
-        <div className="bg-gradient-to-r from-slate-800/80 to-slate-700/50 border border-slate-600 rounded-xl p-6">
-          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <span>🤖</span>
-            Self-Healing Bot Status
-          </h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-slate-900/50 rounded-lg">
-              <div className="text-2xl font-bold text-emerald-400">{demoData.metrics.errorsResolved}</div>
-              <div className="text-slate-400 text-sm">Errors Auto-Recovered</div>
-            </div>
-            <div className="text-center p-4 bg-slate-900/50 rounded-lg">
-              <div className="text-2xl font-bold text-white">{demoData.metrics.avgRecoveryTime}s</div>
-              <div className="text-slate-400 text-sm">Avg Recovery Time</div>
-            </div>
-            <div className="text-center p-4 bg-slate-900/50 rounded-lg">
-              <div className="text-2xl font-bold text-white">2</div>
-              <div className="text-slate-400 text-sm">Escalated to Humans</div>
-            </div>
+                <div className="mt-8 relative h-3 bg-slate-800 rounded-full overflow-hidden shadow-inner">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: '32%' }}
+                    transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-emerald-500 to-cyan-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
+                  />
+                </div>
+                <p className="text-sm font-medium text-slate-400 mt-4 flex items-center justify-center md:justify-start gap-2">
+                  <Activity className="w-4 h-4 text-cyan-400" />
+                  At current pace, you'll reach 100% ROI in ~60 days
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Key Metrics */}
+          <motion.div variants={itemVariants} className="grid md:grid-cols-4 gap-5">
+             <StatCard 
+               title="Hours Saved (Week)"
+               value={`${demoData.metrics.hoursSavedThisWeek}h`}
+               icon={<Clock className="w-5 h-5 text-emerald-400" />}
+               description="+15% vs last week"
+             />
+             <StatCard 
+               title="Value Recovered"
+               value={`$${demoData.metrics.moneySavedTotal.toLocaleString()}`}
+               icon={<CircleDollarSign className="w-5 h-5 text-cyan-400" />}
+               description="3.2x your investment"
+             />
+             <StatCard 
+               title="Success Rate"
+               value={`${demoData.metrics.successRate}%`}
+               icon={<CheckCircle2 className="w-5 h-5 text-emerald-400" />}
+               description="Across all automations"
+             />
+             <StatCard 
+               title="Errors Recovered"
+               value={demoData.metrics.errorsResolved}
+               icon={<Bot className="w-5 h-5 text-purple-400" />}
+               description={`${demoData.metrics.avgRecoveryTime}s avg recovery`}
+             />
+          </motion.div>
+
+          {/* Charts Section */}
+          <motion.div variants={itemVariants} className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-slate-900/50">
+              <CardHeader>
+                <CardTitle className="text-slate-200">Weekly Hours Saved</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-end gap-4 h-56 mt-4">
+                  {demoData.weeklyData.map((week, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center group relative">
+                      <div className="w-full flex justify-center mb-2 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8">
+                        <span className="bg-slate-800 text-white text-xs py-1 px-3 rounded shadow-lg font-bold border border-slate-700">
+                          {week.hours}h
+                        </span>
+                      </div>
+                      <motion.div 
+                        initial={{ height: 0 }}
+                        animate={{ height: `${(week.hours / maxHours) * 100}%` }}
+                        transition={{ duration: 0.8, delay: i * 0.1 }}
+                        className="w-full bg-gradient-to-t from-emerald-600/80 to-emerald-400 rounded-t-lg shadow-[0_0_10px_rgba(52,211,153,0.1)] group-hover:shadow-[0_0_15px_rgba(52,211,153,0.3)] group-hover:from-emerald-500 group-hover:to-cyan-400 transition-all cursor-pointer"
+                      />
+                      <div className="text-xs font-medium text-slate-500 mt-3">{week.week}</div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-900/50">
+              <CardHeader>
+                <CardTitle className="text-slate-200">Weekly Value Generated</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-end gap-4 h-56 mt-4">
+                  {demoData.weeklyData.map((week, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center group relative">
+                      <div className="w-full flex justify-center mb-2 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8">
+                        <span className="bg-slate-800 text-white text-xs py-1 px-3 rounded shadow-lg font-bold border border-slate-700">
+                          ${week.money}
+                        </span>
+                      </div>
+                      <motion.div 
+                        initial={{ height: 0 }}
+                        animate={{ height: `${(week.money / 700) * 100}%` }}
+                        transition={{ duration: 0.8, delay: i * 0.1 }}
+                        className="w-full bg-gradient-to-t from-cyan-600/80 to-cyan-400 rounded-t-lg shadow-[0_0_10px_rgba(34,211,238,0.1)] group-hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] group-hover:from-cyan-500 group-hover:to-cyan-300 transition-all cursor-pointer"
+                      />
+                      <div className="text-xs font-medium text-slate-500 mt-3">{week.week}</div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Top Automations and Bot Status */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            <motion.div variants={itemVariants} className="lg:col-span-2">
+              <Card className="h-full bg-slate-900/50">
+                <CardHeader>
+                  <CardTitle className="text-slate-200">Active Workflows</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {demoData.topAutomations.map((auto, i) => (
+                    <motion.div 
+                      key={i}
+                      whileHover={{ scale: 1.01 }}
+                      className={`flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-xl border ${
+                        auto.status === 'needs_attention' 
+                          ? 'bg-orange-500/5 border-orange-500/20' 
+                          : 'bg-slate-950/50 border-slate-800 hover:border-slate-700'
+                      } transition-colors`}
+                    >
+                      <div className="flex items-center gap-4 mb-3 sm:mb-0">
+                        <div className="relative flex h-3 w-3">
+                           {auto.status === 'active' && (
+                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-20"></span>
+                           )}
+                           <span className={`relative inline-flex rounded-full h-3 w-3 ${auto.status === 'active' ? 'bg-emerald-400' : 'bg-orange-400'}`}></span>
+                        </div>
+                        <div>
+                          <div className="text-slate-200 font-semibold">{auto.name}</div>
+                          <div className="text-slate-500 text-sm font-medium">{auto.runs} runs this month</div>
+                        </div>
+                      </div>
+                      
+                      <div className="sm:text-right flex items-center sm:items-end justify-between sm:flex-col sm:justify-center">
+                        <div className="text-cyan-400 font-bold tracking-tight">{auto.timeSaved}h saved</div>
+                        <div className={`text-xs font-medium flex items-center gap-1.5 ${auto.status === 'needs_attention' ? 'text-orange-400' : 'text-emerald-500/70'}`}>
+                          {auto.status === 'needs_attention' ? (
+                            <><AlertTriangle className="w-3.5 h-3.5" /> Needs attention</>
+                          ) : (
+                            <><CheckCircle2 className="w-3.5 h-3.5" /> Running smoothly</>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Self-Healing Status */}
+            <motion.div variants={itemVariants}>
+              <Card className="h-full bg-slate-900/50 border-cyan-500/20 shadow-lg shadow-cyan-900/10">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-cyan-400">
+                    <ShieldCheck className="w-5 h-5" />
+                    System Health
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="p-5 bg-slate-950/80 rounded-xl border border-slate-800 text-center">
+                      <div className="text-4xl font-black text-white mb-1">
+                        {demoData.metrics.errorsResolved}
+                      </div>
+                      <div className="text-slate-400 text-sm font-medium">Auto-Recoveries</div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 bg-slate-950/80 rounded-xl border border-slate-800 text-center">
+                        <div className="text-2xl font-bold text-white mb-1">{demoData.metrics.avgRecoveryTime}s</div>
+                        <div className="text-slate-500 text-xs font-medium">Avg Restart</div>
+                      </div>
+                      <div className="p-4 bg-slate-950/80 rounded-xl border border-slate-800 text-center">
+                        <div className="text-2xl font-bold text-slate-300 mb-1">2</div>
+                        <div className="text-slate-500 text-xs font-medium">Escalations</div>
+                      </div>
+                    </div>
+                    
+                    <p className="text-slate-500 text-sm font-medium leading-relaxed bg-slate-800/30 p-4 rounded-xl">
+                      The resilient auto-healing worker monitors automations 24/7. 
+                      Only critical unrecoverable states reach standard human escalation workflow.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
-          <p className="text-slate-500 text-sm mt-4 text-center">
-            The self-healing bot monitors your automations 24/7 and automatically recovers from errors.
-            Only critical issues that can't be resolved are escalated to our team.
-          </p>
-        </div>
+        </motion.div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-slate-800 px-4 py-12 mt-16">
-        <div className="max-w-7xl mx-auto text-center text-slate-500">
-          <p>AI Jobs Factory - Track your automation ROI</p>
-        </div>
-      </footer>
     </div>
   );
 }

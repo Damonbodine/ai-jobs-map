@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Header } from '@/components/ui/Header';
 
 export const metadata: Metadata = {
   title: 'AI Jobs Map - Discover AI Opportunities for Your Career',
@@ -10,5 +11,10 @@ export default function AIJobsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      <Header />
+      {children}
+    </>
+  );
 }

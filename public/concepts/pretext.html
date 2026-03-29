@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Digital Manuscript | Pretext Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --font-heading: 'Newsreader', serif;
+            --font-body: 'Manrope', sans-serif;
+            --bg-parchment: #F9F8F6;
+            --color-coral: #F87171;
+            --color-ink: #1A1C1B;
+        }
+        body {
+            background-color: var(--bg-parchment);
+            color: var(--color-ink);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+        }
+        .text-balance {
+            text-wrap: balance;
+        }
+    </style>
+</head>
+<body class="selection:bg-[#F87171]/20">
+
+    <nav class="fixed top-0 left-0 right-0 p-8 flex justify-between items-center z-50">
+        <div class="text-xs uppercase tracking-[0.4em] font-black opacity-30">Manuscript v1.0</div>
+        <div class="text-[10px] uppercase tracking-[0.2em] font-black text-[#F87171]">Powered by Pretext</div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto pt-32 pb-60 px-8 relative">
+        
+        <!-- Hero -->
+        <div class="relative mb-32">
+            <h1 class="text-[10rem] md:text-[14rem] font-black tracking-[-0.06em] leading-none text-black/5 absolute -top-16 -left-8 z-0 select-none opacity-50">
+                Accountants
+            </h1>
+            <div class="relative z-10 pt-16">
+                <div class="flex items-center gap-2 mb-4 text-[#F87171] font-black uppercase tracking-widest text-[10px]">
+                    <span class="w-2 h-2 rounded-full bg-[#F87171] animate-pulse"></span>
+                    Reclamation Protocol Active
+                </div>
+                <h2 class="text-6xl font-black tracking-tight leading-[1.05] max-w-xl font-heading italic">
+                    The Sanctuary of the <span class="text-[#F87171]">Reclaimed</span> Hour.
+                </h2>
+            </div>
+        </div>
+
+        <!-- Draggable Orb (Simulated with simple JS) -->
+        <div id="orb" class="fixed z-40 cursor-move pointer-events-auto" style="left: 60%; top: 40%;">
+            <div class="w-48 h-48 rounded-full bg-white shadow-2xl border border-[#F87171]/10 flex flex-col items-center justify-center text-center p-6 backdrop-blur-xl bg-white/80">
+                <div class="text-xs font-black uppercase tracking-widest text-[#F87171] mb-1">Recovery</div>
+                <div class="text-5xl font-black tracking-tighter">60m</div>
+                <div class="text-[9px] font-black uppercase tracking-widest mt-2 opacity-40">Daily Reclaimed</div>
+            </div>
+        </div>
+
+        <!-- Pretext Narrative (Simulated with high-fidelity CSS for the prototype) -->
+        <div class="relative z-30 max-w-2xl text-xl leading-[1.8] font-heading italic text-[#4B5563] space-y-8">
+            <p>In the early hours of a Tuesday morning, the silence of the accounting firm at 12th and Main isn't a sign of emptiness, but of deep, synthesized efficiency. The rhythmic tapping of keys has been replaced by the quiet hum of the Horizon Engine.</p>
+            
+            <p>Automation is no longer a threat; it is an architecture for human recovery. For the modern Accountant, the 'close' is no longer a weekend-stealing marathon. It is a background process, verified by AI but intended for the soul.</p>
+            
+            <p>When we talk about 60 minutes reclaimed, we aren't talking about productivity. We are talking about the sixty minutes you spend reading a story to your daughter without checking your phone. We are talking about the quiet morning where you actually taste your coffee.</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <div class="fixed bottom-0 left-0 right-0 p-12 flex justify-center z-50 pointer-events-none">
+        <button class="bg-[#1A1C1B] text-white px-10 py-5 rounded-full font-black uppercase tracking-widest text-[10px] shadow-2xl pointer-events-auto hover:scale-105 transition-transform">
+            Initialize Recovery
+        </button>
+    </div>
+
+    <script>
+        // Simple draggable mechanism for the prototype
+        const orb = document.getElementById('orb');
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+
+        orb.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offset.x = e.clientX - orb.offsetLeft;
+            offset.y = e.clientY - orb.offsetTop;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            orb.style.left = (e.clientX - offset.x) + 'px';
+            orb.style.top = (e.clientY - offset.y) + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+    </script>
+</body>
+</html>

@@ -23,6 +23,183 @@ const difficultyConfig: Record<string, { label: string; color: string }> = {
   advanced: { label: 'Advanced', color: 'text-red-400 bg-red-400/20' },
 };
 
+const frequencyMeta: Record<string, { label: string; dayWeight: number; tone: string }> = {
+  daily: { label: 'Daily', dayWeight: 1, tone: 'bg-cyan-500/12 text-cyan-300 border-cyan-500/20' },
+  weekly: { label: 'Weekly', dayWeight: 0.35, tone: 'bg-indigo-500/12 text-indigo-300 border-indigo-500/20' },
+  monthly: { label: 'Monthly', dayWeight: 0.12, tone: 'bg-violet-500/12 text-violet-300 border-violet-500/20' },
+  'as-needed': { label: 'As Needed', dayWeight: 0.18, tone: 'bg-slate-500/12 text-slate-300 border-slate-500/20' },
+};
+
+const workBlockDefinitions = {
+  intake: {
+    label: 'Intake & signal review',
+    tone: 'from-cyan-500/20 via-cyan-500/8 to-transparent',
+    border: 'border-cyan-500/20',
+    accent: 'text-cyan-300',
+    posture: 'Triage, collect, sort, and get the right signals into the workflow.',
+    humanEdge: 'People still decide what matters, what is urgent, and what deserves attention.',
+  },
+  analysis: {
+    label: 'Analysis & decision prep',
+    tone: 'from-indigo-500/20 via-indigo-500/8 to-transparent',
+    border: 'border-indigo-500/20',
+    accent: 'text-indigo-300',
+    posture: 'Summarize data, compare options, and prepare the next best recommendation.',
+    humanEdge: 'The final call still depends on context, tradeoffs, and professional judgment.',
+  },
+  documentation: {
+    label: 'Documentation & deliverables',
+    tone: 'from-violet-500/18 via-violet-500/8 to-transparent',
+    border: 'border-violet-500/20',
+    accent: 'text-violet-300',
+    posture: 'Draft the repeatable reports, layouts, summaries, and client-ready outputs.',
+    humanEdge: 'Humans refine voice, accuracy, and the final standard of quality.',
+  },
+  coordination: {
+    label: 'Coordination & follow-through',
+    tone: 'from-emerald-500/18 via-emerald-500/8 to-transparent',
+    border: 'border-emerald-500/20',
+    accent: 'text-emerald-300',
+    posture: 'Route next steps, chase decisions, and keep the work moving across people.',
+    humanEdge: 'Relationship management and stakeholder trust stay human-led.',
+  },
+  exceptions: {
+    label: 'Monitoring & exceptions',
+    tone: 'from-amber-500/18 via-amber-500/8 to-transparent',
+    border: 'border-amber-500/20',
+    accent: 'text-amber-300',
+    posture: 'Flag outliers, surface risks, and move edge cases into human review.',
+    humanEdge: 'Exception handling is where experience and judgment carry the most value.',
+  },
+} as const;
+
+const automationSolutionDefinitions = [
+  {
+    key: 'intake',
+    name: 'Intake Assistant',
+    strapline: 'Turn messy requests, forms, emails, and documents into a clean starting queue.',
+    watches: 'inboxes, submissions, requests, attachments, spreadsheets, and new records',
+    produces: 'prioritized queues, structured summaries, routed assignments, and clean handoffs',
+    review: 'humans keep priority, escalation, and final routing authority',
+    matchCategories: ['communication', 'task_automation'],
+    matchKeywords: ['collect', 'review', 'receive', 'screen', 'intake', 'request', 'capture', 'monitor'],
+  },
+  {
+    key: 'analysis',
+    name: 'Research Desk',
+    strapline: 'Bundle recurring analysis, comparison, and recommendation prep into one system.',
+    watches: 'datasets, briefs, vendor inputs, historical records, and recurring research prompts',
+    produces: 'comparison tables, recommendation memos, summaries, and decision-ready briefs',
+    review: 'humans still make the final call and set thresholds for risk',
+    matchCategories: ['research_discovery', 'decision_support', 'data_analysis'],
+    matchKeywords: ['analyze', 'evaluate', 'compare', 'research', 'assess', 'forecast', 'estimate', 'study'],
+  },
+  {
+    key: 'documentation',
+    name: 'Document Engine',
+    strapline: 'Generate the repeatable paperwork and deliverables that quietly eat the day.',
+    watches: 'notes, templates, source data, field inputs, and standard report formats',
+    produces: 'draft reports, plans, summaries, layouts, forms, and client-ready documents',
+    review: 'humans own final edits, accuracy checks, and sign-off',
+    matchCategories: ['creative_assistance', 'communication', 'task_automation'],
+    matchKeywords: ['design', 'draft', 'document', 'report', 'write', 'plan', 'layout', 'prepare'],
+  },
+  {
+    key: 'coordination',
+    name: 'Workflow Coordinator',
+    strapline: 'Keep follow-ups, reminders, approvals, and next steps moving without manual chasing.',
+    watches: 'status changes, due dates, approvals, inboxes, and collaboration tools',
+    produces: 'follow-ups, reminders, meeting prep, escalations, and routed tasks',
+    review: 'humans step in for sensitive communication and relationship moments',
+    matchCategories: ['communication', 'task_automation'],
+    matchKeywords: ['coordinate', 'schedule', 'follow', 'communicate', 'notify', 'update', 'track'],
+  },
+  {
+    key: 'exceptions',
+    name: 'Review Layer',
+    strapline: 'Catch edge cases and surface the right items for human judgment instead of manual scanning.',
+    watches: 'quality thresholds, exceptions, outliers, compliance checks, and unusual patterns',
+    produces: 'exception queues, flagged records, confidence scores, and review packets',
+    review: 'humans handle the exceptions rather than the whole stream',
+    matchCategories: ['decision_support', 'data_analysis', 'learning_education'],
+    matchKeywords: ['inspect', 'validate', 'verify', 'check', 'audit', 'test', 'monitor'],
+  },
+] as const;
+
+function polarToCartesian(cx: number, cy: number, r: number, angle: number) {
+  const radians = ((angle - 90) * Math.PI) / 180.0;
+  return {
+    x: cx + r * Math.cos(radians),
+    y: cy + r * Math.sin(radians),
+  };
+}
+
+function describeTaskLens(task: any) {
+  const meta = frequencyMeta[task.frequency] ?? frequencyMeta['as-needed'];
+  const impact = Number(task.ai_impact_level || 0);
+  const effort = Number(task.ai_effort_to_implement || 3);
+  const automationFactor = task.ai_applicable
+    ? Math.max(0.24, (impact * 0.18) + ((6 - effort) * 0.08))
+    : 0.06;
+  const modeledMinutesPerDay = Math.round(meta.dayWeight * 26 * automationFactor);
+
+  return {
+    ...meta,
+    impact,
+    effort,
+    automationFactor,
+    modeledMinutesPerDay,
+    modeledWeeklyMinutes: Math.round(modeledMinutesPerDay * 5),
+  };
+}
+
+function inferWorkBlock(task: any) {
+  const content = `${task.task_name || ''} ${task.task_description || ''} ${task.ai_how_it_helps || ''}`.toLowerCase();
+  const category = String(task.ai_category || '').toLowerCase();
+
+  if (
+    category === 'communication' ||
+    /(schedule|follow[- ]?up|coordinate|communicat|notify|respond|meeting|handoff|route)/.test(content)
+  ) {
+    return 'coordination';
+  }
+
+  if (
+    category === 'research_discovery' ||
+    category === 'data_analysis' ||
+    category === 'decision_support' ||
+    /(analy|evaluat|compare|research|assess|forecast|estimate|study|review options)/.test(content)
+  ) {
+    return 'analysis';
+  }
+
+  if (
+    category === 'creative_assistance' ||
+    /(design|draft|document|report|write|plan|layout|prepare|model)/.test(content)
+  ) {
+    return 'documentation';
+  }
+
+  if (
+    /(inspect|validate|verify|check|monitor|audit|compliance|quality|exception)/.test(content)
+  ) {
+    return 'exceptions';
+  }
+
+  return 'intake';
+}
+
+function toSentenceList(items: string[]) {
+  if (items.length === 0) return '';
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(', ')}, and ${items[items.length - 1]}`;
+}
+
+function formatMinutes(minutes: number) {
+  return `${minutes} min/day`;
+}
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
@@ -77,8 +254,8 @@ async function getGranularSkills(occupationId: number) {
        ms.difficulty_level,
        COUNT(tsm.id) as task_count,
        AVG(tsm.skill_proficiency_level) as avg_proficiency,
-       MAX(tsm.is_core_skill) as has_core,
-       MAX(tsm.is_differentiator_skill) as has_differentiator,
+       BOOL_OR(tsm.is_core_skill) as has_core,
+       BOOL_OR(tsm.is_differentiator_skill) as has_differentiator,
        AVG(tsm.ai_dependence_score) as avg_ai_dependence
      FROM task_skill_mapping tsm
      JOIN micro_skills ms ON tsm.micro_skill_id = ms.id
@@ -98,6 +275,37 @@ async function getSkillProfile(occupationId: number) {
     [occupationId]
   );
   return result.rows[0] || null;
+}
+
+async function getOnetTasks(occupationId: number) {
+  const result = await pool.query(
+    `SELECT id, task_title, task_description, gwa_title, task_type, ai_automatable, ai_automation_score, estimated_time_saved_percent
+     FROM onet_tasks
+     WHERE occupation_id = $1
+     ORDER BY ai_automation_score DESC NULLS LAST, task_type ASC
+     LIMIT 18`,
+    [occupationId]
+  );
+  return result.rows;
+}
+
+async function getRoleAlignedPackages(occupationTitle: string) {
+  const result = await pool.query(
+    `SELECT package_code, package_name, package_description, tier, base_price, monthly_price, includes_integrations, roi_multiplier
+     FROM automation_packages
+     WHERE $1 = ANY(target_occupations)
+     ORDER BY
+       CASE tier
+         WHEN 'starter' THEN 1
+         WHEN 'growth' THEN 2
+         WHEN 'enterprise' THEN 3
+         ELSE 4
+       END,
+       base_price ASC
+     LIMIT 3`,
+    [occupationTitle]
+  );
+  return result.rows;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -122,48 +330,149 @@ export default async function OccupationPage({ params }: PageProps) {
     notFound();
   }
 
-  const opportunities = await getOpportunities(occupation.id);
   const skills = await getSkills(occupation.id);
   const microTasks = await getMicroTasks(occupation.id);
   const granularSkills = await getGranularSkills(occupation.id);
   const skillProfile = await getSkillProfile(occupation.id);
+  const roleAlignedPackages = await getRoleAlignedPackages(occupation.title);
+  const taskEntries = microTasks.map((task: any) => ({
+    ...task,
+    lens: describeTaskLens(task),
+    workBlock: inferWorkBlock(task),
+  }));
+  const aiApplicableTasks = taskEntries.filter((task: any) => task.ai_applicable);
+  const topRecoverableTasks = [...aiApplicableTasks]
+    .sort((a: any, b: any) => b.lens.modeledMinutesPerDay - a.lens.modeledMinutesPerDay)
+    .slice(0, 10);
+  const modeledMinutesRecoveredPerDay = topRecoverableTasks.reduce(
+    (sum: number, task: any) => sum + task.lens.modeledMinutesPerDay,
+    0
+  );
+  const oneHourTargetProgress = Math.min(100, Math.round((modeledMinutesRecoveredPerDay / 60) * 100));
+  const oneHourNarrative =
+    modeledMinutesRecoveredPerDay >= 60
+      ? 'This role has a credible path to getting back one hour per day by streamlining routine work.'
+      : 'This role has meaningful automation pockets, but the biggest win is bundling several routine tasks together.';
+  const categoryMix = Object.entries(
+    aiApplicableTasks.reduce((acc: Record<string, number>, task: any) => {
+      const key = task.ai_category || 'task_automation';
+      acc[key] = (acc[key] || 0) + task.lens.modeledMinutesPerDay;
+      return acc;
+    }, {})
+  )
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
 
-  // Calculate AI readiness based on micro-tasks with AI
-  const aiApplicableTasks = microTasks.filter((t: any) => t.ai_applicable && t.ai_impact_level);
-  const readinessScore = aiApplicableTasks.length > 0
-    ? Math.round(
-        (aiApplicableTasks.reduce((sum: number, t: any) => sum + (t.ai_impact_level || 0), 0) / 
-         aiApplicableTasks.length) * 20
-      )
-    : null;
+  const wheelTasks = topRecoverableTasks.slice(0, 8);
+  const wheelSegments = wheelTasks.map((task: any, index: number) => {
+    const startAngle = (index / wheelTasks.length) * 360;
+    const endAngle = ((index + 1) / wheelTasks.length) * 360;
+    const outerRadius = 118;
+    const innerRadius = 60;
+    const startOuter = polarToCartesian(140, 140, outerRadius, endAngle);
+    const endOuter = polarToCartesian(140, 140, outerRadius, startAngle);
+    const startInner = polarToCartesian(140, 140, innerRadius, endAngle);
+    const endInner = polarToCartesian(140, 140, innerRadius, startAngle);
+    const largeArcFlag = endAngle - startAngle > 180 ? 1 : 0;
+    const path = [
+      `M ${startOuter.x} ${startOuter.y}`,
+      `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 0 ${endOuter.x} ${endOuter.y}`,
+      `L ${endInner.x} ${endInner.y}`,
+      `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 1 ${startInner.x} ${startInner.y}`,
+      'Z',
+    ].join(' ');
+
+    const palette = ['#34d399', '#22d3ee', '#38bdf8', '#818cf8', '#a78bfa', '#f59e0b', '#fb7185', '#14b8a6'];
+
+    return {
+      label: task.task_name,
+      value: task.lens.modeledMinutesPerDay,
+      path,
+      color: palette[index % palette.length],
+    };
+  });
+
+  const blockMap = taskEntries.reduce((acc: Record<string, any>, task: any) => {
+    const key = task.workBlock;
+    if (!acc[key]) {
+      acc[key] = {
+        key,
+        ...workBlockDefinitions[key as keyof typeof workBlockDefinitions],
+        tasks: [],
+        minutes: 0,
+        aiMinutes: 0,
+      };
+    }
+
+    acc[key].tasks.push(task);
+    acc[key].minutes += task.lens.modeledMinutesPerDay;
+    if (task.ai_applicable) {
+      acc[key].aiMinutes += task.lens.modeledMinutesPerDay;
+    }
+    return acc;
+  }, {});
+
+  const workBlocks = Object.values(blockMap)
+    .sort((a: any, b: any) => b.minutes - a.minutes)
+    .slice(0, 5)
+    .map((block: any) => ({
+      ...block,
+      tasks: block.tasks.sort((a: any, b: any) => b.lens.modeledMinutesPerDay - a.lens.modeledMinutesPerDay),
+      percentOfRecovery: modeledMinutesRecoveredPerDay > 0
+        ? Math.round((block.aiMinutes / modeledMinutesRecoveredPerDay) * 100)
+        : 0,
+    }));
+
+  const dailyNarrative = workBlocks.length > 0
+    ? `A typical ${occupation.title.toLowerCase()} day in this model revolves around ${toSentenceList(workBlocks.slice(0, 3).map((block: any) => block.label.toLowerCase()))}. The best automation story is not replacing the job, but bundling the repetitive pieces inside those blocks so the human can stay with judgment, exceptions, and final accountability.`
+    : `This role still needs deeper day mapping, but the core product story should focus on repetitive work that can be bundled into one hour back per day.`;
+
+  const automationSolutions = automationSolutionDefinitions
+    .map((product) => {
+      const matchingTasks = taskEntries.filter((task: any) => {
+        const content = `${task.task_name} ${task.task_description} ${task.ai_how_it_helps || ''}`.toLowerCase();
+        return (
+          (product.matchCategories as readonly string[]).includes(String(task.ai_category || '')) ||
+          product.matchKeywords.some((keyword) => content.includes(keyword))
+        );
+      });
+
+      const totalMinutes = matchingTasks.reduce((sum: number, task: any) => sum + task.lens.modeledMinutesPerDay, 0);
+      const matchedBlocks = [...new Set(matchingTasks.map((task: any) => task.workBlock))]
+        .map((blockKey) => workBlockDefinitions[blockKey as keyof typeof workBlockDefinitions].label);
+
+      return {
+        ...product,
+        matchingTasks,
+        totalMinutes,
+        matchedBlocks,
+      };
+    })
+    .filter((product) => product.matchingTasks.length > 0)
+    .sort((a, b) => b.totalMinutes - a.totalMinutes)
+    .slice(0, 4);
+  const summaryBlocks = workBlocks.slice(0, 3);
+  const priorityTasks = topRecoverableTasks.slice(0, 3);
+  const primarySolutions = automationSolutions.slice(0, 1);
+  const skillSummary = skillProfile
+    ? [
+        { label: 'Core skills', value: skillProfile.core_skills_count || granularSkills.filter((s: any) => s.has_core).length },
+        { label: 'Human differentiators', value: skillProfile.human_differentiator_skills_count || granularSkills.filter((s: any) => s.has_differentiator).length },
+        { label: 'Automation-supporting skills', value: skillProfile.automatable_skills_count || granularSkills.filter((s: any) => parseFloat(s.avg_ai_dependence || 0) > 0.5).length },
+      ]
+    : [];
+  const visibleSkillSummary = skillSummary.filter((item) => item.value > 0);
+  const humanEdgeNotes = [...new Set(summaryBlocks.map((block: any) => block.humanEdge))].slice(0, 2);
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      {/* Header */}
-      <header className="border-b border-slate-700/50 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/ai-jobs" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">AI</span>
-            </div>
-            <span className="text-white font-semibold text-lg">AI Jobs Map</span>
-          </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/ai-jobs" className="text-slate-300 hover:text-white transition-colors">
-              Search
-            </Link>
-            <Link href="/ai-jobs/browse" className="text-slate-300 hover:text-white transition-colors">
-              Browse
-            </Link>
-          </nav>
-        </div>
-      </header>
+    <div className="app-shell text-slate-50">
+      <div className="absolute top-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full bg-emerald-600/10 blur-[140px] pointer-events-none animate-pulse-glow" style={{ animationDuration: '7s' }} />
+      <div className="absolute bottom-[-10%] right-[-10%] h-[30%] w-[30%] rounded-full bg-cyan-600/10 blur-[140px] pointer-events-none animate-pulse-glow" style={{ animationDuration: '9s' }} />
 
-      {/* Hero Section */}
-      <section className="px-4 py-12 max-w-7xl mx-auto">
+      <section className="page-container relative z-10 py-12 md:py-16">
         <Link 
           href="/ai-jobs"
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8"
+          className="mb-8 inline-flex items-center gap-2 text-slate-400 transition-colors hover:text-white"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -171,247 +480,356 @@ export default async function OccupationPage({ params }: PageProps) {
           Back to Search
         </Link>
 
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
-          <div>
-            <div className="text-emerald-400 font-medium mb-2">{occupation.major_category}</div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
+          <div className="panel rounded-[2rem] p-7 md:p-8">
+            <div className="eyebrow mb-5">{occupation.major_category}</div>
+            <h1 className="text-4xl font-black tracking-tight text-white md:text-5xl">
               {occupation.title}
             </h1>
             {occupation.employment && (
-              <div className="text-slate-400 mb-4">
+              <div className="mt-4 text-slate-400">
                 {Number(occupation.employment).toLocaleString()} workers in the US
               </div>
             )}
+            <p className="mt-5 max-w-3xl text-slate-400 leading-8">
+              Explore the day-to-day tasks, skill breakdown, and AI opportunity profile for this occupation.
+            </p>
           </div>
 
-          {readinessScore !== null && (
-            <div className="bg-slate-800/80 border border-slate-700 rounded-2xl p-6 text-center min-w-[200px]">
-              <div className="text-5xl font-bold text-emerald-400 mb-2">{readinessScore}</div>
-              <div className="text-slate-400">AI Readiness Score</div>
-              <div className="text-sm text-slate-500 mt-1">
-                Based on {opportunities.length} AI opportunities
-              </div>
+          <div className="panel rounded-[2rem] p-6 text-center">
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Daily recovery model</div>
+            <div className="mt-3 text-6xl font-black text-emerald-400">{modeledMinutesRecoveredPerDay}</div>
+            <div className="mt-2 text-slate-300">Minutes we can realistically target</div>
+            <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-900/80">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-sky-400"
+                style={{ width: `${oneHourTargetProgress}%` }}
+              />
             </div>
-          )}
+            <div className="mt-3 text-sm text-slate-500">
+              {Math.min(modeledMinutesRecoveredPerDay, 60)} of 60 minutes/day target
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Main Content */}
-      <main className="px-4 max-w-7xl mx-auto">
-        {/* Micro-Tasks with AI Mapping */}
-        <section className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-              <span className="text-2xl">📋</span>
-              Day-to-Day Tasks & AI Opportunities
-            </h2>
-            <div className="text-sm text-slate-400">
-              {microTasks.length} tasks • {microTasks.filter((t: any) => t.ai_applicable).length} AI-enabled
+      <main className="page-container relative z-10 space-y-10 pb-16">
+        <section className="panel rounded-[2rem] p-7 md:p-8">
+          <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)] xl:items-center">
+            <div className="mx-auto flex w-full max-w-[320px] items-center justify-center">
+              <svg viewBox="0 0 280 280" className="w-full">
+                <circle cx="140" cy="140" r="122" fill="rgba(15,23,42,0.55)" stroke="rgba(148,163,184,0.12)" />
+                {wheelSegments.map((segment) => (
+                  <path
+                    key={segment.label}
+                    d={segment.path}
+                    fill={segment.color}
+                    fillOpacity="0.88"
+                    stroke="rgba(2,6,23,0.7)"
+                    strokeWidth="2"
+                  />
+                ))}
+                <circle cx="140" cy="140" r="58" fill="rgba(2,6,23,0.92)" stroke="rgba(148,163,184,0.1)" />
+                <text x="140" y="126" textAnchor="middle" className="fill-slate-400 text-[11px] font-semibold tracking-[0.18em] uppercase">
+                  Daily Recovery
+                </text>
+                <text x="140" y="155" textAnchor="middle" className="fill-white text-[34px] font-black">
+                  {modeledMinutesRecoveredPerDay}m
+                </text>
+                <text x="140" y="176" textAnchor="middle" className="fill-emerald-300 text-[12px] font-semibold">
+                  Targeting one hour back
+                </text>
+              </svg>
+            </div>
+
+            <div className="space-y-6">
+              <div className="max-w-3xl">
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">One-hour-back snapshot</div>
+                <h2 className="mt-2 text-3xl font-black text-white">Where the day goes and where to start</h2>
+                <p className="mt-3 text-base leading-8 text-slate-300">{oneHourNarrative}</p>
+                <p className="mt-3 text-sm leading-7 text-slate-400">{dailyNarrative}</p>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.85fr)]">
+                <div className="rounded-[1.4rem] border border-slate-800/75 bg-slate-950/35 p-5">
+                  <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Best places to start</div>
+                  <div className="mt-4 space-y-3">
+                    {categoryMix.map(([category, minutes]) => {
+                      const config = opportunityCategoryConfig[category] || { label: 'Automation', color: 'bg-slate-500', icon: '✨' };
+                      return (
+                        <div key={category} className="flex items-center justify-between gap-4 rounded-[1rem] border border-slate-800/70 bg-slate-950/45 px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <span className={`flex h-10 w-10 items-center justify-center rounded-2xl ${config.color}`}>
+                              {config.icon}
+                            </span>
+                            <div>
+                              <div className="font-semibold text-white">{config.label}</div>
+                              <div className="text-xs text-slate-500">Early automation theme</div>
+                            </div>
+                          </div>
+                          <div className="text-xl font-black text-emerald-300">{minutes}m</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="rounded-[1.4rem] border border-slate-800/75 bg-slate-950/35 p-5">
+                  <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Top routines</div>
+                  <div className="mt-4 grid gap-2">
+                    {priorityTasks.map((task: any, index: number) => (
+                      <div key={task.id} className="flex items-center justify-between gap-3 rounded-[1rem] border border-slate-800/70 bg-slate-950/45 px-4 py-3">
+                        <div className="min-w-0">
+                          <div className="text-sm font-semibold text-white">{index + 1}. {task.task_name}</div>
+                          <div className="text-xs text-slate-500">{task.lens.label}</div>
+                        </div>
+                        <div className="shrink-0 rounded-full border border-cyan-500/20 bg-cyan-500/8 px-3 py-1 text-sm font-bold text-cyan-300">
+                          {task.lens.modeledMinutesPerDay}m
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          
-          {microTasks.length > 0 ? (
-            <div className="space-y-4">
-              {microTasks.map((task: any) => {
-                const config = opportunityCategoryConfig[task.ai_category || 'task_automation'] || {
-                  label: 'Task Automation',
-                  color: 'bg-gray-500',
-                  icon: '✨'
-                };
-                const frequencyColors: Record<string, string> = {
-                  daily: 'text-green-400 bg-green-400/20',
-                  weekly: 'text-blue-400 bg-blue-400/20',
-                  monthly: 'text-purple-400 bg-purple-400/20',
-                  'as-needed': 'text-slate-400 bg-slate-400/20',
-                };
-                
-                return (
-                  <div 
-                    key={task.id}
-                    className={`border rounded-xl p-5 transition-all ${
-                      task.ai_applicable 
-                        ? 'bg-slate-800/80 border-slate-700 hover:border-emerald-500/30' 
-                        : 'bg-slate-800/40 border-slate-700/50 opacity-75'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-4 mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-lg font-semibold text-white">{task.task_name}</h3>
-                          <span className={`px-2 py-0.5 rounded text-xs ${frequencyColors[task.frequency] || frequencyColors['as-needed']}`}>
-                            {task.frequency}
-                          </span>
-                        </div>
-                        <p className="text-slate-400 text-sm">{task.task_description}</p>
-                      </div>
-                      {task.ai_applicable && (
-                        <div className="flex gap-3 text-sm shrink-0">
-                          <div className="text-center">
-                            <div className="text-emerald-400 font-semibold">{task.ai_impact_level}/5</div>
-                            <div className="text-slate-500">Impact</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-orange-400 font-semibold">{task.ai_effort_to_implement}/5</div>
-                            <div className="text-slate-500">Effort</div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {task.ai_applicable && task.ai_how_it_helps && (
-                      <div className="mt-3 pt-3 border-t border-slate-700">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-lg">{config.icon}</span>
-                          <span className={`px-2 py-0.5 rounded text-xs text-white ${config.color}`}>
-                            {config.label}
-                          </span>
-                        </div>
-                        <p className="text-emerald-300/80 text-sm mb-2">{task.ai_how_it_helps}</p>
-                        {task.ai_tools && (
-                          <p className="text-slate-500 text-xs">
-                            <span className="text-slate-400">Tools:</span> {task.ai_tools}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                    
-                    {!task.ai_applicable && (
-                      <div className="mt-2 text-slate-500 text-sm italic">
-                        AI does not apply to this task
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-12 text-center">
-              <div className="text-4xl mb-4">🤖</div>
-              <h3 className="text-xl font-semibold text-white mb-2">Micro-Task Analysis Coming Soon</h3>
-              <p className="text-slate-400 max-w-md mx-auto">
-                We&apos;re analyzing the day-to-day tasks for this occupation to identify specific AI opportunities.
-              </p>
-            </div>
-          )}
         </section>
 
-        {/* Granular Skill Breakdown */}
-        {granularSkills.length > 0 && (
-          <section className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                <span className="text-2xl">🔍</span>
-                Deep Skill Analysis
-              </h2>
-              <div className="text-sm text-slate-400">
-                {granularSkills.length} unique skills • {granularSkills.filter((s: any) => s.has_differentiator).length} human differentiators
+        <section className="space-y-4">
+          <details className="panel group rounded-[2rem] p-7 md:p-8">
+            <summary className="flex cursor-pointer list-none flex-col gap-3 marker:content-none md:flex-row md:items-end md:justify-between">
+              <div className="max-w-3xl">
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Day architecture</div>
+                <h2 className="mt-2 text-3xl font-black text-white">The routines that shape the day</h2>
+                <p className="mt-3 text-slate-400 leading-8">
+                  Open this if you want the fuller shape of the role. It is helpful context, but most people can start with the priority routines below.
+                </p>
               </div>
-            </div>
+              <div className="flex items-center gap-3 text-sm text-slate-400">
+                <span>View supporting context</span>
+                <span className="rounded-full border border-slate-700/70 bg-slate-950/45 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 transition-transform duration-200 group-open:rotate-180">
+                  ↓
+                </span>
+              </div>
+            </summary>
 
-            {/* Skill Profile Summary */}
-            {skillProfile && (
-              <div className="grid md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/30 rounded-xl p-4">
-                  <div className="text-3xl font-bold text-emerald-400">{skillProfile.total_unique_skills || granularSkills.length}</div>
-                  <div className="text-slate-400 text-sm">Total Skills</div>
+            <div className="mt-6 grid gap-4 lg:grid-cols-3">
+              {summaryBlocks.map((block: any) => (
+                <div
+                  key={block.key}
+                  className={`rounded-[1.35rem] border bg-gradient-to-br ${block.tone} ${block.border} p-5`}
+                >
+                  <div className={`text-sm font-semibold uppercase tracking-[0.16em] ${block.accent}`}>
+                    {block.label}
+                  </div>
+                  <div className="mt-3 text-3xl font-black text-white">{formatMinutes(block.aiMinutes)}</div>
+                  <p className="mt-3 text-sm leading-7 text-slate-300">{block.posture}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {block.tasks.slice(0, 2).map((task: any) => (
+                      <span key={task.id} className="rounded-full border border-slate-700/80 bg-slate-950/45 px-3 py-1 text-xs text-slate-300">
+                        {task.task_name}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/30 rounded-xl p-4">
-                  <div className="text-3xl font-bold text-blue-400">{skillProfile.core_skills_count || granularSkills.filter((s: any) => s.has_core).length}</div>
-                  <div className="text-slate-400 text-sm">Core Skills</div>
-                </div>
-                <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/30 rounded-xl p-4">
-                  <div className="text-3xl font-bold text-purple-400">{skillProfile.automatable_skills_count || granularSkills.filter((s: any) => parseFloat(s.avg_ai_dependence || 0) > 0.5).length}</div>
-                  <div className="text-slate-400 text-sm">AI Automatable</div>
-                </div>
-                <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/10 border border-orange-500/30 rounded-xl p-4">
-                  <div className="text-3xl font-bold text-orange-400">{skillProfile.human_differentiator_skills_count || granularSkills.filter((s: any) => s.has_differentiator).length}</div>
-                  <div className="text-slate-400 text-sm">Human Differentiators</div>
-                </div>
+              ))}
+            </div>
+          </details>
+
+          <details open className="group space-y-4">
+            <summary className="flex cursor-pointer list-none flex-col gap-2 marker:content-none md:flex-row md:items-end md:justify-between">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Priority routines</div>
+                <h2 className="mt-2 text-3xl font-black text-white">The first tasks worth redesigning</h2>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-slate-400">
+                <span>Showing the top {priorityTasks.length} routines with the clearest time-back potential</span>
+                <span className="rounded-full border border-slate-700/70 bg-slate-950/45 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 transition-transform duration-200 group-open:rotate-180">
+                  ↓
+                </span>
+              </div>
+            </summary>
+
+            {priorityTasks.length > 0 ? (
+              <div className="grid gap-3">
+                {priorityTasks.map((task: any) => {
+                  const config = opportunityCategoryConfig[task.ai_category || 'task_automation'] || {
+                    label: 'Task Automation',
+                    color: 'bg-slate-500',
+                    icon: '✨'
+                  };
+
+                  return (
+                    <div
+                      key={task.id}
+                      className={`rounded-[1.35rem] border p-4 transition-all ${
+                        task.ai_applicable
+                          ? 'border-slate-800/75 bg-slate-900/58'
+                          : 'border-slate-800/60 bg-slate-900/40 opacity-80'
+                      }`}
+                    >
+                      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start">
+                        <div className="max-w-3xl">
+                          <div className="mb-2 flex flex-wrap items-center gap-2">
+                            <h3 className="text-xl font-bold text-white">{task.task_name}</h3>
+                            <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] ${task.lens.tone}`}>
+                              {task.lens.label}
+                            </span>
+                          </div>
+                          <p className="text-slate-400 leading-7">{task.task_description}</p>
+
+                          {task.ai_applicable && task.ai_how_it_helps ? (
+                            <div className="mt-4 rounded-[1rem] border border-slate-800/75 bg-slate-950/40 p-3.5">
+                              <div className="mb-2 flex items-center gap-2">
+                                <span className="text-lg">{config.icon}</span>
+                                <span className={`rounded-full px-3 py-1 text-xs font-semibold text-white ${config.color}`}>
+                                  {config.label}
+                                </span>
+                              </div>
+                              <p className="text-sm leading-7 text-emerald-200/90">{task.ai_how_it_helps}</p>
+                            </div>
+                          ) : (
+                            <div className="mt-4 text-sm italic text-slate-500">
+                              This task is less likely to be an early automation candidate.
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                          <div className="rounded-[1rem] border border-slate-800/75 bg-slate-950/45 p-4">
+                            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Time-back potential</div>
+                            <div className="mt-2 text-3xl font-black text-cyan-300">{task.lens.modeledMinutesPerDay}m</div>
+                            <div className="mt-1 text-sm text-slate-500">per day</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="panel rounded-[2rem] p-12 text-center">
+                <div className="mb-4 text-4xl">🤖</div>
+                <h3 className="mb-2 text-xl font-semibold text-white">Task analysis coming soon</h3>
+                <p className="mx-auto max-w-md text-slate-400">
+                  We&apos;re still mapping the day-to-day work for this occupation before we can estimate recoverable time.
+                </p>
               </div>
             )}
-            
-            {/* Skills by Category */}
-            <div className="space-y-6">
-              {['Technical', 'Analytical', 'Management', 'Communication', 'Soft Skills', 'Financial', 'Sales and Marketing'].map(category => {
-                const categorySkills = granularSkills.filter((s: any) => s.category === category);
-                if (categorySkills.length === 0) return null;
-                
-                return (
-                  <div key={category} className="bg-slate-800/80 border border-slate-700 rounded-xl p-5">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <span className="text-lg">
-                        {category === 'Technical' ? '💻' : 
-                         category === 'Analytical' ? '📊' :
-                         category === 'Management' ? '📈' :
-                         category === 'Communication' ? '💬' :
-                         category === 'Soft Skills' ? '🧠' :
-                         category === 'Financial' ? '💰' : '🎯'}
-                      </span>
-                      {category}
-                      <span className="text-slate-500 text-sm font-normal">({categorySkills.length} skills)</span>
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {categorySkills.map((skill: any) => {
-                        const aiDep = parseFloat(skill.avg_ai_dependence || 0);
-                        const isCore = skill.has_core;
-                        const isDiff = skill.has_differentiator;
-                        
-                        return (
-                          <div 
-                            key={skill.id}
-                            className={`px-3 py-2 rounded-lg border ${
-                              isDiff 
-                                ? 'bg-orange-500/10 border-orange-500/30' 
-                                : aiDep > 0.5 
-                                  ? 'bg-emerald-500/10 border-emerald-500/30'
-                                  : 'bg-slate-700/50 border-slate-600'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="text-white text-sm font-medium">{skill.skill_name}</span>
-                              {isCore && <span className="text-xs bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded">core</span>}
-                              {isDiff && <span className="text-xs bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded">human</span>}
-                            </div>
-                            <div className="flex items-center gap-2 mt-1">
-                              <div className="w-16 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                                <div 
-                                  className={`h-full ${aiDep > 0.5 ? 'bg-emerald-400' : 'bg-slate-500'}`}
-                                  style={{ width: `${aiDep * 100}%` }}
-                                />
-                              </div>
-                              <span className="text-xs text-slate-500">{Math.round(aiDep * 100)}% AI</span>
-                              <span className="text-xs text-slate-500">•</span>
-                              <span className="text-xs text-slate-500">Prof: {Math.round(skill.avg_proficiency || 0)}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+          </details>
+        </section>
+
+        <section className="space-y-6">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Recommended solutions</div>
+              <h2 className="mt-2 text-3xl font-black text-white">The best-fit solution path</h2>
+            </div>
+            <div className="text-sm text-slate-400">A single recommendation tied directly to the strongest routine cluster.</div>
+          </div>
+
+          <div className="grid gap-4">
+            {primarySolutions.map((product) => (
+              <div key={product.name} className="panel rounded-[1.6rem] p-6">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="max-w-2xl">
+                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">Recommended system</div>
+                    <h3 className="mt-2 text-2xl font-black text-white">{product.name}</h3>
+                    <p className="mt-3 text-slate-300 leading-7">{product.strapline}</p>
                   </div>
-                );
-              })}
+                  <div className="rounded-[1rem] border border-emerald-500/15 bg-emerald-500/6 px-4 py-3 text-right">
+                    <div className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-300">Modeled time back</div>
+                    <div className="mt-1 text-3xl font-black text-white">{product.totalMinutes}m</div>
+                    <div className="text-xs text-slate-500">per day from matching routines</div>
+                  </div>
+                </div>
+
+                <div className="mt-5 grid gap-4 md:grid-cols-3">
+                  <div className="rounded-[1.1rem] border border-slate-800/75 bg-slate-950/45 p-4">
+                    <div className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Watches</div>
+                    <p className="mt-2 text-sm leading-6 text-slate-300">{product.watches}</p>
+                  </div>
+                  <div className="rounded-[1.1rem] border border-slate-800/75 bg-slate-950/45 p-4">
+                    <div className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Produces</div>
+                    <p className="mt-2 text-sm leading-6 text-slate-300">{product.produces}</p>
+                  </div>
+                  <div className="rounded-[1.1rem] border border-slate-800/75 bg-slate-950/45 p-4">
+                    <div className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Human checkpoint</div>
+                    <p className="mt-2 text-sm leading-6 text-slate-300">{product.review}</p>
+                  </div>
+                </div>
+
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {product.matchedBlocks.map((blockLabel) => (
+                    <span key={blockLabel} className="rounded-full border border-slate-700/80 bg-slate-900/50 px-3 py-1 text-xs text-slate-300">
+                      {blockLabel}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-4 text-sm text-slate-500">
+                  Best matched routines: {product.matchingTasks.slice(0, 3).map((task: any) => task.task_name).join(' • ')}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {visibleSkillSummary.length > 0 && (
+          <section className="space-y-6">
+            <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Human edge</div>
+                <h2 className="mt-2 text-3xl font-black text-white">What still belongs to the person</h2>
+              </div>
+              <div className="text-sm text-slate-400">A compact view of what should stay human-led.</div>
+            </div>
+
+            <div className="panel rounded-[1.4rem] p-6">
+              <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_320px] md:items-start">
+                <div>
+                  <p className="text-slate-300 leading-7">
+                    The goal here is not to automate away judgment. It is to remove the repetitive setup around the work so the person can stay with context, edge cases, trust, and final decisions.
+                  </p>
+                  {humanEdgeNotes.length > 0 && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {humanEdgeNotes.map((note) => (
+                        <span key={note} className="rounded-full border border-slate-700/80 bg-slate-950/45 px-3 py-2 text-xs text-slate-300">
+                          {note}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-1">
+                  {visibleSkillSummary.map((item) => (
+                    <div key={item.label} className="rounded-[1rem] border border-slate-800/75 bg-slate-950/45 p-4">
+                      <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{item.label}</div>
+                      <div className="mt-2 text-2xl font-bold text-white">{item.value}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </section>
         )}
 
-        {/* Skill Recommendations */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-            <span className="text-2xl">📈</span>
-            AI Skills to Learn
-          </h2>
+        {skills.length > 0 && (
+        <section className="space-y-6">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Upskilling</div>
+            <h2 className="mt-2 text-3xl font-black text-white">AI skills to learn next</h2>
+          </div>
           
-          {skills.length > 0 ? (
-            <div className="grid md:grid-cols-2 gap-4">
-              {skills.map((skill: any) => {
+            <div className="grid gap-4 md:grid-cols-2">
+              {skills.slice(0, 4).map((skill: any) => {
                 const diff = difficultyConfig[skill.difficulty] || {
                   label: skill.difficulty,
-                  color: 'text-gray-400 bg-gray-400/20'
+                  color: 'text-slate-400 bg-slate-400/20'
                 };
                 return (
                   <div 
                     key={skill.id}
-                    className="bg-slate-800/80 border border-slate-700 rounded-xl p-5"
+                    className="panel rounded-[1.5rem] p-5"
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <h3 className="text-lg font-semibold text-white">{skill.skill_name}</h3>
@@ -437,75 +855,13 @@ export default async function OccupationPage({ params }: PageProps) {
                 );
               })}
             </div>
-          ) : (
-            <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-8 text-center">
-              <p className="text-slate-400">
-                Skill recommendations will be available once we analyze this occupation.
-              </p>
-            </div>
-          )}
         </section>
-
-        {/* Impact/Effort Matrix */}
-        {opportunities.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-              <span className="text-2xl">🎯</span>
-              Impact vs Effort Matrix
-            </h2>
-            <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-6">
-              <div className="relative h-64 bg-slate-900 rounded-lg overflow-hidden">
-                {/* Grid */}
-                <div className="absolute inset-0 grid grid-cols-5 grid-rows-5">
-                  {[...Array(25)].map((_, i) => (
-                    <div key={i} className="border border-slate-800" />
-                  ))}
-                </div>
-                
-                {/* Quadrant labels */}
-                <div className="absolute top-2 left-2 text-xs text-slate-500">Low Impact</div>
-                <div className="absolute top-2 right-2 text-xs text-emerald-500">Quick Wins</div>
-                <div className="absolute bottom-2 right-2 text-xs text-emerald-400">Big Bets</div>
-                <div className="absolute bottom-2 left-2 text-xs text-slate-500">Low Priority</div>
-                
-                {/* Opportunities plotted */}
-                {opportunities.map((opp: any, i: number) => {
-                  const x = ((5 - opp.effort_level) / 4) * 90 + 5;
-                  const y = ((opp.impact_level - 1) / 4) * 85 + 5;
-                  const config = opportunityCategoryConfig[opp.category] || { color: 'bg-gray-500', icon: '✨' };
-                  return (
-                    <div
-                      key={opp.id}
-                      className={`absolute w-8 h-8 ${config.color} rounded-full flex items-center justify-center text-white text-sm cursor-pointer hover:scale-125 transition-transform`}
-                      style={{ left: `${x}%`, top: `${y}%` }}
-                      title={`${opp.title} (Impact: ${opp.impact_level}, Effort: ${opp.effort_level})`}
-                    >
-                      {config.icon}
-                    </div>
-                  );
-                })}
-                
-                {/* Axes */}
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-700" />
-                <div className="absolute top-0 bottom-0 left-0 w-0.5 bg-slate-700" />
-                
-                {/* Axis labels */}
-                <div className="absolute bottom-1/2 -left-6 transform -rotate-90 text-xs text-slate-500">
-                  Impact →
-                </div>
-                <div className="absolute top-1/2 right-1 text-xs text-slate-500">
-                  Effort →
-                </div>
-              </div>
-            </div>
-          </section>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800 px-4 py-12 mt-16">
+      <footer className="border-t border-slate-800/80 bg-slate-950/80 px-4 py-12 mt-16">
         <div className="max-w-7xl mx-auto text-center text-slate-500">
-          <p>Built with Next.js, Supabase & Vercel</p>
+          <p>Designed around reclaiming routine time with automation-first workflows.</p>
           <p className="mt-2 text-sm">Data sourced from U.S. Bureau of Labor Statistics</p>
         </div>
       </footer>

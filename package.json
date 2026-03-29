@@ -6,34 +6,50 @@
     "dev": "next dev --port 3050",
     "build": "next build",
     "start": "next start -p 3050",
+    "preview:fresh": "zsh scripts/preview-fresh.sh 3050",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:seed": "tsx scripts/seed-occupations.ts"
+    "db:seed": "tsx scripts/seed-occupations.ts",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@chenglou/pretext": "^0.0.3",
     "@neondatabase/serverless": "^0.10.0",
     "autoprefixer": "^10.4.27",
+    "clsx": "^2.1.1",
     "csv-parse": "^5.5.6",
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.38.0",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.7.0",
     "next": "^15.0.0",
     "pg": "^8.20.0",
     "postcss": "^8.5.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.2.2",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.2",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.1",
     "drizzle-kit": "^0.30.0",
+    "happy-dom": "^20.8.9",
+    "jsdom": "^29.0.1",
     "tsx": "^4.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.2"
   }
 }

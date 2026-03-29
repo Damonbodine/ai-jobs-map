@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Quiet Morning | Concept A</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --font-heading: 'Newsreader', serif;
+            --font-body: 'Manrope', sans-serif;
+            --bg-dawn: #FDFCFB;
+            --color-amber: #F59E0B;
+            --color-slate: #334155;
+        }
+        body {
+            background-color: var(--bg-dawn);
+            color: var(--color-slate);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+        }
+        .font-heading { font-family: var(--font-heading); }
+    </style>
+</head>
+<body class="selection:bg-amber-100">
+
+    <nav class="fixed top-0 left-0 right-0 p-8 flex justify-between items-center z-50">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-amber-400 rotate-12 transition-transform hover:rotate-0"></div>
+            <span class="text-xs font-black uppercase tracking-widest opacity-40">Quiet Morning v1.0</span>
+        </div>
+        <div class="text-[10px] font-black uppercase tracking-[0.3em] text-amber-600">Editorial Sanctuary</div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto pt-40 pb-60 px-12 relative animate-fade-in">
+        
+        <!-- Hero Section -->
+        <div class="relative mb-40 text-center">
+            <div class="inline-flex items-center gap-2 mb-8 text-amber-600 font-black uppercase tracking-widest text-[10px] bg-amber-50 px-3 py-1 rounded-full">
+                60m Bedtime Minutes Reclaimed
+            </div>
+            <h1 class="text-[clamp(4rem,10vw,8rem)] font-heading italic leading-[0.9] tracking-tighter mb-12 max-w-4xl mx-auto text-slate-900">
+                The Future of <span class="text-amber-500">Recovery</span> is Here.
+            </h1>
+            <p class="text-xl leading-relaxed text-slate-500 max-w-2xl mx-auto italic font-heading opacity-80">
+                A world-class editorial vision for the modern Accountant. Reclaiming time for family through invisible automation.
+            </p>
+        </div>
+
+        <!-- Draggable Life Metric -->
+        <div id="orb" class="fixed z-40 cursor-move" style="left: 10%; top: 30%;">
+            <div class="w-64 h-64 rounded-xl bg-white shadow-[0_40px_80px_rgba(0,0,0,0.05)] border border-slate-100 flex flex-col items-center justify-center text-center p-10 hover:border-amber-200 transition-colors">
+                <div class="text-[10px] font-black uppercase tracking-widest text-amber-500 mb-2">Relief Index</div>
+                <div class="text-6xl font-black tracking-tighter text-slate-900 leading-none">94.2</div>
+                <div class="mt-6 w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
+                    <div class="h-full bg-amber-400 w-[94.2%] transition-all duration-1000"></div>
+                </div>
+                <div class="text-[9px] font-black uppercase tracking-widest mt-4 opacity-30">Human Safety Profile</div>
+            </div>
+        </div>
+
+        <!-- Narrative Blocks -->
+        <div class="grid md:grid-cols-2 gap-24 items-start relative z-30">
+            <div class="space-y-12">
+                <div class="p-12 bg-white rounded-2xl shadow-sm border border-slate-50">
+                    <h3 class="text-2xl font-heading italic font-black mb-6">The Reclaimed Afternoon</h3>
+                    <p class="text-slate-500 leading-relaxed text-lg">
+                        We don't just automate tasks; we eliminate the anxiety of the "close." Every Ledger adjustment, every reconciliation, handled by the Horizon engine so you can be present for the moments that actually matter.
+                    </p>
+                </div>
+                <div class="p-12">
+                    <h3 class="text-sm font-black uppercase tracking-widest mb-4 text-amber-600">Key Transformation</h3>
+                    <p class="text-3xl font-heading italic leading-tight text-slate-800">
+                        "The transition from tool-user to time-owner is the ultimate professional evolution."
+                    </p>
+                </div>
+            </div>
+            <div class="pt-20">
+                <div class="aspect-[4/5] bg-slate-100 rounded-3xl overflow-hidden relative group">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent"></div>
+                    <div class="absolute bottom-12 left-12 right-12 text-white">
+                        <div class="text-[10px] font-black uppercase tracking-widest mb-2 opacity-60">Visual Prototype</div>
+                        <div class="text-2xl font-heading italic leading-tight">A sanctuary of quiet precision and profound human recovery.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="fixed bottom-0 left-0 right-0 p-12 flex justify-center z-50 pointer-events-none">
+        <button class="bg-amber-400 text-white px-12 py-6 rounded-full font-black uppercase tracking-widest text-xs shadow-xl pointer-events-auto hover:bg-amber-500 hover:scale-105 transition-all">
+            Audit Your Life ROI
+        </button>
+    </footer>
+
+    <script>
+        // Draggable Logic
+        const orb = document.getElementById('orb');
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+        orb.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offset.x = e.clientX - orb.offsetLeft;
+            offset.y = e.clientY - orb.offsetTop;
+            orb.style.zIndex = 100;
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            orb.style.left = (e.clientX - offset.x) + 'px';
+            orb.style.top = (e.clientY - offset.y) + 'px';
+        });
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+    </script>
+</body>
+</html>

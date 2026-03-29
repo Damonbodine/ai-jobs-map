@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { TrendingUp, Clock, CheckCircle2, ArrowRight, Quote, Sparkles, Zap } from 'lucide-react';
 
 const caseStudies = [
   {
@@ -130,32 +131,21 @@ const caseStudies = [
 
 export default function CaseStudies() {
   return (
-    <div className="min-h-screen bg-slate-900">
-      {/* Header */}
-      <header className="border-b border-slate-700/50 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/factory" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">AI</span>
-            </div>
-            <span className="text-white font-semibold text-lg">AI Jobs Factory</span>
-          </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/factory" className="text-slate-300 hover:text-white transition-colors">
-              Packages
-            </Link>
-            <Link href="/factory/case-studies" className="text-emerald-400 font-medium">
-              Case Studies
-            </Link>
-          </nav>
-        </div>
-      </header>
+    <div className="min-h-screen bg-slate-950 text-slate-50 relative selection:bg-cyan-500/30 overflow-x-hidden">
+      {/* Glow Effects */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-600/10 blur-[140px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDuration: '7s' }} />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-cyan-600/10 blur-[140px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDuration: '9s' }} />
 
-      <main className="px-4 py-8 max-w-7xl mx-auto">
+      <main className="px-4 py-8 max-w-7xl mx-auto relative z-10">
         {/* Hero */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            Real Results from Real Businesses
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700/50 text-emerald-400 text-sm font-medium mb-6 backdrop-blur-md">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Verified Results</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
+            Real Results from{' '}
+            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Real Businesses</span>
           </h1>
           <p className="text-xl text-slate-400 max-w-2xl mx-auto">
             See how companies like yours are saving 10+ hours per week with AI automation.
@@ -164,24 +154,20 @@ export default function CaseStudies() {
         </div>
 
         {/* Stats Banner */}
-        <div className="bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-2xl p-6 mb-12">
+        <div className="bg-gradient-to-r from-emerald-900/30 via-slate-900/60 to-cyan-900/30 border border-slate-800 rounded-2xl p-6 mb-12 backdrop-blur-xl">
           <div className="grid md:grid-cols-4 gap-6 text-center">
-            <div>
-              <div className="text-3xl font-bold text-emerald-400">$2.4M+</div>
-              <div className="text-slate-400 text-sm">Annual Savings Generated</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-emerald-400">12,400h</div>
-              <div className="text-slate-400 text-sm">Hours Saved Per Year</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-emerald-400">98.7%</div>
-              <div className="text-slate-400 text-sm">Success Rate</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-emerald-400">18 days</div>
-              <div className="text-slate-400 text-sm">Avg. Payback Period</div>
-            </div>
+            {[
+              { value: '$2.4M+', label: 'Annual Savings Generated', icon: <TrendingUp className="w-5 h-5" />, color: 'text-emerald-400' },
+              { value: '12,400h', label: 'Hours Saved Per Year', icon: <Clock className="w-5 h-5" />, color: 'text-cyan-400' },
+              { value: '98.7%', label: 'Success Rate', icon: <CheckCircle2 className="w-5 h-5" />, color: 'text-purple-400' },
+              { value: '18 days', label: 'Avg. Payback Period', icon: <Zap className="w-5 h-5" />, color: 'text-orange-400' },
+            ].map((stat, i) => (
+              <div key={i}>
+                <div className={`${stat.color} mx-auto mb-2 flex justify-center`}>{stat.icon}</div>
+                <div className={`text-3xl font-black ${stat.color}`}>{stat.value}</div>
+                <div className="text-slate-400 text-sm font-medium">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -190,39 +176,34 @@ export default function CaseStudies() {
           {caseStudies.map((study) => (
             <article 
               key={study.id}
-              className="bg-slate-800/80 border border-slate-700 rounded-2xl overflow-hidden"
+              className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition-colors"
             >
               <div className="md:flex">
                 {/* Sidebar */}
-                <div className="md:w-64 bg-slate-900/50 p-6 border-r border-slate-700">
+                <div className="md:w-64 bg-slate-950/50 p-6 border-r border-slate-800/50">
                   <div className="text-4xl mb-4">{study.thumbnail}</div>
                   <h3 className="text-white font-bold text-lg mb-1">{study.company}</h3>
                   <p className="text-slate-400 text-sm mb-4">{study.industry}</p>
-                  <div className="space-y-2 mb-6">
+                  <div className="flex flex-wrap gap-2 mb-6">
                     {study.tags.map(tag => (
-                      <span key={tag} className="inline-block px-2 py-1 bg-slate-700 text-slate-300 text-xs rounded">
+                      <span key={tag} className="inline-block px-2.5 py-1 bg-slate-800/80 text-slate-300 text-xs rounded-lg border border-slate-700/50 font-medium">
                         {tag}
                       </span>
                     ))}
                   </div>
                   
                   <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Job Coverage</span>
-                      <span className="text-emerald-400 font-medium">{study.coverage}%</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Hours Saved</span>
-                      <span className="text-white font-medium">{study.hoursSaved}h/week</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Weekly Value</span>
-                      <span className="text-emerald-400 font-medium">${study.weeklyValue}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-400">Payback</span>
-                      <span className="text-white font-medium">{study.paybackDays} days</span>
-                    </div>
+                    {[
+                      { label: 'Job Coverage', value: `${study.coverage}%`, color: 'text-emerald-400' },
+                      { label: 'Hours Saved', value: `${study.hoursSaved}h/week`, color: 'text-white' },
+                      { label: 'Weekly Value', value: `$${study.weeklyValue}`, color: 'text-emerald-400' },
+                      { label: 'Payback', value: `${study.paybackDays} days`, color: 'text-white' },
+                    ].map((item, i) => (
+                      <div key={i} className="flex justify-between text-sm">
+                        <span className="text-slate-400">{item.label}</span>
+                        <span className={`${item.color} font-medium`}>{item.value}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -235,27 +216,31 @@ export default function CaseStudies() {
                   </div>
 
                   <div className="mb-6">
-                    <h3 className="text-white font-semibold mb-2">Solution</h3>
+                    <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-cyan-400" />
+                      Solution
+                    </h3>
                     <p className="text-slate-300">{study.solution}</p>
                   </div>
 
                   {/* Results */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     {study.results.map((result, i) => (
-                      <div key={i} className="bg-slate-900/50 rounded-lg p-4 text-center">
+                      <div key={i} className="bg-slate-950/50 rounded-xl p-4 text-center border border-slate-800">
                         <div className="text-xl font-bold text-white">{result.value}</div>
-                        <div className="text-xs text-slate-500">{result.metric}</div>
+                        <div className="text-xs text-slate-500 font-medium mt-0.5">{result.metric}</div>
                         {result.change && (
-                          <div className="text-emerald-400 text-xs mt-1">{result.change}</div>
+                          <div className="text-emerald-400 text-xs font-semibold mt-1">{result.change}</div>
                         )}
                       </div>
                     ))}
                   </div>
 
                   {/* Testimonial */}
-                  <div className="bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-xl p-4">
-                    <div className="text-slate-300 italic mb-2">"{study.testimonial}"</div>
-                    <div className="text-emerald-400 text-sm font-medium">— {study.testimonialAuthor}</div>
+                  <div className="bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-xl p-5">
+                    <Quote className="w-5 h-5 text-emerald-500/40 mb-2" />
+                    <div className="text-slate-300 italic mb-3">&quot;{study.testimonial}&quot;</div>
+                    <div className="text-emerald-400 text-sm font-semibold">— {study.testimonialAuthor}</div>
                   </div>
                 </div>
               </div>
@@ -264,23 +249,29 @@ export default function CaseStudies() {
         </div>
 
         {/* CTA */}
-        <div className="mt-12 text-center">
+        <div className="mt-12 bg-gradient-to-br from-emerald-900/30 via-slate-900/60 to-cyan-900/30 rounded-2xl p-8 text-center border border-slate-800 backdrop-blur-xl">
+          <h2 className="text-2xl font-bold text-white mb-4">Get Similar Results for Your Business</h2>
+          <p className="text-slate-300 mb-6 max-w-lg mx-auto">
+            Start with a free audit to see exactly how much time and money you could save.
+          </p>
           <Link 
             href="/factory"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold rounded-xl hover:from-emerald-400 hover:to-cyan-400 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold rounded-xl hover:from-emerald-400 hover:to-cyan-400 transition-all shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40"
           >
-            Get Similar Results for Your Business
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+            Start Your Free Audit
+            <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800 px-4 py-12 mt-16">
-        <div className="max-w-7xl mx-auto text-center text-slate-500">
-          <p>AI Jobs Factory - Real results from real businesses</p>
+      <footer className="border-t border-slate-800/80 bg-slate-950/80 px-4 py-12 mt-16">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-sm">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-cyan-500" />
+            <span className="font-semibold text-slate-300">AI Jobs Factory</span>
+          </div>
+          <p>Real results from real businesses</p>
         </div>
       </footer>
     </div>

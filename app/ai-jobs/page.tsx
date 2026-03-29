@@ -1,8 +1,30 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
+import {
+  ArrowRight,
+  BookOpen,
+  Building2,
+  Code,
+  FlaskConical,
+  HardHat,
+  HeartHandshake,
+  Loader2,
+  Palette,
+  Scale,
+  Search,
+  Sparkles,
+  Stethoscope,
+  TrendingUp,
+  X,
+} from 'lucide-react';
+
+import { Card, CardContent } from '@/components/ui/Card';
+import { StatCard } from '@/components/ui/StatCard';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface Occupation {
   id: number;
@@ -14,46 +36,50 @@ interface Occupation {
 interface SearchResponse {
   results: Occupation[];
   total: number;
-  query: string | null;
-  category: string | null;
 }
 
 const majorCategories = [
-  { name: 'Management', slug: 'management', icon: '👔' },
-  { name: 'Business & Finance', slug: 'business-and-financial-operations', icon: '💼' },
-  { name: 'Computer & Tech', slug: 'computer-and-mathematical', icon: '💻' },
-  { name: 'Healthcare', slug: 'healthcare-practitioners-and-technical', icon: '🏥' },
-  { name: 'Education', slug: 'educational-instruction-and-library', icon: '📚' },
-  { name: 'Legal', slug: 'legal', icon: '⚖️' },
-  { name: 'Engineering', slug: 'architecture-and-engineering', icon: '🏗️' },
-  { name: 'Sales & Marketing', slug: 'sales-and-related', icon: '📈' },
-  { name: 'Science', slug: 'life-physical-and-social-science', icon: '🔬' },
-  { name: 'Arts & Media', slug: 'arts-design-entertainment-sports-and-media', icon: '🎨' },
-  { name: 'Social Service', slug: 'community-and-social-service', icon: '🤝' },
-  { name: 'Construction', slug: 'construction-and-extraction', icon: '🏗️' },
+  { name: 'Management', slug: 'management', icon: Building2 },
+  { name: 'Business & Finance', slug: 'business-and-financial-operations', icon: TrendingUp },
+  { name: 'Computer & Tech', slug: 'computer-and-mathematical', icon: Code },
+  { name: 'Healthcare', slug: 'healthcare-practitioners-and-technical', icon: Stethoscope },
+  { name: 'Education', slug: 'educational-instruction-and-library', icon: BookOpen },
+  { name: 'Legal', slug: 'legal', icon: Scale },
+  { name: 'Engineering', slug: 'architecture-and-engineering', icon: HardHat },
+  { name: 'Sales & Marketing', slug: 'sales-and-related', icon: TrendingUp },
+  { name: 'Science', slug: 'life-physical-and-social-science', icon: FlaskConical },
+  { name: 'Arts & Media', slug: 'arts-design-entertainment-sports-and-media', icon: Palette },
+  { name: 'Social Service', slug: 'community-and-social-service', icon: HeartHandshake },
+  { name: 'Construction', slug: 'construction-and-extraction', icon: HardHat },
 ];
 
 export default function AIJobsLanding() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Occupation[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [totalResults, setTotalResults] = useState(0);
 
   const performSearch = useCallback(async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
       setTotalResults(0);
+      setHasSearched(false);
       return;
     }
 
     setIsSearching(true);
+    setHasSearched(true);
+
     try {
-      const response = await fetch(`/api/ai-jobs/search?q=${encodeURIComponent(query)}&limit=10`);
+      const response = await fetch(`/api/ai-jobs/search?q=${encodeURIComponent(query)}&limit=6`);
       const data: SearchResponse = await response.json();
-      setSearchResults(data.results);
-      setTotalResults(data.total);
+      setSearchResults(data.results || []);
+      setTotalResults(data.total || 0);
     } catch (error) {
       console.error('Search error:', error);
+      setSearchResults([]);
+      setTotalResults(0);
     } finally {
       setIsSearching(false);
     }
@@ -62,191 +88,241 @@ export default function AIJobsLanding() {
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       performSearch(searchQuery);
-    }, 300);
+    }, 250);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchQuery, performSearch]);
+  }, [performSearch, searchQuery]);
+
+  const categoryVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.35 },
+    },
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Header */}
-      <header className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">AI</span>
+    <div className="app-shell text-slate-50">
+      <div className="pointer-events-none absolute left-[-10%] top-0 h-[28rem] w-[28rem] rounded-full bg-emerald-500/12 blur-[140px]" />
+      <div className="pointer-events-none absolute right-[-6%] top-28 h-[22rem] w-[22rem] rounded-full bg-cyan-500/12 blur-[120px]" />
+
+      <main className="page-container relative z-10 pb-20 pt-12 md:pt-16">
+        <section className="grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)] lg:items-center">
+          <div className="max-w-3xl pt-4">
+            <div className="eyebrow mb-6">
+              <Sparkles className="h-4 w-4" />
+              Reclaim one focused hour a day
             </div>
-            <span className="text-white font-semibold text-lg">AI Jobs Map</span>
-          </div>
-          <nav className="flex items-center gap-6">
-            <Link href="/ai-jobs/browse" className="text-slate-300 hover:text-white transition-colors">
-              Browse
-            </Link>
-            <Link href="/factory" className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg font-medium hover:opacity-90 transition-opacity">
-              AI Factory
-            </Link>
-            <Link href="/ai-jobs/about" className="text-slate-300 hover:text-white transition-colors">
-              About
-            </Link>
-          </nav>
-        </div>
-      </header>
 
-      {/* Hero Section */}
-      <section className="px-4 py-20 max-w-7xl mx-auto text-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-          <span className="bg-gradient-to-r from-emerald-400 to-cyan-500 bg-clip-text text-transparent">
-            Map AI Opportunities
-          </span>
-          <br />
-          to Your Career
-        </h1>
-        <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-12">
-          Discover how AI can transform your job. Search any occupation to find AI-powered 
-          opportunities, skill recommendations, and actionable insights.
-        </p>
-        <div className="flex justify-center">
-          <Image src="https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=1400&auto=format&fit=crop" alt="Hero" width={1400} height={600} className="w-full max-w-4xl rounded-md" />
-        </div>
+            <h1 className="mb-6 max-w-4xl text-[clamp(2.8rem,6vw,5.5rem)] font-black leading-[0.94] tracking-[-0.05em] text-white">
+              See where routine work quietly steals time from your day.
+            </h1>
 
-        {/* Search Bar */}
-        <div className="max-w-2xl mx-auto relative">
-          <div className="relative">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search any job title... (e.g., 'Software Developer', 'Nurse')"
-              className="w-full px-6 py-5 pr-12 bg-slate-800/80 border border-slate-700 rounded-2xl text-white text-lg placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
-            />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2">
-              {isSearching ? (
-                <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <svg className="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              )}
-            </div>
-          </div>
+            <p className="mb-8 max-w-2xl text-[clamp(1.05rem,1.8vw,1.3rem)] leading-[1.8] text-slate-400">
+              Search 800+ occupations to understand the micro-tasks behind each role, identify the routines that can be automated, and connect them to products designed to give people at least one hour back.
+            </p>
 
-          {/* Search Results */}
-          {searchQuery.trim() && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-2xl z-10">
-              {searchResults.length > 0 ? (
-                <>
-                  <div className="px-4 py-2 text-sm text-slate-400 border-b border-slate-700">
-                    Found {totalResults} results
+            <form action="/ai-jobs/browse" className="relative">
+              <div className="panel relative overflow-hidden rounded-[1.75rem] border border-white/8 p-2.5">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <div className="flex flex-1 items-center gap-3 rounded-[1.15rem] bg-slate-950/78 px-4 py-3.5">
+                    <Search className="h-5 w-5 shrink-0 text-cyan-300" />
+                    <input
+                      type="text"
+                      name="q"
+                      value={searchQuery}
+                      onChange={(event) => setSearchQuery(event.target.value)}
+                      placeholder="Search job titles, fields, or roles"
+                      className="w-full bg-transparent text-base text-white placeholder:text-slate-500 focus:outline-none"
+                    />
+                    {searchQuery ? (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery('')}
+                        className="rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+                        aria-label="Clear search"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    ) : null}
                   </div>
-                  {searchResults.map((occupation) => (
-                    <Link
-                      key={occupation.id}
-                      href={`/ai-jobs/${occupation.slug}`}
-                      className="block px-4 py-3 hover:bg-slate-700/50 transition-colors"
-                    >
-                      <div className="font-medium text-white">{occupation.title}</div>
-                      <div className="text-sm text-slate-400">{occupation.major_category}</div>
-                    </Link>
-                  ))}
-                  {totalResults > searchResults.length && (
-                    <Link
-                      href={`/ai-jobs/search?q=${encodeURIComponent(searchQuery)}`}
-                      className="block px-4 py-3 text-center text-emerald-400 hover:bg-slate-700/50 border-t border-slate-700 transition-colors"
-                    >
-                      View all {totalResults} results →
-                    </Link>
-                  )}
-                </>
-              ) : !isSearching ? (
-                <div className="px-4 py-8 text-center text-slate-400">
-                  No occupations found for "{searchQuery}"
+
+                  <button
+                    type="submit"
+                    className="inline-flex h-12 items-center justify-center rounded-[1.15rem] bg-gradient-to-r from-emerald-500 to-cyan-500 px-6 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition-all hover:from-emerald-400 hover:to-cyan-400"
+                  >
+                    Browse Results
+                  </button>
                 </div>
-              ) : null}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="px-4 py-12 max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 text-center">
-            <div className="text-4xl font-bold text-emerald-400 mb-2">826+</div>
-            <div className="text-slate-400">Occupations</div>
-          </div>
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 text-center">
-            <div className="text-4xl font-bold text-cyan-400 mb-2">22</div>
-            <div className="text-slate-400">Career Categories</div>
-          </div>
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 text-center">
-            <div className="text-4xl font-bold text-purple-400 mb-2">7</div>
-            <div className="text-slate-400">AI Categories</div>
-          </div>
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 text-center">
-            <div className="text-4xl font-bold text-orange-400 mb-2">AI+</div>
-            <div className="text-slate-400">Skill Paths</div>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories Grid */}
-      <section className="px-4 py-16 max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-white mb-8 text-center">Browse by Category</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {majorCategories.map((category) => (
-            <Link
-              key={category.slug}
-              href={`/ai-jobs/category/${category.slug}`}
-              className="group bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-6 transition-all hover:shadow-lg hover:shadow-emerald-500/10"
-            >
-              <div className="text-4xl mb-3">{category.icon}</div>
-              <div className="font-medium text-white group-hover:text-emerald-400 transition-colors">
-                {category.name}
               </div>
+
+              <AnimatePresence>
+                {searchQuery.trim() ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    className="panel custom-scrollbar absolute left-0 right-0 top-full z-20 mt-3 max-h-[24rem] overflow-y-auto rounded-[1.5rem] border border-slate-700/80"
+                  >
+                    {isSearching ? (
+                      <div className="space-y-3 p-4">
+                        <Skeleton className="h-14 w-full rounded-2xl" />
+                        <Skeleton className="h-14 w-full rounded-2xl" />
+                        <Skeleton className="h-14 w-2/3 rounded-2xl" />
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      <div>
+                        <div className="border-b border-slate-800 px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                          Top matches
+                        </div>
+                        {searchResults.map((occupation) => (
+                          <Link
+                            key={occupation.id}
+                            href={`/ai-jobs/${occupation.slug}`}
+                            className="flex items-center justify-between gap-4 border-b border-slate-800/80 px-5 py-4 transition-colors hover:bg-slate-800/60 last:border-b-0"
+                          >
+                            <div>
+                              <div className="font-semibold text-white">{occupation.title}</div>
+                              <div className="mt-1 text-sm text-slate-400">{occupation.major_category}</div>
+                            </div>
+                            <ArrowRight className="h-5 w-5 shrink-0 text-slate-500" />
+                          </Link>
+                        ))}
+                        <div className="border-t border-slate-800/80 p-3">
+                          <Link
+                            href={`/ai-jobs/browse?q=${encodeURIComponent(searchQuery)}`}
+                            className="flex items-center justify-center rounded-xl bg-slate-950/70 px-4 py-3 text-sm font-semibold text-cyan-300 transition-colors hover:bg-slate-800 hover:text-white"
+                          >
+                            View all {totalResults} result{totalResults === 1 ? '' : 's'}
+                          </Link>
+                        </div>
+                      </div>
+                    ) : hasSearched ? (
+                      <div className="flex flex-col items-center gap-3 px-6 py-10 text-center">
+                        <Search className="h-8 w-8 text-slate-600" />
+                        <div className="text-lg font-semibold text-white">No matches found</div>
+                        <p className="max-w-sm text-sm text-slate-400">
+                          Try a broader title like “engineer”, “analyst”, or “manager”.
+                        </p>
+                      </div>
+                    ) : null}
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
+            </form>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.1 }}
+            className="panel overflow-hidden rounded-[2.25rem] lg:ml-4"
+          >
+            <div className="relative aspect-[4/5] min-h-[24rem] sm:aspect-[16/11] lg:aspect-[4/5]">
+              <Image
+                src="https://images.unsplash.com/photo-1542626991-cbc4e32524cc?q=80&w=1400&auto=format&fit=crop"
+                alt="Planning board with notes representing workflow transformation"
+                fill
+                priority
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/35 to-slate-950/10" />
+              <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+              <div className="rounded-[1.6rem] border border-white/8 bg-slate-950/68 p-5 backdrop-blur-2xl">
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-300">
+                    What you get
+                  </p>
+                  <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+                    {[
+                      'Map the routines behind the role',
+                      'Prioritize time-back opportunities',
+                      'Bundle tasks into automation packages',
+                      'Show a credible one-hour-back path',
+                    ].map((item) => (
+                      <div key={item} className="rounded-[1.1rem] border border-slate-800/70 bg-slate-900/40 px-4 py-3 text-sm leading-6 text-slate-200">
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        <section className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <StatCard value="826+" title="Occupations" description="Mapped across the labor market" colorClass="text-emerald-400" delay={0.1} />
+          <StatCard value="22" title="Market Sectors" description="From finance to engineering" colorClass="text-cyan-400" delay={0.2} />
+          <StatCard value="7" title="AI Categories" description="Ways AI can support daily work" colorClass="text-purple-400" delay={0.3} />
+          <StatCard value="10k+" title="Workflow Clues" description="Signals from tasks and routines" colorClass="text-orange-400" delay={0.4} />
+        </section>
+
+        <section className="mt-18">
+          <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <h2 className="section-title text-white">Explore by industry sector</h2>
+              <p className="section-copy mt-3">
+                Start broad, then narrow into specific occupations with task data, AI opportunity themes,
+                and practical upskilling direction.
+              </p>
+            </div>
+
+            <Link
+              href="/ai-jobs/browse"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-300 transition-colors hover:text-white"
+            >
+              Browse every occupation
+              <ArrowRight className="h-4 w-4" />
             </Link>
-          ))}
-        </div>
-      </section>
+          </div>
 
-      {/* How It Works */}
-      <section className="px-4 py-16 max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-white mb-12 text-center">How It Works</h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">🔍</span>
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Search Your Job</h3>
-            <p className="text-slate-400">
-              Find your occupation from 800+ career paths across all major industries.
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">💡</span>
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Discover AI Opportunities</h3>
-            <p className="text-slate-400">
-              See specific ways AI can add value to your daily tasks and responsibilities.
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-16 h-16 bg-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">📈</span>
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Build AI Skills</h3>
-            <p className="text-slate-400">
-              Get learning paths and resources to leverage AI in your career.
-            </p>
-          </div>
-        </div>
-      </section>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {majorCategories.map((category, index) => {
+              const Icon = category.icon;
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800 px-4 py-12 mt-16">
-        <div className="max-w-7xl mx-auto text-center text-slate-500">
-          <p>Built with Next.js, Supabase & Vercel</p>
-          <p className="mt-2 text-sm">Data sourced from U.S. Bureau of Labor Statistics</p>
+              return (
+                <motion.div
+                  key={category.slug}
+                  variants={categoryVariants}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, margin: '-80px' }}
+                  transition={{ delay: index * 0.03 }}
+                >
+                  <Link href={`/ai-jobs/category/${category.slug}`} className="block h-full">
+                    <Card className="h-full rounded-[1.75rem] border-slate-800/90 bg-slate-900/55 transition-all duration-200 hover:-translate-y-1 hover:border-cyan-500/40 hover:bg-slate-900/75">
+                      <CardContent className="flex h-full flex-col gap-5 p-6">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-300">
+                          <Icon className="h-7 w-7" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-white">{category.name}</h3>
+                          <p className="mt-2 text-sm leading-6 text-slate-400">
+                            Browse roles, compare tasks, and see where AI can support this sector.
+                          </p>
+                        </div>
+                        <div className="mt-auto inline-flex items-center gap-2 text-sm font-semibold text-cyan-300">
+                          Explore sector
+                          <ArrowRight className="h-4 w-4" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-slate-800/80 bg-slate-950/70 py-8">
+        <div className="page-container flex flex-col gap-3 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-2 text-slate-300">
+            <Sparkles className="h-4 w-4 text-cyan-400" />
+            AI Jobs Map
+          </div>
+          <p>Data sourced from the U.S. Bureau of Labor Statistics and internal workflow research.</p>
         </div>
       </footer>
     </div>

@@ -1,7 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight, Search, Target, Zap } from 'lucide-react';
+
+import { Card, CardContent } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface Occupation {
   id: number;
@@ -19,7 +26,32 @@ interface BrowseResponse {
   page: number;
   pageSize: number;
   totalPages: number;
-  categories: { name: string; count: number }[];
+}
+
+const categoryStory: Record<string, { routine: string; payoff: string }> = {
+  Management: { routine: 'status updates, approvals, and planning loops', payoff: 'Create a clearer one-hour-back plan for leaders.' },
+  'Business & Finance': { routine: 'reporting, reconciliations, and document review', payoff: 'Target repetitive back-office work first.' },
+  'Computer & Tech': { routine: 'handoffs, triage, research, and code-adjacent admin', payoff: 'Automate the drag around technical work.' },
+  Healthcare: { routine: 'documentation, intake, and follow-up coordination', payoff: 'Return time to patient-facing work.' },
+  Education: { routine: 'prep, grading, communication, and scheduling', payoff: 'Reduce administrative load without losing quality.' },
+  Legal: { routine: 'document prep, research, and deadline tracking', payoff: 'Free up more time for judgment-heavy work.' },
+  Engineering: { routine: 'documentation, reporting, and evaluation tasks', payoff: 'Bundle recurring analysis into automation.' },
+  'Sales & Marketing': { routine: 'follow-up, content, and CRM maintenance', payoff: 'Push low-leverage coordination off the calendar.' },
+  Science: { routine: 'research synthesis, data prep, and reporting', payoff: 'Protect deep work by automating prep steps.' },
+  'Arts & Media': { routine: 'drafting, revisions, and publishing workflows', payoff: 'Automate production overhead around creative work.' },
+  'Social Service': { routine: 'notes, scheduling, and case coordination', payoff: 'Give more time back to direct service.' },
+  Construction: { routine: 'estimating, reporting, and coordination', payoff: 'Remove routine admin from field-heavy roles.' },
+};
+
+function getOccupationStory(occupation: Occupation) {
+  const fallback = { routine: 'the routine work surrounding the role', payoff: 'See where structured automation can give time back.' };
+  const story = categoryStory[occupation.major_category] ?? fallback;
+  const estimatedMinutes = Math.max(18, Math.round((occupation.ai_opportunities_count * 5) + (occupation.micro_tasks_count * 1.1)));
+
+  return {
+    ...story,
+    estimatedMinutes,
+  };
 }
 
 const allCategories = [
@@ -51,219 +83,271 @@ export default function BrowsePage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(() => {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+
+    return new URLSearchParams(window.location.search).get('q') ?? '';
+  });
   const [sortBy, setSortBy] = useState<'title' | 'ai_opportunities'>('title');
   const [isLoading, setIsLoading] = useState(true);
 
   const pageSize = 24;
-
-  const fetchOccupations = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        pageSize: pageSize.toString(),
-        sort: sortBy,
-      });
-      if (selectedCategory) params.set('category', selectedCategory);
-      if (searchQuery) params.set('q', searchQuery);
-
-      const response = await fetch(`/api/ai-jobs/browse?${params}`);
-      const data: BrowseResponse = await response.json();
-      
-      setOccupations(data.occupations || []);
-      setTotal(data.total || 0);
-      setTotalPages(data.totalPages || 1);
-    } catch (error) {
-      console.error('Error fetching occupations:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [page, selectedCategory, searchQuery, sortBy]);
+  const requestQuery = useMemo(() => searchQuery.trim(), [searchQuery]);
 
   useEffect(() => {
-    fetchOccupations();
-  }, [fetchOccupations]);
+    const controller = new AbortController();
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setPage(1);
+    async function fetchOccupations() {
+      setIsLoading(true);
+
+      try {
+        const params = new URLSearchParams({
+          page: page.toString(),
+          pageSize: pageSize.toString(),
+          sort: sortBy,
+        });
+
+        if (selectedCategory) params.set('category', selectedCategory);
+        if (requestQuery) params.set('q', requestQuery);
+
+        const response = await fetch(`/api/ai-jobs/browse?${params}`, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`Browse request failed with status ${response.status}`);
+        }
+
+        const data: BrowseResponse = await response.json();
+
+        setOccupations(data.occupations || []);
+        setTotal(data.total || 0);
+        setTotalPages(data.totalPages || 1);
+      } catch (error) {
+        if ((error as Error).name === 'AbortError') {
+          return;
+        }
+
+        console.error('Error fetching occupations:', error);
+        setOccupations([]);
+        setTotal(0);
+        setTotalPages(1);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
     fetchOccupations();
+
+    return () => controller.abort();
+  }, [page, requestQuery, selectedCategory, sortBy]);
+
+  const handleSearchSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    setPage(1);
   };
 
+  const pageNumbers = Array.from({ length: Math.min(7, totalPages) }, (_, index) => {
+    if (totalPages <= 7) return index + 1;
+    if (page <= 4) return index + 1;
+    if (page >= totalPages - 3) return totalPages - 6 + index;
+    return page - 3 + index;
+  });
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Header */}
-      <header className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/ai-jobs" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">AI</span>
+    <div className="app-shell text-slate-50">
+      <div className="pointer-events-none absolute left-[-8%] top-8 h-[24rem] w-[24rem] rounded-full bg-emerald-500/10 blur-[120px]" />
+      <div className="pointer-events-none absolute right-[-8%] top-28 h-[22rem] w-[22rem] rounded-full bg-cyan-500/12 blur-[120px]" />
+
+      <main className="page-container relative z-10 pb-20 pt-12 md:pt-16">
+        <section className="mb-10 max-w-4xl">
+          <p className="eyebrow mb-5">Occupation explorer</p>
+          <h1 className="section-title text-white">Find the roles where routine work is easiest to win back.</h1>
+          <p className="section-copy mt-4 max-w-3xl">
+            Filter by occupation family, scan the day-to-day work behind each role, and move into pages that connect micro-tasks to automation packages.
+          </p>
+        </section>
+
+        <section className="panel mb-8 rounded-[2rem] p-5 md:p-6">
+          <form className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px_200px]" onSubmit={handleSearchSubmit}>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-cyan-300" />
+              <Input
+                type="text"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search occupations"
+                className="h-14 rounded-2xl border-slate-700/80 bg-slate-950/65 pl-12"
+              />
             </div>
-            <span className="text-white font-semibold text-lg">AI Jobs Map</span>
-          </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/ai-jobs/browse" className="text-emerald-400 font-medium">
-              Browse
-            </Link>
-            <Link href="/ai-jobs/about" className="text-slate-300 hover:text-white transition-colors">
-              About
-            </Link>
-          </nav>
-        </div>
-      </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Page Title */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Browse Occupations</h1>
-          <p className="text-slate-400">Explore {(total || 0).toLocaleString()} occupations and their AI opportunities</p>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <form onSubmit={handleSearch} className="flex-1">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search occupations..."
-                  className="w-full px-4 py-2 pl-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                />
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </form>
-
-            {/* Category Filter */}
-            <select
+            <Select
               value={selectedCategory}
-              onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }}
-              className="px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              onChange={(event) => {
+                setSelectedCategory(event.target.value);
+                setPage(1);
+              }}
+              className="h-14 rounded-2xl border-slate-700/80 bg-slate-950/65"
             >
-              {allCategories.map((cat) => (
-                <option key={cat.slug} value={cat.slug}>{cat.name}</option>
+              {allCategories.map((category) => (
+                <option key={category.slug} value={category.slug} className="bg-slate-950">
+                  {category.name}
+                </option>
               ))}
-            </select>
+            </Select>
 
-            {/* Sort */}
-            <select
+            <Select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'title' | 'ai_opportunities')}
-              className="px-4 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              onChange={(event) => setSortBy(event.target.value as 'title' | 'ai_opportunities')}
+              className="h-14 rounded-2xl border-slate-700/80 bg-slate-950/65"
             >
-              <option value="title">Sort by Name</option>
-              <option value="ai_opportunities">Sort by AI Opportunities</option>
-            </select>
-          </div>
-        </div>
+              <option value="title" className="bg-slate-950">
+                Sort A-Z
+              </option>
+              <option value="ai_opportunities" className="bg-slate-950">
+                Most AI Opportunities
+              </option>
+            </Select>
+          </form>
 
-        {/* Results Grid */}
+          <div className="mt-4 flex flex-col gap-3 border-t border-slate-800/80 pt-4 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              Showing <span className="font-semibold text-white">{occupations.length}</span> of{' '}
+              <span className="font-semibold text-white">{total.toLocaleString()}</span> occupations
+            </div>
+            {(selectedCategory || searchQuery.trim()) && (
+              <button
+                onClick={() => {
+                  setSelectedCategory('');
+                  setSearchQuery('');
+                  setPage(1);
+                }}
+                className="font-semibold text-cyan-300 transition-colors hover:text-white"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        </section>
+
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 animate-pulse">
-                <div className="h-5 bg-slate-700 rounded w-3/4 mb-2" />
-                <div className="h-4 bg-slate-700 rounded w-1/2" />
-              </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 12 }).map((_, index) => (
+              <Card key={index} className="rounded-[1.5rem] bg-slate-900/55">
+                <CardContent className="p-6">
+                  <Skeleton className="mb-4 h-6 w-3/4 rounded-xl" />
+                  <Skeleton className="mb-8 h-4 w-1/2 rounded-xl" />
+                  <div className="flex gap-3">
+                    <Skeleton className="h-6 w-28 rounded-xl" />
+                    <Skeleton className="h-6 w-24 rounded-xl" />
+                  </div>
+                </CardContent>
+              </Card>
             ))}
+          </div>
+        ) : occupations.length === 0 ? (
+          <div className="panel rounded-[2rem] px-8 py-16 text-center">
+            <Search className="mx-auto h-12 w-12 text-slate-600" />
+            <h2 className="mt-5 text-2xl font-semibold text-white">No occupations found</h2>
+            <p className="mt-3 text-slate-400">Try a different title, a broader keyword, or remove a category filter.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {(occupations || []).map((occ) => (
-              <Link
-                key={occ.id}
-                href={`/ai-jobs/${occ.slug}`}
-                className="group bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-6 transition-all hover:shadow-lg hover:shadow-emerald-500/10"
-              >
-                <h3 className="font-medium text-white group-hover:text-emerald-400 transition-colors mb-2">
-                  {occ.title}
-                </h3>
-                <p className="text-sm text-slate-400 mb-4">{occ.major_category}</p>
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="flex items-center gap-1 text-emerald-400">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    {occ.ai_opportunities_count || 0} AI opportunities
-                  </span>
-                  <span className="flex items-center gap-1 text-cyan-400">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    {occ.micro_tasks_count || 0} tasks
-                  </span>
-                </div>
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+          >
+            {occupations.map((occupation) => (
+              <Link key={occupation.id} href={`/ai-jobs/${occupation.slug}`} className="block h-full">
+                <Card className="h-full border-slate-800/90 bg-slate-900/55 transition-all duration-200 hover:-translate-y-1 hover:border-cyan-500/30 hover:bg-slate-900/78">
+                  <CardContent className="flex h-full flex-col gap-5 p-6">
+                    <div>
+                      <div className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                        {occupation.major_category}
+                      </div>
+                      <h2 className="mt-3 text-2xl font-semibold leading-tight text-white">{occupation.title}</h2>
+                      <p className="mt-3 text-sm leading-7 text-slate-400">
+                        {getOccupationStory(occupation).routine}
+                      </p>
+                    </div>
+
+                    <div className="rounded-[0.95rem] border border-slate-800 bg-slate-950/55 px-4 py-3">
+                      <div className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-slate-500">Modeled upside</div>
+                      <div className="mt-2 text-3xl font-semibold text-cyan-300">
+                        {getOccupationStory(occupation).estimatedMinutes}m
+                      </div>
+                      <div className="mt-1 text-sm text-slate-400">{getOccupationStory(occupation).payoff}</div>
+                    </div>
+
+                    <div className="mt-auto flex flex-wrap gap-3">
+                      <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-2 text-sm font-medium text-emerald-300">
+                        <Zap className="h-4 w-4" />
+                        {occupation.ai_opportunities_count || 0} automation angles
+                      </span>
+                      <span className="inline-flex items-center gap-2 rounded-full bg-cyan-500/10 px-3 py-2 text-sm font-medium text-cyan-300">
+                        <Target className="h-4 w-4" />
+                        {occupation.micro_tasks_count || 0} mapped micro-tasks
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
               </Link>
             ))}
-          </div>
+          </motion.div>
         )}
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-8">
+        {!isLoading && totalPages > 1 ? (
+          <div className="mt-10 flex items-center justify-center gap-2">
             <button
-              onClick={() => setPage(Math.max(1, page - 1))}
+              onClick={() => {
+                setPage(Math.max(1, page - 1));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               disabled={page === 1}
-              className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-700 transition-colors"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-800 bg-slate-900/70 text-slate-300 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
             >
-              Previous
+              <ChevronLeft className="h-5 w-5" />
             </button>
-            
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
-                let pageNum;
-                if (totalPages <= 7) {
-                  pageNum = i + 1;
-                } else if (page <= 4) {
-                  pageNum = i + 1;
-                } else if (page >= totalPages - 3) {
-                  pageNum = totalPages - 6 + i;
-                } else {
-                  pageNum = page - 3 + i;
-                }
-                
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setPage(pageNum)}
-                    className={`w-10 h-10 rounded-lg transition-colors ${
-                      page === pageNum
-                        ? 'bg-emerald-500 text-white'
-                        : 'bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700'
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-            </div>
+
+            {pageNumbers.map((pageNumber) => (
+              <button
+                key={pageNumber}
+                onClick={() => {
+                  setPage(pageNumber);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`inline-flex h-11 min-w-11 items-center justify-center rounded-full px-3 text-sm font-semibold transition-all ${
+                  page === pageNumber
+                    ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-lg shadow-cyan-500/20'
+                    : 'border border-slate-800 bg-slate-900/70 text-slate-300 hover:text-white'
+                }`}
+              >
+                {pageNumber}
+              </button>
+            ))}
 
             <button
-              onClick={() => setPage(Math.min(totalPages, page + 1))}
+              onClick={() => {
+                setPage(Math.min(totalPages, page + 1));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               disabled={page === totalPages}
-              className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-700 transition-colors"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-800 bg-slate-900/70 text-slate-300 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
             >
-              Next
+              <ChevronRight className="h-5 w-5" />
             </button>
           </div>
-        )}
-
-        {/* Page Info */}
-        <div className="text-center text-slate-500 mt-4">
-          Showing {((page - 1) * pageSize) + 1}-{Math.min(page * pageSize, total || 0)} of {(total || 0).toLocaleString()} occupations
-        </div>
+        ) : null}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800 px-4 py-12 mt-16">
-        <div className="max-w-7xl mx-auto text-center text-slate-500">
-          <p>Built with Next.js, Supabase & Vercel</p>
-          <p className="mt-2 text-sm">Data sourced from U.S. Bureau of Labor Statistics</p>
+      <footer className="border-t border-slate-800/80 bg-slate-950/70 py-8">
+        <div className="page-container flex flex-col gap-2 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+          <p>Built with Next.js, PostgreSQL, and Tailwind CSS.</p>
+          <p>Occupation data from the U.S. Bureau of Labor Statistics.</p>
         </div>
       </footer>
     </div>

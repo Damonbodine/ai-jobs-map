@@ -1,4 +1,17 @@
 import type { Metadata } from 'next';
+import { Manrope, Newsreader } from 'next/font/google';
+
+const headingFont = Newsreader({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  display: 'swap',
+});
+
+const bodyFont = Manrope({
+  subsets: ['latin'],
+  variable: '--font-body',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'AI Jobs Map',
@@ -13,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={`${headingFont.variable} ${bodyFont.variable}`}>{children}</body>
     </html>
   );
 }

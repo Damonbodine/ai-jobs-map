@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       orderClause = 'ai_opportunities_count DESC, o.title ASC';
     }
 
-    // Get total count
+    // Get total count from the filtered occupations table only.
     const countResult = await pool.query(
       `SELECT COUNT(*) as total
        FROM occupations o
@@ -46,30 +46,41 @@ export async function GET(request: NextRequest) {
     const total = parseInt(countResult.rows[0].total);
     const totalPages = Math.ceil(total / pageSize);
 
-    // Get occupations with counts
+    // First isolate the current page of occupations, then compute related counts
+    // only for those rows instead of aggregating entire side tables every request.
     const result = await pool.query(
-      `SELECT 
-         o.id,
-         o.title,
-         o.slug,
-         o.major_category,
-         o.sub_category,
+      `WITH paged_occupations AS (
+         SELECT
+           o.id,
+           o.title,
+           o.slug,
+           o.major_category,
+           o.sub_category
+         FROM occupations o
+         WHERE ${whereClause}
+         ORDER BY ${orderClause}
+         LIMIT $${params.length + 1} OFFSET $${params.length + 2}
+       )
+       SELECT
+         p.id,
+         p.title,
+         p.slug,
+         p.major_category,
+         p.sub_category,
          COALESCE(ao_count.count, 0) as ai_opportunities_count,
          COALESCE(mt_count.count, 0) as micro_tasks_count
-       FROM occupations o
-       LEFT JOIN (
-         SELECT occupation_id, COUNT(*) as count
-         FROM ai_opportunities
-         GROUP BY occupation_id
-       ) ao_count ON o.id = ao_count.occupation_id
-       LEFT JOIN (
-         SELECT occupation_id, COUNT(*) as count
-         FROM job_micro_tasks
-         GROUP BY occupation_id
-       ) mt_count ON o.id = mt_count.occupation_id
-       WHERE ${whereClause}
-       ORDER BY ${orderClause}
-       LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+       FROM paged_occupations p
+       LEFT JOIN LATERAL (
+         SELECT COUNT(*) as count
+         FROM ai_opportunities ao
+         WHERE ao.occupation_id = p.id
+       ) ao_count ON true
+       LEFT JOIN LATERAL (
+         SELECT COUNT(*) as count
+         FROM job_micro_tasks jmt
+         WHERE jmt.occupation_id = p.id
+       ) mt_count ON true
+       ORDER BY ${sort === 'ai_opportunities' ? 'ai_opportunities_count DESC, p.title ASC' : 'p.title ASC'}`,
       [...params, pageSize, offset]
     );
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { ChevronRight, Search, Zap, Users } from 'lucide-react';
 
 interface Occupation {
   id: number;
@@ -66,6 +67,7 @@ export default function CategoryPage() {
   const categorySlug = params.category as string;
   const [occupations, setOccupations] = useState<Occupation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   const categoryName = slugToCategory[categorySlug] || categorySlug
     .split('-')
@@ -88,70 +90,117 @@ export default function CategoryPage() {
   }, [categoryName]);
 
   const icon = categoryIcons[categoryName] || '📁';
+  const filteredOccupations = search
+    ? occupations.filter(o => o.title.toLowerCase().includes(search.toLowerCase()))
+    : occupations;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <header className="border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/ai-jobs" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">AI</span>
-            </div>
-            <span className="text-white font-semibold text-lg">AI Jobs Map</span>
-          </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/ai-jobs" className="text-slate-300 hover:text-white transition-colors">Search</Link>
-            <Link href="/ai-jobs/browse" className="text-slate-300 hover:text-white transition-colors">Browse</Link>
-          </nav>
-        </div>
-      </header>
+    <div className="app-shell text-slate-50">
+      <div className="absolute top-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full bg-emerald-600/10 blur-[140px] pointer-events-none animate-pulse-glow" style={{ animationDuration: '7s' }} />
+      <div className="absolute bottom-[-10%] right-[-10%] h-[30%] w-[30%] rounded-full bg-cyan-600/10 blur-[140px] pointer-events-none animate-pulse-glow" style={{ animationDuration: '9s' }} />
 
-      <main className="max-w-7xl mx-auto px-4 py-12">
-        <Link href="/ai-jobs" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+      <main className="page-container relative z-10 py-12 md:py-16">
+        <Link href="/ai-jobs" className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300 group">
+          <ChevronRight className="w-4 h-4 rotate-180 group-hover:-translate-x-0.5 transition-transform" />
           Back to Search
         </Link>
 
-        <div className="flex items-center gap-4 mb-8">
-          <span className="text-5xl">{icon}</span>
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white">{categoryName}</h1>
-            <p className="text-slate-400 mt-1">{loading ? 'Loading...' : `${occupations.length} occupations`}</p>
+        <div className="panel mb-8 rounded-[2rem] p-6 md:p-8">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-end">
+            <div className="flex items-start gap-4 md:gap-5">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.4rem] border border-slate-800 bg-slate-950/70 text-4xl shadow-[0_18px_50px_rgba(2,6,23,0.22)]">
+                {icon}
+              </div>
+              <div className="max-w-3xl">
+                <div className="eyebrow mb-4">Industry sector</div>
+                <h1 className="section-title text-white">{categoryName}</h1>
+                <p className="mt-3 max-w-2xl text-slate-400 leading-8">
+                  {loading ? 'Loading occupations…' : `Browse ${occupations.length} roles in this sector and open the ones where routine work looks ready for smarter automation.`}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-[1.5rem] border border-slate-800 bg-slate-950/55 px-5 py-4 text-left">
+              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Roles in sector</div>
+              <div className="mt-2 flex items-center gap-2 text-3xl font-black text-cyan-300">
+                <Users className="h-5 w-5" />
+                {loading ? '...' : occupations.length}
+              </div>
+            </div>
           </div>
+        </div>
+
+        <div className="panel mb-8 rounded-[1.8rem] p-4 md:p-5">
+          <div className="relative group">
+            <div className="absolute -inset-px rounded-[1.4rem] bg-gradient-to-r from-emerald-500/15 to-cyan-500/15 opacity-0 blur-sm transition-all duration-300 group-focus-within:opacity-100" />
+            <div className="relative flex items-center">
+              <Search className="absolute left-4 z-10 h-5 w-5 text-slate-500 transition-colors duration-300 group-focus-within:text-cyan-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={`Filter ${categoryName} occupations...`}
+                className="h-14 w-full rounded-[1.4rem] border border-slate-800 bg-slate-950/70 pl-12 pr-4 text-white placeholder-slate-500 transition-all focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
+              />
+            </div>
+          </div>
+          {search && (
+            <div className="mt-3 text-sm text-slate-500">
+              Found <span className="font-medium text-slate-200">{filteredOccupations.length}</span> results for &quot;{search}&quot;
+            </div>
+          )}
         </div>
 
         {loading ? (
           <div className="grid gap-3">
             {[...Array(10)].map((_, i) => (
-              <div key={i} className="bg-slate-800/50 rounded-lg h-16 animate-pulse" />
+              <div key={i} className="h-16 rounded-[1.25rem] border border-slate-800 bg-slate-900/60 animate-pulse" />
             ))}
           </div>
         ) : (
-          <div className="grid gap-3">
-            {occupations.map((occupation) => (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {filteredOccupations.map((occupation) => (
               <Link
                 key={occupation.id}
                 href={`/ai-jobs/${occupation.slug}`}
-                className="group bg-slate-800/80 border border-slate-700 hover:border-emerald-500/50 rounded-lg p-4 transition-all hover:shadow-lg hover:shadow-emerald-500/10"
+                className="group flex min-h-[112px] rounded-[1.5rem] border border-slate-800 bg-slate-900/60 p-5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-cyan-500/35 hover:bg-slate-900/80 hover:shadow-[0_22px_55px_rgba(2,6,23,0.28)]"
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-white group-hover:text-emerald-400 transition-colors">{occupation.title}</span>
-                  <svg className="w-5 h-5 text-slate-500 group-hover:text-emerald-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                <div className="flex w-full items-start justify-between gap-4">
+                  <div className="flex min-w-0 items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-950/75 text-slate-400 transition-all group-hover:bg-cyan-500/10 group-hover:text-cyan-300">
+                      <Zap className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0 pr-2">
+                      <span className="block text-lg font-semibold leading-snug text-white transition-colors group-hover:text-cyan-300">
+                        {occupation.title}
+                      </span>
+                      <span className="mt-2 block text-sm text-slate-500">{occupation.major_category}</span>
+                    </div>
+                  </div>
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-800 bg-slate-950/65">
+                    <ChevronRight className="h-4 w-4 text-slate-600 transition-all group-hover:translate-x-0.5 group-hover:text-cyan-300" />
+                  </div>
                 </div>
               </Link>
             ))}
           </div>
         )}
 
-        {!loading && occupations.length === 0 && (
-          <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-12 text-center">
-            <div className="text-4xl mb-4">🔍</div>
-            <h3 className="text-xl font-semibold text-white mb-2">No occupations found</h3>
-            <p className="text-slate-400">We couldn't find any occupations in this category.</p>
+        {!loading && filteredOccupations.length === 0 && (
+          <div className="panel rounded-[2rem] p-12 text-center">
+            <Search className="mx-auto mb-4 h-12 w-12 text-slate-600" />
+            <h3 className="mb-2 text-xl font-semibold text-white">No occupations found</h3>
+            <p className="text-slate-400">
+              {search ? `No results for "${search}". Try a broader term.` : "We couldn't find any occupations in this category."}
+            </p>
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="mt-4 text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300"
+              >
+                Clear search
+              </button>
+            )}
           </div>
         )}
       </main>

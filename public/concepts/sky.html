@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luminous Sky | Business Focused Concept</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Inter:wght@200..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --font-heading: 'Newsreader', serif;
+            --font-body: 'Inter', sans-serif;
+            --surface: #f6fafe;
+            --surface-container-low: #f0f4f8;
+            --surface-container-lowest: #ffffff;
+            --primary: #004ae8;
+            --primary-container: #3766ff;
+            --on-surface-variant: #414755;
+        }
+        body {
+            background-color: var(--surface);
+            color: var(--on-surface-variant);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        .sky-gradient {
+            background: linear-gradient(180deg, #f6fafe 0%, #e0f2fe 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 20px 40px rgba(23, 28, 31, 0.04);
+        }
+        .text-glow {
+            text-shadow: 0 0 30px rgba(0, 74, 232, 0.1);
+        }
+    </style>
+</head>
+<body class="selection:bg-blue-100">
+
+    <!-- Global Sky Background -->
+    <div class="fixed inset-0 z-0 pointer-events-none sky-gradient">
+        <div class="absolute bottom-0 left-0 right-0 h-[40vh] bg-gradient-to-t from-white to-transparent opacity-60"></div>
+    </div>
+
+    <!-- Navigation Pill -->
+    <nav class="fixed top-8 left-1/2 -translate-x-1/2 z-50 px-6 py-3 glass-card rounded-full flex items-center gap-8">
+        <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-full bg-blue-600"></div>
+            <span class="text-sm font-bold tracking-tighter text-slate-900">AIRIS</span>
+        </div>
+        <div class="hidden md:flex gap-6 text-[10px] font-black uppercase tracking-widest opacity-60">
+            <a href="#" class="hover:text-blue-600 transition-colors">Home</a>
+            <a href="#" class="hover:text-blue-600 transition-colors">About us</a>
+            <a href="#" class="hover:text-blue-600 transition-colors">Pricing</a>
+            <a href="#" class="hover:text-blue-600 transition-colors">Contact</a>
+        </div>
+        <button class="bg-slate-950 text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-colors">
+            Get Started
+        </button>
+    </nav>
+
+    <main class="relative z-10 max-w-6xl mx-auto pt-48 pb-60 px-8 text-center">
+        
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-10 border border-blue-100">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+            From Strategy to Success
+        </div>
+
+        <h1 class="text-[clamp(3.5rem,8vw,6rem)] font-['Newsreader'] italic font-black leading-[0.95] tracking-tight text-slate-900 mb-12 max-w-4xl mx-auto text-glow">
+            Build and <span class="text-blue-600">Growth</span> with <br>Scalable Tools.
+        </h1>
+
+        <p class="text-lg leading-relaxed text-slate-500 max-w-xl mx-auto mb-16 opacity-80">
+            Easily adapt to changes and scale your operations with our flexible infrastructure, designed to support your business growth.
+        </p>
+
+        <div class="flex justify-center gap-4 mb-32">
+            <button class="bg-slate-950 text-white px-10 py-5 rounded-full font-black uppercase tracking-widest text-[10px] shadow-2xl hover:bg-blue-700 transition-all active:scale-95">
+                Get Started
+            </button>
+            <button class="glass-card px-10 py-5 rounded-full font-black uppercase tracking-widest text-[10px] hover:bg-white transition-all">
+                Learn More
+            </button>
+        </div>
+
+        <!-- Floating Glassmorphic Components Area -->
+        <div class="relative h-[500px] w-full max-w-5xl mx-auto mt-20">
+            
+            <!-- Center Card: Carduser -->
+            <div id="orb-center" class="absolute left-1/2 top-0 -translate-x-1/2 z-30 glass-card p-10 rounded-[3rem] w-80 cursor-move">
+                <div class="flex justify-between items-center mb-8">
+                    <span class="text-sm font-bold text-slate-900">Carduser</span>
+                    <select class="text-[9px] font-black uppercase tracking-widest opacity-40 bg-transparent border-none">
+                        <option>Monthly</option>
+                    </select>
+                </div>
+                <!-- Arc Metric Simulation -->
+                <div class="relative w-40 h-40 mx-auto mb-6">
+                    <svg viewBox="0 0 100 60" class="w-full h-full">
+                        <path d="M 10 50 A 40 40 0 1 1 90 50" fill="none" stroke="#f1f5f9" stroke-width="12" stroke-linecap="round"/>
+                        <path d="M 10 50 A 40 40 0 1 1 75 20" fill="none" stroke="#004ae8" stroke-width="12" stroke-linecap="round" class="animate-[dash_2s_ease-out_forwards]" style="stroke-dasharray: 100; stroke-dashoffset: 20;"/>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pt-8">
+                        <span class="text-4xl font-black text-slate-900">80%</span>
+                        <span class="text-[8px] font-black uppercase tracking-widest opacity-40">Responses</span>
+                    </div>
+                </div>
+                <div class="flex gap-1 justify-center">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-200"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-200"></span>
+                </div>
+            </div>
+
+            <!-- Left Card: Transactions -->
+            <div id="orb-left" class="absolute left-0 top-20 z-20 glass-card p-8 rounded-[2.5rem] w-64 rotate-[-6deg] cursor-move">
+                <div class="text-xs font-bold text-slate-900 mb-6">Transactions</div>
+                <div class="flex items-end gap-2 mb-4">
+                    <span class="text-4xl font-black text-slate-900">85%</span>
+                    <span class="text-emerald-500 text-[10px] font-black mb-1">+12%</span>
+                </div>
+                <div class="flex items-end gap-1.5 h-16">
+                    <div class="w-full bg-blue-100 rounded-t-lg h-[40%]"></div>
+                    <div class="w-full bg-blue-200 rounded-t-lg h-[60%]"></div>
+                    <div class="w-full bg-blue-600 rounded-t-lg h-[100%]"></div>
+                    <div class="w-full bg-blue-300 rounded-t-lg h-[75%]"></div>
+                    <div class="w-full bg-blue-100 rounded-t-lg h-[50%]"></div>
+                </div>
+            </div>
+
+            <!-- Right Card: Revenue (Simulating the overlapping cards) -->
+            <div id="orb-right" class="absolute right-0 top-20 z-20 glass-card p-8 rounded-[2.5rem] w-64 rotate-[6deg] cursor-move">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-xs font-bold text-slate-900">Revenue</span>
+                    <span class="text-[8px] font-black opacity-30 italic">Real-time</span>
+                </div>
+                <div class="space-y-4">
+                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-600 w-[70%]" id="bar1"></div>
+                    </div>
+                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-300 w-[45%]" id="bar2"></div>
+                    </div>
+                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-100 w-[30%]" id="bar3"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-60 max-w-4xl mx-auto text-center">
+             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-12">
+                About us
+            </div>
+            <h3 class="text-4xl font-['Newsreader'] italic font-black leading-[1.2] text-slate-900 max-w-3xl mx-auto">
+                We are passionate about empowering individuals and businesses to take control of their finances and achieve their financial goals.
+            </h3>
+        </div>
+
+    </main>
+
+    <style>
+        @keyframes dash {
+            from { stroke-dashoffset: 100; }
+            to { stroke-dashoffset: 25; }
+        }
+    </style>
+
+    <script>
+        // Simple Draggable for all "orbs" (cards)
+        function makeDraggable(id) {
+            const el = document.getElementById(id);
+            let isDragging = false;
+            let offset = { x: 0, y: 0 };
+
+            el.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                offset.x = e.clientX - el.offsetLeft;
+                offset.y = e.clientY - el.offsetTop;
+                el.style.zIndex = 100;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                el.style.left = (e.clientX - offset.x) + 'px';
+                el.style.top = (e.clientY - offset.y) + 'px';
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        }
+
+        makeDraggable('orb-center');
+        makeDraggable('orb-left');
+        makeDraggable('orb-right');
+    </script>
+</body>
+</html>

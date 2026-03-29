@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Narrative Sanctuary | Concept C</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --font-heading: 'Newsreader', serif;
+            --font-body: 'Manrope', sans-serif;
+            --bg-linen: #F7F7F2;
+            --color-sage: #4B5563;
+            --color-coral: #F87171;
+        }
+        body {
+            background-color: var(--bg-linen);
+            color: var(--color-sage);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+        }
+        .font-heading { font-family: var(--font-heading); }
+    </style>
+</head>
+<body class="selection:bg-coral-100">
+
+    <nav class="fixed top-0 left-0 right-0 p-12 flex justify-between items-center z-50">
+        <div class="text-[9px] font-black uppercase tracking-[0.4em] opacity-40">Narrative v1.0</div>
+        <div class="flex items-center gap-4">
+            <span class="text-[9px] font-black uppercase tracking-[0.2em] text-[#F87171]">Sanctuary Mode Engaged</span>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto pt-48 pb-60 px-8 relative z-10">
+        
+        <div class="relative space-y-24">
+            
+            <section class="max-w-2xl">
+                <h1 class="text-7xl font-heading italic font-black leading-[1.05] tracking-tight mb-12 text-slate-900">
+                    The <span class="text-[#F87171]">Sanctuary</span> of Invisibility.
+                </h1>
+                <p class="text-2xl leading-relaxed font-heading italic opacity-80 mb-12">
+                    In the Narrative Sanctuary, technology exists as a secondary background layer, allowing the human element to step forward.
+                </p>
+            </section>
+
+            <!-- Life Force Indicator (Draggable) -->
+            <div id="orb" class="fixed z-40 cursor-move" style="left: 65%; top: 30%;">
+                <div class="p-12 bg-white rounded-3xl shadow-[0_50px_100px_rgba(0,0,0,0.04)] border border-slate-100 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 rounded-full bg-coral-50 flex items-center justify-center mb-8">
+                        <svg class="w-8 h-8 text-[#F87171]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.85-8.85 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    </div>
+                    <div class="text-[10px] font-black uppercase tracking-[0.3em] text-[#F87171] mb-2">Human Core</div>
+                    <div class="text-5xl font-black text-slate-800 tracking-tighter italic font-heading leading-none">Recovered</div>
+                </div>
+            </div>
+
+            <div class="grid gap-16 relative z-30">
+                <div class="p-16 bg-white/50 backdrop-blur-sm rounded-[3rem] border border-white/80 max-w-2xl">
+                    <h3 class="text-sm font-black uppercase tracking-widest text-[#F87171] mb-8">01. The Architecture of Peace</h3>
+                    <p class="text-xl leading-[1.8] font-heading italic text-slate-600">
+                        The Narrative Sanctuary is designed to be felt, not just used. It uses wide whitespace and high-fidelity typography to provide a sense of intellectual safety. Information is presented in a linear flow, preventing the "dashboard fatigue" common in traditional software.
+                    </p>
+                </div>
+                <div class="p-16 max-w-xl self-end">
+                    <h3 class="text-sm font-black uppercase tracking-widest text-[#F87171] mb-8">02. Recovery Index</h3>
+                    <p class="text-3xl font-heading italic leading-tight text-slate-800">
+                        "Technology should be as intentional as the time it helps you reclaim."
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="fixed bottom-0 left-0 right-0 p-12 flex justify-center z-50 pointer-events-none">
+        <button class="bg-[#F87171] text-white px-12 py-6 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl pointer-events-auto hover:scale-105 transition-transform">
+            Enter the Sanctuary
+        </button>
+    </footer>
+
+    <script>
+        // Draggable Logic
+        const orb = document.getElementById('orb');
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+        orb.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offset.x = e.clientX - orb.offsetLeft;
+            offset.y = e.clientY - orb.offsetTop;
+            orb.style.zIndex = 100;
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            orb.style.left = (e.clientX - offset.x) + 'px';
+            orb.style.top = (e.clientY - offset.y) + 'px';
+        });
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+    </script>
+</body>
+</html>

@@ -18,6 +18,12 @@ export async function GET(request: NextRequest) {
       query += ' WHERE tier = $1';
       params.push(tier);
     }
+
+    if (occupation) {
+      query += params.length === 0 ? ' WHERE ' : ' AND ';
+      query += `$${params.length + 1} = ANY(target_occupations)`;
+      params.push(occupation);
+    }
     
     query += ' ORDER BY base_price ASC';
 

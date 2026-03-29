@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Luminous Horizon | Concept B</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --font-body: 'Manrope', sans-serif;
+            --bg-midnight: #020617;
+            --color-emerald: #10B981;
+            --color-cyan: #06B6D4;
+        }
+        body {
+            background-color: var(--bg-midnight);
+            color: #E2E8F0;
+            font-family: var(--font-body);
+            overflow-x: hidden;
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+    </style>
+</head>
+<body class="selection:bg-emerald-500/30">
+
+    <!-- Cinematic Background -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-emerald-500/10 blur-[150px] rounded-full animate-pulse"></div>
+        <div class="absolute bottom-[-10%] left-[-20%] w-[50%] h-[50%] bg-blue-600/10 blur-[130px] rounded-full"></div>
+    </div>
+
+    <nav class="fixed top-0 left-0 right-0 p-8 flex justify-between items-center z-50">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center">
+                <svg class="w-5 h-5 text-[#020617]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/></svg>
+            </div>
+            <span class="text-xl font-black tracking-tighter uppercase italic">Horizon v1.0</span>
+        </div>
+        <div class="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400 opacity-60">High-Velocity Synthesis</div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto pt-40 pb-60 px-12 relative z-10 text-center">
+        
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-black uppercase tracking-[0.3em] mb-12 border border-emerald-500/20">
+            Time-Synthesis Engine Active
+        </div>
+
+        <h1 class="text-[clamp(3.5rem,8vw,6rem)] font-black leading-[0.9] tracking-[-0.06em] text-white mb-12 uppercase italic text-glow">
+            Automation is <span class="text-transparent bg-clip-text bg-gradient-to-b from-emerald-300 to-emerald-600">Reclaiming</span> Your Life.
+        </h1>
+
+        <!-- High-Velocity Metric Box (Draggable) -->
+        <div id="orb" class="fixed z-40 cursor-crosshair" style="left: 70%; top: 30%;">
+            <div class="p-1.5 bg-gradient-to-br from-emerald-500/30 to-transparent rounded-2xl backdrop-blur-3xl shadow-[0_0_50px_rgba(16,185,129,0.1)]">
+                <div class="bg-slate-950/80 rounded-xl p-8 border border-white/10 flex flex-col items-center">
+                    <div class="text-[8px] font-black uppercase tracking-widest text-slate-500 mb-2">Efficiency Velocity</div>
+                    <div class="text-5xl font-black text-emerald-400 tracking-tighter italic">200x</div>
+                    <div class="mt-4 flex gap-1">
+                        <div class="w-1 h-3 bg-emerald-500/40 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                        <div class="w-1 h-5 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        <div class="w-1 h-4 bg-emerald-500/60 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Glass Panel Grid -->
+        <div class="grid md:grid-cols-3 gap-8 text-left mt-32 max-w-4xl mx-auto">
+            <div class="p-8 bg-white/5 backdrop-blur-md rounded-2xl border border-white/5 hover:border-emerald-500/30 transition-all group">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                </div>
+                <h3 class="text-xs font-black uppercase tracking-widest text-emerald-400 mb-4">Recovery Index</h3>
+                <p class="text-slate-400 leading-relaxed text-sm">Real-time sentiment monitoring ensures every automated task preserves human dignity and professional worth.</p>
+            </div>
+            <div class="p-8 bg-white/5 backdrop-blur-md rounded-2xl border border-white/5 hover:border-emerald-500/30 transition-all group md:col-span-2">
+                <h3 class="text-4xl font-black tracking-tighter italic mb-6">"Digital precision meets human sanctuary."</h3>
+                <p class="text-slate-400 text-lg opacity-80 leading-relaxed">The Horizon concept is a high-velocity precision engine designed to synthesize complex accounting audits into effortless background processes.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="fixed bottom-12 left-0 right-0 flex justify-center z-50 pointer-events-none">
+        <button class="bg-white text-slate-900 px-12 py-5 rounded-md font-black uppercase tracking-tighter text-xs hover:bg-emerald-400 shadow-[0_30px_60px_rgba(16,185,129,0.2)] transition-all pointer-events-auto active:scale-95">
+            INITIATE LIFE AUDIT
+        </button>
+    </div>
+
+    <script>
+        // Draggable Logic
+        const orb = document.getElementById('orb');
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+        orb.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offset.x = e.clientX - orb.offsetLeft;
+            offset.y = e.clientY - orb.offsetTop;
+            orb.style.zIndex = 100;
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            orb.style.left = (e.clientX - offset.x) + 'px';
+            orb.style.top = (e.clientY - offset.y) + 'px';
+        });
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+    </script>
+</body>
+</html>

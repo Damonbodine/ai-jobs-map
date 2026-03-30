@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { Pool } from 'pg';
-import { ChevronLeft, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronDown, ArrowRight } from 'lucide-react';
 import { getOccupationRecommendationSnapshot } from '@/lib/ai-jobs/recommendations';
 import { Footer } from '@/components/ui/footer';
 
@@ -689,130 +689,25 @@ export default async function OccupationPage({ params }: PageProps) {
         )}
       </section>
 
+      {/* ------------------------------------------------------------------ */}
+      {/* CTA — Go build your solution                                       */}
+      {/* ------------------------------------------------------------------ */}
       <div className="page-container"><div className="border-t border-edge" /></div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* BEAT 3 — The best place to start                                   */}
-      {/* ------------------------------------------------------------------ */}
-      <section className="page-container py-16 md:py-20">
+      <section className="page-container py-16 md:py-20 text-center">
         <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
-          A good place to start
+          Ready to get that time back?
         </h2>
-        <p className="mt-2 max-w-2xl text-ink-secondary leading-relaxed">
-          One support system that fits how you already work.
+        <p className="mx-auto mt-3 max-w-md text-[0.85rem] leading-[1.6] text-ink-secondary">
+          Tell us about your day and we&apos;ll build a custom recommendation for your role.
         </p>
-
-        {primarySolutions.map((product) => (
-          <div key={product.name} className="mt-8 rounded-xl border border-edge bg-surface-raised px-5 py-5 md:px-6 md:py-6">
-            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-              <div className="max-w-2xl">
-                <p className="font-medium text-ink">{product.name}</p>
-                <p className="mt-1 text-ink-secondary leading-relaxed">{product.strapline}</p>
-              </div>
-              <div className="flex shrink-0 items-baseline gap-2 md:text-right">
-                <span className="font-editorial tabular-nums text-ink" style={{ fontSize: '1.5rem' }}>
-                  {recommendationSnapshot.coverage.estimatedDailyHoursSaved > 0
-                    ? Math.round(recommendationSnapshot.coverage.estimatedDailyHoursSaved * 60)
-                    : product.totalMinutes}
-                </span>
-                <span className="text-sm italic text-ink-tertiary">min/day</span>
-              </div>
-            </div>
-          </div>
-        ))}
-
-        <div className="mt-6">
-          <Link
-            href={`/factory?occupation=${occupation.slug}`}
-            className="btn-primary inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-5 py-2.5 text-sm font-medium transition-colors hover:bg-transparent hover:text-ink"
-          >
-            Build your toolkit
-          </Link>
-        </div>
-      </section>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* EXPANDED — Detailed breakdown (collapsed by default)               */}
-      {/* ------------------------------------------------------------------ */}
-      <div className="page-container"><div className="border-t border-edge" /></div>
-
-      <section className="page-container py-16 md:py-20">
-        <div className="eyebrow mb-6">Detailed breakdown</div>
-
-        <div className="space-y-2">
-
-          {/* Section — Evidence layer */}
-          {recommendationSnapshot.topActions.length > 0 && (
-            <details className="group rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
-                <span className="font-medium text-ink">Evidence layer</span>
-                <ChevronDown className="h-4 w-4 shrink-0 text-ink-tertiary transition-transform duration-200 group-open:rotate-180" />
-              </summary>
-              <div className="border-t border-edge px-5 py-5 space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <p className="eyebrow mb-3">Common action patterns</p>
-                    <div className="space-y-2">
-                      {recommendationSnapshot.topActions.slice(0, 5).map((action) => (
-                        <div key={action.code} className="flex items-center justify-between rounded-lg border border-edge bg-surface-sunken px-4 py-2.5">
-                          <div>
-                            <p className="text-sm font-medium text-ink">{action.name}</p>
-                            <p className="text-xs text-ink-tertiary">{action.taskCount} tasks &middot; {Math.round(action.confidence * 100)}% confidence</p>
-                          </div>
-                          <span className="text-xs text-ink-tertiary">{action.code}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="eyebrow mb-3">Recommended support systems</p>
-                    <div className="space-y-2">
-                      {recommendationSnapshot.recommendedPackages.slice(0, 3).map((pkg) => (
-                        <div key={pkg.id} className="rounded-lg border border-edge bg-surface-sunken px-4 py-2.5">
-                          <p className="text-sm font-medium text-ink">{pkg.name}</p>
-                          <p className="mt-0.5 text-xs text-ink-tertiary leading-relaxed">{pkg.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </details>
-          )}
-
-          {/* Section 3 — Human edge */}
-          {visibleSkillSummary.length > 0 && (
-            <details className="group rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
-                <span className="font-medium text-ink">Human edge</span>
-                <ChevronDown className="h-4 w-4 shrink-0 text-ink-tertiary transition-transform duration-200 group-open:rotate-180" />
-              </summary>
-              <div className="border-t border-edge px-5 py-5 space-y-4">
-                <p className="text-sm text-ink-secondary leading-relaxed">
-                  The goal is not to automate away judgment. It is to remove the repetitive setup around the work so the person can stay with context, edge cases, trust, and final decisions.
-                </p>
-                {humanEdgeNotes.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {humanEdgeNotes.map((note) => (
-                      <span key={note} className="rounded-full border border-edge bg-surface-sunken px-3 py-1.5 text-xs text-ink-secondary">
-                        {note}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {visibleSkillSummary.map((item) => (
-                    <div key={item.label} className="rounded-lg border border-edge bg-surface-sunken px-4 py-3">
-                      <p className="text-xs text-ink-tertiary">{item.label}</p>
-                      <p className="mt-1 text-lg font-medium text-ink">{item.value}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </details>
-          )}
-
-        </div>
+        <Link
+          href={`/factory?occupation=${occupation.slug}`}
+          className="btn-primary mt-8 inline-flex items-center gap-2 rounded-lg border border-primary bg-primary px-6 py-3 text-[0.875rem] font-medium transition-colors hover:bg-transparent hover:text-ink"
+        >
+          Build your toolkit
+          <ArrowRight className="h-4 w-4" />
+        </Link>
       </section>
 
       <Footer />

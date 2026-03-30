@@ -694,20 +694,24 @@ export default async function OccupationPage({ params }: PageProps) {
       {/* ------------------------------------------------------------------ */}
       <div className="page-container"><div className="border-t border-edge" /></div>
 
-      <section className="page-container py-16 md:py-20 text-center">
-        <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
-          Ready to get that time back?
-        </h2>
-        <p className="mx-auto mt-3 max-w-md text-[0.85rem] leading-[1.6] text-ink-secondary">
-          Tell us about your day and we&apos;ll build a custom recommendation for your role.
-        </p>
-        <Link
-          href={`/factory?occupation=${occupation.slug}`}
-          className="btn-primary mt-8 inline-flex items-center gap-2 rounded-lg border border-primary bg-primary px-6 py-3 text-[0.875rem] font-medium transition-colors hover:bg-transparent hover:text-ink"
-        >
-          Build your toolkit
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+      <section className="page-container py-16 md:py-20">
+        <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
+              Ready to get that time back?
+            </h2>
+            <p className="mt-1.5 text-[0.85rem] text-ink-secondary">
+              Tell us about your day. We&apos;ll build a custom recommendation.
+            </p>
+          </div>
+          <Link
+            href={`/factory?occupation=${occupation.slug}`}
+            className="btn-primary group inline-flex shrink-0 items-center gap-2.5 rounded-lg border border-primary bg-primary px-8 py-3.5 text-[0.9rem] font-medium transition-all hover:bg-transparent hover:text-ink"
+          >
+            Get started
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
       </section>
 
       <Footer />

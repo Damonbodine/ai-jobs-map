@@ -2,7 +2,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { Pool } from 'pg';
-import { ChevronLeft, ChevronDown, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ArrowRight } from 'lucide-react';
+import { DayChart } from '@/components/occupation/day-chart';
+import { TimeBackChart } from '@/components/occupation/time-back-chart';
+import { CountUp } from '@/components/ui/count-up';
 import { getOccupationRecommendationSnapshot } from '@/lib/ai-jobs/recommendations';
 import { Footer } from '@/components/ui/footer';
 
@@ -541,12 +544,13 @@ export default async function OccupationPage({ params }: PageProps) {
                 Time you could get back
               </p>
               <div className="mt-3 flex items-baseline gap-2">
-                <span
+                <CountUp
+                  value={displayedMinutesRecoveredPerDay}
+                  duration={1.5}
+                  delay={0.3}
                   className="dark-panel-text font-editorial font-normal"
                   style={{ fontSize: 'clamp(4rem, 9vw, 6rem)', lineHeight: 0.85 }}
-                >
-                  {displayedMinutesRecoveredPerDay}
-                </span>
+                />
                 <span className="dark-panel-muted font-editorial text-lg italic">min/day</span>
               </div>
             </div>
@@ -558,127 +562,41 @@ export default async function OccupationPage({ params }: PageProps) {
       </section>
 
       {/* ------------------------------------------------------------------ */}
-      {/* BEAT 2 — A typical day (infographic)                               */}
+      {/* BEAT 2 — A typical day (interactive charts)                        */}
       {/* ------------------------------------------------------------------ */}
       <section className="page-container py-16 md:py-20">
         <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
           A typical day
         </h2>
         <p className="mt-2 max-w-xl text-[0.85rem] leading-[1.6] text-ink-secondary">
-          Based on roles like yours, here&apos;s how an average 8-hour day tends to break down — and where support tools could make a difference.
+          Hover over the chart to explore how your 8-hour day breaks down — and where support tools could make a difference.
         </p>
 
         {daySegments.length > 0 ? (
           <div className="mt-10">
-            {/* Stacked bar — the full day */}
-            <div className="flex h-3 w-full overflow-hidden rounded-full">
-              {daySegments.map((seg, i) => {
-                const widthPercent = Math.max(2, Math.round((seg.minutes / fullDayMinutes) * 100));
-                const isRecoverable = seg.recoverable > 0;
-                return (
-                  <div
-                    key={seg.label}
-                    className={isRecoverable ? 'bg-ink' : 'bg-edge-strong'}
-                    style={{ width: `${widthPercent}%` }}
-                    title={`${seg.label}: ${Math.round(seg.minutes / 60 * 10) / 10}h`}
-                  />
-                );
-              })}
-            </div>
-            <div className="mt-2 flex items-center gap-4 text-[0.7rem] text-ink-tertiary">
-              <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-ink" /> Could be lighter</span>
-              <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-edge-strong" /> Yours to own</span>
-            </div>
+            <DayChart
+              segments={daySegments.map(s => ({ label: s.label, minutes: s.minutes, recoverable: s.recoverable, posture: s.posture }))}
+              totalMinutes={displayedMinutesRecoveredPerDay}
+              fullDayMinutes={fullDayMinutes}
+            />
 
-            {/* Segment breakdown */}
-            <div className="mt-8 space-y-1">
-              {daySegments.map((seg) => {
-                const hours = Math.round(seg.minutes / 60 * 10) / 10;
-                const barWidth = Math.max(3, Math.round((seg.minutes / fullDayMinutes) * 100));
-                const isRecoverable = seg.recoverable > 0;
-
-                return (
-                  <div key={seg.label} className="group rounded-lg px-4 py-3 transition-colors hover:bg-surface-sunken">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div className={`h-2.5 w-2.5 shrink-0 rounded-full ${isRecoverable ? 'bg-ink' : 'bg-edge-strong'}`} />
-                        <span className="text-[0.85rem] font-medium text-ink">{seg.label}</span>
-                      </div>
-                      <div className="flex shrink-0 items-baseline gap-1">
-                        <span className="font-editorial text-[1.1rem] tabular-nums tracking-[-0.02em] text-ink">{hours}</span>
-                        <span className="text-[0.7rem] text-ink-tertiary">h</span>
-                        {isRecoverable && (
-                          <span className="ml-2 rounded bg-surface-sunken px-1.5 py-0.5 text-[0.65rem] font-medium text-ink-secondary">
-                            {seg.recoverable} min back
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="mt-2 ml-[22px]">
-                      <div className="h-[3px] w-full overflow-hidden rounded-full bg-surface-sunken">
-                        <div
-                          className={`h-full rounded-full ${isRecoverable ? 'bg-ink/30' : 'bg-edge-strong/50'}`}
-                          style={{ width: `${barWidth}%` }}
-                        />
-                      </div>
-                    </div>
-                    <p className="mt-1.5 ml-[22px] text-[0.75rem] leading-[1.5] text-ink-tertiary opacity-0 transition-opacity group-hover:opacity-100">
-                      {seg.posture}
-                    </p>
-                  </div>
-                );
-              })}
+            {/* Time back breakdown */}
+            <div className="mt-12">
+              <TimeBackChart
+                items={daySegments.filter(s => s.recoverable > 0).map(seg => {
+                  const matchingSolution = automationSolutions.find(sol =>
+                    sol.matchedBlocks.some(b => b.toLowerCase().includes(seg.label.split(' ')[0].toLowerCase()))
+                  );
+                  return {
+                    label: seg.label,
+                    recoverable: seg.recoverable,
+                    posture: seg.posture,
+                    solution: matchingSolution?.name,
+                  };
+                })}
+                total={displayedMinutesRecoveredPerDay}
+              />
             </div>
-
-            {/* Your time back — expandable with HOW breakdown */}
-            <details className="group mt-8 rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 [&::-webkit-details-marker]:hidden">
-                <div>
-                  <p className="text-[0.85rem] font-medium text-ink">Your time back</p>
-                  <p className="mt-0.5 text-[0.78rem] text-ink-tertiary">
-                    See how each area adds up — and what would handle it
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-baseline gap-1">
-                    <span className="font-editorial text-[2rem] tabular-nums tracking-[-0.03em] text-ink">
-                      {displayedMinutesRecoveredPerDay}
-                    </span>
-                    <span className="font-editorial text-[0.8rem] italic text-ink-tertiary">min/day</span>
-                  </div>
-                  <ChevronDown className="h-4 w-4 shrink-0 text-ink-tertiary transition-transform duration-200 group-open:rotate-180" />
-                </div>
-              </summary>
-              <div className="border-t border-edge px-6 py-5">
-                <div className="space-y-3">
-                  {daySegments.filter(seg => seg.recoverable > 0).map((seg) => {
-                    const matchingSolution = automationSolutions.find(sol =>
-                      sol.matchedBlocks.some(b => b.toLowerCase().includes(seg.label.split(' ')[0].toLowerCase()))
-                    );
-                    return (
-                      <div key={seg.label} className="flex items-start justify-between gap-4 rounded-lg bg-surface-sunken px-4 py-3">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[0.85rem] font-medium text-ink">{seg.label}</p>
-                          <p className="mt-0.5 text-[0.75rem] text-ink-tertiary">{seg.posture}</p>
-                          {matchingSolution && (
-                            <p className="mt-1.5 text-[0.72rem] font-medium text-accent-blue">
-                              → {matchingSolution.name} could handle this
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex shrink-0 items-baseline gap-0.5">
-                          <span className="font-editorial text-[1.25rem] tabular-nums text-ink">{seg.recoverable}</span>
-                          <span className="text-[0.65rem] text-ink-tertiary">min</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <p className="mt-4 text-[0.75rem] text-ink-tertiary">
-                  These estimates are based on task mapping for this role. Your actual time back depends on which tools you adopt and how your day is structured.
-                </p>
-              </div>
-            </details>
           </div>
         ) : (
           <div className="mt-8 rounded-xl border border-edge bg-surface-raised px-6 py-12 text-center">

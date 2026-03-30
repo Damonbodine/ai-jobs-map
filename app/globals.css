@@ -40,6 +40,14 @@
   --color-edge:           #DDD8D0;
   --color-edge-strong:    #CCC6BC;
 
+  /* Chart palette — warm, editorial, distinct */
+  --color-chart-ink:      #1C1816;
+  --color-chart-amber:    #B8860B;
+  --color-chart-clay:     #A0522D;
+  --color-chart-sage:     #6B7F5E;
+  --color-chart-slate:    #6B6259;
+  --color-chart-plum:     #7B506F;
+
   /* Shadows — warm-toned */
   --shadow-sm:  0 1px 2px rgba(28,25,23,0.04);
   --shadow-md:  0 4px 12px rgba(28,25,23,0.06), 0 1px 3px rgba(28,25,23,0.04);

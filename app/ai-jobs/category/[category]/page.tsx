@@ -115,7 +115,7 @@ export default function CategoryPage() {
                 <div className="eyebrow mb-4">Industry sector</div>
                 <h1 className="section-title text-white">{categoryName}</h1>
                 <p className="mt-3 max-w-2xl text-slate-400 leading-8">
-                  {loading ? 'Loading occupations…' : `Browse ${occupations.length} roles in this sector and open the ones where routine work looks ready for smarter automation.`}
+                  {loading ? 'Loading occupations…' : `Browse ${occupations.length} roles in this sector and open the ones where routine work looks most ready for practical support and time back.`}
                 </p>
               </div>
             </div>

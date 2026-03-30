@@ -3,7 +3,7 @@ import { Database, BrainCircuit, BarChart3, Target, Sparkles, ChevronRight, Zap,
 
 export const metadata = {
   title: 'About - AI Jobs Map',
-  description: 'Learn about AI Jobs Map - mapping AI opportunities to 800+ occupations from the Bureau of Labor Statistics.',
+  description: 'Learn how AI Jobs Map identifies time-back opportunities across 800+ occupations from the Bureau of Labor Statistics.',
 };
 
 export default function AboutPage() {
@@ -40,7 +40,7 @@ export default function AboutPage() {
           About <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">AI Jobs Map</span>
         </h1>
         <p className="text-lg text-slate-400 mb-12 max-w-2xl">
-          Mapping artificial intelligence opportunities to over 800 occupations.
+          Mapping time-back opportunities across over 800 occupations.
         </p>
         
         <div className="space-y-12">
@@ -51,15 +51,15 @@ export default function AboutPage() {
             </h2>
             <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 space-y-4">
               <p className="text-slate-300 leading-relaxed">
-                AI Jobs Map is a comprehensive resource that maps artificial intelligence opportunities 
+                AI Jobs Map is a comprehensive resource that maps practical support opportunities 
                 to over 800 occupations from the U.S. Bureau of Labor Statistics. Our mission is to 
-                help professionals understand how AI can enhance their work, automate routine tasks, 
+                help professionals understand how AI can lighten repetitive work, support better decisions, 
                 and create new opportunities for career growth.
               </p>
               <p className="text-slate-300 leading-relaxed">
-                Whether you&apos;re a software developer looking to leverage AI tools, a healthcare 
-                professional exploring AI-assisted diagnostics, or a creative professional curious 
-                about AI-generated content, AI Jobs Map provides personalized insights for your career.
+                Whether you&apos;re a software developer looking to use AI tools more effectively, a healthcare 
+                professional exploring supportive diagnostics, or a creative professional curious 
+                about faster drafting and research, AI Jobs Map provides practical guidance for your role.
               </p>
             </div>
           </section>
@@ -71,10 +71,10 @@ export default function AboutPage() {
             </h2>
             <div className="grid md:grid-cols-2 gap-5">
               {[
-                { icon: <Database className="w-6 h-6" />, title: 'Comprehensive Database', desc: '826 occupations across 22 major categories, each with detailed micro-tasks and AI opportunity mappings.', color: 'emerald' },
-                { icon: <BrainCircuit className="w-6 h-6" />, title: 'AI-Generated Insights', desc: 'Powered by AI to generate specific, actionable insights about how artificial intelligence can be applied to your occupation.', color: 'cyan' },
-                { icon: <BarChart3 className="w-6 h-6" />, title: 'Impact & Effort Ratings', desc: 'Each AI opportunity includes impact level and effort ratings to help you prioritize which AI applications to explore first.', color: 'purple' },
-                { icon: <Target className="w-6 h-6" />, title: 'Task-Level Breakdown', desc: 'Micro-task analysis breaks down occupations into specific activities, showing exactly where AI can help in your daily work.', color: 'orange' },
+                { icon: <Database className="w-6 h-6" />, title: 'Comprehensive Database', desc: '826 occupations across 22 major categories, each with detailed routines and support-path mappings.', color: 'emerald' },
+                { icon: <BrainCircuit className="w-6 h-6" />, title: 'AI-Guided Insights', desc: 'Specific, actionable guidance about where supportive systems can lighten the load in your occupation.', color: 'cyan' },
+                { icon: <BarChart3 className="w-6 h-6" />, title: 'Impact & Effort Ratings', desc: 'Each opportunity includes impact and effort ratings to help you prioritize which ideas to explore first.', color: 'purple' },
+                { icon: <Target className="w-6 h-6" />, title: 'Task-Level Breakdown', desc: 'Routine-level analysis shows exactly where support systems can give time back in daily work.', color: 'orange' },
               ].map((feature) => (
                 <div key={feature.title} className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 hover:border-slate-700 transition-colors group">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${featureStyles[feature.color]}`}>
@@ -90,22 +90,22 @@ export default function AboutPage() {
           <section>
             <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
               <BookOpen className="w-6 h-6 text-purple-400" />
-              How We Classify AI Opportunities
+              How We Classify Opportunity Themes
             </h2>
             <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-6">
               <p className="text-slate-300 leading-relaxed mb-6">
-                AI opportunities are categorized into seven key areas to help you understand 
-                the type of AI application:
+                Opportunity themes are grouped into seven areas to help you understand 
+                the kind of support that fits the work:
               </p>
               <div className="grid sm:grid-cols-2 gap-3">
                 {[
-                  { name: 'Task Automation', desc: 'Automating repetitive manual tasks', color: 'emerald' },
-                  { name: 'Decision Support', desc: 'AI helping make better decisions', color: 'purple' },
+                  { name: 'Routine Support', desc: 'Lightening repetitive manual work', color: 'emerald' },
+                  { name: 'Decision Prep', desc: 'Helping people prepare better decisions', color: 'purple' },
                   { name: 'Research & Discovery', desc: 'Finding insights in data or research', color: 'green' },
-                  { name: 'Communication', desc: 'Improving communication and messaging', color: 'orange' },
-                  { name: 'Creative Assistance', desc: 'Helping with creative tasks', color: 'pink' },
-                  { name: 'Data Analysis', desc: 'Analyzing data and trends', color: 'cyan' },
-                  { name: 'Learning & Education', desc: 'Learning and skill development', color: 'yellow' },
+                  { name: 'Communication Support', desc: 'Improving communication and follow-through', color: 'orange' },
+                  { name: 'Drafting Help', desc: 'Helping with creative and document-heavy tasks', color: 'pink' },
+                  { name: 'Analysis Support', desc: 'Analyzing data and trends', color: 'cyan' },
+                  { name: 'Learning Support', desc: 'Learning and skill development', color: 'yellow' },
                 ].map((cat) => (
                   <div key={cat.name} className="flex items-start gap-3 bg-slate-950/50 rounded-xl p-4 border border-slate-800 hover:border-slate-700 transition-colors">
                     <div className={`w-2 h-2 mt-2 rounded-full flex-shrink-0 ${categoryDotStyles[cat.color]}`} />
@@ -131,8 +131,8 @@ export default function AboutPage() {
                 covers all major occupational categories in the United States.
               </p>
               <p className="text-slate-300 leading-relaxed">
-                AI opportunities and micro-tasks are generated using advanced language models, 
-                trained on industry knowledge and current AI capabilities. While AI-generated, 
+                Opportunity themes and micro-tasks are generated using advanced language models, 
+                trained on industry knowledge and current AI capabilities. While model-assisted, 
                 these insights are designed to be practical and actionable for professionals 
                 in each field.
               </p>
@@ -153,8 +153,8 @@ export default function AboutPage() {
           <section className="bg-gradient-to-br from-emerald-900/30 via-slate-900/60 to-cyan-900/30 rounded-2xl p-8 text-center border border-slate-800 backdrop-blur-xl">
             <h2 className="text-2xl font-bold text-white mb-4">Get Started</h2>
             <p className="text-slate-300 leading-relaxed mb-6 max-w-lg mx-auto">
-              Ready to explore AI opportunities in your field? Search for your occupation 
-              to discover specific ways AI can enhance your work.
+              Ready to explore time-back opportunities in your field? Search for your occupation 
+              to discover specific ways AI can support your work.
             </p>
             <Link 
               href="/ai-jobs"

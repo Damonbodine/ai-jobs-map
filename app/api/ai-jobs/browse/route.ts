@@ -1,39 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
+import { normalizeOccupationCategory } from '@/lib/ai-jobs/categories';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+function safeParseJson<T>(value: unknown, fallback: T): T {
+  if (!value) {
+    return fallback;
+  }
+
+  if (typeof value !== 'string') {
+    return value as T;
+  }
+
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const page = parseInt(searchParams.get('page') || '1');
-    const pageSize = parseInt(searchParams.get('pageSize') || '24');
-    const category = searchParams.get('category') || '';
-    const query = searchParams.get('q') || '';
-    const sort = searchParams.get('sort') || 'title';
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+    const pageSize = Math.min(48, Math.max(1, parseInt(searchParams.get('pageSize') || '24', 10)));
+    const category = normalizeOccupationCategory(searchParams.get('category'));
+    const query = (searchParams.get('q') || '').trim();
+    const sort = searchParams.get('sort') || 'time_back';
 
     const offset = (page - 1) * pageSize;
 
-    // Build WHERE clause
     let whereClause = '1=1';
     const params: (string | number)[] = [];
-    
+
     if (category) {
       params.push(category);
-      whereClause += ` AND o.major_category ILIKE $${params.length}`;
-    }
-    
-    if (query) {
-      params.push(`%${query}%`);
-      whereClause += ` AND o.title ILIKE $${params.length}`;
+      whereClause += ` AND o.major_category = $${params.length}`;
     }
 
-    // Determine sort
-    let orderClause = 'o.title ASC';
+    if (query) {
+      params.push(`%${query}%`);
+      whereClause += ` AND (
+        o.title ILIKE $${params.length}
+        OR o.major_category ILIKE $${params.length}
+        OR COALESCE(o.sub_category, '') ILIKE $${params.length}
+      )`;
+    }
+
+    let orderClause = 'estimated_daily_hours_saved DESC NULLS LAST, coverage_percent DESC NULLS LAST, title ASC';
     if (sort === 'ai_opportunities') {
-      orderClause = 'ai_opportunities_count DESC, o.title ASC';
+      orderClause = 'ai_opportunities_count DESC, title ASC';
+    } else if (sort === 'title') {
+      orderClause = 'title ASC';
+    } else if (sort === 'coverage') {
+      orderClause = 'coverage_percent DESC NULLS LAST, estimated_daily_hours_saved DESC NULLS LAST, title ASC';
     }
 
     // Get total count from the filtered occupations table only.
@@ -46,18 +69,35 @@ export async function GET(request: NextRequest) {
     const total = parseInt(countResult.rows[0].total);
     const totalPages = Math.ceil(total / pageSize);
 
-    // First isolate the current page of occupations, then compute related counts
-    // only for those rows instead of aggregating entire side tables every request.
     const result = await pool.query(
-      `WITH paged_occupations AS (
+      `WITH filtered_occupations AS (
          SELECT
            o.id,
            o.title,
            o.slug,
            o.major_category,
-           o.sub_category
+           o.sub_category,
+           oc.coverage_percent,
+           oc.estimated_daily_hours_saved,
+           oc.top_actions,
+           oc.recommended_packages,
+           COALESCE((
+             SELECT COUNT(*)
+             FROM ai_opportunities ao
+             WHERE ao.occupation_id = o.id
+           ), 0)::int AS ai_opportunities_count,
+           COALESCE((
+             SELECT COUNT(*)
+             FROM job_micro_tasks jmt
+             WHERE jmt.occupation_id = o.id
+           ), 0)::int AS micro_tasks_count
          FROM occupations o
+         LEFT JOIN occupation_coverage oc ON oc.occupation_id = o.id
          WHERE ${whereClause}
+       ),
+       paged_occupations AS (
+         SELECT *
+         FROM filtered_occupations
          ORDER BY ${orderClause}
          LIMIT $${params.length + 1} OFFSET $${params.length + 2}
        )
@@ -67,25 +107,23 @@ export async function GET(request: NextRequest) {
          p.slug,
          p.major_category,
          p.sub_category,
-         COALESCE(ao_count.count, 0) as ai_opportunities_count,
-         COALESCE(mt_count.count, 0) as micro_tasks_count
+         p.coverage_percent,
+         p.estimated_daily_hours_saved,
+         p.top_actions,
+         p.recommended_packages,
+         p.ai_opportunities_count,
+         p.micro_tasks_count
        FROM paged_occupations p
-       LEFT JOIN LATERAL (
-         SELECT COUNT(*) as count
-         FROM ai_opportunities ao
-         WHERE ao.occupation_id = p.id
-       ) ao_count ON true
-       LEFT JOIN LATERAL (
-         SELECT COUNT(*) as count
-         FROM job_micro_tasks jmt
-         WHERE jmt.occupation_id = p.id
-       ) mt_count ON true
-       ORDER BY ${sort === 'ai_opportunities' ? 'ai_opportunities_count DESC, p.title ASC' : 'p.title ASC'}`,
+       ORDER BY ${sort === 'ai_opportunities' ? 'p.ai_opportunities_count DESC, p.title ASC' : 'p.title ASC'}`,
       [...params, pageSize, offset]
     );
 
     return NextResponse.json({
-      occupations: result.rows,
+      occupations: result.rows.map((row) => ({
+        ...row,
+        top_actions: safeParseJson(row.top_actions, []),
+        recommended_packages: safeParseJson(row.recommended_packages, []),
+      })),
       total,
       page,
       pageSize,
@@ -93,6 +131,17 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Browse API error:', error);
+
+    if ((error as NodeJS.ErrnoException).code === 'ECONNREFUSED') {
+      return NextResponse.json(
+        {
+          error: 'The occupation database is currently unavailable.',
+          code: 'database_unavailable',
+        },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       { error: 'Failed to fetch occupations' },
       { status: 500 }

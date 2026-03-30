@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accountant | The Singular Lens</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --font-heading: 'Newsreader', serif;
+            --font-body: 'Manrope', sans-serif;
+            --bg-canvas: #FAF9F6;
+        }
+        body {
+            background-color: var(--bg-canvas);
+            color: #1A1C1E;
+            font-family: var(--font-body);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        .scroll-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+        .scroll-section {
+            height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            position: relative;
+        }
+        .ghost-bg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20rem;
+            font-weight: 800;
+            font-family: var(--font-heading);
+            font-style: italic;
+            color: rgba(0,0,0,0.03);
+            white-space: nowrap;
+            z-index: 0;
+            pointer-events: none;
+            letter-spacing: -0.05em;
+        }
+        .font-editorial {
+            font-family: var(--font-heading);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="selection:bg-blue-100">
+
+    <!-- Fixed Architectural Layer -->
+    <div class="ghost-bg">Accountant</div>
+    
+    <nav class="fixed top-12 left-12 z-50 flex items-center gap-4 text-[10px] font-black uppercase tracking-widest opacity-30 italic">
+        The Singular Lens v1.0 • Narrative Audit
+    </nav>
+
+    <div class="fixed right-12 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4">
+        {[0,1,2,3].map(i => (
+            <div key={i} class="w-1 h-8 rounded-full bg-slate-200 border border-slate-300"></div>
+        ))}
+    </div>
+
+    <!-- Scroll Sections -->
+    <div class="scroll-container relative z-10">
+        
+        <!-- Section 1: The Potential -->
+        <section class="scroll-section">
+            <div class="max-w-4xl text-center space-y-12">
+                <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-slate-200 bg-white/50 text-[10px] font-black uppercase tracking-[0.2em]">
+                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                    Occupational Exposure Detected
+                </div>
+                <h2 class="text-[clamp(4rem,10vw,8rem)] font-black italic tracking-tighter leading-none font-editorial">
+                    93% <span class="text-blue-600">Synthetic</span> Efficiency.
+                </h2>
+                <p class="text-2xl text-slate-500 max-w-2xl mx-auto italic font-editorial leading-relaxed">
+                    Nearly every professional action within this domain can now be synthesized. We are not just automating a job; we are architecture for recovery.
+                </p>
+                <div class="pt-12 animate-bounce opacity-20">
+                    <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7-7-7"/></svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: The Outcome -->
+        <section class="scroll-section bg-white/40">
+            <div class="max-w-4xl text-center">
+                <div class="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 mb-12">The Bedtime Metric</div>
+                <div class="flex items-center justify-center gap-12 mb-16">
+                    <div class="text-[12rem] font-black italic tracking-tighter text-blue-600 leading-none">60</div>
+                    <div class="text-left">
+                        <div class="text-4xl font-black italic tracking-tighter text-slate-900 leading-none mb-2 font-editorial">Minutes</div>
+                        <div class="text-[10px] font-black uppercase tracking-widest opacity-40">Reclaimed Every Day</div>
+                    </div>
+                </div>
+                <p class="text-xl text-slate-500 max-w-xl mx-auto italic font-editorial leading-relaxed">
+                    By offloading the rhythmic verification of records, you gain time to be human. Time for a slow morning, a quiet story, or a meaningful strategy.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 3: The Work Blocks -->
+        <section class="scroll-section">
+             <div class="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 mb-20">The Evolution of Effort</div>
+             <div class="grid md:grid-cols-5 gap-px bg-slate-200 w-full max-w-6xl overflow-hidden rounded-[3rem] border border-slate-200 shadow-xl">
+                 {[
+                     { label: 'Intake', val: 'Low', color: 'bg-canvas' },
+                     { label: 'Analysis', val: 'High', color: 'bg-white' },
+                     { label: 'Drafting', val: 'Elite', color: 'bg-canvas' },
+                     { label: 'Routing', val: 'Direct', color: 'bg-white' },
+                     { label: 'Review', val: 'Expert', color: 'bg-canvas' }
+                 ].map((b, i) => (
+                    <div key={i} class={`p-16 flex flex-col items-center justify-center text-center ${b.color} transition-all hover:scale-[1.02] hover:z-10`}>
+                        <div class="text-[9px] font-black uppercase tracking-widest opacity-30 mb-6">{b.label}</div>
+                        <div class="text-3xl font-black italic tracking-tighter text-slate-900 font-editorial">{b.val}</div>
+                    </div>
+                 ))}
+             </div>
+        </section>
+
+        <!-- Section 4: The Disclosure -->
+        <section class="scroll-section">
+            <div class="text-center">
+                <div class="text-[10px] font-black uppercase tracking-[0.4em] opacity-30 mb-12">The Final Layer</div>
+                <h3 class="text-5xl font-black italic tracking-tighter text-slate-900 mb-16 max-w-2xl font-editorial">
+                    The remaining 67 tasks are yours to command. Step into the Sanctuary.
+                </h3>
+                <div class="flex flex-col items-center gap-8">
+                     <button class="bg-[#1A1C1B] text-white px-16 py-8 rounded-full font-black uppercase tracking-widest text-xs shadow-[0_40px_80px_rgba(0,0,0,0.2)] hover:scale-105 transition-transform active:scale-95">
+                        Initialize Occupational Shift
+                    </button>
+                    <button class="text-sm font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity italic">
+                        View Complete Task Map (67)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+</body>
+</html>

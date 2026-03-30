@@ -2,19 +2,20 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { Pool } from 'pg';
+import { getOccupationRecommendationSnapshot } from '@/lib/ai-jobs/recommendations';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
 const opportunityCategoryConfig: Record<string, { label: string; color: string; icon: string }> = {
-  task_automation: { label: 'Task Automation', color: 'bg-blue-500', icon: '🤖' },
-  decision_support: { label: 'Decision Support', color: 'bg-purple-500', icon: '🎯' },
-  research_discovery: { label: 'Research & Discovery', color: 'bg-green-500', icon: '🔬' },
-  communication: { label: 'Communication', color: 'bg-orange-500', icon: '💬' },
-  creative_assistance: { label: 'Creative Assistance', color: 'bg-pink-500', icon: '🎨' },
-  data_analysis: { label: 'Data Analysis', color: 'bg-cyan-500', icon: '📊' },
-  learning_education: { label: 'Learning & Education', color: 'bg-yellow-500', icon: '📚' },
+  task_automation: { label: 'Routine support', color: 'bg-blue-500', icon: '🤖' },
+  decision_support: { label: 'Decision prep', color: 'bg-purple-500', icon: '🎯' },
+  research_discovery: { label: 'Research help', color: 'bg-green-500', icon: '🔬' },
+  communication: { label: 'Communication support', color: 'bg-orange-500', icon: '💬' },
+  creative_assistance: { label: 'Drafting help', color: 'bg-pink-500', icon: '🎨' },
+  data_analysis: { label: 'Analysis support', color: 'bg-cyan-500', icon: '📊' },
+  learning_education: { label: 'Learning support', color: 'bg-yellow-500', icon: '📚' },
 };
 
 const difficultyConfig: Record<string, { label: string; color: string }> = {
@@ -200,6 +201,14 @@ function formatMinutes(minutes: number) {
   return `${minutes} min/day`;
 }
 
+function formatHours(hours: number) {
+  if (hours >= 1) {
+    return `${hours.toFixed(hours >= 2 ? 0 : 1)}h/day`;
+  }
+
+  return `${Math.round(hours * 60)} min/day`;
+}
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
@@ -318,7 +327,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${occupation.title} - AI Opportunities | AI Jobs Map`,
-    description: `Discover how AI can transform your role as a ${occupation.title}. Find AI-powered opportunities, skill recommendations, and actionable insights.`,
+    description: `See where ${occupation.title} can get meaningful time back, which routines are easiest to lighten, and which workflow support systems fit best.`,
   };
 }
 
@@ -335,6 +344,7 @@ export default async function OccupationPage({ params }: PageProps) {
   const granularSkills = await getGranularSkills(occupation.id);
   const skillProfile = await getSkillProfile(occupation.id);
   const roleAlignedPackages = await getRoleAlignedPackages(occupation.title);
+  const recommendationSnapshot = await getOccupationRecommendationSnapshot(pool, occupation.id);
   const taskEntries = microTasks.map((task: any) => ({
     ...task,
     lens: describeTaskLens(task),
@@ -348,11 +358,15 @@ export default async function OccupationPage({ params }: PageProps) {
     (sum: number, task: any) => sum + task.lens.modeledMinutesPerDay,
     0
   );
-  const oneHourTargetProgress = Math.min(100, Math.round((modeledMinutesRecoveredPerDay / 60) * 100));
+  const snapshotMinutesRecoveredPerDay = Math.round(recommendationSnapshot.coverage.estimatedDailyHoursSaved * 60);
+  const displayedMinutesRecoveredPerDay = snapshotMinutesRecoveredPerDay > 0
+    ? snapshotMinutesRecoveredPerDay
+    : modeledMinutesRecoveredPerDay;
+  const oneHourTargetProgress = Math.min(100, Math.round((displayedMinutesRecoveredPerDay / 60) * 100));
   const oneHourNarrative =
-    modeledMinutesRecoveredPerDay >= 60
-      ? 'This role has a credible path to getting back one hour per day by streamlining routine work.'
-      : 'This role has meaningful automation pockets, but the biggest win is bundling several routine tasks together.';
+    displayedMinutesRecoveredPerDay >= 60
+      ? 'This role has a credible path to giving people back at least one hour per day by reducing repeat work and coordination drag.'
+      : 'This role already shows meaningful time-back potential, but the strongest gains will come from bundling several support moves together.';
   const categoryMix = Object.entries(
     aiApplicableTasks.reduce((acc: Record<string, number>, task: any) => {
       const key = task.ai_category || 'task_automation';
@@ -418,14 +432,14 @@ export default async function OccupationPage({ params }: PageProps) {
     .map((block: any) => ({
       ...block,
       tasks: block.tasks.sort((a: any, b: any) => b.lens.modeledMinutesPerDay - a.lens.modeledMinutesPerDay),
-      percentOfRecovery: modeledMinutesRecoveredPerDay > 0
-        ? Math.round((block.aiMinutes / modeledMinutesRecoveredPerDay) * 100)
+      percentOfRecovery: displayedMinutesRecoveredPerDay > 0
+        ? Math.round((block.aiMinutes / displayedMinutesRecoveredPerDay) * 100)
         : 0,
     }));
 
   const dailyNarrative = workBlocks.length > 0
-    ? `A typical ${occupation.title.toLowerCase()} day in this model revolves around ${toSentenceList(workBlocks.slice(0, 3).map((block: any) => block.label.toLowerCase()))}. The best automation story is not replacing the job, but bundling the repetitive pieces inside those blocks so the human can stay with judgment, exceptions, and final accountability.`
-    : `This role still needs deeper day mapping, but the core product story should focus on repetitive work that can be bundled into one hour back per day.`;
+    ? `A typical ${occupation.title.toLowerCase()} day in this model revolves around ${toSentenceList(workBlocks.slice(0, 3).map((block: any) => block.label.toLowerCase()))}. The right product story is not replacement. It is reducing the repetitive setup around the work so the person can stay with judgment, exceptions, and final accountability.`
+    : `This role still needs deeper day mapping, but the core product story should focus on reducing repetitive work in a way that clearly gives time back.`;
 
   const automationSolutions = automationSolutionDefinitions
     .map((product) => {
@@ -492,14 +506,14 @@ export default async function OccupationPage({ params }: PageProps) {
               </div>
             )}
             <p className="mt-5 max-w-3xl text-slate-400 leading-8">
-              Explore the day-to-day tasks, skill breakdown, and AI opportunity profile for this occupation.
+              Explore the day-to-day tasks, task clusters, and support systems most likely to give this role meaningful time back.
             </p>
           </div>
 
           <div className="panel rounded-[2rem] p-6 text-center">
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Daily recovery model</div>
-            <div className="mt-3 text-6xl font-black text-emerald-400">{modeledMinutesRecoveredPerDay}</div>
-            <div className="mt-2 text-slate-300">Minutes we can realistically target</div>
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Daily time-back model</div>
+            <div className="mt-3 text-6xl font-black text-emerald-400">{displayedMinutesRecoveredPerDay}</div>
+            <div className="mt-2 text-slate-300">Minutes of repeat work we can realistically lighten</div>
             <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-900/80">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-sky-400"
@@ -507,7 +521,7 @@ export default async function OccupationPage({ params }: PageProps) {
               />
             </div>
             <div className="mt-3 text-sm text-slate-500">
-              {Math.min(modeledMinutesRecoveredPerDay, 60)} of 60 minutes/day target
+              {Math.min(displayedMinutesRecoveredPerDay, 60)} of 60 minutes/day target
             </div>
           </div>
         </div>
@@ -534,10 +548,10 @@ export default async function OccupationPage({ params }: PageProps) {
                   Daily Recovery
                 </text>
                 <text x="140" y="155" textAnchor="middle" className="fill-white text-[34px] font-black">
-                  {modeledMinutesRecoveredPerDay}m
+                  {displayedMinutesRecoveredPerDay}m
                 </text>
                 <text x="140" y="176" textAnchor="middle" className="fill-emerald-300 text-[12px] font-semibold">
-                  Targeting one hour back
+                  Aiming for one hour back
                 </text>
               </svg>
             </div>
@@ -564,7 +578,7 @@ export default async function OccupationPage({ params }: PageProps) {
                             </span>
                             <div>
                               <div className="font-semibold text-white">{config.label}</div>
-                              <div className="text-xs text-slate-500">Early automation theme</div>
+                              <div className="text-xs text-slate-500">Early time-back theme</div>
                             </div>
                           </div>
                           <div className="text-xl font-black text-emerald-300">{minutes}m</div>
@@ -690,7 +704,7 @@ export default async function OccupationPage({ params }: PageProps) {
                             </div>
                           ) : (
                             <div className="mt-4 text-sm italic text-slate-500">
-                              This task is less likely to be an early automation candidate.
+                              This task is less likely to be an early time-back candidate.
                             </div>
                           )}
                         </div>
@@ -725,7 +739,7 @@ export default async function OccupationPage({ params }: PageProps) {
               <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Recommended solutions</div>
               <h2 className="mt-2 text-3xl font-black text-white">The best-fit solution path</h2>
             </div>
-            <div className="text-sm text-slate-400">A single recommendation tied directly to the strongest routine cluster.</div>
+              <div className="text-sm text-slate-400">One support path tied directly to the strongest routine cluster.</div>
           </div>
 
           <div className="grid gap-4">
@@ -733,14 +747,18 @@ export default async function OccupationPage({ params }: PageProps) {
               <div key={product.name} className="panel rounded-[1.6rem] p-6">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="max-w-2xl">
-                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">Recommended system</div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">Recommended support system</div>
                     <h3 className="mt-2 text-2xl font-black text-white">{product.name}</h3>
                     <p className="mt-3 text-slate-300 leading-7">{product.strapline}</p>
                   </div>
                   <div className="rounded-[1rem] border border-emerald-500/15 bg-emerald-500/6 px-4 py-3 text-right">
                     <div className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-300">Modeled time back</div>
-                    <div className="mt-1 text-3xl font-black text-white">{product.totalMinutes}m</div>
-                    <div className="text-xs text-slate-500">per day from matching routines</div>
+                    <div className="mt-1 text-3xl font-black text-white">
+                      {recommendationSnapshot.coverage.estimatedDailyHoursSaved > 0
+                        ? formatHours(recommendationSnapshot.coverage.estimatedDailyHoursSaved)
+                        : `${product.totalMinutes}m`}
+                    </div>
+                    <div className="text-xs text-slate-500">from mapped routines and workflow coverage</div>
                   </div>
                 </div>
 
@@ -765,6 +783,11 @@ export default async function OccupationPage({ params }: PageProps) {
                       {blockLabel}
                     </span>
                   ))}
+                  {recommendationSnapshot.coverage.percent > 0 && (
+                    <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
+                      {Math.round(recommendationSnapshot.coverage.percent)}% workflow coverage
+                    </span>
+                  )}
                 </div>
                 <div className="mt-4 text-sm text-slate-500">
                   Best matched routines: {product.matchingTasks.slice(0, 3).map((task: any) => task.task_name).join(' • ')}
@@ -773,6 +796,57 @@ export default async function OccupationPage({ params }: PageProps) {
             ))}
           </div>
         </section>
+
+        {recommendationSnapshot.topActions.length > 0 && (
+          <section className="space-y-6">
+            <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Evidence layer</div>
+                <h2 className="mt-2 text-3xl font-black text-white">How this role maps into reusable systems</h2>
+              </div>
+              <div className="text-sm text-slate-400">This is the bridge from occupation research to a product recommendation.</div>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+              <div className="panel rounded-[1.5rem] p-5">
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Common action patterns</div>
+                <div className="mt-4 grid gap-3">
+                  {recommendationSnapshot.topActions.slice(0, 5).map((action) => (
+                    <div key={action.code} className="rounded-[1rem] border border-slate-800/75 bg-slate-950/45 px-4 py-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <div className="font-semibold text-white">{action.name}</div>
+                          <div className="text-xs text-slate-500">{action.taskCount} mapped tasks • {Math.round(action.confidence * 100)}% confidence</div>
+                        </div>
+                        <div className="text-xs uppercase tracking-[0.14em] text-emerald-300">{action.code}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="panel rounded-[1.5rem] p-5">
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Package fit</div>
+                <div className="mt-4 grid gap-3">
+                  {recommendationSnapshot.recommendedPackages.slice(0, 3).map((pkg) => (
+                    <div key={pkg.id} className="rounded-[1rem] border border-slate-800/75 bg-slate-950/45 px-4 py-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="font-semibold text-white">{pkg.name}</div>
+                          <div className="mt-1 text-sm leading-6 text-slate-400">{pkg.description}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-semibold text-emerald-300">${pkg.basePrice.toLocaleString()}</div>
+                          <div className="text-xs text-slate-500">{pkg.tier}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {visibleSkillSummary.length > 0 && (
           <section className="space-y-6">
@@ -861,7 +935,7 @@ export default async function OccupationPage({ params }: PageProps) {
 
       <footer className="border-t border-slate-800/80 bg-slate-950/80 px-4 py-12 mt-16">
         <div className="max-w-7xl mx-auto text-center text-slate-500">
-          <p>Designed around reclaiming routine time with automation-first workflows.</p>
+          <p>Designed around giving people time back with workflow support systems.</p>
           <p className="mt-2 text-sm">Data sourced from U.S. Bureau of Labor Statistics</p>
         </div>
       </footer>

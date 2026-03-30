@@ -120,7 +120,7 @@ export default function AIJobsLanding() {
             </h1>
 
             <p className="mb-8 max-w-2xl text-[clamp(1.05rem,1.8vw,1.3rem)] leading-[1.8] text-slate-400">
-              Search 800+ occupations to understand the micro-tasks behind each role, identify the routines that can be automated, and connect them to products designed to give people at least one hour back.
+              Search 800+ occupations to understand the routines behind each role, spot the support opportunities most likely to lighten the load, and connect them to products designed to give people at least one hour back.
             </p>
 
             <form action="/ai-jobs/browse" className="relative">
@@ -237,7 +237,7 @@ export default function AIJobsLanding() {
                     {[
                       'Map the routines behind the role',
                       'Prioritize time-back opportunities',
-                      'Bundle tasks into automation packages',
+                      'Bundle tasks into support systems',
                       'Show a credible one-hour-back path',
                     ].map((item) => (
                       <div key={item} className="rounded-[1.1rem] border border-slate-800/70 bg-slate-900/40 px-4 py-3 text-sm leading-6 text-slate-200">
@@ -254,7 +254,7 @@ export default function AIJobsLanding() {
         <section className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <StatCard value="826+" title="Occupations" description="Mapped across the labor market" colorClass="text-emerald-400" delay={0.1} />
           <StatCard value="22" title="Market Sectors" description="From finance to engineering" colorClass="text-cyan-400" delay={0.2} />
-          <StatCard value="7" title="AI Categories" description="Ways AI can support daily work" colorClass="text-purple-400" delay={0.3} />
+          <StatCard value="7" title="Support Themes" description="Ways AI can lighten daily work" colorClass="text-purple-400" delay={0.3} />
           <StatCard value="10k+" title="Workflow Clues" description="Signals from tasks and routines" colorClass="text-orange-400" delay={0.4} />
         </section>
 
@@ -263,7 +263,7 @@ export default function AIJobsLanding() {
             <div className="max-w-2xl">
               <h2 className="section-title text-white">Explore by industry sector</h2>
               <p className="section-copy mt-3">
-                Start broad, then narrow into specific occupations with task data, AI opportunity themes,
+                Start broad, then narrow into specific occupations with task data, support themes,
                 and practical upskilling direction.
               </p>
             </div>

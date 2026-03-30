@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accountant | Zero-Base Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --font-heading: 'Newsreader', serif;
+            --font-body: 'Manrope', sans-serif;
+            --bg-canvas: #FFFFFF;
+        }
+        body {
+            background-color: var(--bg-canvas);
+            color: #1A1C1E;
+            font-family: var(--font-body);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        .font-editorial {
+            font-family: var(--font-heading);
+            font-style: italic;
+        }
+        .luminous-arc {
+            background: conic-gradient(from 180deg at 50% 50%, #004ae8 0deg, #3766ff 334.8deg, #f1f5f9 334.8deg);
+        }
+    </style>
+</head>
+<body class="selection:bg-blue-100">
+
+    <nav class="fixed top-12 left-12 z-50 flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.4em] opacity-20">
+        Executive Synthesis v1.0
+    </nav>
+
+    <main class="h-screen w-screen flex flex-col items-center justify-center p-12 text-center space-y-24">
+        
+        <!-- 1. The Headline -->
+        <div class="max-w-5xl">
+            <h1 class="text-[clamp(4rem,8vw,7rem)] font-black italic tracking-tighter leading-[0.9] text-slate-900 font-editorial mb-8">
+                Accountants are now high-capacity <span class="text-blue-600">strategists.</span>
+            </h1>
+            <p class="text-xl text-slate-400 max-w-2xl mx-auto italic font-editorial leading-relaxed opacity-60">
+                The shift from verification to clinical judgment.
+            </p>
+        </div>
+
+        <!-- 2. The Number (The North Star Metric) -->
+        <div class="relative group">
+            <div class="absolute inset-0 bg-blue-600/5 blur-[120px] rounded-full scale-150 group-hover:bg-blue-600/10 transition-colors"></div>
+            <div class="relative z-10 flex flex-col items-center">
+                <div class="text-[12rem] md:text-[16rem] font-black italic tracking-tighter text-slate-900 leading-none mb-2">93%</div>
+                <div class="text-[10px] font-black uppercase tracking-[0.5em] text-blue-600">Synthetic Displacement</div>
+            </div>
+        </div>
+
+        <!-- 3. The Benefit (Reclaimed Time) -->
+        <div class="max-w-xl">
+            <p class="text-4xl font-black italic tracking-tighter text-slate-900 font-editorial mb-12">
+                "We found your missing hour."
+            </p>
+            <div class="flex flex-col items-center gap-12">
+                 <button class="bg-slate-950 text-white px-20 py-8 rounded-full font-black uppercase tracking-widest text-[11px] shadow-[0_40px_100px_rgba(0,0,0,0.1)] active:scale-95 transition-all hover:bg-blue-700">
+                    Audit the Task Map (67)
+                </button>
+                <div class="text-[9px] font-black uppercase tracking-[0.3em] opacity-20 italic">
+                    60m Bedtime Minutes Reclaimed
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Navigation Markers (Optional Context) -->
+    <div class="fixed bottom-12 left-12 flex gap-4 text-[8px] font-black uppercase tracking-widest opacity-10">
+        <span>01 potential</span>
+        <span>02 outcome</span>
+        <span>03 shift</span>
+    </div>
+
+</body>
+</html>

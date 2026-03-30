@@ -703,29 +703,7 @@ export default async function OccupationPage({ params }: PageProps) {
 
         <div className="space-y-2">
 
-          {/* Section 1 — Day architecture */}
-          <details className="group rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
-              <span className="font-medium text-ink">Day architecture</span>
-              <ChevronDown className="h-4 w-4 shrink-0 text-ink-tertiary transition-transform duration-200 group-open:rotate-180" />
-            </summary>
-            <div className="border-t border-edge px-5 py-5 space-y-4">
-              <p className="text-sm text-ink-secondary leading-relaxed">{dailyNarrative}</p>
-              {summaryBlocks.length > 0 && (
-                <div className="grid gap-4 sm:grid-cols-3">
-                  {summaryBlocks.map((block: any) => (
-                    <div key={block.key} className="rounded-lg border border-edge bg-surface-sunken px-4 py-3">
-                      <p className="text-sm font-medium text-ink">{block.label}</p>
-                      <p className="mt-1 font-editorial tabular-nums text-ink">{block.aiMinutes} <span className="text-sm italic text-ink-tertiary">min</span></p>
-                      <p className="mt-2 text-xs text-ink-tertiary leading-relaxed">{block.posture}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </details>
-
-          {/* Section 2 — Evidence layer */}
+          {/* Section — Evidence layer */}
           {recommendationSnapshot.topActions.length > 0 && (
             <details className="group rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
@@ -749,18 +727,12 @@ export default async function OccupationPage({ params }: PageProps) {
                     </div>
                   </div>
                   <div>
-                    <p className="eyebrow mb-3">Package fit</p>
+                    <p className="eyebrow mb-3">Recommended support systems</p>
                     <div className="space-y-2">
                       {recommendationSnapshot.recommendedPackages.slice(0, 3).map((pkg) => (
-                        <div key={pkg.id} className="flex items-start justify-between gap-3 rounded-lg border border-edge bg-surface-sunken px-4 py-2.5">
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-ink">{pkg.name}</p>
-                            <p className="mt-0.5 text-xs text-ink-tertiary leading-relaxed">{pkg.description}</p>
-                          </div>
-                          <div className="shrink-0 text-right">
-                            <p className="text-sm font-medium text-ink">${pkg.basePrice.toLocaleString()}</p>
-                            <p className="text-xs text-ink-tertiary">{pkg.tier}</p>
-                          </div>
+                        <div key={pkg.id} className="rounded-lg border border-edge bg-surface-sunken px-4 py-2.5">
+                          <p className="text-sm font-medium text-ink">{pkg.name}</p>
+                          <p className="mt-0.5 text-xs text-ink-tertiary leading-relaxed">{pkg.description}</p>
                         </div>
                       ))}
                     </div>

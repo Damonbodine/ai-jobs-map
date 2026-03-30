@@ -361,9 +361,7 @@ export default async function OccupationPage({ params }: PageProps) {
     0
   );
   const snapshotMinutesRecoveredPerDay = Math.round(recommendationSnapshot.coverage.estimatedDailyHoursSaved * 60);
-  const rawMinutes = snapshotMinutesRecoveredPerDay > 0 ? snapshotMinutesRecoveredPerDay : modeledMinutesRecoveredPerDay;
-  // Cap at 90 min — anything higher looks like a data error and scares people
-  const displayedMinutesRecoveredPerDay = Math.min(rawMinutes, 90);
+  const displayedMinutesRecoveredPerDay = snapshotMinutesRecoveredPerDay > 0 ? snapshotMinutesRecoveredPerDay : modeledMinutesRecoveredPerDay;
   const oneHourTargetProgress = Math.min(100, Math.round((displayedMinutesRecoveredPerDay / 60) * 100));
   const oneHourNarrative =
     displayedMinutesRecoveredPerDay >= 60
@@ -630,23 +628,55 @@ export default async function OccupationPage({ params }: PageProps) {
               })}
             </div>
 
-            {/* Summary callout */}
-            <div className="mt-8 rounded-xl border border-edge-strong bg-surface-raised px-6 py-5 shadow-sm">
-              <div className="flex items-center justify-between gap-4">
+            {/* Your time back — expandable with HOW breakdown */}
+            <details className="group mt-8 rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 [&::-webkit-details-marker]:hidden">
                 <div>
                   <p className="text-[0.85rem] font-medium text-ink">Your time back</p>
                   <p className="mt-0.5 text-[0.78rem] text-ink-tertiary">
-                    The total daily time that could feel lighter with the right support
+                    See how each area adds up — and what would handle it
                   </p>
                 </div>
-                <div className="flex items-baseline gap-1">
-                  <span className="font-editorial text-[2rem] tabular-nums tracking-[-0.03em] text-ink">
-                    {displayedMinutesRecoveredPerDay}
-                  </span>
-                  <span className="font-editorial text-[0.8rem] italic text-ink-tertiary">min/day</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-baseline gap-1">
+                    <span className="font-editorial text-[2rem] tabular-nums tracking-[-0.03em] text-ink">
+                      {displayedMinutesRecoveredPerDay}
+                    </span>
+                    <span className="font-editorial text-[0.8rem] italic text-ink-tertiary">min/day</span>
+                  </div>
+                  <ChevronDown className="h-4 w-4 shrink-0 text-ink-tertiary transition-transform duration-200 group-open:rotate-180" />
                 </div>
+              </summary>
+              <div className="border-t border-edge px-6 py-5">
+                <div className="space-y-3">
+                  {daySegments.filter(seg => seg.recoverable > 0).map((seg) => {
+                    const matchingSolution = automationSolutions.find(sol =>
+                      sol.matchedBlocks.some(b => b.toLowerCase().includes(seg.label.split(' ')[0].toLowerCase()))
+                    );
+                    return (
+                      <div key={seg.label} className="flex items-start justify-between gap-4 rounded-lg bg-surface-sunken px-4 py-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[0.85rem] font-medium text-ink">{seg.label}</p>
+                          <p className="mt-0.5 text-[0.75rem] text-ink-tertiary">{seg.posture}</p>
+                          {matchingSolution && (
+                            <p className="mt-1.5 text-[0.72rem] font-medium text-accent-blue">
+                              → {matchingSolution.name} could handle this
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex shrink-0 items-baseline gap-0.5">
+                          <span className="font-editorial text-[1.25rem] tabular-nums text-ink">{seg.recoverable}</span>
+                          <span className="text-[0.65rem] text-ink-tertiary">min</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="mt-4 text-[0.75rem] text-ink-tertiary">
+                  These estimates are based on task mapping for this role. Your actual time back depends on which tools you adopt and how your day is structured.
+                </p>
               </div>
-            </div>
+            </details>
           </div>
         ) : (
           <div className="mt-8 rounded-xl border border-edge bg-surface-raised px-6 py-12 text-center">
@@ -679,9 +709,9 @@ export default async function OccupationPage({ params }: PageProps) {
               </div>
               <div className="flex shrink-0 items-baseline gap-2 md:text-right">
                 <span className="font-editorial tabular-nums text-ink" style={{ fontSize: '1.5rem' }}>
-                  {Math.min(90, recommendationSnapshot.coverage.estimatedDailyHoursSaved > 0
+                  {recommendationSnapshot.coverage.estimatedDailyHoursSaved > 0
                     ? Math.round(recommendationSnapshot.coverage.estimatedDailyHoursSaved * 60)
-                    : product.totalMinutes)}
+                    : product.totalMinutes}
                 </span>
                 <span className="text-sm italic text-ink-tertiary">min/day</span>
               </div>

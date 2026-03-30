@@ -38,8 +38,7 @@ export function Header() {
           {isFactory ? (
             <>
               <NavLink href="/ai-jobs" active={false}>Map</NavLink>
-              <NavLink href="/factory" active={pathname === '/factory'}>Packages</NavLink>
-              <NavLink href="/factory/roi" active={pathname === '/factory/roi'}>ROI</NavLink>
+              <NavLink href="/ai-jobs/browse" active={false}>Browse</NavLink>
             </>
           ) : (
             <>

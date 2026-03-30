@@ -681,7 +681,7 @@ export default async function OccupationPage({ params }: PageProps) {
 
         <div className="mt-6">
           <Link
-            href="/factory"
+            href={`/factory?occupation=${occupation.slug}`}
             className="btn-primary inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-5 py-2.5 text-sm font-medium transition-colors hover:bg-transparent hover:text-ink"
           >
             Build your toolkit

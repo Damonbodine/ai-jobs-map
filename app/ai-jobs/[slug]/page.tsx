@@ -520,32 +520,38 @@ export default async function OccupationPage({ params }: PageProps) {
             {occupation.major_category}
           </p>
 
-          <h1 className="mt-3 font-editorial font-normal text-panel-text" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
+          {/* Job title — big, emotional, identity-affirming */}
+          <h1
+            className="mt-4 font-editorial font-normal text-panel-text"
+            style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', lineHeight: 1.02, letterSpacing: '-0.03em' }}
+          >
             {occupation.title}
           </h1>
 
           {occupation.employment && (
-            <p className="mt-2 text-[0.8rem] text-panel-muted">
-              {Number(occupation.employment).toLocaleString()} employed in the U.S.
+            <p className="mt-3 text-[0.8rem] text-panel-muted">
+              {Number(occupation.employment).toLocaleString()} people in this role across the U.S.
             </p>
           )}
 
-          {/* The Number — the moment */}
-          <div className="mt-14">
-            <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-panel-muted">
-              Recoverable time per day
-            </p>
-            <div className="mt-3 flex items-baseline gap-2">
-              <span
-                className="font-editorial font-normal text-panel-text"
-                style={{ fontSize: 'clamp(5rem, 10vw, 7rem)', lineHeight: 0.85 }}
-              >
-                {displayedMinutesRecoveredPerDay}
-              </span>
-              <span className="font-editorial text-xl italic text-panel-muted">min</span>
+          {/* The Number */}
+          <div className="mt-16 grid gap-8 md:grid-cols-[auto_minmax(0,1fr)] md:items-end">
+            <div>
+              <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-panel-muted">
+                Time you could get back
+              </p>
+              <div className="mt-3 flex items-baseline gap-2">
+                <span
+                  className="font-editorial font-normal text-panel-text"
+                  style={{ fontSize: 'clamp(4rem, 9vw, 6rem)', lineHeight: 0.85 }}
+                >
+                  {displayedMinutesRecoveredPerDay}
+                </span>
+                <span className="font-editorial text-lg italic text-panel-muted">min/day</span>
+              </div>
             </div>
-            <p className="mt-5 max-w-md text-[0.875rem] leading-[1.6] text-panel-muted">
-              of routine work that support tools could realistically lighten each day
+            <p className="max-w-sm text-[0.85rem] leading-[1.6] text-panel-muted md:pb-2">
+              We found routine work in your day that the right tools could handle — so you can focus on what actually needs you.
             </p>
           </div>
         </div>
@@ -580,8 +586,8 @@ export default async function OccupationPage({ params }: PageProps) {
               })}
             </div>
             <div className="mt-2 flex items-center gap-4 text-[0.7rem] text-ink-tertiary">
-              <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-ink" /> Recoverable with support</span>
-              <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-edge-strong" /> Stays with you</span>
+              <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-ink" /> Could be lighter</span>
+              <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-edge-strong" /> Yours to own</span>
             </div>
 
             {/* Segment breakdown */}
@@ -603,7 +609,7 @@ export default async function OccupationPage({ params }: PageProps) {
                         <span className="text-[0.7rem] text-ink-tertiary">h</span>
                         {isRecoverable && (
                           <span className="ml-2 rounded bg-surface-sunken px-1.5 py-0.5 text-[0.65rem] font-medium text-ink-secondary">
-                            {seg.recoverable} min recoverable
+                            {seg.recoverable} min back
                           </span>
                         )}
                       </div>
@@ -628,9 +634,9 @@ export default async function OccupationPage({ params }: PageProps) {
             <div className="mt-8 rounded-xl border border-edge-strong bg-surface-raised px-6 py-5 shadow-sm">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-[0.85rem] font-medium text-ink">Total recoverable time</p>
+                  <p className="text-[0.85rem] font-medium text-ink">Your time back</p>
                   <p className="mt-0.5 text-[0.78rem] text-ink-tertiary">
-                    Across all mapped routine work in this role
+                    The total daily time that could feel lighter with the right support
                   </p>
                 </div>
                 <div className="flex items-baseline gap-1">
@@ -658,10 +664,10 @@ export default async function OccupationPage({ params }: PageProps) {
       {/* ------------------------------------------------------------------ */}
       <section className="page-container py-16 md:py-20">
         <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
-          The best place to start
+          A good place to start
         </h2>
         <p className="mt-2 max-w-2xl text-ink-secondary leading-relaxed">
-          One support system tied directly to the strongest routine cluster.
+          One support system that fits how you already work.
         </p>
 
         {primarySolutions.map((product) => (

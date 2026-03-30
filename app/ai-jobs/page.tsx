@@ -46,12 +46,12 @@ export default function AIJobsLanding() {
   }, [performSearch, query]);
 
   return (
-    <div className="flex min-h-[calc(100vh-57px)] flex-col items-center justify-center px-5">
+    <div className="flex min-h-[calc(100vh-57px)] items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-xl text-center"
+        className="mx-auto w-full max-w-[28rem] px-5 text-center"
       >
         <h1 className="font-editorial text-[clamp(2.2rem,5.5vw,3.4rem)] leading-[1.06] tracking-[-0.04em] text-ink font-normal">
           How many minutes{' '}
@@ -59,17 +59,13 @@ export default function AIJobsLanding() {
           {' '}get&nbsp;back?
         </h1>
 
-        <p className="mx-auto mt-6 max-w-[24rem] text-[0.9rem] leading-[1.7] text-ink-secondary">
-          Search your role. See where routine work quietly takes your time — and what you could do about it.
-        </p>
-
-        {/* Search */}
-        <div className="relative mx-auto mt-10 max-w-md">
+        {/* Search bar — the visual anchor. Everything above and below centers to this. */}
+        <div className="relative mt-10">
           <div
-            className="flex items-center gap-3 rounded-xl border border-edge-strong bg-surface-raised px-4 py-3 shadow-md transition-all duration-200 focus-within:shadow-lg focus-within:ring-2 focus-within:ring-ink/5"
+            className="flex items-center gap-3 rounded-xl border border-edge-strong bg-surface-raised py-3 pl-4 pr-4 shadow-md transition-all duration-200 focus-within:shadow-lg focus-within:ring-2 focus-within:ring-ink/5"
             onClick={() => inputRef.current?.focus()}
           >
-            <Search className="h-[18px] w-[18px] shrink-0 text-ink-tertiary" />
+            <Search className="h-4 w-4 shrink-0 text-ink-tertiary/60" />
             <input
               ref={inputRef}
               type="text"
@@ -77,7 +73,7 @@ export default function AIJobsLanding() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search your job title..."
-              className="w-full bg-transparent text-[0.9rem] text-ink placeholder:text-ink-tertiary/50 focus:outline-none"
+              className="w-full bg-transparent text-[0.9rem] text-ink placeholder:text-ink-tertiary/40 focus:outline-none"
               autoComplete="off"
               autoFocus
             />
@@ -92,6 +88,10 @@ export default function AIJobsLanding() {
               </button>
             )}
           </div>
+
+          <p className="mt-3 text-[0.8rem] leading-[1.65] text-ink-tertiary">
+            See where routine work quietly takes your time.
+          </p>
 
           {/* Dropdown */}
           <AnimatePresence>
@@ -172,7 +172,7 @@ export default function AIJobsLanding() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.55, duration: 0.5 }}
-          className="mt-20 text-[0.7rem] tracking-[0.06em] uppercase text-ink-tertiary/50"
+          className="mt-20 text-[0.7rem] tracking-[0.06em] uppercase text-ink"
         >
           800+ occupations &middot; U.S. Bureau of Labor Statistics
         </motion.p>

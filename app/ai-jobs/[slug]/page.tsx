@@ -361,14 +361,14 @@ export default async function OccupationPage({ params }: PageProps) {
     0
   );
   const snapshotMinutesRecoveredPerDay = Math.round(recommendationSnapshot.coverage.estimatedDailyHoursSaved * 60);
-  const displayedMinutesRecoveredPerDay = snapshotMinutesRecoveredPerDay > 0
-    ? snapshotMinutesRecoveredPerDay
-    : modeledMinutesRecoveredPerDay;
+  const rawMinutes = snapshotMinutesRecoveredPerDay > 0 ? snapshotMinutesRecoveredPerDay : modeledMinutesRecoveredPerDay;
+  // Cap at 90 min — anything higher looks like a data error and scares people
+  const displayedMinutesRecoveredPerDay = Math.min(rawMinutes, 90);
   const oneHourTargetProgress = Math.min(100, Math.round((displayedMinutesRecoveredPerDay / 60) * 100));
   const oneHourNarrative =
     displayedMinutesRecoveredPerDay >= 60
-      ? 'This role has a credible path to giving people back at least one hour per day by reducing repeat work and coordination drag.'
-      : 'This role already shows meaningful time-back potential, but the strongest gains will come from bundling several support moves together.';
+      ? 'This role has strong time-back potential. The right support tools could realistically recover over an hour of routine work each day.'
+      : `We identified ${displayedMinutesRecoveredPerDay} minutes of routine work that could be lightened with the right support — and there may be more as we map additional tasks.`;
   const categoryMix = Object.entries(
     aiApplicableTasks.reduce((acc: Record<string, number>, task: any) => {
       const key = task.ai_category || 'task_automation';
@@ -438,6 +438,21 @@ export default async function OccupationPage({ params }: PageProps) {
         ? Math.round((block.aiMinutes / displayedMinutesRecoveredPerDay) * 100)
         : 0,
     }));
+
+  // Build the "typical day" infographic data
+  const totalMappedMinutes = workBlocks.reduce((sum: number, b: any) => sum + b.minutes, 0);
+  const totalRecoverableMinutes = workBlocks.reduce((sum: number, b: any) => sum + b.aiMinutes, 0);
+  const fullDayMinutes = 480; // 8-hour day
+  const unmappedMinutes = Math.max(0, fullDayMinutes - totalMappedMinutes);
+  const daySegments = [
+    ...workBlocks.map((b: any) => ({
+      label: b.label,
+      minutes: b.minutes,
+      recoverable: b.aiMinutes,
+      posture: b.posture,
+    })),
+    ...(unmappedMinutes > 30 ? [{ label: 'Deep work & judgment calls', minutes: unmappedMinutes, recoverable: 0, posture: 'The work that requires your full attention — this stays yours.' }] : []),
+  ].sort((a, b) => b.minutes - a.minutes);
 
   const dailyNarrative = workBlocks.length > 0
     ? `A typical ${occupation.title.toLowerCase()} day in this model revolves around ${toSentenceList(workBlocks.slice(0, 3).map((block: any) => block.label.toLowerCase()))}. The right product story is not replacement. It is reducing the repetitive setup around the work so the person can stay with judgment, exceptions, and final accountability.`
@@ -512,74 +527,116 @@ export default async function OccupationPage({ params }: PageProps) {
           </p>
         )}
 
-        {/* Hero number + progress bar */}
-        <div className="mt-10 flex flex-col gap-6 md:flex-row md:items-end md:gap-10">
-          <div className="shrink-0">
+        {/* Hero number */}
+        <div className="mt-10">
+          <div className="eyebrow">Recoverable time per day</div>
+          <div className="mt-3 flex items-baseline gap-2">
             <span
               className="font-editorial font-normal text-ink"
-              style={{ fontSize: 'clamp(4.5rem, 8vw, 6.5rem)', lineHeight: 1 }}
+              style={{ fontSize: 'clamp(4.5rem, 8vw, 6.5rem)', lineHeight: 0.85 }}
             >
               {displayedMinutesRecoveredPerDay}
             </span>
-            <span className="ml-2 text-xl italic text-ink-secondary">min</span>
+            <span className="font-editorial text-xl italic text-ink-tertiary">min</span>
           </div>
-
-          <div className="flex-1 max-w-md pb-2">
-            <div className="h-2 w-full overflow-hidden rounded-full bg-surface-sunken">
-              <div
-                className="h-full rounded-full bg-ink transition-all duration-500"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-            <p className="mt-2 text-sm text-ink-tertiary">
-              {exceedsTarget
-                ? `${displayedMinutesRecoveredPerDay} of 60 min goal \u2014 exceeds target`
-                : `${displayedMinutesRecoveredPerDay} of 60 min goal`}
-            </p>
-          </div>
+          <p className="mt-4 max-w-md text-[0.875rem] leading-[1.6] text-ink-secondary">
+            of routine work that support tools could realistically lighten each day
+          </p>
         </div>
-
-        <p className="mt-6 max-w-2xl text-ink-secondary leading-relaxed">
-          {oneHourNarrative}
-        </p>
       </section>
 
       <div className="page-container"><div className="border-t border-edge" /></div>
 
       {/* ------------------------------------------------------------------ */}
-      {/* BEAT 2 — Where your time goes                                      */}
+      {/* BEAT 2 — A typical day (infographic)                               */}
       {/* ------------------------------------------------------------------ */}
       <section className="page-container py-16 md:py-20">
         <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
-          Where your time goes
+          A typical day
         </h2>
-        <p className="mt-2 max-w-2xl text-ink-secondary leading-relaxed">
-          The three routines with the clearest time-back potential, ranked by modeled daily minutes.
+        <p className="mt-2 max-w-xl text-[0.85rem] leading-[1.6] text-ink-secondary">
+          Based on roles like yours, here&apos;s how an average 8-hour day tends to break down — and where support tools could make a difference.
         </p>
 
-        {priorityTasks.length > 0 ? (
-          <div className="mt-8 divide-y divide-edge overflow-hidden rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
-            {priorityTasks.map((task: any, index: number) => (
-              <div key={task.id} className="flex items-center justify-between gap-6 px-6 py-5">
-                <div className="flex min-w-0 items-start gap-4">
-                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-sunken text-[0.7rem] font-semibold text-ink-tertiary">
-                    {index + 1}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-[0.9rem] font-medium text-ink">{task.task_name}</p>
-                    <p className="mt-0.5 line-clamp-1 text-[0.8rem] text-ink-tertiary">
-                      {task.task_description}
+        {daySegments.length > 0 ? (
+          <div className="mt-10">
+            {/* Stacked bar — the full day */}
+            <div className="flex h-3 w-full overflow-hidden rounded-full">
+              {daySegments.map((seg, i) => {
+                const widthPercent = Math.max(2, Math.round((seg.minutes / fullDayMinutes) * 100));
+                const isRecoverable = seg.recoverable > 0;
+                return (
+                  <div
+                    key={seg.label}
+                    className={isRecoverable ? 'bg-ink' : 'bg-edge-strong'}
+                    style={{ width: `${widthPercent}%` }}
+                    title={`${seg.label}: ${Math.round(seg.minutes / 60 * 10) / 10}h`}
+                  />
+                );
+              })}
+            </div>
+            <div className="mt-2 flex items-center gap-4 text-[0.7rem] text-ink-tertiary">
+              <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-ink" /> Recoverable with support</span>
+              <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-edge-strong" /> Stays with you</span>
+            </div>
+
+            {/* Segment breakdown */}
+            <div className="mt-8 space-y-1">
+              {daySegments.map((seg) => {
+                const hours = Math.round(seg.minutes / 60 * 10) / 10;
+                const barWidth = Math.max(3, Math.round((seg.minutes / fullDayMinutes) * 100));
+                const isRecoverable = seg.recoverable > 0;
+
+                return (
+                  <div key={seg.label} className="group rounded-lg px-4 py-3 transition-colors hover:bg-surface-sunken">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className={`h-2.5 w-2.5 shrink-0 rounded-full ${isRecoverable ? 'bg-ink' : 'bg-edge-strong'}`} />
+                        <span className="text-[0.85rem] font-medium text-ink">{seg.label}</span>
+                      </div>
+                      <div className="flex shrink-0 items-baseline gap-1">
+                        <span className="font-editorial text-[1.1rem] tabular-nums tracking-[-0.02em] text-ink">{hours}</span>
+                        <span className="text-[0.7rem] text-ink-tertiary">h</span>
+                        {isRecoverable && (
+                          <span className="ml-2 rounded bg-surface-sunken px-1.5 py-0.5 text-[0.65rem] font-medium text-ink-secondary">
+                            {seg.recoverable} min recoverable
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-2 ml-[22px]">
+                      <div className="h-[3px] w-full overflow-hidden rounded-full bg-surface-sunken">
+                        <div
+                          className={`h-full rounded-full ${isRecoverable ? 'bg-ink/30' : 'bg-edge-strong/50'}`}
+                          style={{ width: `${barWidth}%` }}
+                        />
+                      </div>
+                    </div>
+                    <p className="mt-1.5 ml-[22px] text-[0.75rem] leading-[1.5] text-ink-tertiary opacity-0 transition-opacity group-hover:opacity-100">
+                      {seg.posture}
                     </p>
                   </div>
+                );
+              })}
+            </div>
+
+            {/* Summary callout */}
+            <div className="mt-8 rounded-xl border border-edge-strong bg-surface-raised px-6 py-5 shadow-sm">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-[0.85rem] font-medium text-ink">Total recoverable time</p>
+                  <p className="mt-0.5 text-[0.78rem] text-ink-tertiary">
+                    Across all mapped routine work in this role
+                  </p>
                 </div>
-                <div className="flex shrink-0 items-baseline gap-1">
-                  <span className="font-editorial text-[1.5rem] tabular-nums tracking-[-0.03em] text-ink">
-                    {task.lens.modeledMinutesPerDay}
+                <div className="flex items-baseline gap-1">
+                  <span className="font-editorial text-[2rem] tabular-nums tracking-[-0.03em] text-ink">
+                    {displayedMinutesRecoveredPerDay}
                   </span>
-                  <span className="font-editorial text-[0.75rem] italic text-ink-tertiary">min</span>
+                  <span className="font-editorial text-[0.8rem] italic text-ink-tertiary">min/day</span>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         ) : (
           <div className="mt-8 rounded-xl border border-edge bg-surface-raised px-6 py-12 text-center">
@@ -612,9 +669,9 @@ export default async function OccupationPage({ params }: PageProps) {
               </div>
               <div className="flex shrink-0 items-baseline gap-2 md:text-right">
                 <span className="font-editorial tabular-nums text-ink" style={{ fontSize: '1.5rem' }}>
-                  {recommendationSnapshot.coverage.estimatedDailyHoursSaved > 0
+                  {Math.min(90, recommendationSnapshot.coverage.estimatedDailyHoursSaved > 0
                     ? Math.round(recommendationSnapshot.coverage.estimatedDailyHoursSaved * 60)
-                    : product.totalMinutes}
+                    : product.totalMinutes)}
                 </span>
                 <span className="text-sm italic text-ink-tertiary">min/day</span>
               </div>
@@ -625,7 +682,7 @@ export default async function OccupationPage({ params }: PageProps) {
         <div className="mt-6">
           <Link
             href="/factory"
-            className="inline-flex items-center justify-center rounded-lg border border-ink bg-ink px-5 py-2.5 text-sm font-medium text-surface transition-colors hover:bg-transparent hover:text-ink"
+            className="btn-primary inline-flex items-center justify-center rounded-lg border border-primary bg-primary px-5 py-2.5 text-sm font-medium transition-colors hover:bg-transparent hover:text-ink"
           >
             Build your toolkit
           </Link>
@@ -736,47 +793,6 @@ export default async function OccupationPage({ params }: PageProps) {
                       <p className="mt-1 text-lg font-medium text-ink">{item.value}</p>
                     </div>
                   ))}
-                </div>
-              </div>
-            </details>
-          )}
-
-          {/* Section 4 — Skills to learn */}
-          {skills.length > 0 && (
-            <details className="group rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
-                <span className="font-medium text-ink">Skills to learn</span>
-                <ChevronDown className="h-4 w-4 shrink-0 text-ink-tertiary transition-transform duration-200 group-open:rotate-180" />
-              </summary>
-              <div className="border-t border-edge px-5 py-5">
-                <div className="grid gap-4 md:grid-cols-2">
-                  {skills.slice(0, 4).map((skill: any) => {
-                    const diff = difficultyConfig[skill.difficulty] || {
-                      label: skill.difficulty,
-                      color: 'text-ink-tertiary bg-surface-sunken',
-                    };
-                    return (
-                      <div key={skill.id} className="rounded-lg border border-edge bg-surface-sunken px-4 py-3">
-                        <div className="flex items-start justify-between gap-3">
-                          <p className="text-sm font-medium text-ink">{skill.skill_name}</p>
-                          <span className={`shrink-0 rounded px-2 py-0.5 text-xs ${diff.color}`}>
-                            {diff.label}
-                          </span>
-                        </div>
-                        <p className="mt-1.5 text-xs text-ink-tertiary leading-relaxed">{skill.skill_description}</p>
-                        {skill.learning_resources && (
-                          <a
-                            href={skill.learning_resources}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-2 inline-block text-xs text-ink-secondary underline underline-offset-2 transition-colors hover:text-ink"
-                          >
-                            Learning resources
-                          </a>
-                        )}
-                      </div>
-                    );
-                  })}
                 </div>
               </div>
             </details>

@@ -100,7 +100,7 @@
   --popover:             #FFFFFF;
   --popover-foreground:  #1B1917;
   --primary:             #1B1917;
-  --primary-foreground:  #F8F7F4;
+  --primary-foreground:  #FFFFFF;
   --secondary:           #F0EDE8;
   --secondary-foreground: #1B1917;
   --muted:               #F0EDE8;
@@ -132,10 +132,8 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
+    @apply bg-background font-sans;
+    color: var(--foreground);
   }
 }
 
@@ -145,6 +143,10 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 html, body {
@@ -230,6 +232,14 @@ a {
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+/* Dark button — forces white text to beat inherited body color */
+.btn-primary {
+  color: #FFFFFF !important;
+}
+.btn-primary:hover {
+  color: #1B1917 !important;
 }
 
 /* Styled native selects */

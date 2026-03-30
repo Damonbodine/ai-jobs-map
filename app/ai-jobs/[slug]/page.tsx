@@ -502,50 +502,54 @@ export default async function OccupationPage({ params }: PageProps) {
     <div className="bg-surface text-ink">
 
       {/* ------------------------------------------------------------------ */}
-      {/* BEAT 1 — Above the fold                                            */}
+      {/* BEAT 1 — Dark hero panel                                           */}
       {/* ------------------------------------------------------------------ */}
-      <section className="page-container pt-10 pb-16 md:pt-14 md:pb-20">
-        <div className="mb-10">
-          <Link
-            href="/ai-jobs"
-            className="inline-flex items-center gap-1 text-[0.78rem] text-ink-tertiary transition-colors hover:text-ink"
-          >
-            <ChevronLeft className="h-3.5 w-3.5" />
-            Back
-          </Link>
-        </div>
-
-        <div className="eyebrow mb-3">{occupation.major_category}</div>
-
-        <h1 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(2rem, 4vw, 3.25rem)' }}>
-          {occupation.title}
-        </h1>
-
-        {occupation.employment && (
-          <p className="mt-2 text-ink-tertiary">
-            {Number(occupation.employment).toLocaleString()} employed in the U.S.
-          </p>
-        )}
-
-        {/* Hero number */}
-        <div className="mt-10">
-          <div className="eyebrow">Recoverable time per day</div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span
-              className="font-editorial font-normal text-ink"
-              style={{ fontSize: 'clamp(4.5rem, 8vw, 6.5rem)', lineHeight: 0.85 }}
+      <section className="bg-panel">
+        <div className="page-container pt-8 pb-16 md:pt-10 md:pb-20">
+          <div className="mb-10">
+            <Link
+              href="/ai-jobs"
+              className="inline-flex items-center gap-1 text-[0.78rem] text-panel-muted transition-colors hover:text-panel-text"
             >
-              {displayedMinutesRecoveredPerDay}
-            </span>
-            <span className="font-editorial text-xl italic text-ink-tertiary">min</span>
+              <ChevronLeft className="h-3.5 w-3.5" />
+              Back
+            </Link>
           </div>
-          <p className="mt-4 max-w-md text-[0.875rem] leading-[1.6] text-ink-secondary">
-            of routine work that support tools could realistically lighten each day
+
+          <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-panel-muted">
+            {occupation.major_category}
           </p>
+
+          <h1 className="mt-3 font-editorial font-normal text-panel-text" style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}>
+            {occupation.title}
+          </h1>
+
+          {occupation.employment && (
+            <p className="mt-2 text-[0.8rem] text-panel-muted">
+              {Number(occupation.employment).toLocaleString()} employed in the U.S.
+            </p>
+          )}
+
+          {/* The Number — the moment */}
+          <div className="mt-14">
+            <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-panel-muted">
+              Recoverable time per day
+            </p>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span
+                className="font-editorial font-normal text-panel-text"
+                style={{ fontSize: 'clamp(5rem, 10vw, 7rem)', lineHeight: 0.85 }}
+              >
+                {displayedMinutesRecoveredPerDay}
+              </span>
+              <span className="font-editorial text-xl italic text-panel-muted">min</span>
+            </div>
+            <p className="mt-5 max-w-md text-[0.875rem] leading-[1.6] text-panel-muted">
+              of routine work that support tools could realistically lighten each day
+            </p>
+          </div>
         </div>
       </section>
-
-      <div className="page-container"><div className="border-t border-edge" /></div>
 
       {/* ------------------------------------------------------------------ */}
       {/* BEAT 2 — A typical day (infographic)                               */}

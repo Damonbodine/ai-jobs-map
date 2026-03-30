@@ -10,29 +10,35 @@
    ═══════════════════════════════════════════════ */
 
 @theme {
-  /* Surface — warm, not gray */
-  --color-surface:        #F8F7F4;
-  --color-surface-raised: #FFFFFF;
-  --color-surface-sunken: #F0EDE8;
-  --color-surface-hover:  #EBE8E2;
+  /* Surface — warm parchment */
+  --color-surface:        #F5F2ED;
+  --color-surface-raised: #FDFCFA;
+  --color-surface-sunken: #ECE8E1;
+  --color-surface-hover:  #E6E2DA;
 
-  /* Ink — rich, not flat black */
-  --color-ink:            #1B1917;
-  --color-ink-secondary:  #706B63;
-  --color-ink-tertiary:   #A39E95;
+  /* Ink — deep espresso */
+  --color-ink:            #1C1816;
+  --color-ink-secondary:  #6B6259;
+  --color-ink-tertiary:   #9C9488;
 
-  /* Accent — deep warm indigo, not generic blue */
-  --color-accent-blue:    #3D3BF3;
-  --color-accent-blue-hover: #2F2DD4;
-  --color-accent-blue-subtle: #EDEDFE;
+  /* Dark panel — for hero sections */
+  --color-panel:          #1C1816;
+  --color-panel-lighter:  #2A2521;
+  --color-panel-text:     #F5F2ED;
+  --color-panel-muted:    #9C9488;
+
+  /* Accent — warm amber, not cold blue */
+  --color-accent-blue:    #B8860B;
+  --color-accent-blue-hover: #9A7209;
+  --color-accent-blue-subtle: #F5EFE0;
 
   /* Signal */
   --color-signal:         #C4553A;
   --color-signal-subtle:  #FDF0ED;
 
-  /* Borders — warm, barely there */
-  --color-edge:           #E8E5DF;
-  --color-edge-strong:    #D5D0C8;
+  /* Borders — warm, visible */
+  --color-edge:           #DDD8D0;
+  --color-edge-strong:    #CCC6BC;
 
   /* Shadows — warm-toned */
   --shadow-sm:  0 1px 2px rgba(28,25,23,0.04);
@@ -93,24 +99,24 @@
 }
 
 :root {
-  --background:          #F8F7F4;
-  --foreground:          #1B1917;
-  --card:                #FFFFFF;
-  --card-foreground:     #1B1917;
-  --popover:             #FFFFFF;
-  --popover-foreground:  #1B1917;
-  --primary:             #1B1917;
-  --primary-foreground:  #FFFFFF;
-  --secondary:           #F0EDE8;
-  --secondary-foreground: #1B1917;
-  --muted:               #F0EDE8;
-  --muted-foreground:    #A39E95;
-  --accent:              #F0EDE8;
-  --accent-foreground:   #1B1917;
+  --background:          #F5F2ED;
+  --foreground:          #1C1816;
+  --card:                #FDFCFA;
+  --card-foreground:     #1C1816;
+  --popover:             #FDFCFA;
+  --popover-foreground:  #1C1816;
+  --primary:             #1C1816;
+  --primary-foreground:  #F5F2ED;
+  --secondary:           #ECE8E1;
+  --secondary-foreground: #1C1816;
+  --muted:               #ECE8E1;
+  --muted-foreground:    #9C9488;
+  --accent:              #ECE8E1;
+  --accent-foreground:   #1C1816;
   --destructive:         #C4553A;
-  --border:              #E8E5DF;
-  --input:               #E8E5DF;
-  --ring:                #3D3BF3;
+  --border:              #DDD8D0;
+  --input:               #DDD8D0;
+  --ring:                #B8860B;
   --chart-1:             #1B1917;
   --chart-2:             #706B63;
   --chart-3:             #A39E95;

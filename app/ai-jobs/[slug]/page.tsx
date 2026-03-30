@@ -361,7 +361,9 @@ export default async function OccupationPage({ params }: PageProps) {
     0
   );
   const snapshotMinutesRecoveredPerDay = Math.round(recommendationSnapshot.coverage.estimatedDailyHoursSaved * 60);
-  const displayedMinutesRecoveredPerDay = snapshotMinutesRecoveredPerDay > 0 ? snapshotMinutesRecoveredPerDay : modeledMinutesRecoveredPerDay;
+  // Always use the bottom-up sum so the hero number matches the breakdown
+  // (the snapshot estimate can diverge wildly from task-level data)
+  const displayedMinutesRecoveredPerDay = modeledMinutesRecoveredPerDay;
   const oneHourTargetProgress = Math.min(100, Math.round((displayedMinutesRecoveredPerDay / 60) * 100));
   const oneHourNarrative =
     displayedMinutesRecoveredPerDay >= 60

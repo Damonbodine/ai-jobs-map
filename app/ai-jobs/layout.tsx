@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Header } from '@/components/ui/Header';
+import { Header } from '@/components/ui/header';
 
 export const metadata: Metadata = {
   title: 'AI Jobs Map - Find Time-Back Opportunities In Your Work',

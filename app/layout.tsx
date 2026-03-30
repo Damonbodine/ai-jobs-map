@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import { Manrope, Newsreader, Geist } from 'next/font/google';
+import { Manrope, Newsreader } from 'next/font/google';
+import { cn } from '@/lib/utils';
+import './globals.css';
 
 const headingFont = Newsreader({
   subsets: ['latin'],
@@ -9,7 +11,7 @@ const headingFont = Newsreader({
 
 const bodyFont = Manrope({
   subsets: ['latin'],
-  variable: '--font-body',
+  variable: '--font-sans',
   display: 'swap',
 });
 
@@ -18,20 +20,16 @@ export const metadata: Metadata = {
   description: 'Discover AI opportunities for any career',
 };
 
-import './globals.css'
-import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
-      <body className={`${headingFont.variable} ${bodyFont.variable} bg-surface text-ink antialiased`}>{children}</body>
+    <html lang="en" className={cn('font-sans', bodyFont.variable)}>
+      <body className={cn(headingFont.variable, 'bg-surface text-ink antialiased')}>
+        {children}
+      </body>
     </html>
   );
 }

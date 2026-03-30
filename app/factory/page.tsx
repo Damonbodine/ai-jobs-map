@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/input';
+import { NativeSelect as Select } from '@/components/ui/native-select';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Zap, CheckCircle2, X, Search, Activity, Cpu, Wand2 } from 'lucide-react';
 
 interface Package {

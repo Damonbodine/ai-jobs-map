@@ -2,7 +2,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { Pool } from 'pg';
+import { ChevronLeft, ChevronDown } from 'lucide-react';
 import { getOccupationRecommendationSnapshot } from '@/lib/ai-jobs/recommendations';
+import { Footer } from '@/components/ui/footer';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -243,7 +245,7 @@ async function getSkills(occupationId: number) {
 
 async function getMicroTasks(occupationId: number) {
   const result = await pool.query(
-    `SELECT id, task_name, task_description, frequency, ai_applicable, ai_how_it_helps, 
+    `SELECT id, task_name, task_description, frequency, ai_applicable, ai_how_it_helps,
             ai_impact_level, ai_effort_to_implement, ai_category, ai_tools
      FROM job_micro_tasks WHERE occupation_id = $1
      ORDER BY ai_impact_level DESC NULLS LAST, ai_effort_to_implement ASC NULLS LAST`,
@@ -255,7 +257,7 @@ async function getMicroTasks(occupationId: number) {
 async function getGranularSkills(occupationId: number) {
   // Get skill breakdown from task_skill_mapping
   const result = await pool.query(
-    `SELECT 
+    `SELECT
        ms.id,
        ms.skill_code,
        ms.skill_name,
@@ -320,7 +322,7 @@ async function getRoleAlignedPackages(occupationTitle: string) {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const occupation = await getOccupation(slug);
-  
+
   if (!occupation) {
     return { title: 'Occupation Not Found' };
   }
@@ -478,467 +480,312 @@ export default async function OccupationPage({ params }: PageProps) {
   const visibleSkillSummary = skillSummary.filter((item) => item.value > 0);
   const humanEdgeNotes = [...new Set(summaryBlocks.map((block: any) => block.humanEdge))].slice(0, 2);
 
+  const exceedsTarget = displayedMinutesRecoveredPerDay > 60;
+  const progressPercent = exceedsTarget ? 100 : oneHourTargetProgress;
+
   return (
-    <div className="app-shell text-slate-50">
-      <div className="absolute top-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full bg-emerald-600/10 blur-[140px] pointer-events-none animate-pulse-glow" style={{ animationDuration: '7s' }} />
-      <div className="absolute bottom-[-10%] right-[-10%] h-[30%] w-[30%] rounded-full bg-cyan-600/10 blur-[140px] pointer-events-none animate-pulse-glow" style={{ animationDuration: '9s' }} />
+    <div className="bg-surface text-ink">
 
-      <section className="page-container relative z-10 py-12 md:py-16">
-        <Link 
-          href="/ai-jobs"
-          className="mb-8 inline-flex items-center gap-2 text-slate-400 transition-colors hover:text-white"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Search
-        </Link>
+      {/* ------------------------------------------------------------------ */}
+      {/* BEAT 1 — Above the fold                                            */}
+      {/* ------------------------------------------------------------------ */}
+      <section className="page-container pt-10 pb-16 md:pt-14 md:pb-20">
+        <div className="mb-10">
+          <Link
+            href="/ai-jobs"
+            className="inline-flex items-center gap-1 text-[0.78rem] text-ink-tertiary transition-colors hover:text-ink"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" />
+            Back
+          </Link>
+        </div>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
-          <div className="panel rounded-[2rem] p-7 md:p-8">
-            <div className="eyebrow mb-5">{occupation.major_category}</div>
-            <h1 className="text-4xl font-black tracking-tight text-white md:text-5xl">
-              {occupation.title}
-            </h1>
-            {occupation.employment && (
-              <div className="mt-4 text-slate-400">
-                {Number(occupation.employment).toLocaleString()} workers in the US
-              </div>
-            )}
-            <p className="mt-5 max-w-3xl text-slate-400 leading-8">
-              Explore the day-to-day tasks, task clusters, and support systems most likely to give this role meaningful time back.
-            </p>
+        <div className="eyebrow mb-3">{occupation.major_category}</div>
+
+        <h1 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(2rem, 4vw, 3.25rem)' }}>
+          {occupation.title}
+        </h1>
+
+        {occupation.employment && (
+          <p className="mt-2 text-ink-tertiary">
+            {Number(occupation.employment).toLocaleString()} employed in the U.S.
+          </p>
+        )}
+
+        {/* Hero number + progress bar */}
+        <div className="mt-10 flex flex-col gap-6 md:flex-row md:items-end md:gap-10">
+          <div className="shrink-0">
+            <span
+              className="font-editorial font-normal text-ink"
+              style={{ fontSize: 'clamp(4.5rem, 8vw, 6.5rem)', lineHeight: 1 }}
+            >
+              {displayedMinutesRecoveredPerDay}
+            </span>
+            <span className="ml-2 text-xl italic text-ink-secondary">min</span>
           </div>
 
-          <div className="panel rounded-[2rem] p-6 text-center">
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Daily time-back model</div>
-            <div className="mt-3 text-6xl font-black text-emerald-400">{displayedMinutesRecoveredPerDay}</div>
-            <div className="mt-2 text-slate-300">Minutes of repeat work we can realistically lighten</div>
-            <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-900/80">
+          <div className="flex-1 max-w-md pb-2">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-surface-sunken">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-sky-400"
-                style={{ width: `${oneHourTargetProgress}%` }}
+                className="h-full rounded-full bg-ink transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <div className="mt-3 text-sm text-slate-500">
-              {Math.min(displayedMinutesRecoveredPerDay, 60)} of 60 minutes/day target
-            </div>
+            <p className="mt-2 text-sm text-ink-tertiary">
+              {exceedsTarget
+                ? `${displayedMinutesRecoveredPerDay} of 60 min goal \u2014 exceeds target`
+                : `${displayedMinutesRecoveredPerDay} of 60 min goal`}
+            </p>
           </div>
         </div>
+
+        <p className="mt-6 max-w-2xl text-ink-secondary leading-relaxed">
+          {oneHourNarrative}
+        </p>
       </section>
 
-      <main className="page-container relative z-10 space-y-10 pb-16">
-        <section className="panel rounded-[2rem] p-7 md:p-8">
-          <div className="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)] xl:items-center">
-            <div className="mx-auto flex w-full max-w-[320px] items-center justify-center">
-              <svg viewBox="0 0 280 280" className="w-full">
-                <circle cx="140" cy="140" r="122" fill="rgba(15,23,42,0.55)" stroke="rgba(148,163,184,0.12)" />
-                {wheelSegments.map((segment) => (
-                  <path
-                    key={segment.label}
-                    d={segment.path}
-                    fill={segment.color}
-                    fillOpacity="0.88"
-                    stroke="rgba(2,6,23,0.7)"
-                    strokeWidth="2"
-                  />
-                ))}
-                <circle cx="140" cy="140" r="58" fill="rgba(2,6,23,0.92)" stroke="rgba(148,163,184,0.1)" />
-                <text x="140" y="126" textAnchor="middle" className="fill-slate-400 text-[11px] font-semibold tracking-[0.18em] uppercase">
-                  Daily Recovery
-                </text>
-                <text x="140" y="155" textAnchor="middle" className="fill-white text-[34px] font-black">
-                  {displayedMinutesRecoveredPerDay}m
-                </text>
-                <text x="140" y="176" textAnchor="middle" className="fill-emerald-300 text-[12px] font-semibold">
-                  Aiming for one hour back
-                </text>
-              </svg>
-            </div>
+      <div className="page-container"><div className="border-t border-edge" /></div>
 
-            <div className="space-y-6">
-              <div className="max-w-3xl">
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">One-hour-back snapshot</div>
-                <h2 className="mt-2 text-3xl font-black text-white">Where the day goes and where to start</h2>
-                <p className="mt-3 text-base leading-8 text-slate-300">{oneHourNarrative}</p>
-                <p className="mt-3 text-sm leading-7 text-slate-400">{dailyNarrative}</p>
-              </div>
+      {/* ------------------------------------------------------------------ */}
+      {/* BEAT 2 — Where your time goes                                      */}
+      {/* ------------------------------------------------------------------ */}
+      <section className="page-container py-16 md:py-20">
+        <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
+          Where your time goes
+        </h2>
+        <p className="mt-2 max-w-2xl text-ink-secondary leading-relaxed">
+          The three routines with the clearest time-back potential, ranked by modeled daily minutes.
+        </p>
 
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.85fr)]">
-                <div className="rounded-[1.4rem] border border-slate-800/75 bg-slate-950/35 p-5">
-                  <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Best places to start</div>
-                  <div className="mt-4 space-y-3">
-                    {categoryMix.map(([category, minutes]) => {
-                      const config = opportunityCategoryConfig[category] || { label: 'Automation', color: 'bg-slate-500', icon: '✨' };
-                      return (
-                        <div key={category} className="flex items-center justify-between gap-4 rounded-[1rem] border border-slate-800/70 bg-slate-950/45 px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            <span className={`flex h-10 w-10 items-center justify-center rounded-2xl ${config.color}`}>
-                              {config.icon}
-                            </span>
-                            <div>
-                              <div className="font-semibold text-white">{config.label}</div>
-                              <div className="text-xs text-slate-500">Early time-back theme</div>
-                            </div>
-                          </div>
-                          <div className="text-xl font-black text-emerald-300">{minutes}m</div>
-                        </div>
-                      );
-                    })}
+        {priorityTasks.length > 0 ? (
+          <div className="mt-8 divide-y divide-edge overflow-hidden rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
+            {priorityTasks.map((task: any, index: number) => (
+              <div key={task.id} className="flex items-center justify-between gap-6 px-6 py-5">
+                <div className="flex min-w-0 items-start gap-4">
+                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-sunken text-[0.7rem] font-semibold text-ink-tertiary">
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[0.9rem] font-medium text-ink">{task.task_name}</p>
+                    <p className="mt-0.5 line-clamp-1 text-[0.8rem] text-ink-tertiary">
+                      {task.task_description}
+                    </p>
                   </div>
                 </div>
-
-                <div className="rounded-[1.4rem] border border-slate-800/75 bg-slate-950/35 p-5">
-                  <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Top routines</div>
-                  <div className="mt-4 grid gap-2">
-                    {priorityTasks.map((task: any, index: number) => (
-                      <div key={task.id} className="flex items-center justify-between gap-3 rounded-[1rem] border border-slate-800/70 bg-slate-950/45 px-4 py-3">
-                        <div className="min-w-0">
-                          <div className="text-sm font-semibold text-white">{index + 1}. {task.task_name}</div>
-                          <div className="text-xs text-slate-500">{task.lens.label}</div>
-                        </div>
-                        <div className="shrink-0 rounded-full border border-cyan-500/20 bg-cyan-500/8 px-3 py-1 text-sm font-bold text-cyan-300">
-                          {task.lens.modeledMinutesPerDay}m
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="space-y-4">
-          <details className="panel group rounded-[2rem] p-7 md:p-8">
-            <summary className="flex cursor-pointer list-none flex-col gap-3 marker:content-none md:flex-row md:items-end md:justify-between">
-              <div className="max-w-3xl">
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Day architecture</div>
-                <h2 className="mt-2 text-3xl font-black text-white">The routines that shape the day</h2>
-                <p className="mt-3 text-slate-400 leading-8">
-                  Open this if you want the fuller shape of the role. It is helpful context, but most people can start with the priority routines below.
-                </p>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-slate-400">
-                <span>View supporting context</span>
-                <span className="rounded-full border border-slate-700/70 bg-slate-950/45 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 transition-transform duration-200 group-open:rotate-180">
-                  ↓
-                </span>
-              </div>
-            </summary>
-
-            <div className="mt-6 grid gap-4 lg:grid-cols-3">
-              {summaryBlocks.map((block: any) => (
-                <div
-                  key={block.key}
-                  className={`rounded-[1.35rem] border bg-gradient-to-br ${block.tone} ${block.border} p-5`}
-                >
-                  <div className={`text-sm font-semibold uppercase tracking-[0.16em] ${block.accent}`}>
-                    {block.label}
-                  </div>
-                  <div className="mt-3 text-3xl font-black text-white">{formatMinutes(block.aiMinutes)}</div>
-                  <p className="mt-3 text-sm leading-7 text-slate-300">{block.posture}</p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {block.tasks.slice(0, 2).map((task: any) => (
-                      <span key={task.id} className="rounded-full border border-slate-700/80 bg-slate-950/45 px-3 py-1 text-xs text-slate-300">
-                        {task.task_name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </details>
-
-          <details open className="group space-y-4">
-            <summary className="flex cursor-pointer list-none flex-col gap-2 marker:content-none md:flex-row md:items-end md:justify-between">
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Priority routines</div>
-                <h2 className="mt-2 text-3xl font-black text-white">The first tasks worth redesigning</h2>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-slate-400">
-                <span>Showing the top {priorityTasks.length} routines with the clearest time-back potential</span>
-                <span className="rounded-full border border-slate-700/70 bg-slate-950/45 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 transition-transform duration-200 group-open:rotate-180">
-                  ↓
-                </span>
-              </div>
-            </summary>
-
-            {priorityTasks.length > 0 ? (
-              <div className="grid gap-3">
-                {priorityTasks.map((task: any) => {
-                  const config = opportunityCategoryConfig[task.ai_category || 'task_automation'] || {
-                    label: 'Task Automation',
-                    color: 'bg-slate-500',
-                    icon: '✨'
-                  };
-
-                  return (
-                    <div
-                      key={task.id}
-                      className={`rounded-[1.35rem] border p-4 transition-all ${
-                        task.ai_applicable
-                          ? 'border-slate-800/75 bg-slate-900/58'
-                          : 'border-slate-800/60 bg-slate-900/40 opacity-80'
-                      }`}
-                    >
-                      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start">
-                        <div className="max-w-3xl">
-                          <div className="mb-2 flex flex-wrap items-center gap-2">
-                            <h3 className="text-xl font-bold text-white">{task.task_name}</h3>
-                            <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] ${task.lens.tone}`}>
-                              {task.lens.label}
-                            </span>
-                          </div>
-                          <p className="text-slate-400 leading-7">{task.task_description}</p>
-
-                          {task.ai_applicable && task.ai_how_it_helps ? (
-                            <div className="mt-4 rounded-[1rem] border border-slate-800/75 bg-slate-950/40 p-3.5">
-                              <div className="mb-2 flex items-center gap-2">
-                                <span className="text-lg">{config.icon}</span>
-                                <span className={`rounded-full px-3 py-1 text-xs font-semibold text-white ${config.color}`}>
-                                  {config.label}
-                                </span>
-                              </div>
-                              <p className="text-sm leading-7 text-emerald-200/90">{task.ai_how_it_helps}</p>
-                            </div>
-                          ) : (
-                            <div className="mt-4 text-sm italic text-slate-500">
-                              This task is less likely to be an early time-back candidate.
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                          <div className="rounded-[1rem] border border-slate-800/75 bg-slate-950/45 p-4">
-                            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Time-back potential</div>
-                            <div className="mt-2 text-3xl font-black text-cyan-300">{task.lens.modeledMinutesPerDay}m</div>
-                            <div className="mt-1 text-sm text-slate-500">per day</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="panel rounded-[2rem] p-12 text-center">
-                <div className="mb-4 text-4xl">🤖</div>
-                <h3 className="mb-2 text-xl font-semibold text-white">Task analysis coming soon</h3>
-                <p className="mx-auto max-w-md text-slate-400">
-                  We&apos;re still mapping the day-to-day work for this occupation before we can estimate recoverable time.
-                </p>
-              </div>
-            )}
-          </details>
-        </section>
-
-        <section className="space-y-6">
-          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Recommended solutions</div>
-              <h2 className="mt-2 text-3xl font-black text-white">The best-fit solution path</h2>
-            </div>
-              <div className="text-sm text-slate-400">One support path tied directly to the strongest routine cluster.</div>
-          </div>
-
-          <div className="grid gap-4">
-            {primarySolutions.map((product) => (
-              <div key={product.name} className="panel rounded-[1.6rem] p-6">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="max-w-2xl">
-                    <div className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">Recommended support system</div>
-                    <h3 className="mt-2 text-2xl font-black text-white">{product.name}</h3>
-                    <p className="mt-3 text-slate-300 leading-7">{product.strapline}</p>
-                  </div>
-                  <div className="rounded-[1rem] border border-emerald-500/15 bg-emerald-500/6 px-4 py-3 text-right">
-                    <div className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-300">Modeled time back</div>
-                    <div className="mt-1 text-3xl font-black text-white">
-                      {recommendationSnapshot.coverage.estimatedDailyHoursSaved > 0
-                        ? formatHours(recommendationSnapshot.coverage.estimatedDailyHoursSaved)
-                        : `${product.totalMinutes}m`}
-                    </div>
-                    <div className="text-xs text-slate-500">from mapped routines and workflow coverage</div>
-                  </div>
-                </div>
-
-                <div className="mt-5 grid gap-4 md:grid-cols-3">
-                  <div className="rounded-[1.1rem] border border-slate-800/75 bg-slate-950/45 p-4">
-                    <div className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Watches</div>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">{product.watches}</p>
-                  </div>
-                  <div className="rounded-[1.1rem] border border-slate-800/75 bg-slate-950/45 p-4">
-                    <div className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Produces</div>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">{product.produces}</p>
-                  </div>
-                  <div className="rounded-[1.1rem] border border-slate-800/75 bg-slate-950/45 p-4">
-                    <div className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Human checkpoint</div>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">{product.review}</p>
-                  </div>
-                </div>
-
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {product.matchedBlocks.map((blockLabel) => (
-                    <span key={blockLabel} className="rounded-full border border-slate-700/80 bg-slate-900/50 px-3 py-1 text-xs text-slate-300">
-                      {blockLabel}
-                    </span>
-                  ))}
-                  {recommendationSnapshot.coverage.percent > 0 && (
-                    <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
-                      {Math.round(recommendationSnapshot.coverage.percent)}% workflow coverage
-                    </span>
-                  )}
-                </div>
-                <div className="mt-4 text-sm text-slate-500">
-                  Best matched routines: {product.matchingTasks.slice(0, 3).map((task: any) => task.task_name).join(' • ')}
+                <div className="flex shrink-0 items-baseline gap-1">
+                  <span className="font-editorial text-[1.5rem] tabular-nums tracking-[-0.03em] text-ink">
+                    {task.lens.modeledMinutesPerDay}
+                  </span>
+                  <span className="font-editorial text-[0.75rem] italic text-ink-tertiary">min</span>
                 </div>
               </div>
             ))}
           </div>
-        </section>
-
-        {recommendationSnapshot.topActions.length > 0 && (
-          <section className="space-y-6">
-            <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Evidence layer</div>
-                <h2 className="mt-2 text-3xl font-black text-white">How this role maps into reusable systems</h2>
-              </div>
-              <div className="text-sm text-slate-400">This is the bridge from occupation research to a product recommendation.</div>
-            </div>
-
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-              <div className="panel rounded-[1.5rem] p-5">
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Common action patterns</div>
-                <div className="mt-4 grid gap-3">
-                  {recommendationSnapshot.topActions.slice(0, 5).map((action) => (
-                    <div key={action.code} className="rounded-[1rem] border border-slate-800/75 bg-slate-950/45 px-4 py-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <div className="font-semibold text-white">{action.name}</div>
-                          <div className="text-xs text-slate-500">{action.taskCount} mapped tasks • {Math.round(action.confidence * 100)}% confidence</div>
-                        </div>
-                        <div className="text-xs uppercase tracking-[0.14em] text-emerald-300">{action.code}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="panel rounded-[1.5rem] p-5">
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Package fit</div>
-                <div className="mt-4 grid gap-3">
-                  {recommendationSnapshot.recommendedPackages.slice(0, 3).map((pkg) => (
-                    <div key={pkg.id} className="rounded-[1rem] border border-slate-800/75 bg-slate-950/45 px-4 py-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <div className="font-semibold text-white">{pkg.name}</div>
-                          <div className="mt-1 text-sm leading-6 text-slate-400">{pkg.description}</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-semibold text-emerald-300">${pkg.basePrice.toLocaleString()}</div>
-                          <div className="text-xs text-slate-500">{pkg.tier}</div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
+        ) : (
+          <div className="mt-8 rounded-xl border border-edge bg-surface-raised px-6 py-12 text-center">
+            <p className="text-ink-secondary">
+              We&apos;re still mapping the day-to-day work for this occupation.
+            </p>
+          </div>
         )}
+      </section>
 
-        {visibleSkillSummary.length > 0 && (
-          <section className="space-y-6">
-            <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Human edge</div>
-                <h2 className="mt-2 text-3xl font-black text-white">What still belongs to the person</h2>
+      <div className="page-container"><div className="border-t border-edge" /></div>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* BEAT 3 — The best place to start                                   */}
+      {/* ------------------------------------------------------------------ */}
+      <section className="page-container py-16 md:py-20">
+        <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
+          The best place to start
+        </h2>
+        <p className="mt-2 max-w-2xl text-ink-secondary leading-relaxed">
+          One support system tied directly to the strongest routine cluster.
+        </p>
+
+        {primarySolutions.map((product) => (
+          <div key={product.name} className="mt-8 rounded-xl border border-edge bg-surface-raised px-5 py-5 md:px-6 md:py-6">
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div className="max-w-2xl">
+                <p className="font-medium text-ink">{product.name}</p>
+                <p className="mt-1 text-ink-secondary leading-relaxed">{product.strapline}</p>
               </div>
-              <div className="text-sm text-slate-400">A compact view of what should stay human-led.</div>
+              <div className="flex shrink-0 items-baseline gap-2 md:text-right">
+                <span className="font-editorial tabular-nums text-ink" style={{ fontSize: '1.5rem' }}>
+                  {recommendationSnapshot.coverage.estimatedDailyHoursSaved > 0
+                    ? Math.round(recommendationSnapshot.coverage.estimatedDailyHoursSaved * 60)
+                    : product.totalMinutes}
+                </span>
+                <span className="text-sm italic text-ink-tertiary">min/day</span>
+              </div>
             </div>
+          </div>
+        ))}
 
-            <div className="panel rounded-[1.4rem] p-6">
-              <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_320px] md:items-start">
-                <div>
-                  <p className="text-slate-300 leading-7">
-                    The goal here is not to automate away judgment. It is to remove the repetitive setup around the work so the person can stay with context, edge cases, trust, and final decisions.
-                  </p>
-                  {humanEdgeNotes.length > 0 && (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {humanEdgeNotes.map((note) => (
-                        <span key={note} className="rounded-full border border-slate-700/80 bg-slate-950/45 px-3 py-2 text-xs text-slate-300">
-                          {note}
-                        </span>
+        <div className="mt-6">
+          <Link
+            href="/factory"
+            className="inline-flex items-center justify-center rounded-lg border border-ink bg-ink px-5 py-2.5 text-sm font-medium text-surface transition-colors hover:bg-transparent hover:text-ink"
+          >
+            Build your toolkit
+          </Link>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* EXPANDED — Detailed breakdown (collapsed by default)               */}
+      {/* ------------------------------------------------------------------ */}
+      <div className="page-container"><div className="border-t border-edge" /></div>
+
+      <section className="page-container py-16 md:py-20">
+        <div className="eyebrow mb-6">Detailed breakdown</div>
+
+        <div className="space-y-2">
+
+          {/* Section 1 — Day architecture */}
+          <details className="group rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
+              <span className="font-medium text-ink">Day architecture</span>
+              <ChevronDown className="h-4 w-4 shrink-0 text-ink-tertiary transition-transform duration-200 group-open:rotate-180" />
+            </summary>
+            <div className="border-t border-edge px-5 py-5 space-y-4">
+              <p className="text-sm text-ink-secondary leading-relaxed">{dailyNarrative}</p>
+              {summaryBlocks.length > 0 && (
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {summaryBlocks.map((block: any) => (
+                    <div key={block.key} className="rounded-lg border border-edge bg-surface-sunken px-4 py-3">
+                      <p className="text-sm font-medium text-ink">{block.label}</p>
+                      <p className="mt-1 font-editorial tabular-nums text-ink">{block.aiMinutes} <span className="text-sm italic text-ink-tertiary">min</span></p>
+                      <p className="mt-2 text-xs text-ink-tertiary leading-relaxed">{block.posture}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </details>
+
+          {/* Section 2 — Evidence layer */}
+          {recommendationSnapshot.topActions.length > 0 && (
+            <details className="group rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
+                <span className="font-medium text-ink">Evidence layer</span>
+                <ChevronDown className="h-4 w-4 shrink-0 text-ink-tertiary transition-transform duration-200 group-open:rotate-180" />
+              </summary>
+              <div className="border-t border-edge px-5 py-5 space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <p className="eyebrow mb-3">Common action patterns</p>
+                    <div className="space-y-2">
+                      {recommendationSnapshot.topActions.slice(0, 5).map((action) => (
+                        <div key={action.code} className="flex items-center justify-between rounded-lg border border-edge bg-surface-sunken px-4 py-2.5">
+                          <div>
+                            <p className="text-sm font-medium text-ink">{action.name}</p>
+                            <p className="text-xs text-ink-tertiary">{action.taskCount} tasks &middot; {Math.round(action.confidence * 100)}% confidence</p>
+                          </div>
+                          <span className="text-xs text-ink-tertiary">{action.code}</span>
+                        </div>
                       ))}
                     </div>
-                  )}
+                  </div>
+                  <div>
+                    <p className="eyebrow mb-3">Package fit</p>
+                    <div className="space-y-2">
+                      {recommendationSnapshot.recommendedPackages.slice(0, 3).map((pkg) => (
+                        <div key={pkg.id} className="flex items-start justify-between gap-3 rounded-lg border border-edge bg-surface-sunken px-4 py-2.5">
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-ink">{pkg.name}</p>
+                            <p className="mt-0.5 text-xs text-ink-tertiary leading-relaxed">{pkg.description}</p>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <p className="text-sm font-medium text-ink">${pkg.basePrice.toLocaleString()}</p>
+                            <p className="text-xs text-ink-tertiary">{pkg.tier}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-1">
+              </div>
+            </details>
+          )}
+
+          {/* Section 3 — Human edge */}
+          {visibleSkillSummary.length > 0 && (
+            <details className="group rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
+                <span className="font-medium text-ink">Human edge</span>
+                <ChevronDown className="h-4 w-4 shrink-0 text-ink-tertiary transition-transform duration-200 group-open:rotate-180" />
+              </summary>
+              <div className="border-t border-edge px-5 py-5 space-y-4">
+                <p className="text-sm text-ink-secondary leading-relaxed">
+                  The goal is not to automate away judgment. It is to remove the repetitive setup around the work so the person can stay with context, edge cases, trust, and final decisions.
+                </p>
+                {humanEdgeNotes.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {humanEdgeNotes.map((note) => (
+                      <span key={note} className="rounded-full border border-edge bg-surface-sunken px-3 py-1.5 text-xs text-ink-secondary">
+                        {note}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="grid gap-3 sm:grid-cols-3">
                   {visibleSkillSummary.map((item) => (
-                    <div key={item.label} className="rounded-[1rem] border border-slate-800/75 bg-slate-950/45 p-4">
-                      <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{item.label}</div>
-                      <div className="mt-2 text-2xl font-bold text-white">{item.value}</div>
+                    <div key={item.label} className="rounded-lg border border-edge bg-surface-sunken px-4 py-3">
+                      <p className="text-xs text-ink-tertiary">{item.label}</p>
+                      <p className="mt-1 text-lg font-medium text-ink">{item.value}</p>
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
-          </section>
-        )}
+            </details>
+          )}
 
-        {skills.length > 0 && (
-        <section className="space-y-6">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Upskilling</div>
-            <h2 className="mt-2 text-3xl font-black text-white">AI skills to learn next</h2>
-          </div>
-          
-            <div className="grid gap-4 md:grid-cols-2">
-              {skills.slice(0, 4).map((skill: any) => {
-                const diff = difficultyConfig[skill.difficulty] || {
-                  label: skill.difficulty,
-                  color: 'text-slate-400 bg-slate-400/20'
-                };
-                return (
-                  <div 
-                    key={skill.id}
-                    className="panel rounded-[1.5rem] p-5"
-                  >
-                    <div className="flex items-start justify-between gap-3 mb-3">
-                      <h3 className="text-lg font-semibold text-white">{skill.skill_name}</h3>
-                      <span className={`px-2 py-1 rounded text-xs ${diff.color}`}>
-                        {diff.label}
-                      </span>
-                    </div>
-                    <p className="text-slate-400 text-sm mb-4">{skill.skill_description}</p>
-                    {skill.learning_resources && (
-                      <a
-                        href={skill.learning_resources}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 text-sm transition-colors"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                        Learning Resources
-                      </a>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-        </section>
-        )}
-      </main>
+          {/* Section 4 — Skills to learn */}
+          {skills.length > 0 && (
+            <details className="group rounded-xl border border-edge-strong bg-surface-raised shadow-sm">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
+                <span className="font-medium text-ink">Skills to learn</span>
+                <ChevronDown className="h-4 w-4 shrink-0 text-ink-tertiary transition-transform duration-200 group-open:rotate-180" />
+              </summary>
+              <div className="border-t border-edge px-5 py-5">
+                <div className="grid gap-4 md:grid-cols-2">
+                  {skills.slice(0, 4).map((skill: any) => {
+                    const diff = difficultyConfig[skill.difficulty] || {
+                      label: skill.difficulty,
+                      color: 'text-ink-tertiary bg-surface-sunken',
+                    };
+                    return (
+                      <div key={skill.id} className="rounded-lg border border-edge bg-surface-sunken px-4 py-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="text-sm font-medium text-ink">{skill.skill_name}</p>
+                          <span className={`shrink-0 rounded px-2 py-0.5 text-xs ${diff.color}`}>
+                            {diff.label}
+                          </span>
+                        </div>
+                        <p className="mt-1.5 text-xs text-ink-tertiary leading-relaxed">{skill.skill_description}</p>
+                        {skill.learning_resources && (
+                          <a
+                            href={skill.learning_resources}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-2 inline-block text-xs text-ink-secondary underline underline-offset-2 transition-colors hover:text-ink"
+                          >
+                            Learning resources
+                          </a>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </details>
+          )}
 
-      <footer className="border-t border-slate-800/80 bg-slate-950/80 px-4 py-12 mt-16">
-        <div className="max-w-7xl mx-auto text-center text-slate-500">
-          <p>Designed around giving people time back with workflow support systems.</p>
-          <p className="mt-2 text-sm">Data sourced from U.S. Bureau of Labor Statistics</p>
         </div>
-      </footer>
+      </section>
+
+      <Footer />
     </div>
   );
 }

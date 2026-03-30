@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ChevronRight, Search, Zap, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Footer } from '@/components/ui/footer';
 
 interface Occupation {
   id: number;
@@ -11,31 +12,6 @@ interface Occupation {
   slug: string;
   major_category: string;
 }
-
-const categoryIcons: Record<string, string> = {
-  'Management': '👔',
-  'Business and Financial Operations': '💼',
-  'Computer and Mathematical': '💻',
-  'Architecture and Engineering': '🏗️',
-  'Life Physical and Social Science': '🔬',
-  'Community and Social Service': '🤝',
-  'Legal': '⚖️',
-  'Educational Instruction and Library': '📚',
-  'Arts Design Entertainment Sports and Media': '🎨',
-  'Healthcare Practitioners and Technical': '🏥',
-  'Healthcare Support': '🩺',
-  'Protective Service': '🛡️',
-  'Food Preparation and Serving': '🍳',
-  'Building and Grounds Cleaning and Maintenance': '🧹',
-  'Personal Care and Service': '💇',
-  'Sales and Related': '📈',
-  'Office and Administrative Support': '📋',
-  'Farming Fishing and Forestry': '🌾',
-  'Construction and Extraction': '🔨',
-  'Installation Maintenance and Repair': '🔧',
-  'Production': '🏭',
-  'Transportation and Material Moving': '🚚',
-};
 
 const slugToCategory: Record<string, string> = {
   'management': 'Management',
@@ -69,10 +45,7 @@ export default function CategoryPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
-  const categoryName = slugToCategory[categorySlug] || categorySlug
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+  const categoryName = slugToCategory[categorySlug] || categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
   useEffect(() => {
     async function fetchOccupations() {
@@ -89,121 +62,86 @@ export default function CategoryPage() {
     fetchOccupations();
   }, [categoryName]);
 
-  const icon = categoryIcons[categoryName] || '📁';
   const filteredOccupations = search
     ? occupations.filter(o => o.title.toLowerCase().includes(search.toLowerCase()))
     : occupations;
 
   return (
-    <div className="app-shell text-slate-50">
-      <div className="absolute top-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full bg-emerald-600/10 blur-[140px] pointer-events-none animate-pulse-glow" style={{ animationDuration: '7s' }} />
-      <div className="absolute bottom-[-10%] right-[-10%] h-[30%] w-[30%] rounded-full bg-cyan-600/10 blur-[140px] pointer-events-none animate-pulse-glow" style={{ animationDuration: '9s' }} />
-
-      <main className="page-container relative z-10 py-12 md:py-16">
-        <Link href="/ai-jobs" className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300 group">
-          <ChevronRight className="w-4 h-4 rotate-180 group-hover:-translate-x-0.5 transition-transform" />
+    <div className="app-shell">
+      <main className="page-container py-10 md:py-14">
+        <Link href="/ai-jobs" className="mb-8 inline-flex items-center gap-1.5 text-sm text-ink-tertiary transition-colors hover:text-ink">
+          <ChevronLeft className="h-4 w-4" />
           Back to Search
         </Link>
 
-        <div className="panel mb-8 rounded-[2rem] p-6 md:p-8">
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-end">
-            <div className="flex items-start gap-4 md:gap-5">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.4rem] border border-slate-800 bg-slate-950/70 text-4xl shadow-[0_18px_50px_rgba(2,6,23,0.22)]">
-                {icon}
-              </div>
-              <div className="max-w-3xl">
-                <div className="eyebrow mb-4">Industry sector</div>
-                <h1 className="section-title text-white">{categoryName}</h1>
-                <p className="mt-3 max-w-2xl text-slate-400 leading-8">
-                  {loading ? 'Loading occupations…' : `Browse ${occupations.length} roles in this sector and open the ones where routine work looks most ready for practical support and time back.`}
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-[1.5rem] border border-slate-800 bg-slate-950/55 px-5 py-4 text-left">
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Roles in sector</div>
-              <div className="mt-2 flex items-center gap-2 text-3xl font-black text-cyan-300">
-                <Users className="h-5 w-5" />
-                {loading ? '...' : occupations.length}
-              </div>
-            </div>
-          </div>
+        <div className="mb-8">
+          <span className="eyebrow">Industry sector</span>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-ink md:text-4xl" style={{ fontFamily: 'var(--font-heading)' }}>
+            {categoryName}
+          </h1>
+          <p className="mt-3 max-w-2xl text-ink-secondary">
+            {loading ? 'Loading occupations...' : `Browse ${occupations.length} roles in this sector. Open any to see where routine work is most ready for support.`}
+          </p>
         </div>
 
-        <div className="panel mb-8 rounded-[1.8rem] p-4 md:p-5">
-          <div className="relative group">
-            <div className="absolute -inset-px rounded-[1.4rem] bg-gradient-to-r from-emerald-500/15 to-cyan-500/15 opacity-0 blur-sm transition-all duration-300 group-focus-within:opacity-100" />
-            <div className="relative flex items-center">
-              <Search className="absolute left-4 z-10 h-5 w-5 text-slate-500 transition-colors duration-300 group-focus-within:text-cyan-400" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={`Filter ${categoryName} occupations...`}
-                className="h-14 w-full rounded-[1.4rem] border border-slate-800 bg-slate-950/70 pl-12 pr-4 text-white placeholder-slate-500 transition-all focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
-              />
-            </div>
+        {/* Search */}
+        <div className="mb-6 rounded-lg border border-edge bg-surface-raised p-3 shadow-sm">
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-tertiary" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={`Filter ${categoryName} occupations...`}
+              className="h-10 w-full rounded-md border border-edge bg-surface pl-10 pr-4 text-sm text-ink placeholder:text-ink-tertiary focus:border-edge-strong focus:outline-none focus:ring-2 focus:ring-ring/50"
+            />
           </div>
           {search && (
-            <div className="mt-3 text-sm text-slate-500">
-              Found <span className="font-medium text-slate-200">{filteredOccupations.length}</span> results for &quot;{search}&quot;
-            </div>
+            <p className="mt-2 text-sm text-ink-tertiary">
+              Found <span className="font-medium text-ink">{filteredOccupations.length}</span> results for &ldquo;{search}&rdquo;
+            </p>
           )}
         </div>
 
+        {/* Results */}
         {loading ? (
-          <div className="grid gap-3">
-            {[...Array(10)].map((_, i) => (
-              <div key={i} className="h-16 rounded-[1.25rem] border border-slate-800 bg-slate-900/60 animate-pulse" />
+          <div className="grid gap-2">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="h-14 animate-pulse rounded-md bg-surface-sunken" />
             ))}
           </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {filteredOccupations.map((occupation) => (
-              <Link
-                key={occupation.id}
-                href={`/ai-jobs/${occupation.slug}`}
-                className="group flex min-h-[112px] rounded-[1.5rem] border border-slate-800 bg-slate-900/60 p-5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-cyan-500/35 hover:bg-slate-900/80 hover:shadow-[0_22px_55px_rgba(2,6,23,0.28)]"
-              >
-                <div className="flex w-full items-start justify-between gap-4">
-                  <div className="flex min-w-0 items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-950/75 text-slate-400 transition-all group-hover:bg-cyan-500/10 group-hover:text-cyan-300">
-                      <Zap className="h-4 w-4" />
-                    </div>
-                    <div className="min-w-0 pr-2">
-                      <span className="block text-lg font-semibold leading-snug text-white transition-colors group-hover:text-cyan-300">
-                        {occupation.title}
-                      </span>
-                      <span className="mt-2 block text-sm text-slate-500">{occupation.major_category}</span>
-                    </div>
-                  </div>
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-800 bg-slate-950/65">
-                    <ChevronRight className="h-4 w-4 text-slate-600 transition-all group-hover:translate-x-0.5 group-hover:text-cyan-300" />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-
-        {!loading && filteredOccupations.length === 0 && (
-          <div className="panel rounded-[2rem] p-12 text-center">
-            <Search className="mx-auto mb-4 h-12 w-12 text-slate-600" />
-            <h3 className="mb-2 text-xl font-semibold text-white">No occupations found</h3>
-            <p className="text-slate-400">
-              {search ? `No results for "${search}". Try a broader term.` : "We couldn't find any occupations in this category."}
+        ) : filteredOccupations.length === 0 ? (
+          <div className="rounded-lg border border-edge bg-surface-raised p-10 text-center shadow-sm">
+            <Search className="mx-auto mb-3 h-8 w-8 text-ink-tertiary" />
+            <h3 className="text-lg font-semibold text-ink">No occupations found</h3>
+            <p className="mt-1 text-sm text-ink-secondary">
+              {search ? `No results for "${search}". Try a broader term.` : "No occupations found in this category."}
             </p>
             {search && (
-              <button
-                onClick={() => setSearch('')}
-                className="mt-4 text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300"
-              >
+              <button onClick={() => setSearch('')} className="mt-3 text-sm font-medium text-accent-blue hover:text-accent-blue-hover">
                 Clear search
               </button>
             )}
           </div>
+        ) : (
+          <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+            {filteredOccupations.map((occupation) => (
+              <Link
+                key={occupation.id}
+                href={`/ai-jobs/${occupation.slug}`}
+                className="group flex items-center justify-between gap-3 rounded-lg border border-edge bg-surface-raised px-4 py-3.5 shadow-sm transition-all hover:shadow-md hover:border-edge-strong"
+              >
+                <span className="text-sm font-medium text-ink group-hover:text-accent-blue transition-colors">
+                  {occupation.title}
+                </span>
+                <ChevronRight className="h-4 w-4 shrink-0 text-ink-tertiary" />
+              </Link>
+            ))}
+          </div>
         )}
       </main>
+
+      <Footer />
     </div>
   );
 }

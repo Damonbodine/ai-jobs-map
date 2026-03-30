@@ -1,38 +1,52 @@
+'use client';
+
 import Link from 'next/link';
-import { Button } from './Button';
-import { Sparkles } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+
+function NavLink({ href, children, active }: { href: string; children: React.ReactNode; active?: boolean }) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        'text-[0.8rem] transition-colors duration-200',
+        active
+          ? 'text-ink font-medium'
+          : 'text-ink-tertiary hover:text-ink'
+      )}
+    >
+      {children}
+    </Link>
+  );
+}
 
 export function Header() {
+  const pathname = usePathname();
+  const isFactory = pathname.startsWith('/factory');
+
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-800/70 bg-slate-950/78 backdrop-blur-2xl">
-      <div className="page-container flex flex-wrap items-center justify-between gap-4 py-4">
-        <Link href="/ai-jobs" className="flex min-w-0 items-center gap-3 group">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-lg shadow-cyan-500/20 transition-all group-hover:scale-105 group-hover:shadow-cyan-500/40">
-            <Sparkles className="text-white h-5 w-5" />
-          </div>
-          <span className="truncate text-lg font-bold tracking-tight text-slate-100 transition-colors group-hover:text-cyan-300">
-            AI Jobs Map
-          </span>
+    <header className="sticky top-0 z-50 border-b border-edge/50 bg-surface/92 backdrop-blur-xl">
+      <div className="page-container flex items-center justify-between py-4">
+        <Link
+          href="/ai-jobs"
+          className="font-editorial text-[0.9rem] font-medium tracking-[-0.02em] text-ink transition-opacity hover:opacity-60"
+        >
+          AI Jobs Map
         </Link>
 
-        <nav className="ml-auto flex flex-wrap items-center justify-end gap-3 sm:gap-5">
-          <Link
-            href="/ai-jobs/browse"
-            className="text-sm font-medium text-slate-400 transition-colors hover:text-white"
-          >
-            Browse Paths
-          </Link>
-          <Link
-            href="/ai-jobs/about"
-            className="hidden text-sm font-medium text-slate-400 transition-colors hover:text-white sm:inline"
-          >
-            Methodology
-          </Link>
-          <Link href="/factory">
-            <Button variant="default" className="h-10 px-4 font-semibold sm:px-5">
-              AI Factory
-            </Button>
-          </Link>
+        <nav className="flex items-center gap-7">
+          {isFactory ? (
+            <>
+              <NavLink href="/ai-jobs" active={false}>Map</NavLink>
+              <NavLink href="/factory" active={pathname === '/factory'}>Packages</NavLink>
+              <NavLink href="/factory/roi" active={pathname === '/factory/roi'}>ROI</NavLink>
+            </>
+          ) : (
+            <>
+              <NavLink href="/ai-jobs/browse" active={pathname.startsWith('/ai-jobs/browse')}>Browse</NavLink>
+              <NavLink href="/ai-jobs/about" active={pathname === '/ai-jobs/about'}>About</NavLink>
+            </>
+          )}
         </nav>
       </div>
     </header>

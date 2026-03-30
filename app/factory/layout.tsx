@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { FactoryHeader } from '@/components/ui/FactoryHeader';
+import { FactoryHeader } from '@/components/ui/factory-header';
 
 export const metadata: Metadata = {
   title: 'AI Jobs Factory - Automations',

@@ -245,7 +245,15 @@ a {
   color: #FFFFFF !important;
 }
 .btn-primary:hover {
-  color: #1B1917 !important;
+  color: #1C1816 !important;
+}
+
+/* Dark panel text — forces light text on dark backgrounds */
+.dark-panel-text {
+  color: #F5F2ED !important;
+}
+.dark-panel-muted {
+  color: #9C9488 !important;
 }
 
 /* Styled native selects */

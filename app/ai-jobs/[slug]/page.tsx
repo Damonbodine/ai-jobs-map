@@ -505,52 +505,52 @@ export default async function OccupationPage({ params }: PageProps) {
       {/* BEAT 1 — Dark hero panel                                           */}
       {/* ------------------------------------------------------------------ */}
       <section className="bg-panel">
-        <div className="page-container pt-8 pb-16 md:pt-10 md:pb-20">
+        <div className="page-container pt-8 pb-14 md:pt-10 md:pb-16">
           <div className="mb-10">
             <Link
               href="/ai-jobs"
-              className="inline-flex items-center gap-1 text-[0.78rem] text-panel-muted transition-colors hover:text-panel-text"
+              className="dark-panel-muted inline-flex items-center gap-1 text-[0.78rem] transition-opacity hover:opacity-70"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
               Back
             </Link>
           </div>
 
-          <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-panel-muted">
+          <p className="dark-panel-muted text-[0.6875rem] font-semibold uppercase tracking-[0.1em]">
             {occupation.major_category}
           </p>
 
-          {/* Job title — big, emotional, identity-affirming */}
+          {/* Job title — THE hero of the page */}
           <h1
-            className="mt-4 font-editorial font-normal text-panel-text"
-            style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', lineHeight: 1.02, letterSpacing: '-0.03em' }}
+            className="dark-panel-text mt-6 font-editorial font-normal"
+            style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)', lineHeight: 1, letterSpacing: '-0.035em' }}
           >
             {occupation.title}
           </h1>
 
           {occupation.employment && (
-            <p className="mt-3 text-[0.8rem] text-panel-muted">
+            <p className="dark-panel-muted mt-4 text-[0.8rem]">
               {Number(occupation.employment).toLocaleString()} people in this role across the U.S.
             </p>
           )}
 
           {/* The Number */}
-          <div className="mt-16 grid gap-8 md:grid-cols-[auto_minmax(0,1fr)] md:items-end">
+          <div className="mt-12 grid gap-8 md:grid-cols-[auto_minmax(0,1fr)] md:items-end">
             <div>
-              <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-panel-muted">
+              <p className="dark-panel-muted text-[0.6875rem] font-semibold uppercase tracking-[0.1em]">
                 Time you could get back
               </p>
               <div className="mt-3 flex items-baseline gap-2">
                 <span
-                  className="font-editorial font-normal text-panel-text"
+                  className="dark-panel-text font-editorial font-normal"
                   style={{ fontSize: 'clamp(4rem, 9vw, 6rem)', lineHeight: 0.85 }}
                 >
                   {displayedMinutesRecoveredPerDay}
                 </span>
-                <span className="font-editorial text-lg italic text-panel-muted">min/day</span>
+                <span className="dark-panel-muted font-editorial text-lg italic">min/day</span>
               </div>
             </div>
-            <p className="max-w-sm text-[0.85rem] leading-[1.6] text-panel-muted md:pb-2">
+            <p className="dark-panel-muted max-w-sm text-[0.85rem] leading-[1.6] md:pb-2">
               We found routine work in your day that the right tools could handle — so you can focus on what actually needs you.
             </p>
           </div>

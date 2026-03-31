@@ -144,25 +144,57 @@ export default function CategoryPage() {
             )}
           </div>
         ) : (
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {filteredOccupations.map((occupation, i) => (
-              <motion.div
-                key={occupation.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: Math.min(i * 0.02, 0.4), duration: 0.35 }}
-              >
-                <Link
-                  href={`/ai-jobs/${occupation.slug}`}
-                  className="group flex items-center justify-between gap-4 rounded-xl border border-edge-strong bg-surface-raised px-5 py-4 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredOccupations.map((occupation, i) => {
+              // Generate a unique warm color from the occupation name
+              const hash = occupation.title.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+              const hue = (hash * 37) % 360;
+              const color = `hsl(${hue}, 25%, 45%)`;
+
+              return (
+                <motion.div
+                  key={occupation.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(i * 0.03, 0.5), duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <span className="text-[0.85rem] font-medium text-ink transition-colors group-hover:text-ink/70">
-                    {occupation.title}
-                  </span>
-                  <ArrowRight className="h-3.5 w-3.5 shrink-0 text-ink-tertiary/30 transition-all group-hover:text-ink-tertiary group-hover:translate-x-0.5" />
-                </Link>
-              </motion.div>
-            ))}
+                  <Link
+                    href={`/ai-jobs/${occupation.slug}`}
+                    className="group relative flex flex-col overflow-hidden rounded-2xl border border-edge-strong bg-surface-raised shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                  >
+                    {/* Visual header */}
+                    <div
+                      className="relative h-24 overflow-hidden"
+                      style={{ background: `linear-gradient(135deg, ${color}20, ${color}08), linear-gradient(to bottom right, #ECE8E1, #DDD8D0)` }}
+                    >
+                      <div
+                        className="absolute -right-4 -top-4 h-20 w-20 rounded-full opacity-[0.12] transition-all duration-500 group-hover:scale-125 group-hover:opacity-[0.22]"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span
+                        className="absolute bottom-2 right-3 font-editorial text-[2.5rem] leading-none opacity-[0.06] transition-opacity duration-300 group-hover:opacity-[0.12]"
+                        style={{ color }}
+                      >
+                        {occupation.title.charAt(0)}
+                      </span>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex flex-1 flex-col p-4">
+                      <h3 className="text-[0.85rem] font-medium text-ink leading-snug">
+                        {occupation.title}
+                      </h3>
+                      <div className="mt-auto flex items-center justify-between pt-3">
+                        <span className="text-[0.68rem] text-ink-tertiary transition-colors group-hover:text-ink-secondary">
+                          View time analysis
+                        </span>
+                        <ArrowRight className="h-3 w-3 text-ink-tertiary/30 transition-all duration-300 group-hover:text-ink-tertiary group-hover:translate-x-0.5" />
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </main>

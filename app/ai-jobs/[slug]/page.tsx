@@ -538,26 +538,19 @@ export default async function OccupationPage({ params }: PageProps) {
             </p>
           )}
 
-          {/* Number + description — grid layout, right column on desktop */}
-          <div className="mt-10 grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-            <p className="dark-panel-muted max-w-md text-[0.8rem] leading-[1.55] md:order-1">
-              We found routine work in your day that the right tools could handle — so you can focus on what actually needs&nbsp;you.
+          {/* Number */}
+          <div className="mt-10">
+            <p className="dark-panel-muted text-[0.85rem] leading-[1.6]">
+              We believe you can save{' '}
+              <CountUp
+                value={displayedMinutesRecoveredPerDay}
+                duration={1.5}
+                delay={0.3}
+                className="dark-panel-text font-editorial font-normal"
+                style={{ fontSize: 'clamp(3rem, 7vw, 4.5rem)', lineHeight: 0.85, display: 'inline' }}
+              />
+              <span className="dark-panel-muted font-editorial text-base italic"> min/day</span>
             </p>
-            <div className="md:order-2 md:text-right">
-              <p className="dark-panel-muted text-[0.6875rem] font-semibold uppercase tracking-[0.1em]">
-                Time you could get back
-              </p>
-              <div className="mt-2 flex items-baseline gap-2 md:justify-end">
-                <CountUp
-                  value={displayedMinutesRecoveredPerDay}
-                  duration={1.5}
-                  delay={0.3}
-                  className="dark-panel-text font-editorial font-normal"
-                  style={{ fontSize: 'clamp(3rem, 7vw, 4.5rem)', lineHeight: 0.85 }}
-                />
-                <span className="dark-panel-muted font-editorial text-base italic">min/day</span>
-              </div>
-            </div>
           </div>
         </div>
       </section>

@@ -524,24 +524,23 @@ export default async function OccupationPage({ params }: PageProps) {
             {occupation.major_category}
           </p>
 
-          {/* Job title — THE hero of the page */}
-          <h1
-            className="dark-panel-text mt-6 font-editorial font-normal"
-            style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)', lineHeight: 1, letterSpacing: '-0.035em' }}
-          >
-            {occupation.title}
-          </h1>
-
-          {occupation.employment && (
-            <p className="dark-panel-muted mt-4 text-[0.8rem]">
-              {Number(occupation.employment).toLocaleString()} people in this role across the U.S.
-            </p>
-          )}
-
-          {/* Number — right corner, text stacked above it */}
-          <div className="mt-10 flex justify-end">
-            <div className="text-right">
-              <p className="dark-panel-muted text-[0.85rem]">We believe you can save</p>
+          {/* Title left + Number right — same level */}
+          <div className="mt-6 flex items-start justify-between gap-6">
+            <div className="min-w-0 flex-1">
+              <h1
+                className="dark-panel-text font-editorial font-normal"
+                style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)', lineHeight: 1, letterSpacing: '-0.035em' }}
+              >
+                {occupation.title}
+              </h1>
+              {occupation.employment && (
+                <p className="dark-panel-muted mt-4 text-[0.8rem]">
+                  {Number(occupation.employment).toLocaleString()} people in this role across the U.S.
+                </p>
+              )}
+            </div>
+            <div className="shrink-0 text-right pt-1">
+              <p className="dark-panel-muted text-[0.8rem]">We believe you can save</p>
               <div className="mt-1 flex items-baseline gap-2 justify-end">
                 <CountUp
                   value={displayedMinutesRecoveredPerDay}

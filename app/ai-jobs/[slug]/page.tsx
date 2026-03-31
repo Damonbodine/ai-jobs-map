@@ -309,38 +309,59 @@ async function getOnetTasks(occupationId: number) {
 }
 
 async function getAutomationProfile(occupationId: number) {
-  const result = await pool.query(
-    `SELECT composite_score, ability_automation_potential, work_activity_automation_potential,
-            keyword_score, knowledge_digital_readiness, task_frequency_weight,
-            physical_ability_avg, cognitive_routine_avg, cognitive_creative_avg,
-            top_automatable_activities, top_blocking_abilities,
-            time_range_low, time_range_high, time_range_by_block
-     FROM occupation_automation_profile WHERE occupation_id = $1`,
-    [occupationId]
-  );
-  return result.rows[0] || null;
+  try {
+    const result = await pool.query(
+      `SELECT composite_score, ability_automation_potential, work_activity_automation_potential,
+              keyword_score, knowledge_digital_readiness, task_frequency_weight,
+              physical_ability_avg, cognitive_routine_avg, cognitive_creative_avg,
+              top_automatable_activities, top_blocking_abilities,
+              time_range_low, time_range_high, time_range_by_block
+       FROM occupation_automation_profile WHERE occupation_id = $1`,
+      [occupationId]
+    );
+    return result.rows[0] || null;
+  } catch {
+    // Fallback if time_range columns don't exist yet in production
+    const result = await pool.query(
+      `SELECT composite_score, ability_automation_potential, work_activity_automation_potential,
+              keyword_score, knowledge_digital_readiness, task_frequency_weight,
+              physical_ability_avg, cognitive_routine_avg, cognitive_creative_avg,
+              top_automatable_activities, top_blocking_abilities
+       FROM occupation_automation_profile WHERE occupation_id = $1`,
+      [occupationId]
+    );
+    return result.rows[0] || null;
+  }
 }
 
 async function getTopAbilities(occupationId: number) {
-  const result = await pool.query(
-    `SELECT element_name, importance, level
-     FROM onet_abilities WHERE occupation_id = $1
-     ORDER BY importance DESC NULLS LAST
-     LIMIT 8`,
-    [occupationId]
-  );
-  return result.rows;
+  try {
+    const result = await pool.query(
+      `SELECT element_name, importance, level
+       FROM onet_abilities WHERE occupation_id = $1
+       ORDER BY importance DESC NULLS LAST
+       LIMIT 8`,
+      [occupationId]
+    );
+    return result.rows;
+  } catch {
+    return [];
+  }
 }
 
 async function getTopKnowledge(occupationId: number) {
-  const result = await pool.query(
-    `SELECT element_name, importance, level
-     FROM onet_knowledge WHERE occupation_id = $1
-     ORDER BY importance DESC NULLS LAST
-     LIMIT 8`,
-    [occupationId]
-  );
-  return result.rows;
+  try {
+    const result = await pool.query(
+      `SELECT element_name, importance, level
+       FROM onet_knowledge WHERE occupation_id = $1
+       ORDER BY importance DESC NULLS LAST
+       LIMIT 8`,
+      [occupationId]
+    );
+    return result.rows;
+  } catch {
+    return [];
+  }
 }
 
 async function getRelevantTools(occupationId: number) {

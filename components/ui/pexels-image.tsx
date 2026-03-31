@@ -3,7 +3,8 @@
 import { useState, useRef } from 'react';
 import { useInView } from 'framer-motion';
 
-const STORAGE_URL = 'https://nhjwpmfcpbfbzcaookkw.supabase.co/storage/v1/object/public/occupation-images';
+const SUPABASE_REF = process.env.NEXT_PUBLIC_SUPABASE_REF || 'nhjwpmfcpbfbzcaookkw';
+const STORAGE_URL = `https://${SUPABASE_REF}.supabase.co/storage/v1/object/public/occupation-images`;
 
 interface PexelsImageProps {
   query: string;

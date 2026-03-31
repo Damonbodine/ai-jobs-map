@@ -7,6 +7,7 @@ interface WorkBlock {
   label: string;
   minutes: number;
   recoverable: number;
+  recoverableHigh: number;
   posture: string;
   color: string;
 }
@@ -14,6 +15,7 @@ interface WorkBlock {
 interface DayValueMapProps {
   blocks: WorkBlock[];
   totalRecoverable: number;
+  totalRecoverableHigh: number;
   fullDayMinutes: number;
   defaultHourlyRate: number;
   salaryLabel: string | null;
@@ -118,6 +120,7 @@ function AnimatedDonut({ pct, size = 160, strokeWidth = 12 }: { pct: number; siz
 export function DayValueMap({
   blocks,
   totalRecoverable,
+  totalRecoverableHigh,
   fullDayMinutes,
   defaultHourlyRate,
   salaryLabel,
@@ -125,13 +128,15 @@ export function DayValueMap({
   const [hourlyRate, setHourlyRate] = useState(defaultHourlyRate);
   const [hasEdited, setHasEdited] = useState(false);
 
-  const weeklyHours = Math.round((totalRecoverable / 60) * 5 * 10) / 10;
-  const annualValue = Math.round(weeklyHours * 50 * hourlyRate);
-  const monthlyValue = Math.round(annualValue / 12);
+  const hasRange = totalRecoverableHigh > totalRecoverable;
+  const weeklyHoursLow = Math.round((totalRecoverable / 60) * 5 * 10) / 10;
+  const weeklyHoursHigh = Math.round((totalRecoverableHigh / 60) * 5 * 10) / 10;
+  const annualValueLow = Math.round(weeklyHoursLow * 50 * hourlyRate);
+  const annualValueHigh = Math.round(weeklyHoursHigh * 50 * hourlyRate);
   const perMinuteValue = hourlyRate > 0 ? Math.round((hourlyRate / 60) * 100) / 100 : 0;
 
-  const sortedBlocks = [...blocks].filter(b => b.recoverable > 0).sort((a, b) => b.recoverable - a.recoverable);
-  const maxRecoverable = sortedBlocks.length > 0 ? sortedBlocks[0].recoverable : 1;
+  const sortedBlocks = [...blocks].filter(b => b.recoverable > 0 || b.recoverableHigh > 0).sort((a, b) => b.recoverableHigh - a.recoverableHigh);
+  const maxRecoverable = sortedBlocks.length > 0 ? sortedBlocks[0].recoverableHigh : 1;
   const pct = Math.round((totalRecoverable / fullDayMinutes) * 100);
 
   function handleRateChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -158,9 +163,12 @@ export function DayValueMap({
         </p>
 
         <div className="flex flex-col items-end shrink-0">
-          <p className="font-editorial font-normal text-ink text-right" style={{ fontSize: 'clamp(2.25rem, 5vw, 3.25rem)', lineHeight: 1 }}>
+          <p className="font-editorial font-normal text-ink text-right" style={{ fontSize: 'clamp(2rem, 4.5vw, 3rem)', lineHeight: 1 }}>
             <AnimatedNumber value={totalRecoverable} duration={1.5} />
-            <span className="text-[0.85rem] text-ink-muted font-normal"> min/day</span>
+            {hasRange && (
+              <span className="text-ink-muted">–<AnimatedNumber value={totalRecoverableHigh} duration={1.8} /></span>
+            )}
+            <span className="text-[0.8rem] text-ink-muted font-normal"> min/day</span>
           </p>
           <div className="mt-1">
             <AnimatedDonut pct={pct} size={180} strokeWidth={13} />
@@ -193,16 +201,22 @@ export function DayValueMap({
 
         {/* Time back */}
         <div className="flex items-baseline gap-1.5">
-          <span className="font-editorial text-xl font-normal text-ink">{totalRecoverable}</span>
+          <span className="font-editorial text-xl font-normal text-ink">
+            {totalRecoverable}{hasRange && `–${totalRecoverableHigh}`}
+          </span>
           <span className="text-[0.7rem] text-ink-muted">min/day</span>
-          <span className="text-[0.6rem] text-ink-muted">({weeklyHours} hrs/wk)</span>
+          <span className="text-[0.6rem] text-ink-muted">
+            ({weeklyHoursLow}{hasRange && `–${weeklyHoursHigh}`} hrs/wk)
+          </span>
         </div>
 
         <span className="text-ink-muted text-[0.7rem]">=</span>
 
         {/* Annual value */}
         <div className="flex items-baseline gap-1.5">
-          <span className="font-editorial text-xl font-normal text-ink">${annualValue.toLocaleString()}</span>
+          <span className="font-editorial text-xl font-normal text-ink">
+            ${annualValueLow.toLocaleString()}{hasRange && `–$${annualValueHigh.toLocaleString()}`}
+          </span>
           <span className="text-[0.65rem] text-ink-muted">/year</span>
         </div>
       </div>
@@ -214,7 +228,7 @@ export function DayValueMap({
       {/* Per-minute hook */}
       <p className="mt-4 text-[0.75rem] leading-relaxed text-ink-secondary">
         Every minute of routine work costs you <span className="font-medium text-ink">${perMinuteValue.toFixed(2)}</span>.
-        That&apos;s <span className="font-medium text-ink">${Math.round(perMinuteValue * totalRecoverable * 250).toLocaleString()}/year</span> spent
+        That&apos;s <span className="font-medium text-ink">${annualValueLow.toLocaleString()}{hasRange && `–$${annualValueHigh.toLocaleString()}`}/year</span> spent
         on work a system could handle.
       </p>
 
@@ -225,22 +239,41 @@ export function DayValueMap({
         </p>
         <div className="space-y-4">
           {sortedBlocks.map((block, i) => {
-            const barWidth = Math.max(4, (block.recoverable / maxRecoverable) * 100);
-            const dollarValue = Math.round((block.recoverable / 60) * hourlyRate * 250);
+            const barWidthLow = Math.max(4, (block.recoverable / maxRecoverable) * 100);
+            const barWidthHigh = Math.max(barWidthLow, (block.recoverableHigh / maxRecoverable) * 100);
+            const dollarLow = Math.round((block.recoverable / 60) * hourlyRate * 250);
+            const dollarHigh = Math.round((block.recoverableHigh / 60) * hourlyRate * 250);
+            const showBlockRange = block.recoverableHigh > block.recoverable;
             return (
               <div key={block.key}>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[0.8rem] text-ink">{block.label}</span>
                   <div className="flex items-baseline gap-3">
-                    <span className="font-editorial text-[1rem] font-normal text-ink">{block.recoverable} min</span>
-                    <span className="text-[0.7rem] text-ink-muted">${dollarValue.toLocaleString()}/yr</span>
+                    <span className="font-editorial text-[1rem] font-normal text-ink">
+                      {block.recoverable}{showBlockRange && `–${block.recoverableHigh}`} min
+                    </span>
+                    <span className="text-[0.7rem] text-ink-muted">
+                      ${dollarLow.toLocaleString()}{showBlockRange && `–$${dollarHigh.toLocaleString()}`}/yr
+                    </span>
                   </div>
                 </div>
-                <div className="h-2.5 rounded-full bg-border/30">
+                <div className="relative h-2.5 rounded-full bg-border/30">
+                  {/* High range — lighter */}
+                  {showBlockRange && (
+                    <div
+                      className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
+                      style={{
+                        width: `${barWidthHigh}%`,
+                        backgroundColor: CHART_COLORS[i % CHART_COLORS.length],
+                        opacity: 0.25,
+                      }}
+                    />
+                  )}
+                  {/* Low range — solid */}
                   <div
-                    className="h-full rounded-full transition-all duration-700"
+                    className="absolute inset-y-0 left-0 rounded-full transition-all duration-700"
                     style={{
-                      width: `${barWidth}%`,
+                      width: `${barWidthLow}%`,
                       backgroundColor: CHART_COLORS[i % CHART_COLORS.length],
                     }}
                   />

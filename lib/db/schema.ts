@@ -360,6 +360,10 @@ export const occupationAutomationProfile = pgTable(
     cognitiveCreativeAvg: real('cognitive_creative_avg'),
     topAutomatableActivities: text('top_automatable_activities'), // JSON array
     topBlockingAbilities: text('top_blocking_abilities'), // JSON array (physical/creative barriers)
+    // O*NET-grounded time ranges (minutes per day)
+    timeRangeLow: integer('time_range_low'), // Conservative: high-confidence tasks, 20% savings
+    timeRangeHigh: integer('time_range_high'), // Optimistic: moderate+ tasks, 35% savings, cap 90
+    timeRangeByBlock: text('time_range_by_block'), // JSON: {intake: {low, high}, analysis: {low, high}, ...}
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },

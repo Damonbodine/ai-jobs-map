@@ -313,7 +313,8 @@ async function getAutomationProfile(occupationId: number) {
     `SELECT composite_score, ability_automation_potential, work_activity_automation_potential,
             keyword_score, knowledge_digital_readiness, task_frequency_weight,
             physical_ability_avg, cognitive_routine_avg, cognitive_creative_avg,
-            top_automatable_activities, top_blocking_abilities
+            top_automatable_activities, top_blocking_abilities,
+            time_range_low, time_range_high, time_range_by_block
      FROM occupation_automation_profile WHERE occupation_id = $1`,
     [occupationId]
   );
@@ -435,8 +436,15 @@ export default async function OccupationPage({ params }: PageProps) {
 
   // Archetype: classify occupation and modulate time-back claim by credibility
   const occupationArchetype = classifyOccupation(automationProfile);
-  const rawMinutes = modeledMinutesRecoveredPerDay;
-  const displayedMinutesRecoveredPerDay = modulateTimeBack(rawMinutes, occupationArchetype);
+
+  // Use O*NET-grounded time ranges when available, fall back to LLM-derived estimate
+  const hasTimeRange = automationProfile?.time_range_low != null && automationProfile?.time_range_high != null;
+  const timeRangeLow = hasTimeRange ? automationProfile.time_range_low : modulateTimeBack(modeledMinutesRecoveredPerDay, occupationArchetype);
+  const timeRangeHigh = hasTimeRange ? automationProfile.time_range_high : timeRangeLow;
+  const displayedMinutesRecoveredPerDay = timeRangeLow;
+  const timeRangeByBlock = hasTimeRange && automationProfile.time_range_by_block
+    ? JSON.parse(automationProfile.time_range_by_block)
+    : null;
 
   // AI Blueprint: generate dynamic agent architecture from task data + O*NET enrichment
   const blueprint = generateBlueprint(taskEntries, occupationArchetype, occupation.title, onetTasks);
@@ -651,19 +659,26 @@ export default async function OccupationPage({ params }: PageProps) {
           <div>
             <DayValueMap
               blocks={(() => {
-                // Scale recoverable minutes proportionally so bars sum to the modulated total
+                // Use O*NET block ranges when available, fall back to scaled LLM data
                 const rawTotal = workBlocks.reduce((s: number, b: any) => s + b.aiMinutes, 0);
-                const scale = rawTotal > 0 ? displayedMinutesRecoveredPerDay / rawTotal : 1;
-                return workBlocks.map((b: any) => ({
-                  key: b.key,
-                  label: b.label,
-                  minutes: b.minutes,
-                  recoverable: Math.round(b.aiMinutes * scale),
-                  posture: b.posture,
-                  color: workBlockColors[b.key as keyof typeof workBlockColors] || '#94a3b8',
-                }));
+                const scaleLow = rawTotal > 0 ? timeRangeLow / rawTotal : 1;
+                const scaleHigh = rawTotal > 0 ? timeRangeHigh / rawTotal : scaleLow;
+                return workBlocks.map((b: any) => {
+                  const blockKey = b.key as string;
+                  const blockRange = timeRangeByBlock?.[blockKey];
+                  return {
+                    key: b.key,
+                    label: b.label,
+                    minutes: b.minutes,
+                    recoverable: blockRange ? blockRange.low : Math.round(b.aiMinutes * scaleLow),
+                    recoverableHigh: blockRange ? blockRange.high : Math.round(b.aiMinutes * scaleHigh),
+                    posture: b.posture,
+                    color: workBlockColors[blockKey as keyof typeof workBlockColors] || '#94a3b8',
+                  };
+                });
               })()}
-              totalRecoverable={displayedMinutesRecoveredPerDay}
+              totalRecoverable={timeRangeLow}
+              totalRecoverableHigh={timeRangeHigh}
               fullDayMinutes={fullDayMinutes}
               defaultHourlyRate={Math.round(hourlyRate)}
               salaryLabel={annualWage ? `$${(annualWage / 1000).toFixed(0)}K median salary` : null}

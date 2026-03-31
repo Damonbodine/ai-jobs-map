@@ -538,19 +538,21 @@ export default async function OccupationPage({ params }: PageProps) {
             </p>
           )}
 
-          {/* Number */}
-          <div className="mt-10">
-            <p className="dark-panel-muted text-[0.85rem] leading-[1.6]">
-              We believe you can save{' '}
-              <CountUp
-                value={displayedMinutesRecoveredPerDay}
-                duration={1.5}
-                delay={0.3}
-                className="dark-panel-text font-editorial font-normal"
-                style={{ fontSize: 'clamp(3rem, 7vw, 4.5rem)', lineHeight: 0.85, display: 'inline' }}
-              />
-              <span className="dark-panel-muted font-editorial text-base italic"> min/day</span>
-            </p>
+          {/* Number — right corner, text stacked above it */}
+          <div className="mt-10 flex justify-end">
+            <div className="text-right">
+              <p className="dark-panel-muted text-[0.85rem]">We believe you can save</p>
+              <div className="mt-1 flex items-baseline gap-2 justify-end">
+                <CountUp
+                  value={displayedMinutesRecoveredPerDay}
+                  duration={1.5}
+                  delay={0.3}
+                  className="dark-panel-text font-editorial font-normal"
+                  style={{ fontSize: 'clamp(3rem, 7vw, 4.5rem)', lineHeight: 0.85 }}
+                />
+                <span className="dark-panel-muted font-editorial text-base italic">min/day</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>

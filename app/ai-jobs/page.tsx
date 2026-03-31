@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Search, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Footer } from '@/components/ui/footer';
+import { CategoryImage } from '@/components/ui/category-image';
 
 interface Occupation {
   id: number;
@@ -199,30 +200,12 @@ export default function AIJobsLanding() {
                 href={`/ai-jobs/category/${cat.slug}`}
                 className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-edge-strong bg-surface-raised shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
               >
-                {/* Image area — gradient placeholder, will be replaced with Gemini images */}
-                <div
-                  className="relative h-36 overflow-hidden"
-                  style={{
-                    background: `linear-gradient(135deg, ${cat.color}18, ${cat.color}08), linear-gradient(to bottom right, #ECE8E1, #DDD8D0)`,
-                  }}
-                >
-                  {/* Decorative shapes */}
-                  <div
-                    className="absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-[0.12] transition-all duration-500 group-hover:scale-125 group-hover:opacity-[0.2]"
-                    style={{ backgroundColor: cat.color }}
-                  />
-                  <div
-                    className="absolute -bottom-4 -left-4 h-16 w-16 rounded-full opacity-[0.08] transition-all duration-500 group-hover:scale-110"
-                    style={{ backgroundColor: cat.color }}
-                  />
-                  {/* Category initial — large, decorative */}
-                  <span
-                    className="absolute bottom-3 right-4 font-editorial text-[4rem] leading-none opacity-[0.06] transition-opacity duration-300 group-hover:opacity-[0.1]"
-                    style={{ color: cat.color }}
-                  >
-                    {cat.name.charAt(0)}
-                  </span>
-                </div>
+                {/* Image area — loads from Gemini API, falls back to gradient */}
+                <CategoryImage
+                  category={cat.name}
+                  color={cat.color}
+                  className="h-36"
+                />
 
                 {/* Content */}
                 <div className="flex flex-1 flex-col p-5">

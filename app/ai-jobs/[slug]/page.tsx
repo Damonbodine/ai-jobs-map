@@ -538,26 +538,26 @@ export default async function OccupationPage({ params }: PageProps) {
             </p>
           )}
 
-          {/* The Number */}
-          <div className="mt-12 grid gap-8 md:grid-cols-[auto_minmax(0,1fr)] md:items-end">
-            <div>
+          {/* The Number — right-aligned on desktop */}
+          <div className="mt-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <p className="dark-panel-muted max-w-md text-[0.85rem] leading-[1.6]">
+              We found routine work in your day that the right tools could handle — so you can focus on what actually needs you.
+            </p>
+            <div className="shrink-0 md:text-right">
               <p className="dark-panel-muted text-[0.6875rem] font-semibold uppercase tracking-[0.1em]">
                 Time you could get back
               </p>
-              <div className="mt-3 flex items-baseline gap-2">
+              <div className="mt-2 flex items-baseline gap-2 md:justify-end">
                 <CountUp
                   value={displayedMinutesRecoveredPerDay}
                   duration={1.5}
                   delay={0.3}
                   className="dark-panel-text font-editorial font-normal"
-                  style={{ fontSize: 'clamp(4rem, 9vw, 6rem)', lineHeight: 0.85 }}
+                  style={{ fontSize: 'clamp(3.5rem, 8vw, 5rem)', lineHeight: 0.85 }}
                 />
-                <span className="dark-panel-muted font-editorial text-lg italic">min/day</span>
+                <span className="dark-panel-muted font-editorial text-base italic">min/day</span>
               </div>
             </div>
-            <p className="dark-panel-muted max-w-sm text-[0.85rem] leading-[1.6] md:pb-2">
-              We found routine work in your day that the right tools could handle — so you can focus on what actually needs you.
-            </p>
           </div>
         </div>
       </section>

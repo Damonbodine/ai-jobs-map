@@ -50,32 +50,34 @@ export function InsightCard({
       />
 
       <div className="p-5 pl-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-ink-tertiary">
-              {title}
-            </p>
-            <div className="mt-1.5 flex items-baseline gap-1.5">
-              <span className="font-editorial text-[1.75rem] font-normal tracking-[-0.03em] text-ink">
-                {value}
-              </span>
-              {subtitle && (
-                <span className="font-editorial text-[0.8rem] italic text-ink-tertiary">{subtitle}</span>
-              )}
-            </div>
-            {description && (
-              <p className="mt-2 text-[0.78rem] leading-[1.5] text-ink-secondary opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                {description}
-              </p>
-            )}
-          </div>
-
+        {/* Top row: title + ring in corner */}
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-ink-tertiary">
+            {title}
+          </p>
           {(icon || chart) && (
-            <div className="shrink-0">
+            <div className="shrink-0 -mt-0.5">
               {chart || icon}
             </div>
           )}
         </div>
+
+        {/* Value — large, below title */}
+        <div className="mt-2 flex items-baseline gap-1.5">
+          <span className="font-editorial text-[1.75rem] font-normal tracking-[-0.03em] text-ink">
+            {value}
+          </span>
+          {subtitle && (
+            <span className="font-editorial text-[0.78rem] italic text-ink-tertiary">{subtitle}</span>
+          )}
+        </div>
+
+        {/* Description — always visible, muted */}
+        {description && (
+          <p className="mt-2 text-[0.75rem] leading-[1.5] text-ink-tertiary">
+            {description}
+          </p>
+        )}
 
         {children}
       </div>

@@ -181,9 +181,10 @@ export default function AIJobsLanding() {
           </div>
           <Link
             href="/ai-jobs/browse"
-            className="shrink-0 text-[0.8rem] font-medium text-ink-secondary transition-colors hover:text-ink"
+            className="btn-primary group shrink-0 inline-flex items-center gap-2 rounded-lg border border-primary bg-primary px-5 py-2.5 text-[0.85rem] font-medium transition-all hover:bg-transparent hover:text-ink"
           >
-            View all →
+            View all
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </motion.div>
 

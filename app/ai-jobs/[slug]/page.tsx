@@ -267,37 +267,33 @@ async function getMicroTasks(occupationId: number) {
 }
 
 async function getGranularSkills(occupationId: number) {
-  // Get skill breakdown from task_skill_mapping
-  const result = await pool.query(
-    `SELECT
-       ms.id,
-       ms.skill_code,
-       ms.skill_name,
-       ms.category,
-       ms.difficulty_level,
-       COUNT(tsm.id) as task_count,
-       AVG(tsm.skill_proficiency_level) as avg_proficiency,
-       BOOL_OR(tsm.is_core_skill) as has_core,
-       BOOL_OR(tsm.is_differentiator_skill) as has_differentiator,
-       AVG(tsm.ai_dependence_score) as avg_ai_dependence
-     FROM task_skill_mapping tsm
-     JOIN micro_skills ms ON tsm.micro_skill_id = ms.id
-     JOIN onet_tasks ot ON tsm.onet_task_id = ot.id
-     WHERE ot.occupation_id = $1
-     GROUP BY ms.id, ms.skill_code, ms.skill_name, ms.category, ms.difficulty_level
-     ORDER BY task_count DESC
-     LIMIT 20`,
-    [occupationId]
-  );
-  return result.rows;
+  try {
+    const result = await pool.query(
+      `SELECT
+         ms.id, ms.skill_code, ms.skill_name, ms.category, ms.difficulty_level,
+         COUNT(tsm.id) as task_count, AVG(tsm.skill_proficiency_level) as avg_proficiency,
+         BOOL_OR(tsm.is_core_skill) as has_core, BOOL_OR(tsm.is_differentiator_skill) as has_differentiator,
+         AVG(tsm.ai_dependence_score) as avg_ai_dependence
+       FROM task_skill_mapping tsm
+       JOIN micro_skills ms ON tsm.micro_skill_id = ms.id
+       JOIN onet_tasks ot ON tsm.onet_task_id = ot.id
+       WHERE ot.occupation_id = $1
+       GROUP BY ms.id, ms.skill_code, ms.skill_name, ms.category, ms.difficulty_level
+       ORDER BY task_count DESC LIMIT 20`,
+      [occupationId]
+    );
+    return result.rows;
+  } catch { return []; }
 }
 
 async function getSkillProfile(occupationId: number) {
-  const result = await pool.query(
-    `SELECT * FROM occupation_skill_profile WHERE occupation_id = $1`,
-    [occupationId]
-  );
-  return result.rows[0] || null;
+  try {
+    const result = await pool.query(
+      `SELECT * FROM occupation_skill_profile WHERE occupation_id = $1`,
+      [occupationId]
+    );
+    return result.rows[0] || null;
+  } catch { return null; }
 }
 
 async function getOnetTasks(occupationId: number) {
@@ -347,49 +343,45 @@ async function getTopKnowledge(occupationId: number) {
 }
 
 async function getRelevantTools(occupationId: number) {
-  // Match tools based on occupation's top work activity GWA categories
-  const result = await pool.query(
-    `WITH occ_categories AS (
-       SELECT DISTINCT
-         CASE
-           WHEN element_id LIKE '4.A.1%' THEN 'information_input'
-           WHEN element_id LIKE '4.A.2%' THEN 'mental_processes'
-           WHEN element_id LIKE '4.A.3.b%' THEN 'technical_work'
-           WHEN element_id LIKE '4.A.4.a%' THEN 'communication'
-           WHEN element_id LIKE '4.A.4.b%' THEN 'management'
-           WHEN element_id LIKE '4.A.4.c%' THEN 'administrative'
-         END as gwa_category
-       FROM onet_work_activities
-       WHERE occupation_id = $1 AND importance > 3.5
-     )
-     SELECT DISTINCT t.tool_name, t.vendor, t.category, t.pricing_model,
-            t.monthly_cost_low, t.monthly_cost_high, t.url, t.capabilities
-     FROM ai_tools t, occ_categories oc
-     WHERE t.dwa_categories::jsonb ? oc.gwa_category
-     ORDER BY t.monthly_cost_low ASC NULLS FIRST
-     LIMIT 6`,
-    [occupationId]
-  );
-  return result.rows;
+  try {
+    const result = await pool.query(
+      `WITH occ_categories AS (
+         SELECT DISTINCT
+           CASE
+             WHEN element_id LIKE '4.A.1%' THEN 'information_input'
+             WHEN element_id LIKE '4.A.2%' THEN 'mental_processes'
+             WHEN element_id LIKE '4.A.3.b%' THEN 'technical_work'
+             WHEN element_id LIKE '4.A.4.a%' THEN 'communication'
+             WHEN element_id LIKE '4.A.4.b%' THEN 'management'
+             WHEN element_id LIKE '4.A.4.c%' THEN 'administrative'
+           END as gwa_category
+         FROM onet_work_activities
+         WHERE occupation_id = $1 AND importance > 3.5
+       )
+       SELECT DISTINCT t.tool_name, t.vendor, t.category, t.pricing_model,
+              t.monthly_cost_low, t.monthly_cost_high, t.url, t.capabilities
+       FROM ai_tools t, occ_categories oc
+       WHERE t.dwa_categories::jsonb ? oc.gwa_category
+       ORDER BY t.monthly_cost_low ASC NULLS FIRST
+       LIMIT 6`,
+      [occupationId]
+    );
+    return result.rows;
+  } catch { return []; }
 }
 
 async function getRoleAlignedPackages(occupationTitle: string) {
-  const result = await pool.query(
-    `SELECT package_code, package_name, package_description, tier, base_price, monthly_price, includes_integrations, roi_multiplier
-     FROM automation_packages
-     WHERE $1 = ANY(target_occupations)
-     ORDER BY
-       CASE tier
-         WHEN 'starter' THEN 1
-         WHEN 'growth' THEN 2
-         WHEN 'enterprise' THEN 3
-         ELSE 4
-       END,
-       base_price ASC
-     LIMIT 3`,
-    [occupationTitle]
-  );
-  return result.rows;
+  try {
+    const result = await pool.query(
+      `SELECT package_code, package_name, package_description, tier, base_price, monthly_price, includes_integrations, roi_multiplier
+       FROM automation_packages
+       WHERE $1 = ANY(target_occupations)
+       ORDER BY CASE tier WHEN 'starter' THEN 1 WHEN 'growth' THEN 2 WHEN 'enterprise' THEN 3 ELSE 4 END, base_price ASC
+       LIMIT 3`,
+      [occupationTitle]
+    );
+    return result.rows;
+  } catch { return []; }
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

@@ -65,6 +65,7 @@ export async function getOccupationRecommendationSnapshot(
   pool: DbPool,
   occupationId: number
 ): Promise<OccupationRecommendationSnapshot> {
+  try {
   const actionsResult = await pool.query(`
     SELECT 
       aa.*,
@@ -202,4 +203,14 @@ export async function getOccupationRecommendationSnapshot(
         : 200,
     },
   };
+  } catch {
+    return {
+      coverage: { percent: 0, coveredTasks: 0, estimatedDailyHoursSaved: 0, estimatedWeeklyHoursSaved: 0, estimatedYearlyValue: 0 },
+      analysis: { totalTasks: 0, automatableTasks: 0, avgAutomationScore: 0, estimatedDailyTimeSaved: 0 },
+      topActions: [],
+      recommendedWorkflows: [],
+      recommendedPackages: [],
+      roi: { estimatedDailyTimeSaved: 0, estimatedYearlyValue: 0, paybackDays: 90, yearOneROI: 0 },
+    };
+  }
 }

@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { AlertCircle, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
+import { AlertCircle, ArrowRight, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { Footer } from '@/components/ui/footer';
-import { PageHeader } from '@/components/ui/page-header';
+import { PexelsImage } from '@/components/ui/pexels-image';
 import { getOccupationCategoryLabel, normalizeOccupationCategory, occupationCategoryOptions } from '@/lib/ai-jobs/categories';
 
 interface Occupation {
@@ -18,8 +18,6 @@ interface Occupation {
   sub_category: string | null;
   coverage_percent?: number | string | null;
   estimated_daily_hours_saved?: number | string | null;
-  top_actions?: Array<{ action_name?: string; action_code?: string; task_count?: number }>;
-  recommended_packages?: Array<{ package_name?: string; tier?: string }>;
   ai_opportunities_count: number;
   micro_tasks_count: number;
 }
@@ -32,29 +30,16 @@ interface BrowseResponse {
   totalPages: number;
 }
 
-const categoryStory: Record<string, { routine: string; payoff: string }> = {
-  Management: { routine: 'Status updates, approvals, and planning loops', payoff: 'Create a clearer one-hour-back plan for leaders.' },
-  'Business and Financial Operations': { routine: 'Reporting, reconciliations, and document review', payoff: 'Target repetitive back-office work first.' },
-  'Computer and Mathematical': { routine: 'Handoffs, triage, research, and code-adjacent admin', payoff: 'Automate the drag around technical work.' },
-  'Healthcare Practitioners and Technical': { routine: 'Documentation, intake, and follow-up coordination', payoff: 'Return time to patient-facing work.' },
-  'Educational Instruction and Library': { routine: 'Prep, grading, communication, and scheduling', payoff: 'Reduce administrative load without losing quality.' },
-  Legal: { routine: 'Document prep, research, and deadline tracking', payoff: 'Free up more time for judgment-heavy work.' },
-  'Architecture and Engineering': { routine: 'Documentation, reporting, and evaluation tasks', payoff: 'Bundle recurring analysis into automation.' },
-  'Sales and Related': { routine: 'Follow-up, content, and CRM maintenance', payoff: 'Push low-leverage coordination off the calendar.' },
-  'Life Physical and Social Science': { routine: 'Research synthesis, data prep, and reporting', payoff: 'Protect deep work by automating prep steps.' },
-  'Arts Design Entertainment Sports and Media': { routine: 'Drafting, revisions, and publishing workflows', payoff: 'Automate production overhead around creative work.' },
-  'Community and Social Service': { routine: 'Notes, scheduling, and case coordination', payoff: 'Give more time back to direct service.' },
-  'Construction and Extraction': { routine: 'Estimating, reporting, and coordination', payoff: 'Remove routine admin from field-heavy roles.' },
-};
-
-function getOccupationStory(occupation: Occupation) {
-  const fallback = { routine: 'The routine work surrounding the role', payoff: 'See where structured automation can give time back.' };
-  const story = categoryStory[occupation.major_category] ?? fallback;
+function getEstimatedMinutes(occupation: Occupation) {
   const coverageHours = Number(occupation.estimated_daily_hours_saved || 0);
-  const countBasedMinutes = Math.max(18, Math.round((occupation.ai_opportunities_count * 5) + (occupation.micro_tasks_count * 1.1)));
-  const estimatedMinutes = coverageHours > 0 ? Math.round(coverageHours * 60) : countBasedMinutes;
-  const coveragePercent = Number(occupation.coverage_percent || 0);
-  return { ...story, estimatedMinutes, coveragePercent };
+  const countBased = Math.max(18, Math.round((occupation.ai_opportunities_count * 5) + (occupation.micro_tasks_count * 1.1)));
+  return coverageHours > 0 ? Math.round(coverageHours * 60) : countBased;
+}
+
+function getColor(title: string) {
+  const hash = title.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const hue = (hash * 37) % 360;
+  return `hsl(${hue}, 25%, 45%)`;
 }
 
 export default function BrowsePage() {
@@ -130,56 +115,58 @@ export default function BrowsePage() {
 
   return (
     <div className="app-shell">
-      <main className="page-container pb-20 pt-10 md:pt-14">
-        <PageHeader
-          eyebrow="Occupation explorer"
-          title="Find where routine work is easiest to recover."
-          description="Filter by occupation family, scan daily routines, and connect tasks to automation."
-          className="mb-10 max-w-3xl"
-        />
+      {/* Hero */}
+      <section className="bg-panel">
+        <div className="page-container pt-8 pb-10 md:pt-10 md:pb-12">
+          <div className="dark-panel-muted eyebrow">Occupation explorer</div>
+          <h1
+            className="dark-panel-text mt-3 font-editorial font-normal"
+            style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: 1, letterSpacing: '-0.035em' }}
+          >
+            Browse all roles
+          </h1>
+          <p className="dark-panel-muted mt-3 max-w-lg text-[0.85rem] leading-[1.6]">
+            {isLoading ? 'Loading...' : `${total.toLocaleString()} occupations mapped. Find yours.`}
+          </p>
+        </div>
+      </section>
 
-        {/* ── Filters ── */}
+      <main className="page-container py-8 md:py-10">
+        {/* Filters */}
         <form
           onSubmit={handleSearchSubmit}
-          className="mb-6 rounded-xl border border-edge-strong bg-surface-raised p-5 shadow-md"
+          className="mb-8 rounded-xl border border-edge-strong bg-surface-raised p-4 shadow-sm"
         >
-          <div className="grid gap-3 lg:grid-cols-[1fr_200px_180px]">
+          <div className="grid gap-3 lg:grid-cols-[1fr_180px_160px]">
             <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-tertiary" />
+              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-tertiary" />
               <input
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search job title, family, or specialty..."
-                className="h-11 w-full rounded-lg border border-edge-strong bg-surface-raised pl-10 pr-10 text-[0.85rem] text-ink placeholder:text-ink-tertiary/50 focus:border-edge-strong focus:outline-none focus:ring-2 focus:ring-ink/5"
+                placeholder="Search job title..."
+                className="h-11 w-full rounded-lg border border-edge-strong bg-surface-raised pl-11 pr-10 text-[0.85rem] text-ink placeholder:text-ink-tertiary/40 focus:outline-none focus:ring-2 focus:ring-ink/5"
               />
               {searchInput && (
-                <button
-                  type="button"
-                  onClick={() => setSearchInput('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-ink-tertiary hover:text-ink"
-                  aria-label="Clear search"
-                >
-                  <X className="h-4 w-4" />
+                <button type="button" onClick={() => setSearchInput('')} className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-ink-tertiary hover:text-ink" aria-label="Clear">
+                  <X className="h-3.5 w-3.5" />
                 </button>
               )}
             </div>
-
             <select
               value={selectedCategory}
               onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }}
-              className="styled-select h-11 rounded-lg border border-edge-strong bg-surface-raised px-3 text-[0.8rem] text-ink focus:border-edge-strong focus:outline-none focus:ring-2 focus:ring-ink/5"
+              className="styled-select h-11 rounded-lg border border-edge-strong bg-surface-raised px-3 text-[0.8rem] text-ink focus:outline-none focus:ring-2 focus:ring-ink/5"
             >
               <option value="">All categories</option>
               {occupationCategoryOptions.map((c) => (
                 <option key={c.slug} value={c.dbValue}>{c.label}</option>
               ))}
             </select>
-
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="styled-select h-11 rounded-lg border border-edge-strong bg-surface-raised px-3 text-[0.8rem] text-ink focus:border-edge-strong focus:outline-none focus:ring-2 focus:ring-ink/5"
+              className="styled-select h-11 rounded-lg border border-edge-strong bg-surface-raised px-3 text-[0.8rem] text-ink focus:outline-none focus:ring-2 focus:ring-ink/5"
             >
               <option value="time_back">Biggest Time Back</option>
               <option value="title">Sort A-Z</option>
@@ -187,99 +174,100 @@ export default function BrowsePage() {
               <option value="coverage">Best Coverage</option>
             </select>
           </div>
-
-          <div className="mt-3 flex items-center justify-between border-t border-edge pt-3 text-sm text-ink-secondary">
-            <div>
-              {isLoading && occupations.length === 0 ? (
-                'Loading occupations...'
-              ) : (
-                <>
-                  Showing <span className="font-medium text-ink">{occupations.length}</span> of{' '}
-                  <span className="font-medium text-ink">{total.toLocaleString()}</span> occupations
-                </>
-              )}
-            </div>
-            {(selectedCategory || searchInput.trim()) && (
+          {(selectedCategory || searchInput.trim()) && (
+            <div className="mt-3 flex items-center justify-between border-t border-edge pt-3">
+              <span className="text-[0.78rem] text-ink-tertiary">Filtered results</span>
               <button
                 type="button"
                 onClick={() => { setSelectedCategory(''); setSearchInput(''); setSearchQuery(''); setPage(1); }}
-                className="text-sm font-medium text-accent-blue hover:text-accent-blue-hover"
+                className="text-[0.78rem] font-medium text-ink-secondary hover:text-ink"
               >
                 Clear filters
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </form>
 
-        {/* ── Results ── */}
+        {/* Results */}
         {errorMessage ? (
-          <div className="rounded-lg border border-signal-subtle bg-signal-subtle p-6">
+          <div className="rounded-xl border border-signal-subtle bg-signal-subtle p-6">
             <div className="flex gap-4">
               <AlertCircle className="h-5 w-5 shrink-0 text-signal" />
               <div>
-                <h2 className="text-lg font-semibold text-ink">Data temporarily unavailable</h2>
-                <p className="mt-1 text-sm text-ink-secondary">
-                  Could not reach the database. Ensure your local Supabase stack is running, then refresh.
-                </p>
-                <p className="mt-2 text-xs text-ink-tertiary">{errorMessage}</p>
+                <h2 className="text-base font-medium text-ink">Data temporarily unavailable</h2>
+                <p className="mt-1 text-[0.8rem] text-ink-secondary">Ensure your database is running, then refresh.</p>
               </div>
             </div>
           </div>
         ) : isLoading && occupations.length === 0 ? (
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="rounded-lg border border-edge bg-surface-raised p-5">
-                <Skeleton className="mb-3 h-4 w-24" />
-                <Skeleton className="mb-2 h-6 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
+              <div key={i} className="overflow-hidden rounded-2xl border border-edge bg-surface-raised">
+                <Skeleton className="h-28 w-full" />
+                <div className="p-4">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="mt-2 h-5 w-3/4" />
+                </div>
               </div>
             ))}
           </div>
         ) : occupations.length === 0 ? (
-          <div className="rounded-lg border border-edge bg-surface-raised px-8 py-14 text-center">
-            <h2 className="text-xl font-semibold text-ink">No occupations found</h2>
-            <p className="mt-2 text-sm text-ink-secondary">Try a different title, a broader keyword, or remove a category filter.</p>
+          <div className="rounded-xl border border-edge bg-surface-raised p-12 text-center">
+            <Search className="mx-auto mb-3 h-8 w-8 text-ink-tertiary" />
+            <h3 className="text-lg font-medium text-ink">No occupations found</h3>
+            <p className="mt-1 text-[0.8rem] text-ink-secondary">Try a different title or remove a filter.</p>
           </div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="grid gap-3 md:grid-cols-2 xl:grid-cols-3"
-          >
-            {occupations.map((occupation) => {
-              const story = getOccupationStory(occupation);
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {occupations.map((occupation, i) => {
+              const minutes = getEstimatedMinutes(occupation);
+              const color = getColor(occupation.title);
+
               return (
-                <Link
+                <motion.div
                   key={occupation.id}
-                  href={`/ai-jobs/${occupation.slug}`}
-                  className="group flex items-center justify-between gap-4 rounded-xl border border-edge bg-surface-raised px-5 py-4 transition-all duration-200 hover:bg-surface-hover hover:shadow-sm"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(i * 0.03, 0.5), duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <div className="min-w-0">
-                    <p className="eyebrow">
-                      {getOccupationCategoryLabel(occupation.major_category)}
-                    </p>
-                    <h2 className="mt-1.5 text-[0.9rem] font-medium text-ink transition-colors group-hover:text-ink/70">
-                      {occupation.title}
-                    </h2>
-                  </div>
-                  <div className="flex shrink-0 items-baseline gap-0.5">
-                    <span className="text-[1.25rem] font-medium tracking-[-0.02em] text-ink" style={{ fontFamily: 'var(--font-heading)' }}>{story.estimatedMinutes}</span>
-                    <span className="text-[0.65rem] text-ink-tertiary">m</span>
-                  </div>
-                </Link>
+                  <Link
+                    href={`/ai-jobs/${occupation.slug}`}
+                    className="group relative flex flex-col overflow-hidden rounded-2xl border border-edge-strong bg-surface-raised shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                  >
+                    <PexelsImage
+                      query={occupation.title}
+                      fallbackColor={color}
+                      fallbackLetter={occupation.title.charAt(0)}
+                      className="h-28"
+                    />
+
+                    <div className="flex flex-1 flex-col p-4">
+                      <p className="eyebrow">{getOccupationCategoryLabel(occupation.major_category)}</p>
+                      <h2 className="mt-1.5 text-[0.85rem] font-medium leading-snug text-ink">
+                        {occupation.title}
+                      </h2>
+                      <div className="mt-auto flex items-center justify-between pt-3">
+                        <div className="flex items-baseline gap-1">
+                          <span className="font-editorial text-[1.1rem] tabular-nums text-ink">{minutes}</span>
+                          <span className="text-[0.6rem] text-ink-tertiary">min/day</span>
+                        </div>
+                        <ArrowRight className="h-3.5 w-3.5 text-ink-tertiary/30 transition-all duration-300 group-hover:text-ink-tertiary group-hover:translate-x-0.5" />
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
               );
             })}
-          </motion.div>
+          </div>
         )}
 
-        {/* ── Pagination ── */}
+        {/* Pagination */}
         {!isLoading && totalPages > 1 && (
-          <div className="mt-10 flex items-center justify-center gap-1.5">
+          <div className="mt-12 flex items-center justify-center gap-1.5">
             <button
               onClick={() => { setPage(Math.max(1, page - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               disabled={page === 1}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-edge text-ink-secondary transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-edge-strong text-ink-secondary transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-30"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -288,10 +276,10 @@ export default function BrowsePage() {
               <button
                 key={n}
                 onClick={() => { setPage(n); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className={`inline-flex h-9 min-w-9 items-center justify-center rounded-md px-2.5 text-sm font-medium transition-colors ${
+                className={`btn-primary inline-flex h-10 min-w-10 items-center justify-center rounded-lg px-3 text-[0.85rem] font-medium transition-colors ${
                   page === n
-                    ? 'bg-primary text-primary-foreground'
-                    : 'border border-edge text-ink-secondary hover:bg-surface-sunken hover:text-ink'
+                    ? 'border border-primary bg-primary'
+                    : 'border border-edge-strong text-ink-secondary hover:bg-surface-sunken hover:text-ink !text-ink-secondary'
                 }`}
               >
                 {n}
@@ -301,7 +289,7 @@ export default function BrowsePage() {
             <button
               onClick={() => { setPage(Math.min(totalPages, page + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               disabled={page === totalPages}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-edge text-ink-secondary transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-edge-strong text-ink-secondary transition-colors hover:bg-surface-sunken hover:text-ink disabled:opacity-30"
             >
               <ChevronRight className="h-4 w-4" />
             </button>

@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { InsightCard } from '@/components/ui/insight-card';
-import { StatRing } from '@/components/ui/stat-ring';
 
 const CHART_COLORS = ['#1C1816', '#B8860B', '#A0522D', '#6B7F5E', '#6B6259', '#7B506F', '#9C9488'];
 
@@ -101,27 +99,35 @@ export function DayChart({ segments, totalMinutes, fullDayMinutes }: DayChartPro
           </div>
         </motion.div>
 
-        {/* Work block cards */}
-        <div className="grid gap-3 sm:grid-cols-2">
+        {/* Work block list — immersive, no cards */}
+        <div className="space-y-0 divide-y divide-edge">
           {chartData.map((seg, i) => (
-            <InsightCard
+            <motion.div
               key={seg.label}
-              title={seg.label}
-              value={`${(seg.minutes / 60).toFixed(1)}h`}
-              subtitle={seg.recoverable > 0 ? `${seg.recoverable}m back` : undefined}
-              description={seg.posture}
-              accentColor={seg.color}
-              delay={i * 0.08}
-              chart={
-                <StatRing
-                  value={Math.round((seg.minutes / fullDayMinutes) * 100)}
-                  size={48}
-                  strokeWidth={4}
-                  color={seg.color}
-                  label={`${Math.round((seg.minutes / fullDayMinutes) * 100)}%`}
-                />
-              }
-            />
+              initial={{ opacity: 0, x: 12 }}
+              animate={inView ? { opacity: 1, x: 0 } : {}}
+              transition={{ delay: 0.3 + i * 0.08, duration: 0.4 }}
+              className="group flex items-center gap-4 py-4 first:pt-0"
+            >
+              <div className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: seg.color }} />
+              <div className="min-w-0 flex-1">
+                <p className="text-[0.85rem] font-medium text-ink">{seg.label}</p>
+                <p className="mt-0.5 text-[0.72rem] text-ink-tertiary opacity-0 transition-opacity group-hover:opacity-100">
+                  {seg.posture}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-baseline gap-1.5">
+                <span className="font-editorial text-[1.25rem] tabular-nums text-ink">
+                  {(seg.minutes / 60).toFixed(1)}
+                </span>
+                <span className="text-[0.65rem] text-ink-tertiary">h</span>
+                {seg.recoverable > 0 && (
+                  <span className="ml-1.5 rounded bg-surface-sunken px-1.5 py-0.5 text-[0.6rem] font-medium text-ink-secondary">
+                    {seg.recoverable}m back
+                  </span>
+                )}
+              </div>
+            </motion.div>
           ))}
         </div>
       </div>

@@ -509,7 +509,7 @@ export default async function OccupationPage({ params }: PageProps) {
       {/* BEAT 1 — Dark hero panel                                           */}
       {/* ------------------------------------------------------------------ */}
       <section className="bg-panel">
-        <div className="page-container pt-8 pb-14 md:pt-10 md:pb-16">
+        <div className="page-container relative pt-8 pb-14 md:pt-10 md:pb-16">
           <div className="mb-10">
             <Link
               href="/ai-jobs"
@@ -538,26 +538,26 @@ export default async function OccupationPage({ params }: PageProps) {
             </p>
           )}
 
-          {/* The Number — right-aligned on desktop */}
-          <div className="mt-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <p className="dark-panel-muted max-w-md text-[0.85rem] leading-[1.6]">
-              We found routine work in your day that the right tools could handle — so you can focus on what actually needs you.
-            </p>
-            <div className="shrink-0 md:text-right">
+          {/* Number upper-right, description bottom-right */}
+          <div className="mt-10 flex flex-col items-end md:absolute md:right-8 md:top-16 md:bottom-16 md:flex md:flex-col md:justify-between">
+            <div className="text-right">
               <p className="dark-panel-muted text-[0.6875rem] font-semibold uppercase tracking-[0.1em]">
                 Time you could get back
               </p>
-              <div className="mt-2 flex items-baseline gap-2 md:justify-end">
+              <div className="mt-2 flex items-baseline gap-2 justify-end">
                 <CountUp
                   value={displayedMinutesRecoveredPerDay}
                   duration={1.5}
                   delay={0.3}
                   className="dark-panel-text font-editorial font-normal"
-                  style={{ fontSize: 'clamp(3.5rem, 8vw, 5rem)', lineHeight: 0.85 }}
+                  style={{ fontSize: 'clamp(3rem, 7vw, 4.5rem)', lineHeight: 0.85 }}
                 />
                 <span className="dark-panel-muted font-editorial text-base italic">min/day</span>
               </div>
             </div>
+            <p className="dark-panel-muted mt-6 max-w-[18rem] text-right text-[0.8rem] leading-[1.55] md:mt-0">
+              We found routine work in your day that the right tools could handle — so you can focus on what actually needs&nbsp;you.
+            </p>
           </div>
         </div>
       </section>

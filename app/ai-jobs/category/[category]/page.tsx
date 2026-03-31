@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronLeft, Search } from 'lucide-react';
 import { Footer } from '@/components/ui/footer';
+import { PexelsImage } from '@/components/ui/pexels-image';
 
 interface Occupation {
   id: number;
@@ -162,22 +163,13 @@ export default function CategoryPage() {
                     href={`/ai-jobs/${occupation.slug}`}
                     className="group relative flex flex-col overflow-hidden rounded-2xl border border-edge-strong bg-surface-raised shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
                   >
-                    {/* Visual header */}
-                    <div
-                      className="relative h-24 overflow-hidden"
-                      style={{ background: `linear-gradient(135deg, ${color}20, ${color}08), linear-gradient(to bottom right, #ECE8E1, #DDD8D0)` }}
-                    >
-                      <div
-                        className="absolute -right-4 -top-4 h-20 w-20 rounded-full opacity-[0.12] transition-all duration-500 group-hover:scale-125 group-hover:opacity-[0.22]"
-                        style={{ backgroundColor: color }}
-                      />
-                      <span
-                        className="absolute bottom-2 right-3 font-editorial text-[2.5rem] leading-none opacity-[0.06] transition-opacity duration-300 group-hover:opacity-[0.12]"
-                        style={{ color }}
-                      >
-                        {occupation.title.charAt(0)}
-                      </span>
-                    </div>
+                    {/* Visual header with Pexels image */}
+                    <PexelsImage
+                      query={occupation.title}
+                      fallbackColor={color}
+                      fallbackLetter={occupation.title.charAt(0)}
+                      className="h-28"
+                    />
 
                     {/* Content */}
                     <div className="flex flex-1 flex-col p-4">

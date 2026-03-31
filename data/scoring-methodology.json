@@ -1,0 +1,253 @@
+{
+  "$schema": "Composite Automation Scoring Methodology — edit weights and mappings here, then re-run calculate_composite_scores.py",
+  "version": "1.0.0",
+  "last_updated": "2026-03-30",
+
+  "dimension_weights": {
+    "ability": 0.30,
+    "work_activity": 0.25,
+    "keyword": 0.20,
+    "knowledge": 0.15,
+    "frequency": 0.10
+  },
+
+  "ability_ai_scores": {
+    "_doc": "How well can AI perform each O*NET ability? 0 = not at all, 1 = excels. Grouped by category.",
+
+    "cognitive_verbal": {
+      "1.A.1.a.1": { "name": "Oral Comprehension", "score": 0.80, "rationale": "Speech-to-text + NLP" },
+      "1.A.1.a.2": { "name": "Written Comprehension", "score": 0.85, "rationale": "LLMs excel at reading" },
+      "1.A.1.a.3": { "name": "Oral Expression", "score": 0.70, "rationale": "TTS improving but not human-level" },
+      "1.A.1.a.4": { "name": "Written Expression", "score": 0.85, "rationale": "LLMs excel at writing" }
+    },
+    "cognitive_reasoning": {
+      "1.A.1.b.1": { "name": "Fluency of Ideas", "score": 0.55, "rationale": "LLMs generate many ideas, quality varies" },
+      "1.A.1.b.2": { "name": "Originality", "score": 0.45, "rationale": "True novelty is human edge" },
+      "1.A.1.b.3": { "name": "Problem Sensitivity", "score": 0.50, "rationale": "Pattern recognition helps, judgment needed" },
+      "1.A.1.b.4": { "name": "Deductive Reasoning", "score": 0.75, "rationale": "Formal logic, AI strong" },
+      "1.A.1.b.5": { "name": "Inductive Reasoning", "score": 0.65, "rationale": "Pattern inference, AI decent" },
+      "1.A.1.b.6": { "name": "Information Ordering", "score": 0.85, "rationale": "Sorting/organizing, AI excels" },
+      "1.A.1.b.7": { "name": "Category Flexibility", "score": 0.70, "rationale": "Classification, AI good" }
+    },
+    "cognitive_quantitative": {
+      "1.A.1.c.1": { "name": "Mathematical Reasoning", "score": 0.80, "rationale": "Computation/logic strong" },
+      "1.A.1.c.2": { "name": "Number Facility", "score": 0.90, "rationale": "Arithmetic, AI perfect" }
+    },
+    "cognitive_memory": {
+      "1.A.1.d.1": { "name": "Memorization", "score": 0.90, "rationale": "Databases >> human memory" }
+    },
+    "cognitive_perceptual": {
+      "1.A.1.e.1": { "name": "Speed of Closure", "score": 0.75, "rationale": "Pattern completion, CV strong" },
+      "1.A.1.e.2": { "name": "Flexibility of Closure", "score": 0.70, "rationale": "Visual pattern recognition" },
+      "1.A.1.e.3": { "name": "Perceptual Speed", "score": 0.85, "rationale": "Rapid comparison, AI excels" }
+    },
+    "cognitive_spatial": {
+      "1.A.1.f.1": { "name": "Spatial Orientation", "score": 0.40, "rationale": "3D reasoning, AI moderate" },
+      "1.A.1.f.2": { "name": "Visualization", "score": 0.50, "rationale": "Improving with generative AI" }
+    },
+    "cognitive_attention": {
+      "1.A.1.g.1": { "name": "Selective Attention", "score": 0.80, "rationale": "Filtering, AI doesn't fatigue" },
+      "1.A.1.g.2": { "name": "Time Sharing", "score": 0.60, "rationale": "Multitasking, AI parallel processing" }
+    },
+    "psychomotor_fine": {
+      "1.A.2.a.1": { "name": "Arm-Hand Steadiness", "score": 0.10, "rationale": "Physical, not AI" },
+      "1.A.2.a.2": { "name": "Manual Dexterity", "score": 0.10, "rationale": "Physical manipulation" },
+      "1.A.2.a.3": { "name": "Finger Dexterity", "score": 0.10, "rationale": "Fine motor, not AI" }
+    },
+    "psychomotor_control": {
+      "1.A.2.b.1": { "name": "Control Precision", "score": 0.15, "rationale": "Physical control" },
+      "1.A.2.b.2": { "name": "Multilimb Coordination", "score": 0.10, "rationale": "Physical" },
+      "1.A.2.b.3": { "name": "Response Orientation", "score": 0.15, "rationale": "Physical reaction" },
+      "1.A.2.b.4": { "name": "Rate Control", "score": 0.15, "rationale": "Physical timing" }
+    },
+    "psychomotor_reaction": {
+      "1.A.2.c.1": { "name": "Reaction Time", "score": 0.15, "rationale": "Physical speed" },
+      "1.A.2.c.2": { "name": "Wrist-Finger Speed", "score": 0.05, "rationale": "Repetitive physical" },
+      "1.A.2.c.3": { "name": "Speed of Limb Movement", "score": 0.05, "rationale": "Physical" }
+    },
+    "physical_strength": {
+      "1.A.3.a.1": { "name": "Static Strength", "score": 0.05, "rationale": "Lifting, not AI" },
+      "1.A.3.a.2": { "name": "Explosive Strength", "score": 0.05, "rationale": "Physical" },
+      "1.A.3.a.3": { "name": "Dynamic Strength", "score": 0.05, "rationale": "Physical" },
+      "1.A.3.a.4": { "name": "Trunk Strength", "score": 0.05, "rationale": "Physical" }
+    },
+    "physical_endurance": {
+      "1.A.3.b.1": { "name": "Stamina", "score": 0.05, "rationale": "Physical endurance" },
+      "1.A.3.c.1": { "name": "Extent Flexibility", "score": 0.05, "rationale": "Physical" },
+      "1.A.3.c.2": { "name": "Dynamic Flexibility", "score": 0.05, "rationale": "Physical" },
+      "1.A.3.c.3": { "name": "Gross Body Coordination", "score": 0.05, "rationale": "Physical" },
+      "1.A.3.c.4": { "name": "Gross Body Equilibrium", "score": 0.05, "rationale": "Physical/balance" }
+    },
+    "sensory_visual": {
+      "1.A.4.a.1": { "name": "Near Vision", "score": 0.60, "rationale": "Computer vision good at close-up" },
+      "1.A.4.a.2": { "name": "Far Vision", "score": 0.50, "rationale": "Less relevant to most AI tasks" },
+      "1.A.4.a.3": { "name": "Visual Color Discrimination", "score": 0.55, "rationale": "CV decent" },
+      "1.A.4.a.4": { "name": "Night Vision", "score": 0.20, "rationale": "Specialized, low AI relevance" },
+      "1.A.4.a.5": { "name": "Peripheral Vision", "score": 0.30, "rationale": "Spatial awareness, limited AI" },
+      "1.A.4.a.6": { "name": "Depth Perception", "score": 0.45, "rationale": "3D vision improving" },
+      "1.A.4.a.7": { "name": "Glare Sensitivity", "score": 0.20, "rationale": "Physical adaptation" }
+    },
+    "sensory_auditory": {
+      "1.A.4.b.1": { "name": "Hearing Sensitivity", "score": 0.50, "rationale": "Audio processing moderate" },
+      "1.A.4.b.2": { "name": "Auditory Attention", "score": 0.55, "rationale": "Audio filtering" },
+      "1.A.4.b.3": { "name": "Sound Localization", "score": 0.30, "rationale": "Spatial audio, niche" },
+      "1.A.4.b.4": { "name": "Speech Recognition", "score": 0.80, "rationale": "AI excels" },
+      "1.A.4.b.5": { "name": "Speech Clarity", "score": 0.75, "rationale": "TTS good and improving" }
+    }
+  },
+
+  "ability_categories": {
+    "_doc": "Groups for profile metadata — physical vs cognitive-routine vs cognitive-creative",
+    "physical": [
+      "1.A.2.a.1", "1.A.2.a.2", "1.A.2.a.3",
+      "1.A.2.b.1", "1.A.2.b.2", "1.A.2.b.3", "1.A.2.b.4",
+      "1.A.2.c.1", "1.A.2.c.2", "1.A.2.c.3",
+      "1.A.3.a.1", "1.A.3.a.2", "1.A.3.a.3", "1.A.3.a.4",
+      "1.A.3.b.1", "1.A.3.c.1", "1.A.3.c.2", "1.A.3.c.3", "1.A.3.c.4"
+    ],
+    "cognitive_routine": [
+      "1.A.1.a.2", "1.A.1.a.4",
+      "1.A.1.b.4", "1.A.1.b.6",
+      "1.A.1.c.1", "1.A.1.c.2",
+      "1.A.1.d.1",
+      "1.A.1.e.1", "1.A.1.e.2", "1.A.1.e.3",
+      "1.A.1.g.1"
+    ],
+    "cognitive_creative": [
+      "1.A.1.b.1", "1.A.1.b.2", "1.A.1.b.3",
+      "1.A.1.b.5", "1.A.1.b.7",
+      "1.A.1.f.1", "1.A.1.f.2",
+      "1.A.1.g.2"
+    ]
+  },
+
+  "work_activity_ai_scores": {
+    "_doc": "How automatable is each General Work Activity? 0 = not automatable, 1 = fully automatable.",
+
+    "information_input": {
+      "4.A.1.a.1": { "name": "Getting Information", "score": 0.80 },
+      "4.A.1.a.2": { "name": "Monitoring Processes, Materials, or Surroundings", "score": 0.60 },
+      "4.A.1.b.1": { "name": "Identifying Objects, Actions, and Events", "score": 0.65 },
+      "4.A.1.b.2": { "name": "Inspecting Equipment, Structures, or Materials", "score": 0.40 },
+      "4.A.1.b.3": { "name": "Estimating Quantifiable Characteristics", "score": 0.70 }
+    },
+    "mental_processes": {
+      "4.A.2.a.1": { "name": "Judging Qualities of Objects, Services, or People", "score": 0.50 },
+      "4.A.2.a.2": { "name": "Processing Information", "score": 0.85 },
+      "4.A.2.a.3": { "name": "Evaluating Compliance with Standards", "score": 0.75 },
+      "4.A.2.a.4": { "name": "Analyzing Data or Information", "score": 0.80 },
+      "4.A.2.b.1": { "name": "Making Decisions and Solving Problems", "score": 0.45 },
+      "4.A.2.b.2": { "name": "Thinking Creatively", "score": 0.50 },
+      "4.A.2.b.3": { "name": "Updating and Using Relevant Knowledge", "score": 0.70 },
+      "4.A.2.b.4": { "name": "Developing Objectives and Strategies", "score": 0.40 },
+      "4.A.2.b.5": { "name": "Scheduling Work and Activities", "score": 0.75 },
+      "4.A.2.b.6": { "name": "Organizing, Planning, and Prioritizing Work", "score": 0.65 }
+    },
+    "work_output": {
+      "4.A.3.a.1": { "name": "Performing General Physical Activities", "score": 0.10 },
+      "4.A.3.a.2": { "name": "Handling and Moving Objects", "score": 0.10 },
+      "4.A.3.a.3": { "name": "Controlling Machines and Processes", "score": 0.25 },
+      "4.A.3.a.4": { "name": "Operating Vehicles, Mechanized Devices, or Equipment", "score": 0.15 },
+      "4.A.3.b.1": { "name": "Working with Computers", "score": 0.80 },
+      "4.A.3.b.2": { "name": "Drafting/Specifying Technical Devices", "score": 0.55 },
+      "4.A.3.b.4": { "name": "Repairing Mechanical Equipment", "score": 0.10 },
+      "4.A.3.b.5": { "name": "Repairing Electronic Equipment", "score": 0.15 },
+      "4.A.3.b.6": { "name": "Documenting/Recording Information", "score": 0.85 }
+    },
+    "interacting_with_others": {
+      "4.A.4.a.1": { "name": "Interpreting Information for Others", "score": 0.65 },
+      "4.A.4.a.2": { "name": "Communicating with Supervisors/Peers", "score": 0.50 },
+      "4.A.4.a.3": { "name": "Communicating with External People", "score": 0.45 },
+      "4.A.4.a.4": { "name": "Establishing Interpersonal Relationships", "score": 0.20 },
+      "4.A.4.a.5": { "name": "Assisting and Caring for Others", "score": 0.10 },
+      "4.A.4.a.6": { "name": "Selling or Influencing Others", "score": 0.35 },
+      "4.A.4.a.7": { "name": "Resolving Conflicts and Negotiating", "score": 0.25 },
+      "4.A.4.a.8": { "name": "Performing for/with the Public", "score": 0.15 }
+    },
+    "management": {
+      "4.A.4.b.1": { "name": "Coordinating Work of Others", "score": 0.40 },
+      "4.A.4.b.2": { "name": "Developing and Building Teams", "score": 0.20 },
+      "4.A.4.b.3": { "name": "Training and Teaching Others", "score": 0.40 },
+      "4.A.4.b.4": { "name": "Guiding/Motivating Subordinates", "score": 0.25 },
+      "4.A.4.b.5": { "name": "Coaching and Developing Others", "score": 0.30 },
+      "4.A.4.b.6": { "name": "Providing Consultation and Advice", "score": 0.45 }
+    },
+    "administrative": {
+      "4.A.4.c.1": { "name": "Performing Administrative Activities", "score": 0.80 },
+      "4.A.4.c.2": { "name": "Staffing Organizational Units", "score": 0.45 },
+      "4.A.4.c.3": { "name": "Monitoring and Controlling Resources", "score": 0.60 }
+    }
+  },
+
+  "knowledge_digital_scores": {
+    "_doc": "How 'digital-ready' is each knowledge domain? Higher = occupation works with structured/digital data.",
+    "2.C.3.a": { "name": "Computers and Electronics", "score": 1.0 },
+    "2.C.4.a": { "name": "Mathematics", "score": 0.8 },
+    "2.C.1.c": { "name": "Economics and Accounting", "score": 0.7 },
+    "2.C.9.a": { "name": "Telecommunications", "score": 0.7 },
+    "2.C.1.a": { "name": "Administration and Management", "score": 0.5 },
+    "2.C.1.b": { "name": "Administrative", "score": 0.6 },
+    "2.C.7.a": { "name": "English Language", "score": 0.6 },
+    "2.C.3.b": { "name": "Engineering and Technology", "score": 0.6 },
+    "2.C.9.b": { "name": "Communications and Media", "score": 0.6 },
+    "2.C.1.d": { "name": "Sales and Marketing", "score": 0.5 },
+    "2.C.1.f": { "name": "Personnel and Human Resources", "score": 0.5 },
+    "2.C.3.c": { "name": "Design", "score": 0.5 },
+    "2.C.4.b": { "name": "Physics", "score": 0.5 },
+    "2.C.8.b": { "name": "Law and Government", "score": 0.5 },
+    "2.C.7.b": { "name": "Foreign Language", "score": 0.5 },
+    "2.C.4.c": { "name": "Chemistry", "score": 0.4 },
+    "2.C.4.d": { "name": "Biology", "score": 0.4 },
+    "2.C.4.g": { "name": "Geography", "score": 0.4 },
+    "2.C.6":   { "name": "Education and Training", "score": 0.4 },
+    "2.C.7.c": { "name": "Fine Arts", "score": 0.4 },
+    "2.C.1.e": { "name": "Customer and Personal Service", "score": 0.3 },
+    "2.C.4.e": { "name": "Psychology", "score": 0.3 },
+    "2.C.5.a": { "name": "Medicine and Dentistry", "score": 0.3 },
+    "2.C.8.a": { "name": "Public Safety and Security", "score": 0.3 },
+    "2.C.7.d": { "name": "History and Archeology", "score": 0.3 },
+    "2.C.10":  { "name": "Transportation", "score": 0.3 },
+    "2.C.2.a": { "name": "Production and Processing", "score": 0.3 },
+    "2.C.4.f": { "name": "Sociology and Anthropology", "score": 0.2 },
+    "2.C.5.b": { "name": "Therapy and Counseling", "score": 0.2 },
+    "2.C.7.e": { "name": "Philosophy and Theology", "score": 0.2 },
+    "2.C.3.d": { "name": "Building and Construction", "score": 0.2 },
+    "2.C.3.e": { "name": "Mechanical", "score": 0.2 },
+    "2.C.2.b": { "name": "Food Production", "score": 0.2 }
+  },
+
+  "keyword_scores": {
+    "_doc": "Task text keywords → automation signal. high=0.9, medium=0.5, low=0.15 in the weighted formula.",
+    "high": [
+      "data entry", "record", "log", "file", "organize", "sort", "categorize",
+      "calculate", "compute", "summarize", "compile", "generate report",
+      "schedule", "calendar", "email", "notification", "remind",
+      "search", "find", "lookup", "retrieve", "query",
+      "translate", "transcribe", "convert", "format",
+      "check", "verify", "validate", "review", "audit",
+      "monitor", "track", "measure", "analyze", "compare"
+    ],
+    "medium": [
+      "prepare", "draft", "create", "develop", "design",
+      "communicate", "respond", "reply", "present", "explain",
+      "evaluate", "assess", "recommend", "suggest", "advise",
+      "plan", "coordinate", "organize", "manage",
+      "research", "investigate", "identify", "determine"
+    ],
+    "low": [
+      "negotiate", "persuade", "sell", "counsel", "interview",
+      "supervise", "lead", "train", "mentor", "coach",
+      "create strategy", "make decisions", "exercise judgment",
+      "physical", "manual", "operate equipment", "drive"
+    ]
+  },
+
+  "frequency_weights": {
+    "_doc": "How much automation value does task frequency add? Daily tasks benefit most.",
+    "daily": 1.0,
+    "weekly": 0.5,
+    "monthly": 0.25,
+    "as-needed": 0.15,
+    "default": 0.3
+  }
+}

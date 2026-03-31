@@ -396,6 +396,45 @@ export const dataVersions = pgTable(
   }
 );
 
+// AI Tools capability database
+export const aiTools = pgTable(
+  'ai_tools',
+  {
+    id: serial('id').primaryKey(),
+    toolName: text('tool_name').notNull(),
+    vendor: text('vendor'),
+    category: text('category').notNull(), // e.g. 'document_ai', 'analytics', 'communication'
+    capabilities: text('capabilities'), // JSON array
+    pricingModel: text('pricing_model'), // 'free', 'freemium', 'subscription', 'usage'
+    monthlyCostLow: integer('monthly_cost_low'),
+    monthlyCostHigh: integer('monthly_cost_high'),
+    url: text('url'),
+    dwaCategories: text('dwa_categories'), // JSON: which GWA categories this tool serves
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('ai_tools_category_idx').on(table.category),
+  ]
+);
+
+// Research calibration benchmarks (Frey & Osborne, OECD, McKinsey)
+export const automationBenchmarks = pgTable(
+  'automation_benchmarks',
+  {
+    id: serial('id').primaryKey(),
+    occupationId: integer('occupation_id').references(() => occupations.id),
+    source: text('source').notNull(), // 'frey_osborne_2017', 'oecd_2019', 'mckinsey_2017'
+    externalScore: real('external_score'), // 0-1 probability of automation
+    socCode: text('soc_code'),
+    notes: text('notes'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('benchmarks_occupation_idx').on(table.occupationId),
+    index('benchmarks_source_idx').on(table.source),
+  ]
+);
+
 export type Occupation = typeof occupations.$inferSelect;
 export type NewOccupation = typeof occupations.$inferInsert;
 export type AiOpportunity = typeof aiOpportunities.$inferSelect;

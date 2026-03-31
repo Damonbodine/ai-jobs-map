@@ -8,6 +8,7 @@ import { TimeBackChart } from '@/components/occupation/time-back-chart';
 import { CountUp } from '@/components/ui/count-up';
 import { FadeIn } from '@/components/ui/fade-in';
 import { getOccupationRecommendationSnapshot } from '@/lib/ai-jobs/recommendations';
+import { classifyOccupation, modulateTimeBack } from '@/lib/ai-jobs/archetypes';
 import { Footer } from '@/components/ui/footer';
 
 const pool = new Pool({
@@ -304,6 +305,58 @@ async function getOnetTasks(occupationId: number) {
   return result.rows;
 }
 
+async function getAutomationProfile(occupationId: number) {
+  const result = await pool.query(
+    `SELECT composite_score, ability_automation_potential, work_activity_automation_potential,
+            keyword_score, knowledge_digital_readiness, task_frequency_weight,
+            physical_ability_avg, cognitive_routine_avg, cognitive_creative_avg,
+            top_automatable_activities, top_blocking_abilities
+     FROM occupation_automation_profile WHERE occupation_id = $1`,
+    [occupationId]
+  );
+  return result.rows[0] || null;
+}
+
+async function getTopAbilities(occupationId: number) {
+  const result = await pool.query(
+    `SELECT element_name, importance, level
+     FROM onet_abilities WHERE occupation_id = $1
+     ORDER BY importance DESC NULLS LAST
+     LIMIT 8`,
+    [occupationId]
+  );
+  return result.rows;
+}
+
+async function getTopKnowledge(occupationId: number) {
+  const result = await pool.query(
+    `SELECT element_name, importance, level
+     FROM onet_knowledge WHERE occupation_id = $1
+     ORDER BY importance DESC NULLS LAST
+     LIMIT 8`,
+    [occupationId]
+  );
+  return result.rows;
+}
+
+async function getRelevantTools(occupationId: number) {
+  // Get the occupation's top work activity categories, then match tools
+  const result = await pool.query(
+    `SELECT DISTINCT t.tool_name, t.vendor, t.category, t.pricing_model,
+            t.monthly_cost_low, t.monthly_cost_high, t.url
+     FROM ai_tools t
+     WHERE EXISTS (
+       SELECT 1 FROM onet_work_activities wa
+       WHERE wa.occupation_id = $1
+       AND wa.importance > 3.5
+     )
+     ORDER BY t.category
+     LIMIT 8`,
+    [occupationId]
+  );
+  return result.rows;
+}
+
 async function getRoleAlignedPackages(occupationTitle: string) {
   const result = await pool.query(
     `SELECT package_code, package_name, package_description, tier, base_price, monthly_price, includes_integrations, roi_multiplier
@@ -345,12 +398,17 @@ export default async function OccupationPage({ params }: PageProps) {
     notFound();
   }
 
-  const skills = await getSkills(occupation.id);
-  const microTasks = await getMicroTasks(occupation.id);
-  const granularSkills = await getGranularSkills(occupation.id);
-  const skillProfile = await getSkillProfile(occupation.id);
-  const roleAlignedPackages = await getRoleAlignedPackages(occupation.title);
-  const recommendationSnapshot = await getOccupationRecommendationSnapshot(pool, occupation.id);
+  const [skills, microTasks, granularSkills, skillProfile, roleAlignedPackages, recommendationSnapshot, automationProfile, topAbilities, topKnowledge] = await Promise.all([
+    getSkills(occupation.id),
+    getMicroTasks(occupation.id),
+    getGranularSkills(occupation.id),
+    getSkillProfile(occupation.id),
+    getRoleAlignedPackages(occupation.title),
+    getOccupationRecommendationSnapshot(pool, occupation.id),
+    getAutomationProfile(occupation.id),
+    getTopAbilities(occupation.id),
+    getTopKnowledge(occupation.id),
+  ]);
   const taskEntries = microTasks.map((task: any) => ({
     ...task,
     lens: describeTaskLens(task),
@@ -365,14 +423,21 @@ export default async function OccupationPage({ params }: PageProps) {
     0
   );
   const snapshotMinutesRecoveredPerDay = Math.round(recommendationSnapshot.coverage.estimatedDailyHoursSaved * 60);
-  // Always use the bottom-up sum so the hero number matches the breakdown
-  // (the snapshot estimate can diverge wildly from task-level data)
-  const displayedMinutesRecoveredPerDay = modeledMinutesRecoveredPerDay;
+
+  // Archetype: classify occupation and modulate time-back claim by credibility
+  const occupationArchetype = classifyOccupation(automationProfile);
+  const rawMinutes = modeledMinutesRecoveredPerDay;
+  const displayedMinutesRecoveredPerDay = modulateTimeBack(rawMinutes, occupationArchetype);
+
   const oneHourTargetProgress = Math.min(100, Math.round((displayedMinutesRecoveredPerDay / 60) * 100));
   const oneHourNarrative =
     displayedMinutesRecoveredPerDay >= 60
       ? 'This role has strong time-back potential. The right support tools could realistically recover over an hour of routine work each day.'
-      : `We identified ${displayedMinutesRecoveredPerDay} minutes of routine work that could be lightened with the right support — and there may be more as we map additional tasks.`;
+      : occupationArchetype.archetype === 'physical'
+        ? `We identified ${displayedMinutesRecoveredPerDay} minutes of administrative and coordination work that could be streamlined — freeing you to focus on the hands-on work itself.`
+        : occupationArchetype.archetype === 'mixed'
+          ? `We identified ${displayedMinutesRecoveredPerDay} minutes of admin and coordination overhead that could be lightened, so you spend more time on the work that matters.`
+          : `We identified ${displayedMinutesRecoveredPerDay} minutes of routine work that could be lightened with the right support — and there may be more as we map additional tasks.`;
   const categoryMix = Object.entries(
     aiApplicableTasks.reduce((acc: Record<string, number>, task: any) => {
       const key = task.ai_category || 'task_automation';
@@ -540,7 +605,7 @@ export default async function OccupationPage({ params }: PageProps) {
               )}
             </div>
             <div className="shrink-0 text-right pt-1">
-              <p className="dark-panel-muted text-[0.8rem]">We believe you can save</p>
+              <p className="dark-panel-muted text-[0.8rem]">{occupationArchetype.heroFrame(displayedMinutesRecoveredPerDay)}</p>
               <div className="mt-1 flex items-baseline gap-2 justify-end">
                 <CountUp
                   value={displayedMinutesRecoveredPerDay}
@@ -551,10 +616,131 @@ export default async function OccupationPage({ params }: PageProps) {
                 />
                 <span className="dark-panel-muted font-editorial text-base italic">min/day</span>
               </div>
+              <span className={`mt-2 inline-block rounded-full border px-2.5 py-0.5 text-[0.65rem] font-medium ${occupationArchetype.badgeTone}`}>
+                {occupationArchetype.label}
+              </span>
             </div>
           </div>
         </div>
       </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* AUTOMATION PROFILE — Multi-signal composite breakdown              */}
+      {/* ------------------------------------------------------------------ */}
+      {automationProfile && (
+        <section className="border-b border-border/60 bg-surface-raised">
+          <div className="page-container py-10 md:py-12">
+            <FadeIn>
+              <div className="flex items-start justify-between gap-6 mb-8">
+                <div>
+                  <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-ink-muted">
+                    Automation Profile
+                  </p>
+                  <h2 className="mt-2 font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)' }}>
+                    Multi-signal analysis
+                  </h2>
+                  <p className="mt-1 max-w-lg text-[0.8rem] leading-[1.6] text-ink-secondary">
+                    {occupationArchetype.rationale}
+                  </p>
+                  <p className="mt-2 max-w-lg text-[0.75rem] leading-[1.5] text-ink-muted">
+                    {occupationArchetype.valueProposition}
+                  </p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-ink-muted">Composite Score</p>
+                  <p className="mt-1 font-editorial text-3xl font-normal text-ink">
+                    {Math.round(automationProfile.composite_score)}
+                    <span className="text-base text-ink-muted">/100</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Dimension bars */}
+              <div className="grid gap-3 md:grid-cols-5">
+                {[
+                  { label: 'Ability profile', value: automationProfile.ability_automation_potential, weight: '30%', desc: 'Cognitive vs physical abilities' },
+                  { label: 'Work activities', value: automationProfile.work_activity_automation_potential, weight: '25%', desc: 'GWA automation potential' },
+                  { label: 'Task keywords', value: automationProfile.keyword_score, weight: '20%', desc: 'Task description signals' },
+                  { label: 'Digital readiness', value: automationProfile.knowledge_digital_readiness, weight: '15%', desc: 'Knowledge domain profile' },
+                  { label: 'Task frequency', value: automationProfile.task_frequency_weight, weight: '10%', desc: 'Daily tasks = higher value' },
+                ].map((dim) => (
+                  <div key={dim.label} className="rounded-lg border border-border/60 bg-surface p-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[0.7rem] font-medium text-ink">{dim.label}</p>
+                      <span className="text-[0.6rem] text-ink-muted">{dim.weight}</span>
+                    </div>
+                    <div className="mt-2 h-1.5 rounded-full bg-border/40">
+                      <div
+                        className="h-full rounded-full bg-accent transition-all duration-700"
+                        style={{ width: `${Math.round((dim.value ?? 0.5) * 100)}%` }}
+                      />
+                    </div>
+                    <p className="mt-1.5 text-[0.65rem] text-ink-muted">
+                      {dim.value != null ? `${Math.round(dim.value * 100)}%` : 'No data'} — {dim.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Ability profile chips */}
+              {(automationProfile.physical_ability_avg != null || automationProfile.cognitive_routine_avg != null) && (
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {automationProfile.cognitive_routine_avg != null && (
+                    <div className="rounded-md border border-cyan-500/20 bg-cyan-500/8 px-3 py-1.5">
+                      <p className="text-[0.65rem] text-cyan-400">Cognitive-routine</p>
+                      <p className="text-sm font-medium text-cyan-300">{automationProfile.cognitive_routine_avg.toFixed(1)} / 5</p>
+                    </div>
+                  )}
+                  {automationProfile.cognitive_creative_avg != null && (
+                    <div className="rounded-md border border-violet-500/20 bg-violet-500/8 px-3 py-1.5">
+                      <p className="text-[0.65rem] text-violet-400">Cognitive-creative</p>
+                      <p className="text-sm font-medium text-violet-300">{automationProfile.cognitive_creative_avg.toFixed(1)} / 5</p>
+                    </div>
+                  )}
+                  {automationProfile.physical_ability_avg != null && (
+                    <div className="rounded-md border border-amber-500/20 bg-amber-500/8 px-3 py-1.5">
+                      <p className="text-[0.65rem] text-amber-400">Physical demand</p>
+                      <p className="text-sm font-medium text-amber-300">{automationProfile.physical_ability_avg.toFixed(1)} / 5</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Top abilities and knowledge */}
+              {(topAbilities.length > 0 || topKnowledge.length > 0) && (
+                <div className="mt-8 grid gap-6 md:grid-cols-2">
+                  {topAbilities.length > 0 && (
+                    <div>
+                      <p className="text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-ink-muted mb-3">Top abilities required</p>
+                      <div className="space-y-1.5">
+                        {topAbilities.map((a: any) => (
+                          <div key={a.element_name} className="flex items-center justify-between rounded border border-border/40 px-2.5 py-1.5">
+                            <span className="text-[0.75rem] text-ink">{a.element_name}</span>
+                            <span className="text-[0.7rem] text-ink-muted">{Number(a.importance).toFixed(1)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {topKnowledge.length > 0 && (
+                    <div>
+                      <p className="text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-ink-muted mb-3">Top knowledge domains</p>
+                      <div className="space-y-1.5">
+                        {topKnowledge.map((k: any) => (
+                          <div key={k.element_name} className="flex items-center justify-between rounded border border-border/40 px-2.5 py-1.5">
+                            <span className="text-[0.75rem] text-ink">{k.element_name}</span>
+                            <span className="text-[0.7rem] text-ink-muted">{Number(k.importance).toFixed(1)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </FadeIn>
+          </div>
+        </section>
+      )}
 
       {/* ------------------------------------------------------------------ */}
       {/* BEAT 2 — A typical day (interactive charts)                        */}

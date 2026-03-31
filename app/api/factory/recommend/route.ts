@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import { pool } from '@/lib/db/pool';
 import { getOccupationRecommendationSnapshot } from '@/lib/ai-jobs/recommendations';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
 export async function GET(request: NextRequest) {
   try {

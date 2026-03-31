@@ -1,4 +1,6 @@
-import type { Pool } from 'pg';
+interface DbPool {
+  query(text: string, params?: unknown[]): Promise<{ rows: any[]; rowCount?: number | null }>;
+}
 
 export interface OccupationCoverageSnapshot {
   percent: number;
@@ -60,7 +62,7 @@ export interface OccupationRecommendationSnapshot {
 }
 
 export async function getOccupationRecommendationSnapshot(
-  pool: Pool,
+  pool: DbPool,
   occupationId: number
 ): Promise<OccupationRecommendationSnapshot> {
   const actionsResult = await pool.query(`

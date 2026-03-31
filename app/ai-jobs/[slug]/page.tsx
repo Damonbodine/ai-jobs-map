@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { Pool } from 'pg';
+import { pool } from '@/lib/db/pool';
 import { ChevronLeft, ArrowRight } from 'lucide-react';
 import { DayChart } from '@/components/occupation/day-chart';
 import { TimeBackChart } from '@/components/occupation/time-back-chart';
@@ -13,10 +13,6 @@ import { DayValueMap } from '@/components/occupation/day-value-map';
 import { Footer } from '@/components/ui/footer';
 import { generateBlueprint } from '@/lib/ai-blueprints/generate-blueprint';
 import { BlueprintSection } from '@/components/ai-blueprint/blueprint-section';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
 const opportunityCategoryConfig: Record<string, { label: string; color: string; icon: string }> = {
   task_automation: { label: 'Routine support', color: 'bg-blue-500', icon: '🤖' },

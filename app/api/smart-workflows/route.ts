@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import { pool } from '@/lib/db/pool';
 import { searchWorkflows } from '@/lib/smart-workflows/queries';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;

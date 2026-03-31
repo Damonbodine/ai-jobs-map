@@ -1,6 +1,4 @@
-import { Pool } from 'pg';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+import { pool } from '@/lib/db/pool';
 
 export interface SmartWorkflowResult {
   id: number;
@@ -30,20 +28,7 @@ export async function getWorkflowsForOccupation(
   majorCategory: string,
   limit = 6
 ): Promise<SmartWorkflowResult[]> {
-  const { rows } = await pool.query<{
-    id: number;
-    name: string;
-    description: string;
-    category: string;
-    integrations: string | null;
-    integration_count: number;
-    trigger_type: string;
-    complexity: string;
-    estimated_hours_saved: number;
-    relevance_score: number;
-    automation_solution_key: string | null;
-    skill_code_prefix: string | null;
-  }>(
+  const { rows } = await pool.query(
     `SELECT DISTINCT ON (sw.id)
        sw.id, sw.name, sw.description, sw.category,
        sw.integrations, sw.integration_count, sw.trigger_type,

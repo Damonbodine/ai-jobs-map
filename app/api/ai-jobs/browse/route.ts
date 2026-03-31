@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import { pool } from '@/lib/db/pool';
 import { normalizeOccupationCategory } from '@/lib/ai-jobs/categories';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
 function safeParseJson<T>(value: unknown, fallback: T): T {
   if (!value) {

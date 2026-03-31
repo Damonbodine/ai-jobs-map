@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import { pool } from '@/lib/db/pool';
 import { generateBlueprint } from '@/lib/ai-blueprints/generate-blueprint';
 import { classifyOccupation } from '@/lib/ai-jobs/archetypes';
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 const frequencyMeta: Record<string, { dayWeight: number }> = {
   daily: { dayWeight: 1 },

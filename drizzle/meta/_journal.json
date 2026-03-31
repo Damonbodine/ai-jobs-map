@@ -8,6 +8,13 @@
       "when": 1774724052487,
       "tag": "0000_add-onet-tasks",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1774925159562,
+      "tag": "0001_smart_workflows",
+      "breakpoints": true
     }
   ]
 }

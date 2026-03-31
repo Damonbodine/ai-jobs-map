@@ -9,7 +9,10 @@ import { CountUp } from '@/components/ui/count-up';
 import { FadeIn } from '@/components/ui/fade-in';
 import { getOccupationRecommendationSnapshot } from '@/lib/ai-jobs/recommendations';
 import { classifyOccupation, modulateTimeBack } from '@/lib/ai-jobs/archetypes';
+import { DayValueMap } from '@/components/occupation/day-value-map';
 import { Footer } from '@/components/ui/footer';
+import { generateBlueprint } from '@/lib/ai-blueprints/generate-blueprint';
+import { BlueprintSection } from '@/components/ai-blueprint/blueprint-section';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -80,6 +83,14 @@ const workBlockDefinitions = {
     humanEdge: 'Exception handling is where experience and judgment carry the most value.',
   },
 } as const;
+
+const workBlockColors: Record<string, string> = {
+  intake: '#06b6d4',      // cyan-500
+  analysis: '#6366f1',    // indigo-500
+  documentation: '#8b5cf6', // violet-500
+  coordination: '#10b981', // emerald-500
+  exceptions: '#f59e0b',  // amber-500
+};
 
 const automationSolutionDefinitions = [
   {
@@ -299,7 +310,7 @@ async function getOnetTasks(occupationId: number) {
      FROM onet_tasks
      WHERE occupation_id = $1
      ORDER BY ai_automation_score DESC NULLS LAST, task_type ASC
-     LIMIT 18`,
+     LIMIT 30`,
     [occupationId]
   );
   return result.rows;
@@ -340,18 +351,27 @@ async function getTopKnowledge(occupationId: number) {
 }
 
 async function getRelevantTools(occupationId: number) {
-  // Get the occupation's top work activity categories, then match tools
+  // Match tools based on occupation's top work activity GWA categories
   const result = await pool.query(
-    `SELECT DISTINCT t.tool_name, t.vendor, t.category, t.pricing_model,
-            t.monthly_cost_low, t.monthly_cost_high, t.url
-     FROM ai_tools t
-     WHERE EXISTS (
-       SELECT 1 FROM onet_work_activities wa
-       WHERE wa.occupation_id = $1
-       AND wa.importance > 3.5
+    `WITH occ_categories AS (
+       SELECT DISTINCT
+         CASE
+           WHEN element_id LIKE '4.A.1%' THEN 'information_input'
+           WHEN element_id LIKE '4.A.2%' THEN 'mental_processes'
+           WHEN element_id LIKE '4.A.3.b%' THEN 'technical_work'
+           WHEN element_id LIKE '4.A.4.a%' THEN 'communication'
+           WHEN element_id LIKE '4.A.4.b%' THEN 'management'
+           WHEN element_id LIKE '4.A.4.c%' THEN 'administrative'
+         END as gwa_category
+       FROM onet_work_activities
+       WHERE occupation_id = $1 AND importance > 3.5
      )
-     ORDER BY t.category
-     LIMIT 8`,
+     SELECT DISTINCT t.tool_name, t.vendor, t.category, t.pricing_model,
+            t.monthly_cost_low, t.monthly_cost_high, t.url, t.capabilities
+     FROM ai_tools t, occ_categories oc
+     WHERE t.dwa_categories::jsonb ? oc.gwa_category
+     ORDER BY t.monthly_cost_low ASC NULLS FIRST
+     LIMIT 6`,
     [occupationId]
   );
   return result.rows;
@@ -398,7 +418,7 @@ export default async function OccupationPage({ params }: PageProps) {
     notFound();
   }
 
-  const [skills, microTasks, granularSkills, skillProfile, roleAlignedPackages, recommendationSnapshot, automationProfile, topAbilities, topKnowledge] = await Promise.all([
+  const [skills, microTasks, granularSkills, skillProfile, roleAlignedPackages, recommendationSnapshot, automationProfile, topAbilities, topKnowledge, onetTasks] = await Promise.all([
     getSkills(occupation.id),
     getMicroTasks(occupation.id),
     getGranularSkills(occupation.id),
@@ -408,6 +428,7 @@ export default async function OccupationPage({ params }: PageProps) {
     getAutomationProfile(occupation.id),
     getTopAbilities(occupation.id),
     getTopKnowledge(occupation.id),
+    getOnetTasks(occupation.id),
   ]);
   const taskEntries = microTasks.map((task: any) => ({
     ...task,
@@ -428,6 +449,9 @@ export default async function OccupationPage({ params }: PageProps) {
   const occupationArchetype = classifyOccupation(automationProfile);
   const rawMinutes = modeledMinutesRecoveredPerDay;
   const displayedMinutesRecoveredPerDay = modulateTimeBack(rawMinutes, occupationArchetype);
+
+  // AI Blueprint: generate dynamic agent architecture from task data + O*NET enrichment
+  const blueprint = generateBlueprint(taskEntries, occupationArchetype, occupation.title, onetTasks);
 
   const oneHourTargetProgress = Math.min(100, Math.round((displayedMinutesRecoveredPerDay / 60) * 100));
   const oneHourNarrative =
@@ -564,6 +588,28 @@ export default async function OccupationPage({ params }: PageProps) {
   const visibleSkillSummary = skillSummary.filter((item) => item.value > 0);
   const humanEdgeNotes = [...new Set(summaryBlocks.map((block: any) => block.humanEdge))].slice(0, 2);
 
+  // "What changes" — top 3 tasks with before/after framing
+  const whatChangesTasks = topRecoverableTasks.slice(0, 3).map((task: any) => {
+    const currentMin = task.lens.modeledMinutesPerDay;
+    const reducedMin = Math.max(1, Math.round(currentMin * (1 - task.lens.automationFactor)));
+    return {
+      name: task.task_name,
+      category: task.ai_category,
+      frequency: task.frequency,
+      currentMinutes: currentMin,
+      afterMinutes: reducedMin,
+      savedMinutes: currentMin - reducedMin,
+      howItHelps: task.ai_how_it_helps,
+    };
+  });
+
+  // ROI calculation
+  const annualWage = occupation.annual_wage ? Number(occupation.annual_wage) * 1000 : null;
+  const hourlyRate = annualWage ? annualWage / 2080 : 75; // fallback $75/hr
+  const dailyHoursSaved = displayedMinutesRecoveredPerDay / 60;
+  const annualValueSaved = Math.round(dailyHoursSaved * 250 * hourlyRate);
+  const weeklyHoursSaved = Math.round(dailyHoursSaved * 5 * 10) / 10;
+
   const exceedsTarget = displayedMinutesRecoveredPerDay > 60;
   const progressPercent = exceedsTarget ? 100 : oneHourTargetProgress;
 
@@ -589,197 +635,47 @@ export default async function OccupationPage({ params }: PageProps) {
             {occupation.major_category}
           </p>
 
-          {/* Title left + Number right — same level on desktop, stacked on mobile */}
-          <div className="mt-6 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-            <div className="min-w-0 flex-1">
-              <h1
-                className="dark-panel-text font-editorial font-normal"
-                style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)', lineHeight: 1, letterSpacing: '-0.035em' }}
-              >
-                {occupation.title}
-              </h1>
-              {occupation.employment && (
-                <p className="dark-panel-muted mt-4 text-[0.8rem]">
-                  {Number(occupation.employment).toLocaleString()} people in this role across the U.S.
-                </p>
-              )}
-            </div>
-            <div className="shrink-0 text-right pt-1">
-              <p className="dark-panel-muted text-[0.8rem]">{occupationArchetype.heroFrame(displayedMinutesRecoveredPerDay)}</p>
-              <div className="mt-1 flex items-baseline gap-2 justify-end">
-                <CountUp
-                  value={displayedMinutesRecoveredPerDay}
-                  duration={1.5}
-                  delay={0.3}
-                  className="dark-panel-text font-editorial font-normal"
-                  style={{ fontSize: 'clamp(3rem, 7vw, 4.5rem)', lineHeight: 0.85 }}
-                />
-                <span className="dark-panel-muted font-editorial text-base italic">min/day</span>
-              </div>
-              <span className={`mt-2 inline-block rounded-full border px-2.5 py-0.5 text-[0.65rem] font-medium ${occupationArchetype.badgeTone}`}>
-                {occupationArchetype.label}
-              </span>
-            </div>
+          {/* Title + archetype badge on the same line */}
+          <div className="mt-4 flex items-baseline justify-between gap-4 flex-wrap">
+            <h1
+              className="dark-panel-text font-editorial font-normal"
+              style={{ fontSize: 'clamp(1.75rem, 4vw, 3rem)', lineHeight: 1.1, letterSpacing: '-0.025em' }}
+            >
+              {occupation.title}
+            </h1>
+            <span className={`shrink-0 inline-block rounded-full border px-4 py-1 text-[0.8rem] font-medium ${occupationArchetype.badgeTone}`}>
+              {occupationArchetype.label}
+            </span>
           </div>
+          {occupation.employment && (
+            <p className="dark-panel-muted mt-3 text-[0.75rem]">
+              {Number(occupation.employment).toLocaleString()} people in this role across the U.S.
+            </p>
+          )}
         </div>
       </section>
 
       {/* ------------------------------------------------------------------ */}
-      {/* AUTOMATION PROFILE — Multi-signal composite breakdown              */}
-      {/* ------------------------------------------------------------------ */}
-      {automationProfile && (
-        <section className="border-b border-border/60 bg-surface-raised">
-          <div className="page-container py-10 md:py-12">
-            <FadeIn>
-              <div className="flex items-start justify-between gap-6 mb-8">
-                <div>
-                  <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-ink-muted">
-                    Automation Profile
-                  </p>
-                  <h2 className="mt-2 font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)' }}>
-                    Multi-signal analysis
-                  </h2>
-                  <p className="mt-1 max-w-lg text-[0.8rem] leading-[1.6] text-ink-secondary">
-                    {occupationArchetype.rationale}
-                  </p>
-                  <p className="mt-2 max-w-lg text-[0.75rem] leading-[1.5] text-ink-muted">
-                    {occupationArchetype.valueProposition}
-                  </p>
-                </div>
-                <div className="shrink-0 text-right">
-                  <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-ink-muted">Composite Score</p>
-                  <p className="mt-1 font-editorial text-3xl font-normal text-ink">
-                    {Math.round(automationProfile.composite_score)}
-                    <span className="text-base text-ink-muted">/100</span>
-                  </p>
-                </div>
-              </div>
-
-              {/* Dimension bars */}
-              <div className="grid gap-3 md:grid-cols-5">
-                {[
-                  { label: 'Ability profile', value: automationProfile.ability_automation_potential, weight: '30%', desc: 'Cognitive vs physical abilities' },
-                  { label: 'Work activities', value: automationProfile.work_activity_automation_potential, weight: '25%', desc: 'GWA automation potential' },
-                  { label: 'Task keywords', value: automationProfile.keyword_score, weight: '20%', desc: 'Task description signals' },
-                  { label: 'Digital readiness', value: automationProfile.knowledge_digital_readiness, weight: '15%', desc: 'Knowledge domain profile' },
-                  { label: 'Task frequency', value: automationProfile.task_frequency_weight, weight: '10%', desc: 'Daily tasks = higher value' },
-                ].map((dim) => (
-                  <div key={dim.label} className="rounded-lg border border-border/60 bg-surface p-3">
-                    <div className="flex items-center justify-between">
-                      <p className="text-[0.7rem] font-medium text-ink">{dim.label}</p>
-                      <span className="text-[0.6rem] text-ink-muted">{dim.weight}</span>
-                    </div>
-                    <div className="mt-2 h-1.5 rounded-full bg-border/40">
-                      <div
-                        className="h-full rounded-full bg-accent transition-all duration-700"
-                        style={{ width: `${Math.round((dim.value ?? 0.5) * 100)}%` }}
-                      />
-                    </div>
-                    <p className="mt-1.5 text-[0.65rem] text-ink-muted">
-                      {dim.value != null ? `${Math.round(dim.value * 100)}%` : 'No data'} — {dim.desc}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Ability profile chips */}
-              {(automationProfile.physical_ability_avg != null || automationProfile.cognitive_routine_avg != null) && (
-                <div className="mt-6 flex flex-wrap gap-3">
-                  {automationProfile.cognitive_routine_avg != null && (
-                    <div className="rounded-md border border-cyan-500/20 bg-cyan-500/8 px-3 py-1.5">
-                      <p className="text-[0.65rem] text-cyan-400">Cognitive-routine</p>
-                      <p className="text-sm font-medium text-cyan-300">{automationProfile.cognitive_routine_avg.toFixed(1)} / 5</p>
-                    </div>
-                  )}
-                  {automationProfile.cognitive_creative_avg != null && (
-                    <div className="rounded-md border border-violet-500/20 bg-violet-500/8 px-3 py-1.5">
-                      <p className="text-[0.65rem] text-violet-400">Cognitive-creative</p>
-                      <p className="text-sm font-medium text-violet-300">{automationProfile.cognitive_creative_avg.toFixed(1)} / 5</p>
-                    </div>
-                  )}
-                  {automationProfile.physical_ability_avg != null && (
-                    <div className="rounded-md border border-amber-500/20 bg-amber-500/8 px-3 py-1.5">
-                      <p className="text-[0.65rem] text-amber-400">Physical demand</p>
-                      <p className="text-sm font-medium text-amber-300">{automationProfile.physical_ability_avg.toFixed(1)} / 5</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Top abilities and knowledge */}
-              {(topAbilities.length > 0 || topKnowledge.length > 0) && (
-                <div className="mt-8 grid gap-6 md:grid-cols-2">
-                  {topAbilities.length > 0 && (
-                    <div>
-                      <p className="text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-ink-muted mb-3">Top abilities required</p>
-                      <div className="space-y-1.5">
-                        {topAbilities.map((a: any) => (
-                          <div key={a.element_name} className="flex items-center justify-between rounded border border-border/40 px-2.5 py-1.5">
-                            <span className="text-[0.75rem] text-ink">{a.element_name}</span>
-                            <span className="text-[0.7rem] text-ink-muted">{Number(a.importance).toFixed(1)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {topKnowledge.length > 0 && (
-                    <div>
-                      <p className="text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-ink-muted mb-3">Top knowledge domains</p>
-                      <div className="space-y-1.5">
-                        {topKnowledge.map((k: any) => (
-                          <div key={k.element_name} className="flex items-center justify-between rounded border border-border/40 px-2.5 py-1.5">
-                            <span className="text-[0.75rem] text-ink">{k.element_name}</span>
-                            <span className="text-[0.7rem] text-ink-muted">{Number(k.importance).toFixed(1)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </FadeIn>
-          </div>
-        </section>
-      )}
-
-      {/* ------------------------------------------------------------------ */}
-      {/* BEAT 2 — A typical day (interactive charts)                        */}
+      {/* YOUR DAY, MAPPED — Unified day timeline + savings + ROI            */}
       {/* ------------------------------------------------------------------ */}
       <section className="page-container py-16 md:py-20">
-        <FadeIn>
-          <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
-            A typical day
-          </h2>
-          <p className="mt-2 max-w-xl text-[0.85rem] leading-[1.6] text-ink-secondary">
-            Hover over the chart to explore how your 8-hour day breaks down — and where support tools could make a difference.
-          </p>
-        </FadeIn>
-
-        {daySegments.length > 0 ? (
-          <div className="mt-10">
-            <DayChart
-              segments={daySegments.map(s => ({ label: s.label, minutes: s.minutes, recoverable: s.recoverable, posture: s.posture }))}
-              totalMinutes={displayedMinutesRecoveredPerDay}
+        {workBlocks.length > 0 ? (
+          <div>
+            <DayValueMap
+              blocks={workBlocks.map((b: any) => ({
+                key: b.key,
+                label: b.label,
+                minutes: b.minutes,
+                recoverable: b.aiMinutes,
+                posture: b.posture,
+                color: workBlockColors[b.key as keyof typeof workBlockColors] || '#94a3b8',
+              }))}
+              totalRecoverable={displayedMinutesRecoveredPerDay}
               fullDayMinutes={fullDayMinutes}
+              defaultHourlyRate={Math.round(hourlyRate)}
+              salaryLabel={annualWage ? `$${(annualWage / 1000).toFixed(0)}K median salary` : null}
+              occupationTitle={occupation.title}
             />
-
-            {/* Time back breakdown */}
-            <div className="mt-12">
-              <TimeBackChart
-                items={daySegments.filter(s => s.recoverable > 0).map(seg => {
-                  const matchingSolution = automationSolutions.find(sol =>
-                    sol.matchedBlocks.some(b => b.toLowerCase().includes(seg.label.split(' ')[0].toLowerCase()))
-                  );
-                  return {
-                    label: seg.label,
-                    recoverable: seg.recoverable,
-                    posture: seg.posture,
-                    solution: matchingSolution?.name,
-                  };
-                })}
-                total={displayedMinutesRecoveredPerDay}
-              />
-            </div>
           </div>
         ) : (
           <div className="mt-8 rounded-xl border border-edge bg-surface-raised px-6 py-12 text-center">
@@ -788,7 +684,91 @@ export default async function OccupationPage({ params }: PageProps) {
             </p>
           </div>
         )}
+
+        {/* Collapsible methodology */}
+        {automationProfile && (
+          <details className="mt-10 group">
+            <summary className="cursor-pointer text-[0.7rem] font-medium text-ink-muted hover:text-ink transition-colors">
+              How we scored this role — methodology &amp; data sources
+            </summary>
+            <div className="mt-4 rounded-lg border border-border/40 bg-surface p-5">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[0.75rem] font-medium text-ink">Composite Score: {Math.round(automationProfile.composite_score)}/100</p>
+                <span className={`rounded-full border px-2.5 py-0.5 text-[0.65rem] font-medium ${occupationArchetype.badgeTone}`}>
+                  {occupationArchetype.label}
+                </span>
+              </div>
+              <p className="text-[0.7rem] text-ink-muted leading-relaxed mb-4">{occupationArchetype.rationale}</p>
+
+              <div className="grid gap-2 md:grid-cols-5">
+                {[
+                  { label: 'Abilities', value: automationProfile.ability_automation_potential, weight: '30%' },
+                  { label: 'Work activities', value: automationProfile.work_activity_automation_potential, weight: '25%' },
+                  { label: 'Task keywords', value: automationProfile.keyword_score, weight: '20%' },
+                  { label: 'Digital readiness', value: automationProfile.knowledge_digital_readiness, weight: '15%' },
+                  { label: 'Frequency', value: automationProfile.task_frequency_weight, weight: '10%' },
+                ].map((dim) => (
+                  <div key={dim.label}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[0.6rem] text-ink-muted">{dim.label}</span>
+                      <span className="text-[0.55rem] text-ink-muted">{dim.value != null ? `${Math.round(dim.value * 100)}%` : '—'}</span>
+                    </div>
+                    <div className="mt-1 h-1 rounded-full bg-border/40">
+                      <div className="h-full rounded-full bg-accent/60" style={{ width: `${Math.round((dim.value ?? 0.5) * 100)}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {(topAbilities.length > 0 || topKnowledge.length > 0) && (
+                <div className="mt-5 grid gap-4 md:grid-cols-2">
+                  {topAbilities.length > 0 && (
+                    <div>
+                      <p className="text-[0.6rem] font-semibold uppercase tracking-[0.08em] text-ink-muted mb-2">Top abilities</p>
+                      {topAbilities.slice(0, 5).map((a: any) => (
+                        <div key={a.element_name} className="flex items-center justify-between py-0.5">
+                          <span className="text-[0.65rem] text-ink-secondary">{a.element_name}</span>
+                          <span className="text-[0.6rem] text-ink-muted">{Number(a.importance).toFixed(1)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {topKnowledge.length > 0 && (
+                    <div>
+                      <p className="text-[0.6rem] font-semibold uppercase tracking-[0.08em] text-ink-muted mb-2">Top knowledge</p>
+                      {topKnowledge.slice(0, 5).map((k: any) => (
+                        <div key={k.element_name} className="flex items-center justify-between py-0.5">
+                          <span className="text-[0.65rem] text-ink-secondary">{k.element_name}</span>
+                          <span className="text-[0.6rem] text-ink-muted">{Number(k.importance).toFixed(1)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <p className="mt-4 text-[0.6rem] text-ink-muted">
+                Data: O*NET 30.x (52 abilities, 41 work activities, 33 knowledge domains) &middot; BLS employment statistics &middot; Task analysis from 15,000+ government task statements
+              </p>
+            </div>
+          </details>
+        )}
       </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* BEAT 3 — AI Agent Blueprint                                        */}
+      {/* ------------------------------------------------------------------ */}
+      {blueprint && (
+        <>
+          <div className="page-container"><div className="border-t border-edge" /></div>
+          <BlueprintSection
+            blueprint={blueprint}
+            occupationSlug={occupation.slug}
+            occupationTitle={occupation.title}
+            totalDayMinutes={displayedMinutesRecoveredPerDay}
+          />
+        </>
+      )}
 
       {/* ------------------------------------------------------------------ */}
       {/* CTA — Go build your solution                                       */}
@@ -808,10 +788,10 @@ export default async function OccupationPage({ params }: PageProps) {
             </div>
             <Link
               href={`/factory?occupation=${occupation.slug}`}
-              className="btn-primary group inline-flex shrink-0 items-center gap-2.5 rounded-lg border border-primary bg-primary px-8 py-3.5 text-[0.9rem] font-medium transition-all hover:bg-transparent hover:text-ink"
+              className="btn-primary group inline-flex shrink-0 items-center gap-3 rounded-xl border border-primary bg-primary px-10 py-5 text-[1.1rem] font-medium transition-all hover:bg-transparent hover:text-ink"
             >
               Get started
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
         </FadeIn>

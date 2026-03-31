@@ -435,6 +435,78 @@ export const automationBenchmarks = pgTable(
   ]
 );
 
+// Smart Workflows - curated automation templates mapped to occupations
+export const smartWorkflows = pgTable(
+  'smart_workflows',
+  {
+    id: serial('id').primaryKey(),
+    sourceTemplateId: text('source_template_id').notNull().unique(),
+    name: text('name').notNull(),
+    description: text('description').notNull(),
+    sourceUrl: text('source_url'),
+    category: text('category').notNull(),
+    tags: text('tags'), // JSON array
+    integrations: text('integrations'), // JSON array of user-friendly names
+    integrationCount: integer('integration_count').default(0),
+    triggerType: text('trigger_type'), // webhook, schedule, manual, email
+    complexity: text('complexity'), // beginner, intermediate, advanced
+    estimatedHoursSaved: real('estimated_hours_saved'),
+    isActive: boolean('is_active').default(true).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('smart_workflows_category_idx').on(table.category),
+    index('smart_workflows_complexity_idx').on(table.complexity),
+  ]
+);
+
+export const smartWorkflowOccupationMappings = pgTable(
+  'smart_workflow_occupation_mappings',
+  {
+    id: serial('id').primaryKey(),
+    workflowId: integer('workflow_id')
+      .notNull()
+      .references(() => smartWorkflows.id, { onDelete: 'cascade' }),
+    occupationId: integer('occupation_id').references(() => occupations.id, { onDelete: 'cascade' }),
+    majorCategory: text('major_category'),
+    skillCodePrefix: text('skill_code_prefix'),
+    automationSolutionKey: text('automation_solution_key'), // intake, analysis, documentation, coordination, exceptions
+    relevanceScore: real('relevance_score').default(0.5).notNull(),
+    mappingSource: text('mapping_source').default('auto_keyword').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('swom_workflow_idx').on(table.workflowId),
+    index('swom_occupation_idx').on(table.occupationId),
+    index('swom_category_idx').on(table.majorCategory),
+    index('swom_skill_prefix_idx').on(table.skillCodePrefix),
+    index('swom_solution_idx').on(table.automationSolutionKey),
+  ]
+);
+
+export const smartWorkflowInternalMappings = pgTable(
+  'smart_workflow_internal_mappings',
+  {
+    id: serial('id').primaryKey(),
+    workflowId: integer('workflow_id')
+      .notNull()
+      .references(() => smartWorkflows.id, { onDelete: 'cascade' }),
+    internalWorkflowCode: text('internal_workflow_code').notNull(),
+    relationship: text('relationship').default('reference').notNull(), // reference, alternative, extension
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('swim_workflow_idx').on(table.workflowId),
+    index('swim_internal_code_idx').on(table.internalWorkflowCode),
+  ]
+);
+
+export type SmartWorkflow = typeof smartWorkflows.$inferSelect;
+export type NewSmartWorkflow = typeof smartWorkflows.$inferInsert;
+export type SmartWorkflowOccupationMapping = typeof smartWorkflowOccupationMappings.$inferSelect;
+export type SmartWorkflowInternalMapping = typeof smartWorkflowInternalMappings.$inferSelect;
+
 export type Occupation = typeof occupations.$inferSelect;
 export type NewOccupation = typeof occupations.$inferInsert;
 export type AiOpportunity = typeof aiOpportunities.$inferSelect;

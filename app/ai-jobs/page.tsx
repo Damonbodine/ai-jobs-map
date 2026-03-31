@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Search, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Footer } from '@/components/ui/footer';
-import { CategoryImage } from '@/components/ui/category-image';
 
 interface Occupation {
   id: number;
@@ -16,25 +15,25 @@ interface Occupation {
 }
 
 const categories = [
-  { name: 'Management', slug: 'management', desc: 'Directors, administrators, executives', color: '#1C1816' },
-  { name: 'Business & Finance', slug: 'business-and-financial-operations', desc: 'Analysts, accountants, consultants', color: '#B8860B' },
-  { name: 'Computer & Tech', slug: 'computer-and-mathematical', desc: 'Developers, analysts, architects', color: '#6B7F5E' },
-  { name: 'Healthcare', slug: 'healthcare-practitioners-and-technical', desc: 'Physicians, nurses, therapists', color: '#A0522D' },
-  { name: 'Education', slug: 'educational-instruction-and-library', desc: 'Teachers, professors, librarians', color: '#6B6259' },
-  { name: 'Legal', slug: 'legal', desc: 'Lawyers, paralegals, judges', color: '#7B506F' },
-  { name: 'Engineering', slug: 'architecture-and-engineering', desc: 'Engineers, architects, drafters', color: '#4A6741' },
-  { name: 'Sales & Marketing', slug: 'sales-and-related', desc: 'Representatives, agents, brokers', color: '#8B6914' },
-  { name: 'Science', slug: 'life-physical-and-social-science', desc: 'Researchers, chemists, biologists', color: '#5B7B8A' },
-  { name: 'Arts & Media', slug: 'arts-design-entertainment-sports-and-media', desc: 'Designers, writers, performers', color: '#9C6B4E' },
-  { name: 'Social Service', slug: 'community-and-social-service', desc: 'Counselors, social workers', color: '#6B8E6B' },
-  { name: 'Construction', slug: 'construction-and-extraction', desc: 'Electricians, carpenters, operators', color: '#8B7355' },
-  { name: 'Installation & Maintenance', slug: 'installation-maintenance-and-repair', desc: 'Mechanics, repairers, technicians', color: '#6B7B6B' },
-  { name: 'Production', slug: 'production', desc: 'Assemblers, machinists, operators', color: '#7B7265' },
-  { name: 'Transportation', slug: 'transportation-and-material-moving', desc: 'Drivers, pilots, logistics', color: '#5B6B7B' },
-  { name: 'Protective Service', slug: 'protective-service', desc: 'Police, firefighters, security', color: '#6B5B5B' },
-  { name: 'Food & Hospitality', slug: 'food-preparation-and-serving-related', desc: 'Chefs, servers, bartenders', color: '#9B7B5B' },
-  { name: 'Building & Grounds', slug: 'building-and-grounds-cleaning-and-maintenance', desc: 'Janitors, landscapers, cleaners', color: '#5B7B5B' },
-  { name: 'Personal Care', slug: 'personal-care-and-service', desc: 'Barbers, fitness trainers, stylists', color: '#8B6B7B' },
+  { name: 'Management', slug: 'management', desc: 'Directors, administrators, executives', color: '#1C1816', img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=340&fit=crop' },
+  { name: 'Business & Finance', slug: 'business-and-financial-operations', desc: 'Analysts, accountants, consultants', color: '#B8860B', img: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&h=340&fit=crop' },
+  { name: 'Computer & Tech', slug: 'computer-and-mathematical', desc: 'Developers, analysts, architects', color: '#6B7F5E', img: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&h=340&fit=crop' },
+  { name: 'Healthcare', slug: 'healthcare-practitioners-and-technical', desc: 'Physicians, nurses, therapists', color: '#A0522D', img: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&h=340&fit=crop' },
+  { name: 'Education', slug: 'educational-instruction-and-library', desc: 'Teachers, professors, librarians', color: '#6B6259', img: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=340&fit=crop' },
+  { name: 'Legal', slug: 'legal', desc: 'Lawyers, paralegals, judges', color: '#7B506F', img: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&h=340&fit=crop' },
+  { name: 'Engineering', slug: 'architecture-and-engineering', desc: 'Engineers, architects, drafters', color: '#4A6741', img: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&h=340&fit=crop' },
+  { name: 'Sales & Marketing', slug: 'sales-and-related', desc: 'Representatives, agents, brokers', color: '#8B6914', img: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&h=340&fit=crop' },
+  { name: 'Science', slug: 'life-physical-and-social-science', desc: 'Researchers, chemists, biologists', color: '#5B7B8A', img: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=600&h=340&fit=crop' },
+  { name: 'Arts & Media', slug: 'arts-design-entertainment-sports-and-media', desc: 'Designers, writers, performers', color: '#9C6B4E', img: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=340&fit=crop' },
+  { name: 'Social Service', slug: 'community-and-social-service', desc: 'Counselors, social workers', color: '#6B8E6B', img: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=340&fit=crop' },
+  { name: 'Construction', slug: 'construction-and-extraction', desc: 'Electricians, carpenters, operators', color: '#8B7355', img: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&h=340&fit=crop' },
+  { name: 'Installation & Maintenance', slug: 'installation-maintenance-and-repair', desc: 'Mechanics, repairers, technicians', color: '#6B7B6B', img: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=600&h=340&fit=crop' },
+  { name: 'Production', slug: 'production', desc: 'Assemblers, machinists, operators', color: '#7B7265', img: 'https://images.unsplash.com/photo-1565043666747-69f6646db940?w=600&h=340&fit=crop' },
+  { name: 'Transportation', slug: 'transportation-and-material-moving', desc: 'Drivers, pilots, logistics', color: '#5B6B7B', img: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&h=340&fit=crop' },
+  { name: 'Protective Service', slug: 'protective-service', desc: 'Police, firefighters, security', color: '#6B5B5B', img: 'https://images.unsplash.com/photo-1517263904808-5dc91e3e7044?w=600&h=340&fit=crop' },
+  { name: 'Food & Hospitality', slug: 'food-preparation-and-serving-related', desc: 'Chefs, servers, bartenders', color: '#9B7B5B', img: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&h=340&fit=crop' },
+  { name: 'Building & Grounds', slug: 'building-and-grounds-cleaning-and-maintenance', desc: 'Janitors, landscapers, cleaners', color: '#5B7B5B', img: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&h=340&fit=crop' },
+  { name: 'Personal Care', slug: 'personal-care-and-service', desc: 'Barbers, fitness trainers, stylists', color: '#8B6B7B', img: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&h=340&fit=crop' },
 ];
 
 export default function AIJobsLanding() {
@@ -208,12 +207,17 @@ export default function AIJobsLanding() {
                 href={`/ai-jobs/category/${cat.slug}`}
                 className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-edge-strong bg-surface-raised shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
               >
-                {/* Image area — loads from Gemini API, falls back to gradient */}
-                <CategoryImage
-                  category={cat.name}
-                  color={cat.color}
-                  className="h-36"
-                />
+                {/* Image area */}
+                <div className="relative h-36 overflow-hidden bg-surface-sunken">
+                  <img
+                    src={cat.img}
+                    alt={`${cat.name} workspace`}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    style={{ filter: 'saturate(0.75) brightness(0.92)' }}
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent" />
+                </div>
 
                 {/* Content */}
                 <div className="flex flex-1 flex-col p-5">

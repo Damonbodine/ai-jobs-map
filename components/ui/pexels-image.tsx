@@ -1,33 +1,27 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useInView } from 'framer-motion';
+
+const STORAGE_URL = 'https://nhjwpmfcpbfbzcaookkw.supabase.co/storage/v1/object/public/occupation-images';
 
 interface PexelsImageProps {
   query: string;
+  slug?: string;
   fallbackColor: string;
   className?: string;
   fallbackLetter?: string;
 }
 
-export function PexelsImage({ query, fallbackColor, className, fallbackLetter }: PexelsImageProps) {
-  const [src, setSrc] = useState<string | null>(null);
+export function PexelsImage({ query, slug, fallbackColor, className, fallbackLetter }: PexelsImageProps) {
   const [loaded, setLoaded] = useState(false);
+  const [errored, setErrored] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '300px' });
-  const attempted = useRef(false);
 
-  useEffect(() => {
-    if (!inView || attempted.current) return;
-    attempted.current = true;
-
-    fetch(`/api/images/pexels?q=${encodeURIComponent(query)}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.url) setSrc(data.url);
-      })
-      .catch(() => {});
-  }, [inView, query]);
+  // Derive slug from query if not provided
+  const imageSlug = slug || query.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const src = `${STORAGE_URL}/${imageSlug}.jpg`;
 
   return (
     <div
@@ -39,11 +33,12 @@ export function PexelsImage({ query, fallbackColor, className, fallbackLetter }:
           : undefined,
       }}
     >
-      {src && (
+      {inView && !errored && (
         <img
           src={src}
           alt={query}
           onLoad={() => setLoaded(true)}
+          onError={() => setErrored(true)}
           className={`absolute inset-0 h-full w-full object-cover transition-all duration-700 group-hover:scale-105 ${loaded ? 'opacity-100' : 'opacity-0'}`}
           style={{ filter: 'saturate(0.7) brightness(0.88)' }}
         />

@@ -236,6 +236,7 @@ export default function BrowsePage() {
                   >
                     <PexelsImage
                       query={occupation.title}
+                      slug={occupation.slug}
                       fallbackColor={color}
                       fallbackLetter={occupation.title.charAt(0)}
                       className="h-28"

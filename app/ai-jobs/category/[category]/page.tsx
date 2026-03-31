@@ -166,6 +166,7 @@ export default function CategoryPage() {
                     {/* Visual header with Pexels image */}
                     <PexelsImage
                       query={occupation.title}
+                      slug={occupation.slug}
                       fallbackColor={color}
                       fallbackLetter={occupation.title.charAt(0)}
                       className="h-28"

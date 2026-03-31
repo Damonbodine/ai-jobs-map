@@ -509,7 +509,7 @@ export default async function OccupationPage({ params }: PageProps) {
       {/* BEAT 1 — Dark hero panel                                           */}
       {/* ------------------------------------------------------------------ */}
       <section className="bg-panel">
-        <div className="page-container relative pt-8 pb-14 md:pt-10 md:pb-16">
+        <div className="page-container pt-8 pb-14 md:pt-10 md:pb-16">
           <div className="mb-10">
             <Link
               href="/ai-jobs"
@@ -538,13 +538,16 @@ export default async function OccupationPage({ params }: PageProps) {
             </p>
           )}
 
-          {/* Number upper-right, description bottom-right */}
-          <div className="mt-10 flex flex-col items-end md:absolute md:right-8 md:top-16 md:bottom-16 md:flex md:flex-col md:justify-between">
-            <div className="text-right">
+          {/* Number + description — grid layout, right column on desktop */}
+          <div className="mt-10 grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+            <p className="dark-panel-muted max-w-md text-[0.8rem] leading-[1.55] md:order-1">
+              We found routine work in your day that the right tools could handle — so you can focus on what actually needs&nbsp;you.
+            </p>
+            <div className="md:order-2 md:text-right">
               <p className="dark-panel-muted text-[0.6875rem] font-semibold uppercase tracking-[0.1em]">
                 Time you could get back
               </p>
-              <div className="mt-2 flex items-baseline gap-2 justify-end">
+              <div className="mt-2 flex items-baseline gap-2 md:justify-end">
                 <CountUp
                   value={displayedMinutesRecoveredPerDay}
                   duration={1.5}
@@ -555,9 +558,6 @@ export default async function OccupationPage({ params }: PageProps) {
                 <span className="dark-panel-muted font-editorial text-base italic">min/day</span>
               </div>
             </div>
-            <p className="dark-panel-muted mt-6 max-w-[18rem] text-right text-[0.8rem] leading-[1.55] md:mt-0">
-              We found routine work in your day that the right tools could handle — so you can focus on what actually needs&nbsp;you.
-            </p>
           </div>
         </div>
       </section>

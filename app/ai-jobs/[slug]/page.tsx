@@ -650,14 +650,19 @@ export default async function OccupationPage({ params }: PageProps) {
         {workBlocks.length > 0 ? (
           <div>
             <DayValueMap
-              blocks={workBlocks.map((b: any) => ({
-                key: b.key,
-                label: b.label,
-                minutes: b.minutes,
-                recoverable: b.aiMinutes,
-                posture: b.posture,
-                color: workBlockColors[b.key as keyof typeof workBlockColors] || '#94a3b8',
-              }))}
+              blocks={(() => {
+                // Scale recoverable minutes proportionally so bars sum to the modulated total
+                const rawTotal = workBlocks.reduce((s: number, b: any) => s + b.aiMinutes, 0);
+                const scale = rawTotal > 0 ? displayedMinutesRecoveredPerDay / rawTotal : 1;
+                return workBlocks.map((b: any) => ({
+                  key: b.key,
+                  label: b.label,
+                  minutes: b.minutes,
+                  recoverable: Math.round(b.aiMinutes * scale),
+                  posture: b.posture,
+                  color: workBlockColors[b.key as keyof typeof workBlockColors] || '#94a3b8',
+                }));
+              })()}
               totalRecoverable={displayedMinutesRecoveredPerDay}
               fullDayMinutes={fullDayMinutes}
               defaultHourlyRate={Math.round(hourlyRate)}

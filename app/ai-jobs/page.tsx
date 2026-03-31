@@ -28,6 +28,13 @@ const categories = [
   { name: 'Arts & Media', slug: 'arts-design-entertainment-sports-and-media', desc: 'Designers, writers, performers', color: '#9C6B4E' },
   { name: 'Social Service', slug: 'community-and-social-service', desc: 'Counselors, social workers', color: '#6B8E6B' },
   { name: 'Construction', slug: 'construction-and-extraction', desc: 'Electricians, carpenters, operators', color: '#8B7355' },
+  { name: 'Installation & Maintenance', slug: 'installation-maintenance-and-repair', desc: 'Mechanics, repairers, technicians', color: '#6B7B6B' },
+  { name: 'Production', slug: 'production', desc: 'Assemblers, machinists, operators', color: '#7B7265' },
+  { name: 'Transportation', slug: 'transportation-and-material-moving', desc: 'Drivers, pilots, logistics', color: '#5B6B7B' },
+  { name: 'Protective Service', slug: 'protective-service', desc: 'Police, firefighters, security', color: '#6B5B5B' },
+  { name: 'Food & Hospitality', slug: 'food-preparation-and-serving-related', desc: 'Chefs, servers, bartenders', color: '#9B7B5B' },
+  { name: 'Building & Grounds', slug: 'building-and-grounds-cleaning-and-maintenance', desc: 'Janitors, landscapers, cleaners', color: '#5B7B5B' },
+  { name: 'Personal Care', slug: 'personal-care-and-service', desc: 'Barbers, fitness trainers, stylists', color: '#8B6B7B' },
 ];
 
 export default function AIJobsLanding() {

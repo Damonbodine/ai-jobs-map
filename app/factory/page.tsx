@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Check } from 'lucide-react';
@@ -18,7 +18,15 @@ const painOptions = [
 const steps = ['role', 'pain', 'freeform', 'contact'] as const;
 type Step = typeof steps[number];
 
-export default function FactoryPage() {
+export default function FactoryPageWrapper() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-ink-tertiary">Loading...</div>}>
+      <FactoryPage />
+    </Suspense>
+  );
+}
+
+function FactoryPage() {
   const searchParams = useSearchParams();
   const [step, setStep] = useState<Step>('role');
   const [role, setRole] = useState('');

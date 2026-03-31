@@ -288,6 +288,14 @@ select.styled-select {
   line-height: 1.7;
 }
 
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .page-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
 /* Subtle grain texture on body */
 body::before {
   content: '';

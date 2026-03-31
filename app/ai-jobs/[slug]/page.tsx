@@ -589,8 +589,8 @@ export default async function OccupationPage({ params }: PageProps) {
             {occupation.major_category}
           </p>
 
-          {/* Title left + Number right — same level */}
-          <div className="mt-6 flex items-start justify-between gap-6">
+          {/* Title left + Number right — same level on desktop, stacked on mobile */}
+          <div className="mt-6 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div className="min-w-0 flex-1">
               <h1
                 className="dark-panel-text font-editorial font-normal"

@@ -186,35 +186,55 @@ export default function AIJobsLanding() {
           </Link>
         </motion.div>
 
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((cat, i) => (
             <motion.div
               key={cat.slug}
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
-              transition={{ delay: i * 0.04, duration: 0.4 }}
+              transition={{ delay: i * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
               <Link
                 href={`/ai-jobs/category/${cat.slug}`}
-                className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-edge-strong bg-surface-raised p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-edge-strong bg-surface-raised shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
               >
-                {/* Accent bar */}
-                <div className="absolute left-0 top-0 bottom-0 w-1 transition-all duration-300 group-hover:w-1.5" style={{ backgroundColor: cat.color }} />
-
-                <div className="pl-3">
-                  <h3 className="text-[0.95rem] font-medium text-ink">{cat.name}</h3>
-                  <p className="mt-1 text-[0.78rem] text-ink-tertiary">{cat.desc}</p>
-                </div>
-
-                <div className="mt-auto flex items-center justify-between pl-3 pt-4">
-                  <span className="text-[0.7rem] font-medium text-ink-tertiary transition-colors group-hover:text-ink-secondary">
-                    Explore roles →
-                  </span>
+                {/* Image area — gradient placeholder, will be replaced with Gemini images */}
+                <div
+                  className="relative h-36 overflow-hidden"
+                  style={{
+                    background: `linear-gradient(135deg, ${cat.color}18, ${cat.color}08), linear-gradient(to bottom right, #ECE8E1, #DDD8D0)`,
+                  }}
+                >
+                  {/* Decorative shapes */}
                   <div
-                    className="h-8 w-8 rounded-full opacity-10 transition-opacity group-hover:opacity-20"
+                    className="absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-[0.12] transition-all duration-500 group-hover:scale-125 group-hover:opacity-[0.2]"
                     style={{ backgroundColor: cat.color }}
                   />
+                  <div
+                    className="absolute -bottom-4 -left-4 h-16 w-16 rounded-full opacity-[0.08] transition-all duration-500 group-hover:scale-110"
+                    style={{ backgroundColor: cat.color }}
+                  />
+                  {/* Category initial — large, decorative */}
+                  <span
+                    className="absolute bottom-3 right-4 font-editorial text-[4rem] leading-none opacity-[0.06] transition-opacity duration-300 group-hover:opacity-[0.1]"
+                    style={{ color: cat.color }}
+                  >
+                    {cat.name.charAt(0)}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="flex flex-1 flex-col p-5">
+                  <h3 className="text-[0.95rem] font-medium text-ink">{cat.name}</h3>
+                  <p className="mt-1.5 text-[0.75rem] leading-[1.5] text-ink-tertiary">{cat.desc}</p>
+
+                  <div className="mt-auto flex items-center justify-between pt-5">
+                    <span className="text-[0.72rem] font-medium text-ink-tertiary transition-colors group-hover:text-ink-secondary">
+                      Explore roles
+                    </span>
+                    <ArrowRight className="h-3.5 w-3.5 text-ink-tertiary/30 transition-all duration-300 group-hover:text-ink-tertiary group-hover:translate-x-1" />
+                  </div>
                 </div>
               </Link>
             </motion.div>

@@ -3,6 +3,7 @@ import {
   serial,
   text,
   integer,
+  real,
   timestamp,
   boolean,
   pgEnum,
@@ -276,6 +277,125 @@ export const dwaRelations = relations(detailedWorkActivities, ({ many }) => ({
   tasks: many(onetTasks),
 }));
 
+// O*NET Abilities - cognitive/physical ability profiles per occupation
+export const onetAbilities = pgTable(
+  'onet_abilities',
+  {
+    id: serial('id').primaryKey(),
+    onetSocCode: text('onet_soc_code').notNull(),
+    elementId: text('element_id').notNull(),
+    elementName: text('element_name').notNull(),
+    importance: real('importance'), // IM scale (1-5)
+    level: real('level'), // LV scale (0-7)
+    occupationId: integer('occupation_id').references(() => occupations.id),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('onet_abilities_soc_idx').on(table.onetSocCode),
+    index('onet_abilities_occupation_idx').on(table.occupationId),
+    index('onet_abilities_element_idx').on(table.elementId),
+  ]
+);
+
+// O*NET Knowledge - knowledge domain profiles per occupation
+export const onetKnowledge = pgTable(
+  'onet_knowledge',
+  {
+    id: serial('id').primaryKey(),
+    onetSocCode: text('onet_soc_code').notNull(),
+    elementId: text('element_id').notNull(),
+    elementName: text('element_name').notNull(),
+    importance: real('importance'), // IM scale (1-5)
+    level: real('level'), // LV scale (0-7)
+    occupationId: integer('occupation_id').references(() => occupations.id),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('onet_knowledge_soc_idx').on(table.onetSocCode),
+    index('onet_knowledge_occupation_idx').on(table.occupationId),
+    index('onet_knowledge_element_idx').on(table.elementId),
+  ]
+);
+
+// O*NET Work Activities - GWA/IWA importance/level per occupation
+export const onetWorkActivities = pgTable(
+  'onet_work_activities',
+  {
+    id: serial('id').primaryKey(),
+    onetSocCode: text('onet_soc_code').notNull(),
+    elementId: text('element_id').notNull(),
+    elementName: text('element_name').notNull(),
+    importance: real('importance'), // IM scale (1-5)
+    level: real('level'), // LV scale (0-7)
+    occupationId: integer('occupation_id').references(() => occupations.id),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('onet_work_activities_soc_idx').on(table.onetSocCode),
+    index('onet_work_activities_occupation_idx').on(table.occupationId),
+    index('onet_work_activities_element_idx').on(table.elementId),
+  ]
+);
+
+// Occupation Automation Profile - composite multi-signal scores per occupation
+export const occupationAutomationProfile = pgTable(
+  'occupation_automation_profile',
+  {
+    id: serial('id').primaryKey(),
+    occupationId: integer('occupation_id')
+      .notNull()
+      .references(() => occupations.id, { onDelete: 'cascade' })
+      .unique(),
+    // Composite score (0-100)
+    compositeScore: real('composite_score').notNull(),
+    // Dimensional breakdowns (0-1 each)
+    abilityAutomationPotential: real('ability_automation_potential'),
+    workActivityAutomationPotential: real('work_activity_automation_potential'),
+    keywordScore: real('keyword_score'),
+    knowledgeDigitalReadiness: real('knowledge_digital_readiness'),
+    taskFrequencyWeight: real('task_frequency_weight'),
+    // Metadata
+    physicalAbilityAvg: real('physical_ability_avg'),
+    cognitiveRoutineAvg: real('cognitive_routine_avg'),
+    cognitiveCreativeAvg: real('cognitive_creative_avg'),
+    topAutomatableActivities: text('top_automatable_activities'), // JSON array
+    topBlockingAbilities: text('top_blocking_abilities'), // JSON array (physical/creative barriers)
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    index('oap_occupation_idx').on(table.occupationId),
+    index('oap_composite_idx').on(table.compositeScore),
+  ]
+);
+
+// Pipeline tracking
+export const pipelineRuns = pgTable(
+  'pipeline_runs',
+  {
+    id: serial('id').primaryKey(),
+    stage: text('stage').notNull(),
+    status: text('status').notNull(), // running, completed, failed
+    recordsProcessed: integer('records_processed'),
+    errorMessage: text('error_message'),
+    startedAt: timestamp('started_at').defaultNow().notNull(),
+    completedAt: timestamp('completed_at'),
+  }
+);
+
+// Data version tracking
+export const dataVersions = pgTable(
+  'data_versions',
+  {
+    id: serial('id').primaryKey(),
+    source: text('source').notNull(), // e.g. "onet_abilities", "bls_occupations"
+    version: text('version').notNull(), // e.g. "30.1", "2024"
+    importedAt: timestamp('imported_at').defaultNow().notNull(),
+    recordCount: integer('record_count'),
+    checksum: text('checksum'),
+  }
+);
+
 export type Occupation = typeof occupations.$inferSelect;
 export type NewOccupation = typeof occupations.$inferInsert;
 export type AiOpportunity = typeof aiOpportunities.$inferSelect;
@@ -288,3 +408,7 @@ export type OnetTask = typeof onetTasks.$inferSelect;
 export type NewOnetTask = typeof onetTasks.$inferInsert;
 export type DetailedWorkActivity = typeof detailedWorkActivities.$inferSelect;
 export type NewDetailedWorkActivity = typeof detailedWorkActivities.$inferInsert;
+export type OnetAbility = typeof onetAbilities.$inferSelect;
+export type OnetKnowledgeRow = typeof onetKnowledge.$inferSelect;
+export type OnetWorkActivity = typeof onetWorkActivities.$inferSelect;
+export type OccupationAutomationProfileRow = typeof occupationAutomationProfile.$inferSelect;

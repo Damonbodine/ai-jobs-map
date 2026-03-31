@@ -64,38 +64,40 @@ export function DayChart({ segments, totalMinutes, fullDayMinutes }: DayChartPro
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="mx-auto w-full max-w-[280px]"
         >
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie
-                data={chartData}
-                cx="50%"
-                cy="50%"
-                innerRadius={70}
-                outerRadius={120}
-                paddingAngle={2}
-                dataKey="minutes"
-                animationBegin={200}
-                animationDuration={1200}
-                onMouseEnter={(_, i) => setHoveredIndex(i)}
-                onMouseLeave={() => setHoveredIndex(null)}
-              >
-                {chartData.map((entry, i) => (
-                  <Cell
-                    key={entry.label}
-                    fill={entry.color}
-                    opacity={hoveredIndex === null ? 1 : hoveredIndex === i ? 1 : 0.3}
-                    stroke="none"
-                    style={{ transition: 'opacity 0.2s', cursor: 'pointer' }}
-                  />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-            </PieChart>
-          </ResponsiveContainer>
-          {/* Center label */}
-          <div className="relative -mt-[180px] mb-[40px] flex flex-col items-center justify-center pointer-events-none">
-            <span className="font-editorial text-[2rem] font-normal text-ink">{Math.round(fullDayMinutes / 60)}h</span>
-            <span className="text-[0.65rem] text-ink-tertiary">workday</span>
+          <div className="relative">
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={chartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={120}
+                  paddingAngle={2}
+                  dataKey="minutes"
+                  animationBegin={200}
+                  animationDuration={1200}
+                  onMouseEnter={(_, i) => setHoveredIndex(i)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                >
+                  {chartData.map((entry, i) => (
+                    <Cell
+                      key={entry.label}
+                      fill={entry.color}
+                      opacity={hoveredIndex === null ? 1 : hoveredIndex === i ? 1 : 0.3}
+                      stroke="none"
+                      style={{ transition: 'opacity 0.2s', cursor: 'pointer' }}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+            {/* Center label — absolute positioned over the donut hole */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span className="font-editorial text-[1.75rem] font-normal text-ink">{Math.round(fullDayMinutes / 60)}h</span>
+              <span className="text-[0.6rem] text-ink-tertiary">workday</span>
+            </div>
           </div>
         </motion.div>
 

@@ -6,6 +6,7 @@ import { ChevronLeft, ArrowRight } from 'lucide-react';
 import { DayChart } from '@/components/occupation/day-chart';
 import { TimeBackChart } from '@/components/occupation/time-back-chart';
 import { CountUp } from '@/components/ui/count-up';
+import { FadeIn } from '@/components/ui/fade-in';
 import { getOccupationRecommendationSnapshot } from '@/lib/ai-jobs/recommendations';
 import { Footer } from '@/components/ui/footer';
 
@@ -565,12 +566,14 @@ export default async function OccupationPage({ params }: PageProps) {
       {/* BEAT 2 — A typical day (interactive charts)                        */}
       {/* ------------------------------------------------------------------ */}
       <section className="page-container py-16 md:py-20">
-        <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
-          A typical day
-        </h2>
-        <p className="mt-2 max-w-xl text-[0.85rem] leading-[1.6] text-ink-secondary">
-          Hover over the chart to explore how your 8-hour day breaks down — and where support tools could make a difference.
-        </p>
+        <FadeIn>
+          <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
+            A typical day
+          </h2>
+          <p className="mt-2 max-w-xl text-[0.85rem] leading-[1.6] text-ink-secondary">
+            Hover over the chart to explore how your 8-hour day breaks down — and where support tools could make a difference.
+          </p>
+        </FadeIn>
 
         {daySegments.length > 0 ? (
           <div className="mt-10">
@@ -613,23 +616,25 @@ export default async function OccupationPage({ params }: PageProps) {
       <div className="page-container"><div className="border-t border-edge" /></div>
 
       <section className="page-container py-16 md:py-20">
-        <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
-              Ready to get that time back?
-            </h2>
-            <p className="mt-1.5 text-[0.85rem] text-ink-secondary">
-              Tell us about your day. We&apos;ll build a custom recommendation.
-            </p>
+        <FadeIn>
+          <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
+                Ready to get that time back?
+              </h2>
+              <p className="mt-1.5 text-[0.85rem] text-ink-secondary">
+                Tell us about your day. We&apos;ll build a custom recommendation.
+              </p>
+            </div>
+            <Link
+              href={`/factory?occupation=${occupation.slug}`}
+              className="btn-primary group inline-flex shrink-0 items-center gap-2.5 rounded-lg border border-primary bg-primary px-8 py-3.5 text-[0.9rem] font-medium transition-all hover:bg-transparent hover:text-ink"
+            >
+              Get started
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            </Link>
           </div>
-          <Link
-            href={`/factory?occupation=${occupation.slug}`}
-            className="btn-primary group inline-flex shrink-0 items-center gap-2.5 rounded-lg border border-primary bg-primary px-8 py-3.5 text-[0.9rem] font-medium transition-all hover:bg-transparent hover:text-ink"
-          >
-            Get started
-            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </div>
+        </FadeIn>
       </section>
 
       <Footer />

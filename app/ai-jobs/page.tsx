@@ -15,22 +15,18 @@ interface Occupation {
 }
 
 const categories = [
-  { name: 'Management', slug: 'management' },
-  { name: 'Business & Finance', slug: 'business-and-financial-operations' },
-  { name: 'Computer & Tech', slug: 'computer-and-mathematical' },
-  { name: 'Healthcare', slug: 'healthcare-practitioners-and-technical' },
-  { name: 'Education', slug: 'educational-instruction-and-library' },
-  { name: 'Legal', slug: 'legal' },
-  { name: 'Engineering', slug: 'architecture-and-engineering' },
-  { name: 'Sales & Marketing', slug: 'sales-and-related' },
-  { name: 'Science', slug: 'life-physical-and-social-science' },
-  { name: 'Arts & Media', slug: 'arts-design-entertainment-sports-and-media' },
-  { name: 'Social Service', slug: 'community-and-social-service' },
-  { name: 'Construction', slug: 'construction-and-extraction' },
-  { name: 'Office & Admin', slug: 'office-and-administrative-support' },
-  { name: 'Healthcare Support', slug: 'healthcare-support' },
-  { name: 'Production', slug: 'production' },
-  { name: 'Transportation', slug: 'transportation-and-material-moving' },
+  { name: 'Management', slug: 'management', desc: 'Directors, administrators, executives', color: '#1C1816' },
+  { name: 'Business & Finance', slug: 'business-and-financial-operations', desc: 'Analysts, accountants, consultants', color: '#B8860B' },
+  { name: 'Computer & Tech', slug: 'computer-and-mathematical', desc: 'Developers, analysts, architects', color: '#6B7F5E' },
+  { name: 'Healthcare', slug: 'healthcare-practitioners-and-technical', desc: 'Physicians, nurses, therapists', color: '#A0522D' },
+  { name: 'Education', slug: 'educational-instruction-and-library', desc: 'Teachers, professors, librarians', color: '#6B6259' },
+  { name: 'Legal', slug: 'legal', desc: 'Lawyers, paralegals, judges', color: '#7B506F' },
+  { name: 'Engineering', slug: 'architecture-and-engineering', desc: 'Engineers, architects, drafters', color: '#4A6741' },
+  { name: 'Sales & Marketing', slug: 'sales-and-related', desc: 'Representatives, agents, brokers', color: '#8B6914' },
+  { name: 'Science', slug: 'life-physical-and-social-science', desc: 'Researchers, chemists, biologists', color: '#5B7B8A' },
+  { name: 'Arts & Media', slug: 'arts-design-entertainment-sports-and-media', desc: 'Designers, writers, performers', color: '#9C6B4E' },
+  { name: 'Social Service', slug: 'community-and-social-service', desc: 'Counselors, social workers', color: '#6B8E6B' },
+  { name: 'Construction', slug: 'construction-and-extraction', desc: 'Electricians, carpenters, operators', color: '#8B7355' },
 ];
 
 export default function AIJobsLanding() {
@@ -167,7 +163,13 @@ export default function AIJobsLanding() {
 
       {/* ── Category Directory ── */}
       <section className="page-container py-16 md:py-20">
-        <div className="flex items-end justify-between gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.5 }}
+          className="flex items-end justify-between gap-4"
+        >
           <div>
             <h2 className="font-editorial text-[clamp(1.3rem,2.5vw,1.75rem)] font-normal tracking-[-0.02em] text-ink">
               Browse by category
@@ -182,20 +184,40 @@ export default function AIJobsLanding() {
           >
             View all →
           </Link>
-        </div>
+        </motion.div>
 
-        <div className="mt-8 grid gap-px overflow-hidden rounded-xl border border-edge-strong bg-edge-strong sm:grid-cols-2 lg:grid-cols-4">
-          {categories.map((cat) => (
-            <Link
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {categories.map((cat, i) => (
+            <motion.div
               key={cat.slug}
-              href={`/ai-jobs/category/${cat.slug}`}
-              className="group flex items-center justify-between bg-surface-raised px-5 py-4 transition-colors hover:bg-surface-hover"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ delay: i * 0.04, duration: 0.4 }}
             >
-              <span className="text-[0.85rem] font-medium text-ink group-hover:text-ink/70 transition-colors">
-                {cat.name}
-              </span>
-              <ArrowRight className="h-3.5 w-3.5 text-ink-tertiary/30 transition-all group-hover:text-ink-tertiary group-hover:translate-x-0.5" />
-            </Link>
+              <Link
+                href={`/ai-jobs/category/${cat.slug}`}
+                className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-edge-strong bg-surface-raised p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+              >
+                {/* Accent bar */}
+                <div className="absolute left-0 top-0 bottom-0 w-1 transition-all duration-300 group-hover:w-1.5" style={{ backgroundColor: cat.color }} />
+
+                <div className="pl-3">
+                  <h3 className="text-[0.95rem] font-medium text-ink">{cat.name}</h3>
+                  <p className="mt-1 text-[0.78rem] text-ink-tertiary">{cat.desc}</p>
+                </div>
+
+                <div className="mt-auto flex items-center justify-between pl-3 pt-4">
+                  <span className="text-[0.7rem] font-medium text-ink-tertiary transition-colors group-hover:text-ink-secondary">
+                    Explore roles →
+                  </span>
+                  <div
+                    className="h-8 w-8 rounded-full opacity-10 transition-opacity group-hover:opacity-20"
+                    style={{ backgroundColor: cat.color }}
+                  />
+                </div>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </section>

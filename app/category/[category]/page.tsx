@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, ChevronRight } from "lucide-react"

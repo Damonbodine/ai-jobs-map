@@ -17,7 +17,7 @@ const INFO_SECTIONS = [
   {
     icon: Brain,
     title: "Task-Level Analysis",
-    body: "Instead of broad "AI will automate X% of jobs" predictions, we break each occupation into micro-tasks and score them individually for AI applicability, impact, and implementation effort.",
+    body: "Instead of broad predictions, we break each occupation into micro-tasks and score them individually for AI applicability, impact, and implementation effort.",
   },
   {
     icon: Target,

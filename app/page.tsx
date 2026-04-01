@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import Link from "next/link"
 import { Clock, Cpu, Users } from "lucide-react"
 import { createServerClient } from "@/lib/supabase/server"

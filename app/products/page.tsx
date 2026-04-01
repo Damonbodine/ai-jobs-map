@@ -140,7 +140,7 @@ export default async function ProductsPage({
             We identify where routine work is draining time in a role, then package the right AI support around the routines most worth removing.
           </p>
           {occupationLabel ? (
-            <div className="mt-6 inline-flex rounded-full border border-panel-muted/30 bg-panel-lighter/50 px-4 py-2 text-[0.78rem] font-medium text-panel-text">
+            <div className="btn-dark-secondary mt-6 inline-flex rounded-full border px-4 py-2 text-[0.78rem] font-medium text-white/90">
               Viewing packages for: {occupationLabel}
             </div>
           ) : null}
@@ -158,7 +158,7 @@ export default async function ProductsPage({
               href="/ai-jobs"
               eventName="products_map_clicked"
               eventProps={{ cta: 'hero' }}
-              className="inline-flex items-center gap-2 rounded-lg border border-panel-muted/30 bg-panel-lighter/40 px-5 py-3 text-[0.85rem] font-medium text-panel-text transition-colors hover:bg-panel-lighter/60"
+              className="btn-dark-secondary inline-flex items-center gap-2 rounded-lg border px-5 py-3 text-[0.85rem] font-medium transition-colors"
             >
               Start with your role
             </TrackedLink>

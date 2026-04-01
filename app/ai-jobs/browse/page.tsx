@@ -20,6 +20,9 @@ interface Occupation {
   sub_category: string | null;
   coverage_percent?: number | string | null;
   estimated_daily_hours_saved?: number | string | null;
+  time_range_low?: number | string | null;
+  time_range_high?: number | string | null;
+  browse_estimated_minutes?: number | string | null;
   ai_opportunities_count: number;
   micro_tasks_count: number;
 }
@@ -33,9 +36,23 @@ interface BrowseResponse {
 }
 
 function getEstimatedMinutes(occupation: Occupation) {
+  const browseMinutes = Number(occupation.browse_estimated_minutes || 0);
+  const lowRange = Number(occupation.time_range_low || 0);
+  const highRange = Number(occupation.time_range_high || 0);
   const coverageHours = Number(occupation.estimated_daily_hours_saved || 0);
-  const countBased = Math.max(18, Math.round((occupation.ai_opportunities_count * 5) + (occupation.micro_tasks_count * 1.1)));
-  return coverageHours > 0 ? Math.round(coverageHours * 60) : countBased;
+  if (browseMinutes > 0) {
+    return Math.round(browseMinutes);
+  }
+  if (lowRange > 0 || highRange > 0) {
+    if (lowRange > 0 && highRange > 0) {
+      return Math.round((lowRange * 0.35) + (highRange * 0.65));
+    }
+    return Math.round(Math.max(lowRange, highRange));
+  }
+  if (coverageHours > 0) {
+    return Math.round(coverageHours * 60 * 1.1);
+  }
+  return Math.max(24, Math.round((occupation.ai_opportunities_count * 7.5) + (occupation.micro_tasks_count * 2.2)));
 }
 
 function getColor(title: string) {
@@ -198,7 +215,7 @@ export default function BrowsePage() {
               <AlertCircle className="h-5 w-5 shrink-0 text-signal" />
               <div>
                 <h2 className="text-base font-medium text-ink">Data temporarily unavailable</h2>
-                <p className="mt-1 text-[0.8rem] text-ink-secondary">Ensure your database is running, then refresh.</p>
+                <p className="mt-1 text-[0.8rem] text-ink-secondary">We hit a data issue loading the role directory. Refresh once, and if it persists we need to fix the browse API rather than your setup.</p>
               </div>
             </div>
           </div>

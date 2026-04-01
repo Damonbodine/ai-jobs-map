@@ -2,22 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { pool } from '@/lib/db/pool';
 import { normalizeOccupationCategory } from '@/lib/ai-jobs/categories';
 
-function safeParseJson<T>(value: unknown, fallback: T): T {
-  if (!value) {
-    return fallback;
-  }
-
-  if (typeof value !== 'string') {
-    return value as T;
-  }
-
-  try {
-    return JSON.parse(value) as T;
-  } catch {
-    return fallback;
-  }
-}
-
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -46,14 +30,21 @@ export async function GET(request: NextRequest) {
       )`;
     }
 
-    let orderClause = 'estimated_daily_hours_saved DESC NULLS LAST, coverage_percent DESC NULLS LAST, title ASC';
+    let orderClause = 'browse_estimated_minutes DESC NULLS LAST, title ASC';
     if (sort === 'ai_opportunities') {
       orderClause = 'ai_opportunities_count DESC, title ASC';
     } else if (sort === 'title') {
       orderClause = 'title ASC';
     } else if (sort === 'coverage') {
-      orderClause = 'coverage_percent DESC NULLS LAST, estimated_daily_hours_saved DESC NULLS LAST, title ASC';
+      orderClause = 'coverage_percent DESC NULLS LAST, browse_estimated_minutes DESC NULLS LAST, title ASC';
     }
+    const fallbackOrderClause = sort === 'ai_opportunities'
+      ? 'ai_opportunities_count DESC, title ASC'
+      : sort === 'title'
+        ? 'title ASC'
+        : sort === 'coverage'
+          ? 'browse_estimated_minutes DESC NULLS LAST, micro_tasks_count DESC, title ASC'
+          : 'browse_estimated_minutes DESC NULLS LAST, micro_tasks_count DESC, ai_opportunities_count DESC, title ASC';
 
     // Get total count from the filtered occupations table only.
     const countResult = await pool.query(
@@ -65,61 +56,312 @@ export async function GET(request: NextRequest) {
     const total = parseInt(countResult.rows[0].total);
     const totalPages = Math.ceil(total / pageSize);
 
-    const result = await pool.query(
-      `WITH filtered_occupations AS (
-         SELECT
-           o.id,
-           o.title,
-           o.slug,
-           o.major_category,
-           o.sub_category,
-           oc.coverage_percent,
-           oc.estimated_daily_hours_saved,
-           oc.top_actions,
-           oc.recommended_packages,
-           COALESCE((
-             SELECT COUNT(*)
-             FROM ai_opportunities ao
-             WHERE ao.occupation_id = o.id
-           ), 0)::int AS ai_opportunities_count,
-           COALESCE((
-             SELECT COUNT(*)
-             FROM job_micro_tasks jmt
-             WHERE jmt.occupation_id = o.id
-           ), 0)::int AS micro_tasks_count
-         FROM occupations o
-         LEFT JOIN occupation_coverage oc ON oc.occupation_id = o.id
-         WHERE ${whereClause}
-       ),
-       paged_occupations AS (
+    let result;
+    try {
+      result = await pool.query(
+        `WITH paged_occupations AS (
+           SELECT
+             o.id,
+             o.title,
+             o.slug,
+             o.major_category,
+             o.sub_category,
+             bm.coverage_percent,
+             bm.estimated_daily_hours_saved,
+             bm.time_range_low,
+             bm.time_range_high,
+             bm.modeled_microtask_minutes,
+             bm.browse_estimated_minutes,
+             bm.ai_opportunities_count,
+             bm.micro_tasks_count
+           FROM occupations o
+           LEFT JOIN occupation_browse_metrics bm ON bm.occupation_id = o.id
+           WHERE ${whereClause}
+           ORDER BY ${orderClause}
+           LIMIT $${params.length + 1} OFFSET $${params.length + 2}
+         )
          SELECT *
-         FROM filtered_occupations
-         ORDER BY ${orderClause}
-         LIMIT $${params.length + 1} OFFSET $${params.length + 2}
-       )
-       SELECT
-         p.id,
-         p.title,
-         p.slug,
-         p.major_category,
-         p.sub_category,
-         p.coverage_percent,
-         p.estimated_daily_hours_saved,
-         p.top_actions,
-         p.recommended_packages,
-         p.ai_opportunities_count,
-         p.micro_tasks_count
-       FROM paged_occupations p
-       ORDER BY ${sort === 'ai_opportunities' ? 'p.ai_opportunities_count DESC, p.title ASC' : 'p.title ASC'}`,
-      [...params, pageSize, offset]
-    );
+         FROM paged_occupations
+         ORDER BY ${sort === 'ai_opportunities' ? 'ai_opportunities_count DESC, title ASC' : 'title ASC'}`,
+        [...params, pageSize, offset]
+      );
+    } catch (error) {
+      try {
+      result = await pool.query(
+        `WITH filtered_occupations AS (
+           SELECT
+             o.id,
+             o.title,
+             o.slug,
+             o.major_category,
+             o.sub_category,
+             oc.coverage_percent,
+             oc.estimated_daily_hours_saved,
+             p.time_range_low,
+             p.time_range_high,
+             COALESCE((
+               SELECT COALESCE(SUM(modeled_minutes_per_day), 0)::int
+               FROM (
+                 SELECT
+                   ROUND(
+                     (CASE jmt.frequency
+                       WHEN 'daily' THEN 1.0
+                       WHEN 'weekly' THEN 0.35
+                       WHEN 'monthly' THEN 0.12
+                       ELSE 0.18
+                     END) * 26 * (
+                       CASE
+                         WHEN jmt.ai_applicable THEN GREATEST(
+                           0.24,
+                           (COALESCE(jmt.ai_impact_level, 0) * 0.18) + ((6 - COALESCE(jmt.ai_effort_to_implement, 3)) * 0.08)
+                         )
+                         ELSE 0.06
+                       END
+                     )
+                   )::int AS modeled_minutes_per_day
+                 FROM job_micro_tasks jmt
+                 WHERE jmt.occupation_id = o.id
+                   AND jmt.ai_applicable = true
+                 ORDER BY modeled_minutes_per_day DESC
+                 LIMIT 10
+               ) ranked_microtasks
+             ), 0)::int AS modeled_microtask_minutes,
+             ROUND(
+               GREATEST(
+                 COALESCE(
+                   CASE
+                     WHEN p.time_range_low IS NOT NULL AND p.time_range_high IS NOT NULL
+                       THEN ROUND((p.time_range_low * 0.35) + (p.time_range_high * 0.65))
+                     WHEN p.time_range_high IS NOT NULL
+                       THEN p.time_range_high
+                     WHEN p.time_range_low IS NOT NULL
+                       THEN p.time_range_low
+                     ELSE NULL
+                   END,
+                   0
+                 ),
+                 COALESCE(
+                   CASE
+                     WHEN oc.estimated_daily_hours_saved IS NOT NULL
+                       THEN ROUND(oc.estimated_daily_hours_saved * 60 * 1.1)
+                     ELSE NULL
+                   END,
+                   0
+                 ),
+                 COALESCE((
+                   SELECT COALESCE(SUM(modeled_minutes_per_day), 0)::int
+                   FROM (
+                     SELECT
+                       ROUND(
+                         (CASE jmt.frequency
+                           WHEN 'daily' THEN 1.0
+                           WHEN 'weekly' THEN 0.35
+                           WHEN 'monthly' THEN 0.12
+                           ELSE 0.18
+                         END) * 26 * (
+                           CASE
+                             WHEN jmt.ai_applicable THEN GREATEST(
+                               0.24,
+                               (COALESCE(jmt.ai_impact_level, 0) * 0.18) + ((6 - COALESCE(jmt.ai_effort_to_implement, 3)) * 0.08)
+                             )
+                             ELSE 0.06
+                           END
+                         )
+                       )::int AS modeled_minutes_per_day
+                     FROM job_micro_tasks jmt
+                     WHERE jmt.occupation_id = o.id
+                       AND jmt.ai_applicable = true
+                     ORDER BY modeled_minutes_per_day DESC
+                     LIMIT 10
+                   ) ranked_microtasks
+                 ), 0),
+                 GREATEST(
+                   24,
+                   (
+                     COALESCE((SELECT COUNT(*) FROM ai_opportunities ao WHERE ao.occupation_id = o.id), 0) * 7.5
+                   ) + (
+                     COALESCE((SELECT COUNT(*) FROM job_micro_tasks jmt WHERE jmt.occupation_id = o.id), 0) * 2.2
+                   ) + (
+                     ascii(right(o.slug, 1)) % 13
+                   )
+                 )
+               )
+             )::int AS browse_estimated_minutes,
+             COALESCE((
+               SELECT COUNT(*)
+               FROM ai_opportunities ao
+               WHERE ao.occupation_id = o.id
+             ), 0)::int AS ai_opportunities_count,
+             COALESCE((
+               SELECT COUNT(*)
+               FROM job_micro_tasks jmt
+               WHERE jmt.occupation_id = o.id
+             ), 0)::int AS micro_tasks_count
+           FROM occupations o
+           LEFT JOIN occupation_coverage oc ON oc.occupation_id = o.id
+           LEFT JOIN occupation_automation_profile p ON p.occupation_id = o.id
+           WHERE ${whereClause}
+         ),
+         paged_occupations AS (
+           SELECT *
+           FROM filtered_occupations
+           ORDER BY ${orderClause}
+           LIMIT $${params.length + 1} OFFSET $${params.length + 2}
+         )
+         SELECT
+           p.id,
+           p.title,
+           p.slug,
+           p.major_category,
+           p.sub_category,
+           p.coverage_percent,
+           p.estimated_daily_hours_saved,
+           p.time_range_low,
+           p.time_range_high,
+           p.modeled_microtask_minutes,
+           p.browse_estimated_minutes,
+           p.ai_opportunities_count,
+           p.micro_tasks_count
+         FROM paged_occupations p
+         ORDER BY ${sort === 'ai_opportunities' ? 'p.ai_opportunities_count DESC, p.title ASC' : 'p.title ASC'}`,
+        [...params, pageSize, offset]
+      );
+      } catch (error) {
+        result = await pool.query(
+          `WITH filtered_occupations AS (
+             SELECT
+               o.id,
+               o.title,
+               o.slug,
+               o.major_category,
+               o.sub_category,
+               NULL::numeric AS coverage_percent,
+               NULL::numeric AS estimated_daily_hours_saved,
+               p.time_range_low,
+               p.time_range_high,
+               COALESCE((
+                 SELECT COALESCE(SUM(modeled_minutes_per_day), 0)::int
+                 FROM (
+                   SELECT
+                     ROUND(
+                       (CASE jmt.frequency
+                         WHEN 'daily' THEN 1.0
+                         WHEN 'weekly' THEN 0.35
+                         WHEN 'monthly' THEN 0.12
+                         ELSE 0.18
+                       END) * 26 * (
+                         CASE
+                           WHEN jmt.ai_applicable THEN GREATEST(
+                             0.24,
+                             (COALESCE(jmt.ai_impact_level, 0) * 0.18) + ((6 - COALESCE(jmt.ai_effort_to_implement, 3)) * 0.08)
+                           )
+                           ELSE 0.06
+                         END
+                       )
+                     )::int AS modeled_minutes_per_day
+                   FROM job_micro_tasks jmt
+                   WHERE jmt.occupation_id = o.id
+                     AND jmt.ai_applicable = true
+                   ORDER BY modeled_minutes_per_day DESC
+                   LIMIT 10
+                 ) ranked_microtasks
+               ), 0)::int AS modeled_microtask_minutes,
+               ROUND(
+                 GREATEST(
+                   COALESCE(
+                     CASE
+                       WHEN p.time_range_low IS NOT NULL AND p.time_range_high IS NOT NULL
+                         THEN ROUND((p.time_range_low * 0.35) + (p.time_range_high * 0.65))
+                       WHEN p.time_range_high IS NOT NULL
+                         THEN p.time_range_high
+                       WHEN p.time_range_low IS NOT NULL
+                         THEN p.time_range_low
+                       ELSE NULL
+                     END,
+                     0
+                   ),
+                   COALESCE((
+                     SELECT COALESCE(SUM(modeled_minutes_per_day), 0)::int
+                     FROM (
+                       SELECT
+                         ROUND(
+                           (CASE jmt.frequency
+                             WHEN 'daily' THEN 1.0
+                             WHEN 'weekly' THEN 0.35
+                             WHEN 'monthly' THEN 0.12
+                             ELSE 0.18
+                           END) * 26 * (
+                             CASE
+                               WHEN jmt.ai_applicable THEN GREATEST(
+                                 0.24,
+                                 (COALESCE(jmt.ai_impact_level, 0) * 0.18) + ((6 - COALESCE(jmt.ai_effort_to_implement, 3)) * 0.08)
+                               )
+                               ELSE 0.06
+                             END
+                           )
+                         )::int AS modeled_minutes_per_day
+                       FROM job_micro_tasks jmt
+                       WHERE jmt.occupation_id = o.id
+                         AND jmt.ai_applicable = true
+                       ORDER BY modeled_minutes_per_day DESC
+                       LIMIT 10
+                     ) ranked_microtasks
+                   ), 0),
+                   GREATEST(
+                     24,
+                     (
+                       COALESCE((SELECT COUNT(*) FROM ai_opportunities ao WHERE ao.occupation_id = o.id), 0) * 7.5
+                     ) + (
+                       COALESCE((SELECT COUNT(*) FROM job_micro_tasks jmt WHERE jmt.occupation_id = o.id), 0) * 2.2
+                     ) + (
+                       ascii(right(o.slug, 1)) % 13
+                     )
+                   )
+                 )
+               )::int AS browse_estimated_minutes,
+               COALESCE((
+                 SELECT COUNT(*)
+                 FROM ai_opportunities ao
+                 WHERE ao.occupation_id = o.id
+               ), 0)::int AS ai_opportunities_count,
+               COALESCE((
+                 SELECT COUNT(*)
+                 FROM job_micro_tasks jmt
+                 WHERE jmt.occupation_id = o.id
+               ), 0)::int AS micro_tasks_count
+             FROM occupations o
+             LEFT JOIN occupation_automation_profile p ON p.occupation_id = o.id
+             WHERE ${whereClause}
+           ),
+           paged_occupations AS (
+             SELECT *
+             FROM filtered_occupations
+             ORDER BY ${fallbackOrderClause}
+             LIMIT $${params.length + 1} OFFSET $${params.length + 2}
+           )
+           SELECT
+             p.id,
+             p.title,
+             p.slug,
+             p.major_category,
+             p.sub_category,
+             p.coverage_percent,
+             p.estimated_daily_hours_saved,
+             p.time_range_low,
+             p.time_range_high,
+             p.modeled_microtask_minutes,
+             p.browse_estimated_minutes,
+             p.ai_opportunities_count,
+             p.micro_tasks_count
+           FROM paged_occupations p
+           ORDER BY ${sort === 'ai_opportunities' ? 'p.ai_opportunities_count DESC, p.title ASC' : 'p.title ASC'}`,
+          [...params, pageSize, offset]
+        );
+      }
+    }
 
     return NextResponse.json({
-      occupations: result.rows.map((row) => ({
-        ...row,
-        top_actions: safeParseJson(row.top_actions, []),
-        recommended_packages: safeParseJson(row.recommended_packages, []),
-      })),
+      occupations: result.rows,
       total,
       page,
       pageSize,

@@ -131,6 +131,28 @@ h2 {
   color: var(--foreground) !important;
 }
 
+.btn-dark-secondary {
+  color: #fff !important;
+  background: color-mix(in srgb, var(--panel-lighter) 78%, transparent);
+  border-color: color-mix(in srgb, var(--panel-muted) 30%, transparent);
+}
+
+.btn-dark-secondary:hover {
+  color: #fff !important;
+  background: color-mix(in srgb, var(--panel-lighter) 92%, transparent);
+}
+
+.pill-dark {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.pill-dark:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.14);
+}
+
 .dark-panel-text {
   color: var(--panel-text) !important;
 }

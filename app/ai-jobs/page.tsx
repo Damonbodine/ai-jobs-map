@@ -26,6 +26,15 @@ const quickStarts = [
   { label: 'Electricians', slug: 'electricians' },
 ];
 
+const coverageCategories = [
+  'Management',
+  'Healthcare',
+  'Construction',
+  'Education',
+  'Finance',
+  'Operations',
+];
+
 export default function AIJobsLanding() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Occupation[]>([]);
@@ -71,6 +80,9 @@ export default function AIJobsLanding() {
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-[1rem] leading-8 text-[#d8d1c8]">
             Search your role to see where routine work is stealing time, then move straight into the product package that best fits the job.
+          </p>
+          <p className="mx-auto mt-3 max-w-2xl text-[0.82rem] uppercase tracking-[0.18em] text-[#b9b0a5]">
+            Search across 800+ occupations
           </p>
 
           <div className="relative mx-auto mt-9 max-w-2xl">
@@ -159,7 +171,13 @@ export default function AIJobsLanding() {
             </AnimatePresence>
           </div>
 
-          <div className="mt-6 flex flex-wrap justify-center gap-2.5">
+          <div className="mt-6">
+            <p className="text-[0.75rem] font-medium uppercase tracking-[0.18em] text-[#b9b0a5]">
+              Popular examples
+            </p>
+          </div>
+
+          <div className="mt-3 flex flex-wrap justify-center gap-2.5">
             {quickStarts.map((start, index) => (
               <motion.div
                 key={start.slug}
@@ -171,11 +189,22 @@ export default function AIJobsLanding() {
                   href={`/ai-jobs/${start.slug}`}
                   eventName="landing_role_selected"
                   eventProps={{ occupationSlug: start.slug, occupationTitle: start.label, source: 'quick_start' }}
-                  className="rounded-full border border-white/14 bg-white/6 px-4 py-2 text-[0.82rem] font-medium text-[#efe9e1] transition-colors hover:bg-white/10"
+                  className="pill-dark rounded-full border px-4 py-2 text-[0.82rem] font-medium shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-colors"
                 >
                   {start.label}
                 </TrackedLink>
               </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            {coverageCategories.map((category) => (
+              <span
+                key={category}
+                className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[0.72rem] uppercase tracking-[0.14em] text-[#cfc5b8]"
+              >
+                {category}
+              </span>
             ))}
           </div>
 
@@ -191,14 +220,14 @@ export default function AIJobsLanding() {
             <TrackedLink
               href="/ai-jobs/browse"
               eventName="landing_browse_clicked"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/14 bg-white/6 px-5 py-3 text-[0.85rem] font-medium text-[#efe9e1] transition-colors hover:bg-white/10"
+              className="btn-dark-secondary inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-[0.85rem] font-medium transition-colors"
             >
-              Browse all roles
+              Browse 800+ roles
             </TrackedLink>
           </div>
 
           <p className="mt-9 text-[0.8rem] text-[#b9b0a5]">
-            Mapped across 800+ occupations from the U.S. Bureau of Labor Statistics
+            Built from public occupation data and our own task-level analysis across 800+ roles.
           </p>
         </motion.div>
       </section>

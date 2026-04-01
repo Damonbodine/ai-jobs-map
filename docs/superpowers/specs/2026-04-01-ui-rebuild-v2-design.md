@@ -17,8 +17,8 @@
 
 ### 2.1 Landing (`/`)
 - Hero with autocomplete search (client component for interactivity)
-- 6 hardcoded popular occupation cards with min/day
-- Stats row: 38 avg min, 12K+ tasks, 847 occupations
+- 10 rotating popular occupation cards with min/day
+- Stats row: 58 avg min, 12K+ tasks, 847 occupations
 - Category pills with counts (server-fetched)
 - CTA section with Browse All + Configure System buttons
 
@@ -160,3 +160,6 @@ Fonts: Newsreader (headings), Manrope (body) — loaded via `next/font/google`.
 - Old components: stat-ring, count-up, pexels-image, category-image, insight-card
 - `/app/concepts/*`, `/app/experiments/*`, `/app/simple/*` — experimental pages
 - `/app/factory/build|pipeline|audit|skills-browser|case-studies|marketplace|roi/*` — factory sub-pages replaced by single wizard
+
+
+Please make sure that you that the final build has language that doesn't feel as overwhelming to the average user. We shouldn't use words like automation. We should focus on the tax that currently lives in the app. You know, where possible. For example, things like you know improv you know higher day shifts and stuff like that. So you should mix in those opportunities against like the uh against the existing language, right? To make sure that's up, dude.

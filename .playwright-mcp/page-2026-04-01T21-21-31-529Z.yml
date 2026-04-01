@@ -1,0 +1,156 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "AI Jobs Map" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img [ref=e7]
+          - generic [ref=e10]: AI Jobs Map
+        - navigation [ref=e11]:
+          - link "Map" [ref=e12] [cursor=pointer]:
+            - /url: /
+          - link "Browse" [ref=e13] [cursor=pointer]:
+            - /url: /browse
+          - link "Products" [ref=e14] [cursor=pointer]:
+            - /url: /products
+          - link "About" [ref=e15] [cursor=pointer]:
+            - /url: /about
+          - button "Toggle theme" [ref=e16] [cursor=pointer]:
+            - img [ref=e17]
+          - link "Configure" [ref=e19] [cursor=pointer]:
+            - /url: /factory
+    - main [ref=e20]:
+      - generic [ref=e22]:
+        - generic [ref=e24]:
+          - generic [ref=e26]: 800+ Occupations Analyzed
+          - heading "How much time could AI give you back?" [level=1] [ref=e28]:
+            - text: How much time could
+            - text: AI give you back?
+          - paragraph [ref=e30]: Search your occupation. See which tasks AI can handle — and how many minutes you'd save each day.
+          - generic [ref=e31]:
+            - img [ref=e32]
+            - textbox "Try \"Software Developer\" or \"Nurse\"" [ref=e35]
+        - generic [ref=e37]:
+          - heading "Popular Occupations" [level=2] [ref=e39]
+          - generic [ref=e40]:
+            - link "Software Developer 52 min/day" [ref=e42] [cursor=pointer]:
+              - /url: /occupation/software-developer
+              - generic [ref=e44]: Software Developer
+              - generic [ref=e45]:
+                - generic [ref=e46]: "52"
+                - generic [ref=e47]: min/day
+            - link "Registered Nurse 28 min/day" [ref=e49] [cursor=pointer]:
+              - /url: /occupation/registered-nurse
+              - generic [ref=e51]: Registered Nurse
+              - generic [ref=e52]:
+                - generic [ref=e53]: "28"
+                - generic [ref=e54]: min/day
+            - link "Financial Analyst 47 min/day" [ref=e56] [cursor=pointer]:
+              - /url: /occupation/financial-analyst
+              - generic [ref=e58]: Financial Analyst
+              - generic [ref=e59]:
+                - generic [ref=e60]: "47"
+                - generic [ref=e61]: min/day
+            - link "Marketing Manager 61 min/day" [ref=e63] [cursor=pointer]:
+              - /url: /occupation/marketing-manager
+              - generic [ref=e65]: Marketing Manager
+              - generic [ref=e66]:
+                - generic [ref=e67]: "61"
+                - generic [ref=e68]: min/day
+            - link "Accountant 42 min/day" [ref=e70] [cursor=pointer]:
+              - /url: /occupation/accountant
+              - generic [ref=e72]: Accountant
+              - generic [ref=e73]:
+                - generic [ref=e74]: "42"
+                - generic [ref=e75]: min/day
+            - link "Project Manager 55 min/day" [ref=e77] [cursor=pointer]:
+              - /url: /occupation/project-manager
+              - generic [ref=e79]: Project Manager
+              - generic [ref=e80]:
+                - generic [ref=e81]: "55"
+                - generic [ref=e82]: min/day
+        - generic [ref=e85]:
+          - generic [ref=e86]:
+            - img [ref=e87]
+            - generic [ref=e90]: "38"
+            - generic [ref=e91]: Avg min saved/day
+          - generic [ref=e92]:
+            - img [ref=e93]
+            - generic [ref=e96]: 12K+
+            - generic [ref=e97]: Tasks mapped
+          - generic [ref=e98]:
+            - img [ref=e99]
+            - generic [ref=e104]: "847"
+            - generic [ref=e105]: Occupations
+        - generic [ref=e107]:
+          - generic [ref=e108]:
+            - heading "Browse by Category" [level=2] [ref=e109]
+            - paragraph [ref=e110]: Explore occupations across 19 major categories
+          - generic [ref=e111]:
+            - link "Management" [ref=e112] [cursor=pointer]:
+              - /url: /category/management
+            - link "Business & Finance" [ref=e113] [cursor=pointer]:
+              - /url: /category/business-finance
+            - link "Computer & Math" [ref=e114] [cursor=pointer]:
+              - /url: /category/computer-math
+            - link "Architecture & Engineering" [ref=e115] [cursor=pointer]:
+              - /url: /category/architecture-engineering
+            - link "Life & Physical Science" [ref=e116] [cursor=pointer]:
+              - /url: /category/life-physical-social-science
+            - link "Community & Social Service" [ref=e117] [cursor=pointer]:
+              - /url: /category/community-social-service
+            - link "Legal" [ref=e118] [cursor=pointer]:
+              - /url: /category/legal
+            - link "Education & Training" [ref=e119] [cursor=pointer]:
+              - /url: /category/education
+            - link "Arts & Media" [ref=e120] [cursor=pointer]:
+              - /url: /category/arts-media
+            - link "Healthcare" [ref=e121] [cursor=pointer]:
+              - /url: /category/healthcare-practitioners
+            - link "Healthcare Support" [ref=e122] [cursor=pointer]:
+              - /url: /category/healthcare-support
+            - link "Food Service" [ref=e123] [cursor=pointer]:
+              - /url: /category/food-service
+            - link "Building & Grounds" [ref=e124] [cursor=pointer]:
+              - /url: /category/building-grounds
+            - link "Sales" [ref=e125] [cursor=pointer]:
+              - /url: /category/sales
+            - link "Office & Admin" [ref=e126] [cursor=pointer]:
+              - /url: /category/office-admin
+            - link "Construction" [ref=e127] [cursor=pointer]:
+              - /url: /category/construction
+            - link "Installation & Repair" [ref=e128] [cursor=pointer]:
+              - /url: /category/installation-repair
+            - link "Production" [ref=e129] [cursor=pointer]:
+              - /url: /category/production
+            - link "Transportation" [ref=e130] [cursor=pointer]:
+              - /url: /category/transportation
+        - generic [ref=e132]:
+          - heading "Ready to automate your workflow?" [level=2] [ref=e133]
+          - paragraph [ref=e134]: Configure a multi-agent system tailored to your role.
+          - generic [ref=e135]:
+            - link "Browse All" [ref=e136] [cursor=pointer]:
+              - /url: /browse
+            - link "Configure System" [ref=e137] [cursor=pointer]:
+              - /url: /factory
+    - contentinfo [ref=e138]:
+      - generic [ref=e139]:
+        - generic [ref=e140]:
+          - generic [ref=e141]:
+            - heading "AI Jobs Map" [level=3] [ref=e142]
+            - paragraph [ref=e143]: Discover how AI can save time in your specific occupation. Task-level analysis for 800+ roles.
+          - generic [ref=e144]:
+            - heading "Explore" [level=4] [ref=e145]
+            - generic [ref=e146]:
+              - link "Browse All Occupations" [ref=e147] [cursor=pointer]:
+                - /url: /browse
+              - link "Products & Pricing" [ref=e148] [cursor=pointer]:
+                - /url: /products
+              - link "Configure Your System" [ref=e149] [cursor=pointer]:
+                - /url: /factory
+          - generic [ref=e150]:
+            - heading "Company" [level=4] [ref=e151]
+            - link "About" [ref=e153] [cursor=pointer]:
+              - /url: /about
+        - generic [ref=e154]: Data from Bureau of Labor Statistics and O*NET.
+  - region "Notifications alt+T"

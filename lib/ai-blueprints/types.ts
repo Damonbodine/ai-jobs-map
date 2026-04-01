@@ -31,6 +31,8 @@ export interface BlockAgent {
   assistedTasks: TaskSpec[];
   humanOnlyTasks: TaskSpec[];
   minutesSaved: number;
+  rangeLow?: number;
+  rangeHigh?: number;
   confidenceScore: number;
 }
 

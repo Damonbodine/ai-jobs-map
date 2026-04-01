@@ -13,6 +13,9 @@ import { DayValueMap } from '@/components/occupation/day-value-map';
 import { Footer } from '@/components/ui/footer';
 import { generateBlueprint } from '@/lib/ai-blueprints/generate-blueprint';
 import { BlueprintSection } from '@/components/ai-blueprint/blueprint-section';
+import { TrackedLink } from '@/components/analytics/tracked-link';
+import { TrackPageView } from '@/components/analytics/track-page-view';
+import { deriveBlendedTimeBack } from '@/lib/ai-jobs/timeback';
 
 const opportunityCategoryConfig: Record<string, { label: string; color: string; icon: string }> = {
   task_automation: { label: 'Routine support', color: 'bg-blue-500', icon: '🤖' },
@@ -303,6 +306,53 @@ function formatHours(hours: number) {
   return `${Math.round(hours * 60)} min/day`;
 }
 
+function scaleTaskMinutes(value: number, total: number, target: number, minimum = 1) {
+  if (total <= 0 || target <= 0) {
+    return Math.max(minimum, Math.round(value));
+  }
+
+  return Math.max(minimum, Math.round((value / total) * target));
+}
+
+function allocateWeightedMinutes<T>(
+  items: T[],
+  target: number,
+  getWeight: (item: T) => number
+) {
+  if (items.length === 0) {
+    return [];
+  }
+
+  if (target <= 0) {
+    return items.map(() => 0);
+  }
+
+  const weights = items.map((item) => Math.max(0, getWeight(item)));
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+  const rawShares = totalWeight > 0
+    ? weights.map((weight) => (weight / totalWeight) * target)
+    : items.map(() => target / items.length);
+  const baseShares = rawShares.map((share) => Math.floor(share));
+  let remainder = target - baseShares.reduce((sum, share) => sum + share, 0);
+
+  const rankedRemainders = rawShares
+    .map((share, index) => ({ index, remainder: share - baseShares[index] }))
+    .sort((a, b) => b.remainder - a.remainder);
+
+  for (let i = 0; i < rankedRemainders.length && remainder > 0; i += 1) {
+    baseShares[rankedRemainders[i].index] += 1;
+    remainder -= 1;
+  }
+
+  return baseShares;
+}
+
+function complexityFromMinutes(minutes: number): 'starter' | 'growth' | 'enterprise' {
+  if (minutes >= 60) return 'enterprise';
+  if (minutes >= 30) return 'growth';
+  return 'starter';
+}
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
@@ -540,15 +590,144 @@ export default async function OccupationPage({ params }: PageProps) {
 
   // Use O*NET-grounded time ranges when available, fall back to LLM-derived estimate
   const hasTimeRange = automationProfile?.time_range_low != null && automationProfile?.time_range_high != null;
-  const timeRangeLow = hasTimeRange ? automationProfile.time_range_low : modulateTimeBack(modeledMinutesRecoveredPerDay, occupationArchetype);
-  const timeRangeHigh = hasTimeRange ? automationProfile.time_range_high : timeRangeLow;
-  const displayedMinutesRecoveredPerDay = timeRangeLow;
+  const fallbackMinutes = modulateTimeBack(modeledMinutesRecoveredPerDay, occupationArchetype);
+  const initialTimeRangeLow = hasTimeRange ? automationProfile.time_range_low : fallbackMinutes;
+  const initialTimeRangeHigh = hasTimeRange ? automationProfile.time_range_high : Math.max(fallbackMinutes + 10, fallbackMinutes);
   const timeRangeByBlock = hasTimeRange && automationProfile.time_range_by_block
     ? JSON.parse(automationProfile.time_range_by_block)
     : null;
 
   // AI Blueprint: generate dynamic agent architecture from task data + O*NET enrichment
   const blueprint = generateBlueprint(taskEntries, occupationArchetype, occupation.title, onetTasks, timeRangeByBlock);
+  const blendedTimeBack = deriveBlendedTimeBack({
+    onetLow: initialTimeRangeLow,
+    onetHigh: initialTimeRangeHigh,
+    workflowMinutes: snapshotMinutesRecoveredPerDay,
+    microtaskMinutes: modeledMinutesRecoveredPerDay,
+    blueprintMinutes: blueprint?.impact.totalMinutesSaved ?? null,
+  });
+  const displayedMinutesRecoveredPerDay = blendedTimeBack.displayMinutes;
+  const timeRangeLow = blendedTimeBack.rangeLow;
+  const timeRangeHigh = blendedTimeBack.rangeHigh;
+  const taskContextByName = new Map(
+    taskEntries.map((task: any) => [task.task_name, task])
+  );
+  const displayBlueprint = blueprint
+    ? (() => {
+        const rawAgents = blueprint.agents;
+        const displayAllocations = allocateWeightedMinutes(
+          rawAgents,
+          displayedMinutesRecoveredPerDay,
+          (agent) => agent.minutesSaved
+        );
+        const lowAllocations = allocateWeightedMinutes(
+          rawAgents,
+          timeRangeLow,
+          (agent) => timeRangeByBlock?.[agent.blockKey]?.low ?? agent.minutesSaved
+        );
+        const highAllocations = allocateWeightedMinutes(
+          rawAgents,
+          timeRangeHigh,
+          (agent) => timeRangeByBlock?.[agent.blockKey]?.high ?? timeRangeByBlock?.[agent.blockKey]?.low ?? agent.minutesSaved
+        );
+        const scaledAgents = rawAgents
+          .map((agent, index) => ({
+            ...agent,
+            minutesSaved: displayAllocations[index] ?? agent.minutesSaved,
+            rangeLow: lowAllocations[index] ?? agent.minutesSaved,
+            rangeHigh: Math.max(highAllocations[index] ?? agent.minutesSaved, lowAllocations[index] ?? agent.minutesSaved),
+          }))
+          .sort((a, b) => b.minutesSaved - a.minutesSaved);
+
+        return {
+          ...blueprint,
+          agents: scaledAgents,
+          impact: {
+            ...blueprint.impact,
+            totalMinutesSaved: displayedMinutesRecoveredPerDay,
+            highestImpactBlock: scaledAgents[0]?.blockLabel || blueprint.impact.highestImpactBlock,
+            complexity: complexityFromMinutes(displayedMinutesRecoveredPerDay),
+          },
+        };
+      })()
+    : null;
+  const blockAlignedTasks = displayBlueprint
+    ? displayBlueprint.agents.flatMap((agent) => {
+        const actionableTasks = [...agent.automatedTasks, ...agent.assistedTasks];
+        const taskMinuteAllocations = allocateWeightedMinutes(
+          actionableTasks,
+          agent.minutesSaved,
+          (task) => task.minutesPerDay
+        );
+        const taskLowAllocations = allocateWeightedMinutes(
+          actionableTasks,
+          agent.rangeLow ?? agent.minutesSaved,
+          (task) => task.minutesPerDay
+        );
+        const taskHighAllocations = allocateWeightedMinutes(
+          actionableTasks,
+          agent.rangeHigh ?? agent.minutesSaved,
+          (task) => task.minutesPerDay
+        );
+
+        return actionableTasks
+          .map((task, index) => {
+            const sourceTask = taskContextByName.get(task.taskName);
+
+            return {
+              id: `${agent.blockKey}-${task.taskName}`,
+              task_name: task.taskName,
+              task_description: sourceTask?.task_description || sourceTask?.ai_how_it_helps || task.automationApproach,
+              ai_how_it_helps: sourceTask?.ai_how_it_helps || task.automationApproach,
+              ai_category: sourceTask?.ai_category || null,
+              frequency: task.frequency,
+              lens: {
+                ...sourceTask?.lens,
+                label: frequencyMeta[task.frequency]?.label ?? task.frequency,
+                tone: frequencyMeta[task.frequency]?.tone ?? frequencyMeta['as-needed'].tone,
+              },
+              workBlock: agent.blockKey,
+              blockLabel: agent.blockLabel,
+              scaledMinutes: taskMinuteAllocations[index] ?? 0,
+              scaledRangeLow: taskLowAllocations[index] ?? 0,
+              scaledRangeHigh: Math.max(taskHighAllocations[index] ?? 0, taskLowAllocations[index] ?? 0),
+            };
+          })
+          .filter((task) => task.scaledMinutes > 0);
+      })
+    : topRecoverableTasks.map((task: any) => ({
+        ...task,
+        blockLabel: workBlockDefinitions[task.workBlock as keyof typeof workBlockDefinitions]?.label ?? 'Routine support',
+        scaledMinutes: scaleTaskMinutes(
+          task.lens.modeledMinutesPerDay,
+          modeledMinutesRecoveredPerDay,
+          displayedMinutesRecoveredPerDay
+        ),
+        scaledRangeLow: scaleTaskMinutes(
+          task.lens.modeledMinutesPerDay,
+          modeledMinutesRecoveredPerDay,
+          timeRangeLow
+        ),
+        scaledRangeHigh: scaleTaskMinutes(
+          task.lens.modeledMinutesPerDay,
+          modeledMinutesRecoveredPerDay,
+          timeRangeHigh
+        ),
+      }));
+  const targetVisibleCoverage = Math.round(displayedMinutesRecoveredPerDay * 0.82);
+  const allRoutineTasks = [...blockAlignedTasks]
+    .sort((a: any, b: any) => b.scaledMinutes - a.scaledMinutes)
+  const priorityTasks = allRoutineTasks
+    .reduce((selected: any[], task: any) => {
+    const currentTotal = selected.reduce((sum: number, item: any) => sum + item.scaledMinutes, 0);
+    if (selected.length < 4 || (currentTotal < targetVisibleCoverage && selected.length < 6)) {
+      selected.push(task);
+    }
+    return selected;
+  }, []);
+  const visibleTaskMinutes = priorityTasks.reduce((sum: number, task: any) => sum + task.scaledMinutes, 0);
+  const remainingTaskCount = Math.max(0, allRoutineTasks.length - priorityTasks.length);
+  const remainingTaskMinutes = Math.max(0, displayedMinutesRecoveredPerDay - visibleTaskMinutes);
 
   const oneHourTargetProgress = Math.min(100, Math.round((displayedMinutesRecoveredPerDay / 60) * 100));
   const oneHourNarrative =
@@ -617,17 +796,30 @@ export default async function OccupationPage({ params }: PageProps) {
     }
     return acc;
   }, {});
+  const displayAgentMap = new Map(
+    (displayBlueprint?.agents || []).map((agent) => [agent.blockKey, agent])
+  );
 
   const workBlocks = Object.values(blockMap)
     .sort((a: any, b: any) => b.minutes - a.minutes)
     .slice(0, 5)
-    .map((block: any) => ({
-      ...block,
-      tasks: block.tasks.sort((a: any, b: any) => b.lens.modeledMinutesPerDay - a.lens.modeledMinutesPerDay),
-      percentOfRecovery: displayedMinutesRecoveredPerDay > 0
-        ? Math.round((block.aiMinutes / displayedMinutesRecoveredPerDay) * 100)
-        : 0,
-    }));
+    .map((block: any) => {
+      const displayAgent = displayAgentMap.get(block.key);
+      const recoverableMinutes = displayAgent?.minutesSaved ?? block.aiMinutes;
+      const recoverableLow = displayAgent?.rangeLow ?? block.aiMinutes;
+      const recoverableHigh = displayAgent?.rangeHigh ?? block.aiMinutes;
+
+      return {
+        ...block,
+        recoverableMinutes,
+        recoverableLow,
+        recoverableHigh,
+        tasks: block.tasks.sort((a: any, b: any) => b.lens.modeledMinutesPerDay - a.lens.modeledMinutesPerDay),
+        percentOfRecovery: displayedMinutesRecoveredPerDay > 0
+          ? Math.round((recoverableMinutes / displayedMinutesRecoveredPerDay) * 100)
+          : 0,
+      };
+    });
 
   // Build the "typical day" infographic data
   const totalMappedMinutes = workBlocks.reduce((sum: number, b: any) => sum + b.minutes, 0);
@@ -638,7 +830,7 @@ export default async function OccupationPage({ params }: PageProps) {
     ...workBlocks.map((b: any) => ({
       label: b.label,
       minutes: b.minutes,
-      recoverable: b.aiMinutes,
+      recoverable: b.recoverableMinutes,
       posture: b.posture,
     })),
     ...(unmappedMinutes > 30 ? [{ label: 'Deep work & judgment calls', minutes: unmappedMinutes, recoverable: 0, posture: 'The work that requires your full attention — this stays yours.' }] : []),
@@ -650,7 +842,19 @@ export default async function OccupationPage({ params }: PageProps) {
 
   const automationSolutions = automationSolutionDefinitions
     .map((product) => {
-      const matchingTasks = taskEntries.filter((task: any) => {
+      const matchingBlockKeys = new Set(
+        (displayBlueprint?.agents || [])
+          .filter((agent) => {
+            if (agent.blockKey === product.key) return true;
+            if (product.key === 'analysis' && ['research', 'data_reporting'].includes(agent.blockKey)) return true;
+            if (product.key === 'coordination' && ['communication'].includes(agent.blockKey)) return true;
+            return false;
+          })
+          .map((agent) => agent.blockKey)
+      );
+
+      const matchingTasks = blockAlignedTasks.filter((task: any) => {
+        if (matchingBlockKeys.has(task.workBlock)) return true;
         const content = `${task.task_name} ${task.task_description} ${task.ai_how_it_helps || ''}`.toLowerCase();
         return (
           (product.matchCategories as readonly string[]).includes(String(task.ai_category || '')) ||
@@ -658,9 +862,9 @@ export default async function OccupationPage({ params }: PageProps) {
         );
       });
 
-      const totalMinutes = matchingTasks.reduce((sum: number, task: any) => sum + task.lens.modeledMinutesPerDay, 0);
-      const matchedBlocks = [...new Set(matchingTasks.map((task: any) => task.workBlock))]
-        .map((blockKey) => workBlockDefinitions[blockKey as keyof typeof workBlockDefinitions].label);
+      const totalMinutes = matchingTasks.reduce((sum: number, task: any) => sum + task.scaledMinutes, 0);
+      const matchedBlocks = [...new Set(matchingTasks.map((task: any) => task.blockLabel || workBlockDefinitions[task.workBlock as keyof typeof workBlockDefinitions]?.label))]
+        .filter(Boolean);
 
       return {
         ...product,
@@ -673,7 +877,6 @@ export default async function OccupationPage({ params }: PageProps) {
     .sort((a, b) => b.totalMinutes - a.totalMinutes)
     .slice(0, 4);
   const summaryBlocks = workBlocks.slice(0, 3);
-  const priorityTasks = topRecoverableTasks.slice(0, 3);
   const primarySolutions = automationSolutions.slice(0, 1);
   const skillSummary = skillProfile
     ? [
@@ -684,11 +887,42 @@ export default async function OccupationPage({ params }: PageProps) {
     : [];
   const visibleSkillSummary = skillSummary.filter((item) => item.value > 0);
   const humanEdgeNotes = [...new Set(summaryBlocks.map((block: any) => block.humanEdge))].slice(0, 2);
+  const estimateTrustPoints = [
+    {
+      title: 'Based on recurring task patterns',
+      body: `This estimate is built from recurring routines in ${occupation.title.toLowerCase()} work, not from a generic industry average. The strongest routine clusters carry the most weight.`,
+    },
+    {
+      title: 'Blended across multiple data layers',
+      body: 'The headline is not just the conservative O*NET floor. It blends task-level modeling, workflow coverage, and the package architecture so the estimate reflects how the solution would actually be deployed.',
+    },
+    {
+      title: 'Judgment-heavy work stays human',
+      body: 'The model is intentionally conservative around exceptions, approvals, sensitive communication, and final accountability.',
+    },
+  ];
+  const firstEngagementSteps = [
+    {
+      step: '01',
+      title: 'Confirm the routine cluster',
+      body: 'We narrow the first engagement to the routines most likely to produce visible time-back quickly.',
+    },
+    {
+      step: '02',
+      title: 'Map systems and review points',
+      body: 'We identify the tools involved and where human review, approvals, or exception handling need to stay in place.',
+    },
+    {
+      step: '03',
+      title: 'Recommend the starting package',
+      body: 'You get a practical package recommendation and handoff path rather than a request to configure the system yourself.',
+    },
+  ];
 
   // "What changes" — top 3 tasks with before/after framing
-  const whatChangesTasks = topRecoverableTasks.slice(0, 3).map((task: any) => {
-    const currentMin = task.lens.modeledMinutesPerDay;
-    const reducedMin = Math.max(1, Math.round(currentMin * (1 - task.lens.automationFactor)));
+  const whatChangesTasks = priorityTasks.slice(0, 3).map((task: any) => {
+    const currentMin = task.scaledMinutes;
+    const reducedMin = Math.max(1, Math.round(currentMin * 0.35));
     return {
       name: task.task_name,
       category: task.ai_category,
@@ -711,200 +945,458 @@ export default async function OccupationPage({ params }: PageProps) {
   const progressPercent = exceedsTarget ? 100 : oneHourTargetProgress;
 
   return (
-    <div className="bg-surface text-ink">
+    <div className="app-shell bg-surface text-ink">
+      <TrackPageView eventName="occupation_viewed" properties={{ occupationSlug: occupation.slug, occupationTitle: occupation.title }} />
+      <section className="relative overflow-hidden bg-panel">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute left-[12%] top-10 h-56 w-56 rounded-full bg-white/5 blur-3xl" />
+          <div className="absolute right-[10%] top-20 h-72 w-72 rounded-full bg-accent-blue/10 blur-3xl" />
+        </div>
+        <div className="page-container relative pb-14 pt-10 md:pb-16 md:pt-14">
+          <Link
+            href="/ai-jobs"
+            className="inline-flex items-center gap-1.5 text-[0.82rem] text-[#c8bfb4] transition-colors hover:text-white"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back to search
+          </Link>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* BEAT 1 — Dark hero panel                                           */}
-      {/* ------------------------------------------------------------------ */}
-      <section className="bg-panel">
-        <div className="page-container pt-8 pb-14 md:pt-10 md:pb-16">
-          <div className="mb-10">
-            <Link
-              href="/ai-jobs"
-              className="dark-panel-muted inline-flex items-center gap-1 text-[0.78rem] transition-opacity hover:opacity-70"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-              Back
-            </Link>
-          </div>
-
-          <p className="dark-panel-muted text-[0.6875rem] font-semibold uppercase tracking-[0.1em]">
-            {occupation.major_category}
-          </p>
-
-          {/* Title + archetype badge on the same line */}
-          <div className="mt-4 flex items-baseline justify-between gap-4 flex-wrap">
-            <h1
-              className="dark-panel-text font-editorial font-normal"
-              style={{ fontSize: 'clamp(1.75rem, 4vw, 3rem)', lineHeight: 1.1, letterSpacing: '-0.025em' }}
-            >
+          <div className="mt-8 max-w-4xl">
+            <p className="eyebrow dark-panel-muted">{occupation.major_category}</p>
+            <h1 className="mt-4 font-editorial text-[clamp(2.4rem,5.8vw,5rem)] font-normal leading-[0.95] tracking-[-0.055em] text-white">
               {occupation.title}
             </h1>
-            <span className={`shrink-0 inline-block rounded-full border px-4 py-1 text-[0.8rem] font-medium ${occupationArchetype.badgeTone}`}>
-              {occupationArchetype.label}
-            </span>
+            {occupation.employment && (
+              <p className="mt-4 text-[0.88rem] text-[#c8bfb4]">
+                {Number(occupation.employment).toLocaleString()} people in this role across the U.S.
+              </p>
+            )}
           </div>
-          {occupation.employment && (
-            <p className="dark-panel-muted mt-3 text-[0.75rem]">
-              {Number(occupation.employment).toLocaleString()} people in this role across the U.S.
+
+          <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">
+            <div className="rounded-[2.2rem] border border-white/10 bg-white/6 p-8 shadow-2xl backdrop-blur-sm">
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.1em] text-[#c8bfb4]">
+              Recoverable time per day
             </p>
-          )}
+            <div className="mt-4 flex items-end gap-3">
+              <CountUp
+                value={displayedMinutesRecoveredPerDay}
+                className="font-editorial text-[clamp(4.2rem,10vw,7rem)] leading-none tracking-[-0.08em] text-white"
+              />
+              <span className="pb-2 text-[1.25rem] font-medium text-[#d4cbc0]">min</span>
+            </div>
+            <p className="mt-4 max-w-2xl text-[0.96rem] leading-8 text-[#e7dfd5]">
+              {oneHourNarrative}
+            </p>
+            <div className="mt-7 h-3 w-full overflow-hidden rounded-full bg-white/10">
+              <div
+                className="h-full rounded-full bg-white transition-all duration-700"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <div className="mt-2 flex items-center justify-between text-[0.78rem] text-[#c8bfb4]">
+              <span>{Math.min(displayedMinutesRecoveredPerDay, 60)} of 60 min/day target</span>
+              <span>{weeklyHoursSaved}h/week potential</span>
+            </div>
+          </div>
+
+          <div className="rounded-[1.8rem] border border-white/10 bg-black/10 p-6 backdrop-blur-sm">
+            <p className="eyebrow dark-panel-muted">Why this matters</p>
+            <p className="mt-3 text-[0.92rem] leading-7 text-[#ddd5ca]">
+              This is not a replacement story. It is a routine-load story: reduce the repetitive setup around the work so the human stays with judgment, exceptions, and final accountability.
+            </p>
+            <div className="mt-4 inline-flex rounded-full border border-white/12 bg-white/6 px-3 py-1.5 text-[0.75rem] font-medium text-white">
+              {occupationArchetype.label}
+            </div>
+          </div>
+        </div>
         </div>
       </section>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* YOUR DAY, MAPPED — Unified day timeline + savings + ROI            */}
-      {/* ------------------------------------------------------------------ */}
-      <section className="page-container py-16 md:py-20">
-        {workBlocks.length > 0 ? (
-          <div>
-            <DayValueMap
-              blocks={(() => {
-                // Use O*NET block ranges when available, fall back to scaled LLM data
-                const rawTotal = workBlocks.reduce((s: number, b: any) => s + b.aiMinutes, 0);
-                const scaleLow = rawTotal > 0 ? timeRangeLow / rawTotal : 1;
-                const scaleHigh = rawTotal > 0 ? timeRangeHigh / rawTotal : scaleLow;
-                return workBlocks.map((b: any) => {
-                  const blockKey = b.key as string;
-                  const blockRange = timeRangeByBlock?.[blockKey];
-                  return {
-                    key: b.key,
-                    label: b.label,
-                    minutes: b.minutes,
-                    recoverable: blockRange ? blockRange.low : Math.round(b.aiMinutes * scaleLow),
-                    recoverableHigh: blockRange ? blockRange.high : Math.round(b.aiMinutes * scaleHigh),
-                    posture: b.posture,
-                    color: workBlockColors[blockKey as keyof typeof workBlockColors] || '#94a3b8',
-                  };
-                });
-              })()}
-              totalRecoverable={timeRangeLow}
-              totalRecoverableHigh={timeRangeHigh}
-              fullDayMinutes={fullDayMinutes}
-              defaultHourlyRate={Math.round(hourlyRate)}
-              salaryLabel={annualWage ? `$${(annualWage / 1000).toFixed(0)}K median salary` : null}
-              occupationTitle={occupation.title}
-            />
-          </div>
-        ) : (
-          <div className="mt-8 rounded-xl border border-edge bg-surface-raised px-6 py-12 text-center">
-            <p className="text-ink-secondary">
-              We&apos;re still mapping the day-to-day work for this occupation.
-            </p>
-          </div>
-        )}
+      <main className="page-container -mt-6 space-y-16 pb-20 md:-mt-8 md:space-y-20">
+        {priorityTasks.length > 0 && (
+          <section>
+            <div className="max-w-2xl">
+              <p className="eyebrow">Where your time goes</p>
+              <h2 className="mt-3 font-editorial text-[clamp(1.6rem,3vw,2.4rem)] font-normal tracking-[-0.03em] text-ink">
+                The routines with the clearest time-back potential.
+              </h2>
+              <p className="mt-3 text-[0.9rem] leading-7 text-ink-secondary">
+                These are the leading routine clusters behind the headline estimate. Together, the visible routines account for about {visibleTaskMinutes} of the {displayedMinutesRecoveredPerDay} recoverable minutes shown above.
+              </p>
+            </div>
 
-        {/* Collapsible methodology */}
-        {automationProfile && (
-          <details className="mt-10 group">
-            <summary className="cursor-pointer text-[0.7rem] font-medium text-ink-muted hover:text-ink transition-colors">
-              How we scored this role — methodology &amp; data sources
-            </summary>
-            <div className="mt-4 rounded-lg border border-border/40 bg-surface p-5">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-[0.75rem] font-medium text-ink">Composite Score: {Math.round(automationProfile.composite_score)}/100</p>
-                <span className={`rounded-full border px-2.5 py-0.5 text-[0.65rem] font-medium ${occupationArchetype.badgeTone}`}>
-                  {occupationArchetype.label}
-                </span>
-              </div>
-              <p className="text-[0.7rem] text-ink-muted leading-relaxed mb-4">{occupationArchetype.rationale}</p>
-
-              <div className="grid gap-2 md:grid-cols-5">
-                {[
-                  { label: 'Abilities', value: automationProfile.ability_automation_potential, weight: '30%' },
-                  { label: 'Work activities', value: automationProfile.work_activity_automation_potential, weight: '25%' },
-                  { label: 'Task keywords', value: automationProfile.keyword_score, weight: '20%' },
-                  { label: 'Digital readiness', value: automationProfile.knowledge_digital_readiness, weight: '15%' },
-                  { label: 'Frequency', value: automationProfile.task_frequency_weight, weight: '10%' },
-                ].map((dim) => (
-                  <div key={dim.label}>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[0.6rem] text-ink-muted">{dim.label}</span>
-                      <span className="text-[0.55rem] text-ink-muted">{dim.value != null ? `${Math.round(dim.value * 100)}%` : '—'}</span>
+            <div className="mt-8 grid gap-4 lg:grid-cols-2">
+              {priorityTasks.map((task: any) => (
+                <div key={task.id} className="rounded-[1.6rem] border border-edge bg-surface-raised p-5 shadow-sm">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2 pr-3">
+                        <span className={`rounded-full border px-2.5 py-1 text-[0.66rem] font-medium ${task.lens.tone}`}>
+                          {task.lens.label}
+                        </span>
+                        <span className="rounded-full border border-edge bg-surface px-2.5 py-1 text-[0.66rem] font-medium text-ink-tertiary">
+                          {task.ai_category ? opportunityCategoryConfig[String(task.ai_category)]?.label ?? 'Routine support' : 'Routine support'}
+                        </span>
+                        <span className="rounded-full border border-edge bg-surface px-2.5 py-1 text-[0.66rem] font-medium text-ink-tertiary">
+                          {task.blockLabel}
+                        </span>
+                      </div>
+                      <h3 className="mt-3 text-[0.96rem] font-semibold leading-7 text-ink">{task.task_name}</h3>
+                      <p className="mt-2 text-[0.82rem] leading-6 text-ink-secondary">
+                        {task.task_description || task.ai_how_it_helps || 'Recurring work pattern with strong time-back potential.'}
+                      </p>
                     </div>
-                    <div className="mt-1 h-1 rounded-full bg-border/40">
-                      <div className="h-full rounded-full bg-accent/60" style={{ width: `${Math.round((dim.value ?? 0.5) * 100)}%` }} />
+                    <div className="shrink-0 rounded-[1.2rem] bg-surface-sunken px-4 py-3 text-right">
+                      <div className="font-editorial text-[1.9rem] leading-none tracking-[-0.05em] text-ink">
+                        {task.scaledMinutes}
+                      </div>
+                      <div className="mt-1 text-[0.66rem] font-medium uppercase tracking-[0.08em] text-ink-tertiary">
+                        min/day
+                      </div>
+                      <div className="mt-2 text-[0.64rem] text-ink-tertiary">
+                        Range: {task.scaledRangeLow}-{task.scaledRangeHigh} min/day
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-
-              {(topAbilities.length > 0 || topKnowledge.length > 0) && (
-                <div className="mt-5 grid gap-4 md:grid-cols-2">
-                  {topAbilities.length > 0 && (
-                    <div>
-                      <p className="text-[0.6rem] font-semibold uppercase tracking-[0.08em] text-ink-muted mb-2">Top abilities</p>
-                      {topAbilities.slice(0, 5).map((a: any) => (
-                        <div key={a.element_name} className="flex items-center justify-between py-0.5">
-                          <span className="text-[0.65rem] text-ink-secondary">{a.element_name}</span>
-                          <span className="text-[0.6rem] text-ink-muted">{Number(a.importance).toFixed(1)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {topKnowledge.length > 0 && (
-                    <div>
-                      <p className="text-[0.6rem] font-semibold uppercase tracking-[0.08em] text-ink-muted mb-2">Top knowledge</p>
-                      {topKnowledge.slice(0, 5).map((k: any) => (
-                        <div key={k.element_name} className="flex items-center justify-between py-0.5">
-                          <span className="text-[0.65rem] text-ink-secondary">{k.element_name}</span>
-                          <span className="text-[0.6rem] text-ink-muted">{Number(k.importance).toFixed(1)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-surface-sunken">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{
+                        width: `${Math.max(12, Math.round((task.scaledMinutes / Math.max(priorityTasks[0]?.scaledMinutes || 1, 1)) * 100))}%`,
+                      }}
+                    />
+                  </div>
                 </div>
-              )}
+              ))}
+            </div>
 
-              <p className="mt-4 text-[0.6rem] text-ink-muted">
-                Data: O*NET 30.x (52 abilities, 41 work activities, 33 knowledge domains) &middot; BLS employment statistics &middot; Task analysis from 15,000+ government task statements
+            {remainingTaskCount > 0 ? (
+              <details className="mt-5 rounded-[1.6rem] border border-edge bg-surface-raised p-5 shadow-sm">
+                <summary className="cursor-pointer list-none">
+                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <p className="text-[0.82rem] font-semibold text-ink">More routine coverage</p>
+                      <p className="mt-1 text-[0.76rem] leading-6 text-ink-tertiary">
+                        {remainingTaskCount} additional routines contribute about {remainingTaskMinutes} more min/day across the same model.
+                      </p>
+                    </div>
+                    <span className="inline-flex items-center rounded-full border border-edge bg-surface px-3 py-1.5 text-[0.72rem] font-medium text-ink-secondary">
+                      Expand all routines
+                    </span>
+                  </div>
+                </summary>
+                <div className="mt-5 grid gap-3">
+                  {allRoutineTasks.slice(priorityTasks.length).map((task: any) => (
+                    <div key={task.id} className="rounded-2xl border border-edge bg-surface p-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={`rounded-full border px-2.5 py-1 text-[0.64rem] font-medium ${task.lens.tone}`}>
+                              {task.lens.label}
+                            </span>
+                            <span className="rounded-full border border-edge bg-surface-sunken px-2.5 py-1 text-[0.64rem] font-medium text-ink-tertiary">
+                              {task.blockLabel}
+                            </span>
+                          </div>
+                          <h3 className="mt-3 text-[0.88rem] font-medium text-ink">{task.task_name}</h3>
+                          <p className="mt-1 text-[0.76rem] leading-6 text-ink-secondary">
+                            {task.ai_how_it_helps || task.task_description || 'Recurring work pattern with measurable support potential.'}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-[0.84rem] font-semibold text-ink">{task.scaledMinutes}m/day</div>
+                          <div className="mt-1 text-[0.66rem] text-ink-tertiary">
+                            {task.scaledRangeLow}-{task.scaledRangeHigh}m/day
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            ) : null}
+          </section>
+        )}
+
+        <section>
+          <div className="max-w-2xl">
+            <p className="eyebrow">The best place to start</p>
+            <h2 className="mt-3 font-editorial text-[clamp(1.6rem,3vw,2.4rem)] font-normal tracking-[-0.03em] text-ink">
+              Start with the package that matches the strongest routine cluster.
+            </h2>
+          </div>
+
+          {primarySolutions.length > 0 ? (
+            <div className="mt-8 rounded-[2rem] border border-edge-strong bg-surface-raised p-8 shadow-md">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                <div className="max-w-3xl">
+                  <div className="inline-flex rounded-full border border-edge bg-surface px-3 py-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-ink-tertiary">
+                    Recommended starting system
+                  </div>
+                  <h3 className="mt-4 font-editorial text-[2rem] font-normal tracking-[-0.04em] text-ink">
+                    {primarySolutions[0].name}
+                  </h3>
+                  <p className="mt-3 text-[0.95rem] leading-7 text-ink-secondary">
+                    {primarySolutions[0].strapline}
+                  </p>
+                  <div className="mt-5 grid gap-4 md:grid-cols-3">
+                    <div className="rounded-[1.4rem] border border-edge bg-surface p-4">
+                      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink-tertiary">Covers</p>
+                      <p className="mt-2 text-[0.82rem] leading-6 text-ink-secondary">
+                        ~{primarySolutions[0].totalMinutes} min/day of the strongest routine drag.
+                      </p>
+                    </div>
+                    <div className="rounded-[1.4rem] border border-edge bg-surface p-4">
+                      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink-tertiary">Watches</p>
+                      <p className="mt-2 text-[0.82rem] leading-6 text-ink-secondary">
+                        {primarySolutions[0].watches}
+                      </p>
+                    </div>
+                    <div className="rounded-[1.4rem] border border-edge bg-surface p-4">
+                      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink-tertiary">Produces</p>
+                      <p className="mt-2 text-[0.82rem] leading-6 text-ink-secondary">
+                        {primarySolutions[0].produces}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex shrink-0 flex-col gap-3 lg:w-64">
+                  <TrackedLink
+                    href={`/products?occupation=${occupation.slug}`}
+                    eventName="occupation_products_clicked"
+                    eventProps={{ occupationSlug: occupation.slug, occupationTitle: occupation.title }}
+                    className="btn-primary inline-flex items-center justify-center gap-2 rounded-xl border border-primary bg-primary px-5 py-3 text-[0.86rem] font-medium transition-all hover:bg-transparent hover:text-ink"
+                  >
+                    See the best package
+                    <ArrowRight className="h-4 w-4" />
+                  </TrackedLink>
+                  <TrackedLink
+                    href={`/factory?occupation=${occupation.slug}`}
+                    eventName="occupation_factory_clicked"
+                    eventProps={{ occupationSlug: occupation.slug, occupationTitle: occupation.title, cta: 'primary' }}
+                    className="inline-flex items-center justify-center rounded-xl border border-edge-strong bg-surface px-5 py-3 text-[0.86rem] font-medium text-ink-secondary transition-colors hover:text-ink"
+                  >
+                    Get your plan
+                  </TrackedLink>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-8 rounded-[1.6rem] border border-edge bg-surface-raised p-6 shadow-sm">
+              <p className="text-[0.9rem] leading-7 text-ink-secondary">
+                We are still mapping the best starting package for this role, but the next step is the same: confirm the routines, the systems involved, and the level of operating support you need.
+              </p>
+            </div>
+          )}
+        </section>
+
+        <section>
+          <div className="max-w-2xl">
+            <p className="eyebrow">Why trust this number</p>
+            <h2 className="mt-3 font-editorial text-[clamp(1.6rem,3vw,2.4rem)] font-normal tracking-[-0.03em] text-ink">
+              The estimate is directional, but it is grounded in the work.
+            </h2>
+            <p className="mt-3 text-[0.9rem] leading-7 text-ink-secondary">
+              The goal is not false precision. The goal is a credible view of where routine drag lives in this role and what kind of support could realistically give time back.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {estimateTrustPoints.map((point, index) => (
+              <FadeIn key={point.title} delay={index * 0.06}>
+                <div className="rounded-[1.6rem] border border-edge bg-surface-raised p-6 shadow-sm">
+                  <p className="text-[0.76rem] font-semibold uppercase tracking-[0.08em] text-ink-tertiary">{point.title}</p>
+                  <p className="mt-3 text-[0.84rem] leading-6 text-ink-secondary">{point.body}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <div className="max-w-2xl">
+            <p className="eyebrow">What happens next</p>
+            <h2 className="mt-3 font-editorial text-[clamp(1.6rem,3vw,2.4rem)] font-normal tracking-[-0.03em] text-ink">
+              A first engagement should feel scoped, not overwhelming.
+            </h2>
+            <p className="mt-3 text-[0.9rem] leading-7 text-ink-secondary">
+              If this role looks relevant, the next step is a short qualification flow. We use it to turn the role insight into a practical starting plan.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {firstEngagementSteps.map((step, index) => (
+              <FadeIn key={step.step} delay={index * 0.06}>
+                <div className="rounded-[1.6rem] border border-edge bg-surface-raised p-6 shadow-sm">
+                  <p className="text-[0.74rem] font-semibold uppercase tracking-[0.08em] text-ink-tertiary">{step.step}</p>
+                  <h3 className="mt-3 text-[0.98rem] font-semibold text-ink">{step.title}</h3>
+                  <p className="mt-3 text-[0.84rem] leading-6 text-ink-secondary">{step.body}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <details className="group rounded-[1.6rem] border border-edge bg-surface-raised p-5 shadow-sm">
+            <summary className="cursor-pointer list-none text-[0.88rem] font-medium text-ink">
+              Day architecture
+            </summary>
+            <div className="mt-5">
+              <p className="max-w-3xl text-[0.88rem] leading-7 text-ink-secondary">
+                {dailyNarrative}
+              </p>
+              {workBlocks.length > 0 ? (
+                <div className="mt-6">
+                  <DayValueMap
+                    blocks={workBlocks.map((b: any) => {
+                      const blockKey = b.key as string;
+                      return {
+                        key: b.key,
+                        label: b.label,
+                        minutes: b.minutes,
+                        recoverable: b.recoverableLow,
+                        recoverableHigh: b.recoverableHigh,
+                        posture: b.posture,
+                        color: workBlockColors[blockKey as keyof typeof workBlockColors] || '#94a3b8',
+                      };
+                    })}
+                    totalRecoverable={timeRangeLow}
+                    totalRecoverableHigh={timeRangeHigh}
+                    fullDayMinutes={fullDayMinutes}
+                    defaultHourlyRate={Math.round(hourlyRate)}
+                    salaryLabel={annualWage ? `$${(annualWage / 1000).toFixed(0)}K median salary` : null}
+                    occupationTitle={occupation.title}
+                  />
+                </div>
+              ) : null}
+            </div>
+          </details>
+
+          <details className="group rounded-[1.6rem] border border-edge bg-surface-raised p-5 shadow-sm">
+            <summary className="cursor-pointer list-none text-[0.88rem] font-medium text-ink">
+              Evidence layer
+            </summary>
+            <div className="mt-5 space-y-5">
+              {automationProfile ? (
+                <div className="rounded-2xl border border-edge bg-surface p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-[0.84rem] font-medium text-ink">
+                      Composite score: {Math.round(automationProfile.composite_score)}/100
+                    </p>
+                    <span className={`rounded-full border px-2.5 py-1 text-[0.68rem] font-medium ${occupationArchetype.badgeTone}`}>
+                      {occupationArchetype.label}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-[0.8rem] leading-6 text-ink-secondary">
+                    {occupationArchetype.rationale}
+                  </p>
+                </div>
+              ) : null}
+
+              {categoryMix.length > 0 ? (
+                <div className="grid gap-3 md:grid-cols-3">
+                  {categoryMix.map(([category, minutes]) => (
+                    <div key={category} className="rounded-2xl border border-edge bg-surface p-4">
+                      <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink-tertiary">
+                        {opportunityCategoryConfig[category]?.label ?? category}
+                      </p>
+                      <p className="mt-2 text-[1.2rem] font-semibold text-ink">{minutes}m/day</p>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              <p className="text-[0.72rem] text-ink-tertiary">
+                Data: O*NET 30.x, BLS employment statistics, and task analysis across 15,000+ government task statements.
               </p>
             </div>
           </details>
-        )}
-      </section>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* BEAT 3 — AI Agent Blueprint                                        */}
-      {/* ------------------------------------------------------------------ */}
-      {blueprint && (
-        <>
-          <div className="page-container"><div className="border-t border-edge" /></div>
-          <BlueprintSection
-            blueprint={blueprint}
-            occupationSlug={occupation.slug}
-            occupationTitle={occupation.title}
-            totalDayMinutes={displayedMinutesRecoveredPerDay}
-          />
-        </>
-      )}
+          <details className="group rounded-[1.6rem] border border-edge bg-surface-raised p-5 shadow-sm">
+            <summary className="cursor-pointer list-none text-[0.88rem] font-medium text-ink">
+              Human edge and upskilling
+            </summary>
+            <div className="mt-5 grid gap-5 md:grid-cols-2">
+              <div className="rounded-2xl border border-edge bg-surface p-4">
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-ink-tertiary">What stays human</p>
+                <div className="mt-3 space-y-2">
+                  {(humanEdgeNotes.length > 0 ? humanEdgeNotes : ['Judgment, exceptions, and final accountability remain human-led.']).map((note) => (
+                    <p key={note} className="text-[0.8rem] leading-6 text-ink-secondary">{note}</p>
+                  ))}
+                </div>
+              </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* CTA — Go build your solution                                       */}
-      {/* ------------------------------------------------------------------ */}
-      <div className="page-container"><div className="border-t border-edge" /></div>
-
-      <section className="page-container py-16 md:py-20">
-        <FadeIn>
-          <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="font-editorial font-normal text-ink" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}>
-                Ready to get that time back?
-              </h2>
-              <p className="mt-1.5 text-[0.85rem] text-ink-secondary">
-                Tell us about your day. We&apos;ll build a custom recommendation.
-              </p>
+              <div className="rounded-2xl border border-edge bg-surface p-4">
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-ink-tertiary">Skill profile</p>
+                <div className="mt-3 space-y-2">
+                  {visibleSkillSummary.length > 0 ? visibleSkillSummary.map((item) => (
+                    <div key={item.label} className="flex items-center justify-between text-[0.8rem] text-ink-secondary">
+                      <span>{item.label}</span>
+                      <span className="font-medium text-ink">{item.value}</span>
+                    </div>
+                  )) : (
+                    <p className="text-[0.8rem] leading-6 text-ink-secondary">
+                      This role still needs deeper skill-layer mapping, but the strongest human edge remains in judgment, context, and final review.
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
-            <Link
-              href={`/factory?occupation=${occupation.slug}`}
-              className="btn-primary group inline-flex shrink-0 items-center gap-3 rounded-xl border border-primary bg-primary px-10 py-5 text-[1.1rem] font-medium transition-all hover:bg-transparent hover:text-ink"
-            >
-              Get started
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </div>
-        </FadeIn>
-      </section>
+          </details>
+
+          {displayBlueprint ? (
+            <details className="group rounded-[1.4rem] border border-edge bg-surface-raised p-5 shadow-sm">
+              <summary className="cursor-pointer list-none text-[0.88rem] font-medium text-ink">
+                Product architecture preview
+              </summary>
+              <div className="mt-6">
+                <BlueprintSection
+                  blueprint={displayBlueprint}
+                  occupationSlug={occupation.slug}
+                  occupationTitle={occupation.title}
+                  totalDayMinutes={displayedMinutesRecoveredPerDay}
+                />
+              </div>
+            </details>
+          ) : null}
+        </section>
+
+        <section>
+          <FadeIn>
+            <div className="rounded-[2rem] border border-edge-strong bg-surface-raised p-8 shadow-md">
+              <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+                <div className="max-w-2xl">
+                  <p className="eyebrow">Next step</p>
+                  <h2 className="mt-3 font-editorial text-[clamp(1.6rem,3vw,2.4rem)] font-normal tracking-[-0.03em] text-ink">
+                    Move from role insight into the right package.
+                  </h2>
+                  <p className="mt-3 text-[0.9rem] leading-7 text-ink-secondary">
+                    The best next step is not designing the system yourself. It is confirming the role, the routines, the systems involved, and the level of support you need.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href={`/products?occupation=${occupation.slug}`}
+                    className="btn-primary group inline-flex shrink-0 items-center gap-3 rounded-xl border border-primary bg-primary px-8 py-4 text-[0.95rem] font-medium transition-all hover:bg-transparent hover:text-ink"
+                  >
+                    See the best package
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                  <Link
+                    href={`/factory?occupation=${occupation.slug}`}
+                    className="inline-flex shrink-0 items-center gap-3 rounded-xl border border-edge-strong bg-surface px-8 py-4 text-[0.95rem] font-medium text-ink-secondary transition-colors hover:text-ink"
+                  >
+                    Get your plan
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </FadeIn>
+        </section>
+      </main>
 
       <Footer />
     </div>

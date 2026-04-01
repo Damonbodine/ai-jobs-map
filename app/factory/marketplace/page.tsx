@@ -156,14 +156,40 @@ export default function MarketplacePage() {
             <ChevronRight className="w-4 h-4 rotate-180 group-hover:-translate-x-0.5 transition-transform" />
             Back to Factory
           </Link>
-          <div className="eyebrow mb-5">Automation catalog</div>
+          <div className="eyebrow mb-5">Secondary library</div>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-3 leading-[0.96]">
             <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Automation</span>{' '}
             Marketplace
           </h1>
           <p className="text-slate-400 text-lg leading-8">
-            Browse workflow bundles built around repetitive job routines and connect them to packages designed to return one focused hour a day.
+            Browse workflow bundles and package components after you understand the recommended starting package. This page supports deeper exploration. It is not the main buying path.
           </p>
+        </div>
+
+        <div className="mb-8 rounded-[1.8rem] border border-slate-800 bg-slate-900/60 p-6 backdrop-blur-xl">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-slate-500">Recommended order</p>
+              <h2 className="mt-2 text-2xl font-semibold text-slate-100">Start with the role and package, then use the library for depth.</h2>
+              <p className="mt-3 text-sm leading-7 text-slate-400">
+                If you are still deciding what to buy, go back to the role-based recommendation or the products page first. Come here when you want to inspect workflow parts in more detail.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/products"
+                className="inline-flex items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-3 text-sm font-medium text-emerald-300 transition-colors hover:bg-emerald-500/15"
+              >
+                See products first
+              </Link>
+              <Link
+                href="/factory"
+                className="inline-flex items-center justify-center rounded-xl border border-slate-700 bg-slate-950/70 px-5 py-3 text-sm font-medium text-slate-200 transition-colors hover:border-cyan-400/30 hover:text-white"
+              >
+                Get your plan
+              </Link>
+            </div>
+          </div>
         </div>
 
         <div className="panel mb-8 rounded-[1.8rem] p-5 space-y-4">
@@ -412,14 +438,14 @@ export default function MarketplacePage() {
         <div className="mt-16 bg-gradient-to-br from-emerald-900/30 via-slate-900/60 to-cyan-900/30 rounded-2xl p-8 text-center border border-slate-800 backdrop-blur-xl">
           <h2 className="text-2xl font-bold mb-4">Need a package built around your role?</h2>
           <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
-            Start from the routines consuming the day, then let the product compose a package around those repetitive tasks instead of forcing you into a generic feature list.
+            Start from the routines consuming the day, then let the product compose a package around those repetitive tasks instead of forcing you into a catalog-first buying flow.
           </p>
           <Link
-            href="/factory/build"
+            href="/factory"
             className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white px-8 py-3 rounded-xl font-semibold transition-all shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40"
           >
             <Sparkles className="w-5 h-5" />
-            Build Custom Workflow
+            Get your plan
           </Link>
         </div>
       </div>

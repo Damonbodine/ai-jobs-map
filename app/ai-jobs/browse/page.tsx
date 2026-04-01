@@ -9,6 +9,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Footer } from '@/components/ui/footer';
 import { PexelsImage } from '@/components/ui/pexels-image';
 import { getOccupationCategoryLabel, normalizeOccupationCategory, occupationCategoryOptions } from '@/lib/ai-jobs/categories';
+import { trackEvent } from '@/lib/analytics/client';
+import { TrackPageView } from '@/components/analytics/track-page-view';
 
 interface Occupation {
   id: number;
@@ -115,6 +117,7 @@ export default function BrowsePage() {
 
   return (
     <div className="app-shell">
+      <TrackPageView eventName="browse_viewed" properties={{ category: selectedCategory || null, searchQuery: searchQuery || null }} />
       {/* Hero */}
       <section className="bg-panel">
         <div className="page-container pt-8 pb-10 md:pt-10 md:pb-12">
@@ -232,6 +235,7 @@ export default function BrowsePage() {
                 >
                   <Link
                     href={`/ai-jobs/${occupation.slug}`}
+                    onClick={() => trackEvent('browse_role_selected', { occupationSlug: occupation.slug, occupationTitle: occupation.title, category: occupation.major_category, searchQuery: searchQuery || null })}
                     className="group relative flex flex-col overflow-hidden rounded-2xl border border-edge-strong bg-surface-raised shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
                   >
                     <PexelsImage

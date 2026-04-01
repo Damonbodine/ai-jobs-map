@@ -13,7 +13,10 @@ export default function HorizonConcept() {
         <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-emerald-500/10 blur-[150px] rounded-full animate-pulse" />
         <div className="absolute bottom-[-10%] left-[-20%] w-[50%] h-[50%] bg-blue-600/10 blur-[130px] rounded-full" />
         {/* Grid Overlay */}
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 contrast-150" />
+        <div
+          className="absolute inset-0 opacity-20 contrast-150"
+          style={{ backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')" }}
+        />
       </div>
 
       <nav className="relative z-10 px-8 py-8 flex justify-between items-center max-w-7xl mx-auto">

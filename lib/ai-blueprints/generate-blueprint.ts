@@ -15,6 +15,7 @@ import {
   blockRoleTemplates,
   describeAutomationApproach,
 } from './constants';
+import { deriveBlockMidpointRange } from '@/lib/ai-jobs/timeback';
 
 // ── Input types ────────────────────────────────────────────────
 
@@ -419,13 +420,13 @@ export function generateBlueprint(
     if (agent) agents.push(agent);
   }
 
-  // Override agent minutesSaved with O*NET-grounded block ranges when available
-  // This ensures agent cards sum to the hero number
+  // Override agent minutesSaved with midpoint block ranges when available.
+  // This keeps the package/system layer aligned with a broader, still-grounded estimate.
   if (timeRangeByBlock) {
     for (const agent of agents) {
       const blockRange = timeRangeByBlock[agent.blockKey];
       if (blockRange) {
-        agent.minutesSaved = blockRange.low;
+        agent.minutesSaved = deriveBlockMidpointRange(blockRange);
       }
     }
   }

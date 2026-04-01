@@ -22,7 +22,10 @@ function NavLink({ href, children, active }: { href: string; children: React.Rea
 
 export function Header() {
   const pathname = usePathname();
-  const isFactory = pathname.startsWith('/factory');
+  const isMap = pathname.startsWith('/ai-jobs');
+  const isProducts = pathname.startsWith('/products');
+  const isAbout = pathname === '/ai-jobs/about';
+  const isBrowse = pathname.startsWith('/ai-jobs/browse');
 
   return (
     <header className="sticky top-0 z-50 border-b border-edge/50 bg-surface/92 backdrop-blur-xl">
@@ -35,17 +38,20 @@ export function Header() {
         </Link>
 
         <nav className="flex items-center gap-7">
-          {isFactory ? (
-            <>
-              <NavLink href="/ai-jobs" active={false}>Map</NavLink>
-              <NavLink href="/ai-jobs/browse" active={false}>Browse</NavLink>
-            </>
-          ) : (
-            <>
-              <NavLink href="/ai-jobs/browse" active={pathname.startsWith('/ai-jobs/browse')}>Browse</NavLink>
-              <NavLink href="/ai-jobs/about" active={pathname === '/ai-jobs/about'}>About</NavLink>
-            </>
-          )}
+          <NavLink href="/ai-jobs" active={isMap && !isBrowse && !isAbout}>Map</NavLink>
+          <NavLink href="/products" active={isProducts}>Products</NavLink>
+          <NavLink href="/ai-jobs/about" active={isAbout}>About</NavLink>
+          <Link
+            href="/ai-jobs/browse"
+            className={cn(
+              'rounded-full border px-3 py-1.5 text-[0.72rem] transition-colors duration-200',
+              isBrowse
+                ? 'border-edge-strong bg-surface-raised text-ink'
+                : 'border-edge/70 text-ink-tertiary hover:border-edge-strong hover:text-ink'
+            )}
+          >
+            Browse
+          </Link>
         </nav>
       </div>
     </header>

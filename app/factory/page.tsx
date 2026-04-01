@@ -9,6 +9,8 @@ import { AgentSelector } from '@/components/factory/agent-selector';
 import { ToolPicker } from '@/components/factory/tool-picker';
 import { CustomTasks } from '@/components/factory/custom-tasks';
 import type { AgentBlueprint, BlockAgent } from '@/lib/ai-blueprints/types';
+import { trackEvent } from '@/lib/analytics/client';
+import { TrackPageView } from '@/components/analytics/track-page-view';
 
 // ── Generic wizard (no occupation context) ─────────────────────
 
@@ -21,7 +23,7 @@ const painOptions = [
   { id: 'meetings', label: 'Meetings & scheduling', desc: 'Calendar management, prep, follow-up notes' },
 ];
 
-const genericSteps = ['role', 'pain', 'freeform', 'contact'] as const;
+const genericSteps = ['role', 'pain', 'contact'] as const;
 type GenericStep = typeof genericSteps[number];
 
 function GenericWizard() {
@@ -37,7 +39,6 @@ function GenericWizard() {
   const canGoNext = () => {
     if (step === 'role') return role.trim().length > 0;
     if (step === 'pain') return selectedPains.length > 0;
-    if (step === 'freeform') return true;
     if (step === 'contact') return email.trim().length > 0;
     return false;
   };
@@ -54,7 +55,14 @@ function GenericWizard() {
     setSelectedPains((prev) => prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]);
   };
   const handleSubmit = () => {
-    console.log('Generic intake:', { role, selectedPains, freeform, name, email });
+    trackEvent('factory_completed', {
+      flow: 'generic',
+      role,
+      painCount: selectedPains.length,
+      selectedPains,
+      hasFreeform: Boolean(freeform.trim()),
+      emailProvided: Boolean(email.trim()),
+    });
     setSubmitted(true);
   };
 
@@ -70,7 +78,7 @@ function GenericWizard() {
                 What&apos;s your role?
               </h1>
               <p className="mt-3 text-[0.85rem] leading-[1.6] text-ink-secondary">
-                This helps us understand the kind of work you do every day.
+                We&apos;ll use this to shape a first recommendation around the routines most likely eating your day.
               </p>
               <input type="text" value={role} onChange={(e) => setRole(e.target.value)} placeholder="e.g. Financial Examiner, Project Manager..." className="mt-8 w-full rounded-xl border border-edge-strong bg-surface-raised px-4 py-3.5 text-[0.9rem] text-ink placeholder:text-ink-tertiary/40 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-ink/5 focus:shadow-md" autoFocus />
             </div>
@@ -80,7 +88,7 @@ function GenericWizard() {
               <h1 className="font-editorial text-[clamp(1.5rem,3.5vw,2.25rem)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
                 What takes up too much of your day?
               </h1>
-              <p className="mt-3 text-[0.85rem] leading-[1.6] text-ink-secondary">Pick everything that feels like it eats more time than it should.</p>
+              <p className="mt-3 text-[0.85rem] leading-[1.6] text-ink-secondary">Pick the routine clusters that feel heavier than they should.</p>
               <div className="mt-8 space-y-2">
                 {painOptions.map((option) => {
                   const selected = selectedPains.includes(option.id);
@@ -99,25 +107,24 @@ function GenericWizard() {
               </div>
             </div>
           )}
-          {step === 'freeform' && (
-            <div>
-              <h1 className="font-editorial text-[clamp(1.5rem,3.5vw,2.25rem)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
-                What would getting time back mean for you?
-              </h1>
-              <p className="mt-3 text-[0.85rem] leading-[1.6] text-ink-secondary">Tell us anything — the more detail, the better we can help.</p>
-              <textarea value={freeform} onChange={(e) => setFreeform(e.target.value)} placeholder="I spend too much time on..." rows={5} className="mt-8 w-full rounded-xl border border-edge-strong bg-surface-raised px-4 py-3.5 text-[0.9rem] leading-[1.6] text-ink placeholder:text-ink-tertiary/40 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-ink/5 focus:shadow-md resize-none" autoFocus />
-              <p className="mt-2 text-[0.72rem] text-ink-tertiary">Optional — but the best recommendations come from honest answers.</p>
-            </div>
-          )}
           {step === 'contact' && (
             <div>
               <h1 className="font-editorial text-[clamp(1.5rem,3.5vw,2.25rem)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
                 Where should we send your recommendation?
               </h1>
-              <p className="mt-3 text-[0.85rem] leading-[1.6] text-ink-secondary">We&apos;ll review your answers and come back with a tailored plan.</p>
+              <p className="mt-3 text-[0.85rem] leading-[1.6] text-ink-secondary">We&apos;ll review your answers and send back the best starting package for your role, routines, and likely tool stack.</p>
+              <div className="mt-6 rounded-xl border border-border/60 bg-surface-raised p-5">
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink-tertiary">What you&apos;ll get back</p>
+                <div className="mt-3 space-y-2 text-[0.82rem] text-ink-secondary">
+                  <p>A recommended starting package matched to <span className="font-medium text-ink">{role}</span>.</p>
+                  <p>A short note on the routines we would target first.</p>
+                  <p>A lightweight follow-up path instead of a generic demo request.</p>
+                </div>
+              </div>
               <div className="mt-8 space-y-4">
                 <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name (optional)" className="w-full rounded-xl border border-edge-strong bg-surface-raised px-4 py-3.5 text-[0.9rem] text-ink placeholder:text-ink-tertiary/40 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-ink/5 focus:shadow-md" />
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" className="w-full rounded-xl border border-edge-strong bg-surface-raised px-4 py-3.5 text-[0.9rem] text-ink placeholder:text-ink-tertiary/40 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-ink/5 focus:shadow-md" autoFocus />
+                <textarea value={freeform} onChange={(e) => setFreeform(e.target.value)} placeholder="Optional context: team size, tools you use, or where the drag shows up most..." rows={4} className="w-full rounded-xl border border-edge-strong bg-surface-raised px-4 py-3.5 text-[0.9rem] leading-[1.6] text-ink placeholder:text-ink-tertiary/40 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-ink/5 focus:shadow-md resize-none" />
               </div>
             </div>
           )}
@@ -129,7 +136,7 @@ function GenericWizard() {
 
 // ── Product configurator (with occupation + blueprint) ─────────
 
-const configSteps = ['package', 'tools', 'customize', 'contact'] as const;
+const configSteps = ['fit', 'systems', 'contact'] as const;
 type ConfigStep = typeof configSteps[number];
 
 function ProductConfigurator({ blueprint, occupationTitle, occupationSlug }: {
@@ -137,7 +144,7 @@ function ProductConfigurator({ blueprint, occupationTitle, occupationSlug }: {
   occupationTitle: string;
   occupationSlug: string;
 }) {
-  const [step, setStep] = useState<ConfigStep>('package');
+  const [step, setStep] = useState<ConfigStep>('fit');
   const [selectedAgentKeys, setSelectedAgentKeys] = useState<string[]>(blueprint.agents.map(a => a.blockKey));
   const [toolSelections, setToolSelections] = useState<Record<string, string[]>>({});
   const [customChips, setCustomChips] = useState<string[]>([]);
@@ -165,9 +172,8 @@ function ProductConfigurator({ blueprint, occupationTitle, occupationSlug }: {
   };
 
   const canGoNext = () => {
-    if (step === 'package') return selectedAgentKeys.length > 0;
-    if (step === 'tools') return true;
-    if (step === 'customize') return true;
+    if (step === 'fit') return selectedAgentKeys.length > 0;
+    if (step === 'systems') return true;
     if (step === 'contact') return email.trim().length > 0;
     return false;
   };
@@ -181,15 +187,15 @@ function ProductConfigurator({ blueprint, occupationTitle, occupationSlug }: {
     if (prev) setStep(prev);
   };
   const handleSubmit = () => {
-    console.log('Configurator submission:', {
-      occupation: occupationSlug,
+    trackEvent('factory_completed', {
+      flow: 'occupation',
+      occupationSlug,
       occupationTitle,
-      selectedAgents: selectedAgents.map(a => ({ name: a.agentName, block: a.blockKey, minutes: a.minutesSaved })),
-      toolSelections,
-      customChips,
-      freeform,
-      name,
-      email,
+      selectedAgentCount: selectedAgents.length,
+      selectedAgents: selectedAgents.map(a => a.blockKey),
+      selectedToolCount: Object.values(toolSelections).flat().length,
+      customChipCount: customChips.length,
+      hasFreeform: Boolean(freeform.trim()),
       totalMinutesSaved: totalMinutes,
       totalTasks,
     });
@@ -204,14 +210,22 @@ function ProductConfigurator({ blueprint, occupationTitle, occupationSlug }: {
         <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
 
           {/* Step 1: Package selection */}
-          {step === 'package' && (
+          {step === 'fit' && (
             <div>
               <h1 className="font-editorial text-[clamp(1.5rem,3.5vw,2.25rem)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
-                Here&apos;s what we&apos;d build for you
+                Recommended starting package
               </h1>
               <p className="mt-3 text-[0.85rem] leading-[1.6] text-ink-secondary">
-                Based on your role as <span className="font-medium text-ink">{occupationTitle.toLowerCase()}</span>, we recommend these automation agents. Deselect any you don&apos;t need.
+                Based on your role as <span className="font-medium text-ink">{occupationTitle.toLowerCase()}</span>, these are the support layers most likely to remove routine drag first. Keep this tight. You are shaping a recommendation, not configuring a finished system.
               </p>
+              <div className="mt-6 rounded-xl border border-border/60 bg-surface-raised p-5">
+                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink-tertiary">What this step does</p>
+                <div className="mt-3 space-y-2 text-[0.82rem] text-ink-secondary">
+                  <p>Confirms the routine clusters worth attacking first.</p>
+                  <p>Keeps the starting package scoped to a credible first engagement.</p>
+                  <p>Prevents the recommendation from turning into a catalog dump.</p>
+                </div>
+              </div>
               <div className="mt-8 space-y-2">
                 {blueprint.agents.map((agent) => (
                   <AgentSelector
@@ -234,13 +248,13 @@ function ProductConfigurator({ blueprint, occupationTitle, occupationSlug }: {
           )}
 
           {/* Step 2: Tool selection */}
-          {step === 'tools' && (
+          {step === 'systems' && (
             <div>
               <h1 className="font-editorial text-[clamp(1.5rem,3.5vw,2.25rem)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
-                What tools do you use?
+                What systems would this touch?
               </h1>
               <p className="mt-3 text-[0.85rem] leading-[1.6] text-ink-secondary">
-                This helps us connect your automation to the tools you already have.
+                This tells us what the recommendation would need to connect to. If you are unsure, leave it rough. We only need enough context to follow up intelligently.
               </p>
               <div className="mt-8 space-y-8">
                 {selectedAgents.map((agent) => (
@@ -257,34 +271,19 @@ function ProductConfigurator({ blueprint, occupationTitle, occupationSlug }: {
           )}
 
           {/* Step 3: Custom tasks */}
-          {step === 'customize' && (
-            <div>
-              <h1 className="font-editorial text-[clamp(1.5rem,3.5vw,2.25rem)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
-                Anything we missed?
-              </h1>
-              <CustomTasks
-                selectedChips={customChips}
-                onToggleChip={toggleChip}
-                freeform={freeform}
-                onFreeformChange={setFreeform}
-              />
-            </div>
-          )}
-
-          {/* Step 4: Contact + summary */}
           {step === 'contact' && (
             <div>
               <h1 className="font-editorial text-[clamp(1.5rem,3.5vw,2.25rem)] font-normal leading-[1.1] tracking-[-0.03em] text-ink">
-                Get your build
+                Send your plan
               </h1>
               <p className="mt-3 text-[0.85rem] leading-[1.6] text-ink-secondary">
-                Review your package below. Remove anything you don&apos;t need, then submit.
+                Confirm the package, add any constraints or extra routines, and send it through. We&apos;ll turn this into a practical recommendation instead of asking you to keep configuring.
               </p>
 
               {/* Summary card with removable agents */}
               <div className="mt-6 rounded-xl border border-border/60 bg-surface-raised p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-ink-muted">Your package</p>
+                  <p className="text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-ink-muted">Recommended package</p>
                   <span className="font-editorial text-xl font-normal text-ink">
                     {totalMinutes} <span className="text-[0.7rem] text-ink-muted">min/day</span>
                   </span>
@@ -324,7 +323,15 @@ function ProductConfigurator({ blueprint, occupationTitle, occupationSlug }: {
                 )}
               </div>
 
-              {/* Contact fields — bigger */}
+              <div className="mt-8">
+                <CustomTasks
+                  selectedChips={customChips}
+                  onToggleChip={toggleChip}
+                  freeform={freeform}
+                  onFreeformChange={setFreeform}
+                />
+              </div>
+
               <div className="mt-8 space-y-4">
                 <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name (optional)" className="w-full rounded-xl border border-edge-strong bg-surface-raised px-5 py-4 text-[1rem] text-ink placeholder:text-ink-tertiary/40 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-ink/5 focus:shadow-md" />
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" className="w-full rounded-xl border border-edge-strong bg-surface-raised px-5 py-4 text-[1rem] text-ink placeholder:text-ink-tertiary/40 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-ink/5 focus:shadow-md" autoFocus />
@@ -353,6 +360,13 @@ function WizardShell({ steps, currentIndex, goBack, goNext, canGoNext, isLast, c
     <div className="flex min-h-[calc(100vh-57px)] flex-col">
       <div className="flex flex-1 items-center justify-center px-5 py-16">
         <div className="mx-auto w-full max-w-lg">
+          <div className="mb-6 rounded-xl border border-border/50 bg-surface-raised px-4 py-3">
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-ink-tertiary">Guided qualification</p>
+            <p className="mt-2 text-[0.8rem] leading-[1.6] text-ink-secondary">
+              This flow is here to confirm fit and gather enough context for a recommendation. It is not asking you to configure the finished product yourself.
+            </p>
+          </div>
+
           {/* Progress bar */}
           <div className="mb-12 flex items-center gap-1.5">
             {steps.map((_, i) => (
@@ -370,7 +384,7 @@ function WizardShell({ steps, currentIndex, goBack, goNext, canGoNext, isLast, c
               </button>
             ) : <div />}
             <button type="button" onClick={goNext} disabled={!canGoNext} className="btn-primary inline-flex items-center gap-2 rounded-lg border border-primary bg-primary px-5 py-2.5 text-[0.85rem] font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-transparent hover:text-ink">
-              {isLast ? 'Submit request' : 'Continue'} <ArrowRight className="h-3.5 w-3.5" />
+              {isLast ? 'Send my plan' : 'Continue'} <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
@@ -390,7 +404,7 @@ function SuccessScreen() {
           </div>
           <h1 className="font-editorial text-[1.75rem] font-normal tracking-[-0.03em] text-ink">We&apos;ve got it.</h1>
           <p className="mt-3 text-[0.875rem] leading-[1.6] text-ink-secondary">
-            We&apos;ll review your selections and come back with a build plan tailored to your role. Expect to hear from us within 48 hours.
+            We&apos;ll review your selections and come back with a tailored recommendation for your role. Expect to hear from us within 48 hours.
           </p>
           <a href="/ai-jobs" className="btn-primary mt-8 inline-flex items-center gap-2 rounded-lg border border-primary bg-primary px-5 py-2.5 text-sm font-medium transition-colors hover:bg-transparent hover:text-ink">
             Back to search
@@ -435,10 +449,20 @@ function FactoryPage() {
   }
 
   if (occupationSlug && blueprint) {
-    return <ProductConfigurator blueprint={blueprint} occupationTitle={occupationTitle} occupationSlug={occupationSlug} />;
+    return (
+      <>
+        <TrackPageView eventName="factory_started" properties={{ flow: 'occupation', occupationSlug, occupationTitle }} />
+        <ProductConfigurator blueprint={blueprint} occupationTitle={occupationTitle} occupationSlug={occupationSlug} />
+      </>
+    );
   }
 
-  return <GenericWizard />;
+  return (
+    <>
+      <TrackPageView eventName="factory_started" properties={{ flow: 'generic' }} />
+      <GenericWizard />
+    </>
+  );
 }
 
 export default function FactoryPageWrapper() {

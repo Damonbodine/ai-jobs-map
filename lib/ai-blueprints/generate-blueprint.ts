@@ -124,10 +124,17 @@ const universalQuickWins: TaskEntry[] = [
 
 function inferBlockFromGwa(gwaTitle: string | null, taskTitle: string): string {
   const text = `${gwaTitle || ''} ${taskTitle}`.toLowerCase();
-  if (/(communicat|correspond|contact|inform|advise|consult|coach|present)/.test(text)) return 'coordination';
-  if (/(analyz|evaluat|examin|estimat|assess|study|research|interpret|investigat)/.test(text)) return 'analysis';
+  // New blocks first (more specific)
+  if (/(train|certif|skill gap|upskill|learn|course|curriculum|onboard|mentor|professional develop)/.test(text)) return 'learning';
+  if (/(regulat|compliance|audit|policy|licensure|accredit|legal require|safety protocol)/.test(text)) return 'compliance';
+  if (/(dashboard|kpi|metric|report generat|data visual|analytics|status report)/.test(text)) return 'data_reporting';
+  if (/(research|literature|scan.*source|market intel|competitive|benchmark|trend)/.test(text)) return 'research';
+  if (/(draft.*email|write.*update|present|stakeholder|client.*communicat|newsletter|memo)/.test(text)) return 'communication';
+  // Original blocks
+  if (/(schedul|follow[- ]?up|coordinat|communicat|notify|respond|meeting|handoff|route|correspond|contact|advise|consult|coach)/.test(text)) return 'coordination';
+  if (/(analyz|evaluat|examin|estimat|assess|study|interpret|investigat|recommend)/.test(text)) return 'analysis';
   if (/(prepar|document|record|report|write|develop|design|plan|creat|draft)/.test(text)) return 'documentation';
-  if (/(monitor|inspect|test|check|verify|audit|review|supervise|maintain)/.test(text)) return 'exceptions';
+  if (/(monitor|inspect|test|check|verify|review|supervise|maintain)/.test(text)) return 'exceptions';
   return 'intake';
 }
 
@@ -361,13 +368,19 @@ const blockLabels: Record<string, string> = {
   documentation: 'Documentation & deliverables',
   coordination: 'Coordination & follow-through',
   exceptions: 'Monitoring & exceptions',
+  learning: 'Learning & upskilling',
+  research: 'Research & discovery',
+  compliance: 'Compliance & regulatory',
+  communication: 'Client & stakeholder communication',
+  data_reporting: 'Data & reporting',
 };
 
 export function generateBlueprint(
   taskEntries: TaskEntry[],
   archetype: ArchetypeProfile,
   occupationTitle: string,
-  onetTasks?: OnetTask[]
+  onetTasks?: OnetTask[],
+  timeRangeByBlock?: Record<string, { low: number; high: number }> | null
 ): AgentBlueprint | null {
   // Enrich with O*NET tasks — adds automatable tasks from government data
   let allTasks = onetTasks
@@ -404,6 +417,17 @@ export function generateBlueprint(
       archetype
     );
     if (agent) agents.push(agent);
+  }
+
+  // Override agent minutesSaved with O*NET-grounded block ranges when available
+  // This ensures agent cards sum to the hero number
+  if (timeRangeByBlock) {
+    for (const agent of agents) {
+      const blockRange = timeRangeByBlock[agent.blockKey];
+      if (blockRange) {
+        agent.minutesSaved = blockRange.low;
+      }
+    }
   }
 
   // Fallback: if no agents from role data, always show universal quick wins

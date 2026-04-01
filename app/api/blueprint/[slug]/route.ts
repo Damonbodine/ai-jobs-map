@@ -59,8 +59,10 @@ export async function GET(
     workBlock: inferWorkBlock(task),
   }));
 
-  const archetype = classifyOccupation(profileResult.rows[0] || null);
-  const blueprint = generateBlueprint(taskEntries, archetype, occupation.title, onetResult.rows);
+  const profile = profileResult.rows[0] || null;
+  const archetype = classifyOccupation(profile);
+  const timeRangeByBlock = profile?.time_range_by_block ? JSON.parse(profile.time_range_by_block) : null;
+  const blueprint = generateBlueprint(taskEntries, archetype, occupation.title, onetResult.rows, timeRangeByBlock);
 
   return NextResponse.json({
     occupation: { id: occupation.id, title: occupation.title, slug: occupation.slug, majorCategory: occupation.major_category },

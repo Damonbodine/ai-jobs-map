@@ -548,7 +548,7 @@ export default async function OccupationPage({ params }: PageProps) {
     : null;
 
   // AI Blueprint: generate dynamic agent architecture from task data + O*NET enrichment
-  const blueprint = generateBlueprint(taskEntries, occupationArchetype, occupation.title, onetTasks);
+  const blueprint = generateBlueprint(taskEntries, occupationArchetype, occupation.title, onetTasks, timeRangeByBlock);
 
   const oneHourTargetProgress = Math.min(100, Math.round((displayedMinutesRecoveredPerDay / 60) * 100));
   const oneHourNarrative =

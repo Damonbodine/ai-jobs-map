@@ -100,7 +100,7 @@ export default async function OccupationPage(props: {
   ])
 
   const midMinutes = profile
-    ? Math.round((profile.time_range_low + profile.time_range_high) / 2)
+    ? Math.round(((profile.time_range_low ?? 0) + (profile.time_range_high ?? 0)) / 2)
     : 0
 
   let blocks: TimeRangeByBlock = {}
@@ -114,23 +114,29 @@ export default async function OccupationPage(props: {
 
   let topActivities: string[] = []
   try {
-    topActivities = profile?.top_automatable_activities
+    const raw = profile?.top_automatable_activities
       ? JSON.parse(profile.top_automatable_activities)
       : []
+    topActivities = raw.map((item: unknown) =>
+      typeof item === "string" ? item : (item as { name?: string }).name ?? String(item)
+    )
   } catch {
     topActivities = []
   }
 
   let topBlockers: string[] = []
   try {
-    topBlockers = profile?.top_blocking_abilities
+    const raw = profile?.top_blocking_abilities
       ? JSON.parse(profile.top_blocking_abilities)
       : []
+    topBlockers = raw.map((item: unknown) =>
+      typeof item === "string" ? item : (item as { name?: string }).name ?? String(item)
+    )
   } catch {
     topBlockers = []
   }
 
-  const readiness = profile ? Math.round(profile.composite_score) : 0
+  const readiness = profile ? Math.round(profile.composite_score ?? 0) : 0
 
   const categoryBreakdown: Record<string, number> = {}
   opportunities?.forEach((opp) => {
@@ -174,26 +180,36 @@ export default async function OccupationPage(props: {
         </FadeIn>
 
         {/* Time-Back Hero Card */}
-        {profile && (
+        {profile && (midMinutes > 0 || readiness > 0) && (
           <FadeIn delay={0.15}>
             <div className="rounded-2xl border border-border bg-card p-5 sm:p-8 mb-6 sm:mb-8">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                    Estimated Time Back
-                  </div>
-                  <div className="flex items-baseline gap-1.5 sm:gap-2">
-                    <span className="font-heading text-4xl sm:text-6xl font-bold text-accent">
-                      {midMinutes}
-                    </span>
-                    <span className="text-base sm:text-lg text-muted-foreground">
-                      min/day
-                    </span>
-                  </div>
-                  <div className="text-xs sm:text-sm text-muted-foreground mt-1.5 sm:mt-2">
-                    Range: {profile.time_range_low}–{profile.time_range_high} minutes
-                    <span className="hidden sm:inline"> (conservative to optimistic)</span>
-                  </div>
+                  {midMinutes > 0 ? (
+                    <>
+                      <div className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                        Estimated Time Back
+                      </div>
+                      <div className="flex items-baseline gap-1.5 sm:gap-2">
+                        <span className="font-heading text-4xl sm:text-6xl font-bold text-accent">
+                          {midMinutes}
+                        </span>
+                        <span className="text-base sm:text-lg text-muted-foreground">
+                          min/day
+                        </span>
+                      </div>
+                      {profile.time_range_low != null && profile.time_range_high != null && (
+                        <div className="text-xs sm:text-sm text-muted-foreground mt-1.5 sm:mt-2">
+                          Range: {profile.time_range_low}–{profile.time_range_high} minutes
+                          <span className="hidden sm:inline"> (conservative to optimistic)</span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                      AI Readiness Score
+                    </div>
+                  )}
                 </div>
                 <div className="flex-shrink-0">
                   <div className="relative w-20 h-20 sm:w-28 sm:h-28">

@@ -37,7 +37,7 @@ export default async function CategoryPage(props: {
     const { data } = await supabase
       .from("occupations")
       .select(
-        "id, title, slug, major_category, employment, occupation_automation_profile(time_range_low, time_range_high)"
+        "id, title, slug, major_category, employment, occupation_automation_profile(composite_score)"
       )
       .eq("major_category", cat.dbValue)
       .order("title")
@@ -97,9 +97,9 @@ export default async function CategoryPage(props: {
           {occupations.map((occ) => {
             const profileRaw = occ.occupation_automation_profile
             const profile = Array.isArray(profileRaw) ? profileRaw[0] : profileRaw
-            const minutes =
-              profile
-                ? Math.round((profile.time_range_low + profile.time_range_high) / 2)
+            const score =
+              profile?.composite_score
+                ? Math.round(profile.composite_score)
                 : null
 
             return (
@@ -119,12 +119,12 @@ export default async function CategoryPage(props: {
                     )}
                   </div>
                   <div className="flex items-center gap-3 ml-3 shrink-0">
-                    {minutes !== null && (
+                    {score !== null && (
                       <div className="text-right">
                         <div className="font-heading text-lg font-bold text-[hsl(var(--accent))]">
-                          {minutes}
+                          {score}
                         </div>
-                        <div className="text-[10px] text-muted-foreground">min/day</div>
+                        <div className="text-[10px] text-muted-foreground">readiness</div>
                       </div>
                     )}
                     <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />

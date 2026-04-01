@@ -78,14 +78,59 @@ const workBlockDefinitions = {
     posture: 'Flag outliers, surface risks, and move edge cases into human review.',
     humanEdge: 'Exception handling is where experience and judgment carry the most value.',
   },
+  learning: {
+    label: 'Learning & upskilling',
+    tone: 'from-rose-500/18 via-rose-500/8 to-transparent',
+    border: 'border-rose-500/20',
+    accent: 'text-rose-300',
+    posture: 'Curate training materials, track certifications, and surface skill gaps.',
+    humanEdge: 'What to learn and why still requires professional judgment and career context.',
+  },
+  research: {
+    label: 'Research & discovery',
+    tone: 'from-teal-500/18 via-teal-500/8 to-transparent',
+    border: 'border-teal-500/20',
+    accent: 'text-teal-300',
+    posture: 'Scan sources, synthesize findings, and deliver briefings on what matters.',
+    humanEdge: 'Interpreting meaning and setting research direction stays human-led.',
+  },
+  compliance: {
+    label: 'Compliance & regulatory',
+    tone: 'from-red-500/18 via-red-500/8 to-transparent',
+    border: 'border-red-500/20',
+    accent: 'text-red-300',
+    posture: 'Track regulatory changes, prepare audit docs, and monitor policy adherence.',
+    humanEdge: 'Judgment calls on risk tolerance and enforcement strategy remain yours.',
+  },
+  communication: {
+    label: 'Client & stakeholder communication',
+    tone: 'from-orange-500/18 via-orange-500/8 to-transparent',
+    border: 'border-orange-500/20',
+    accent: 'text-orange-300',
+    posture: 'Draft emails, prepare presentations, and write stakeholder updates.',
+    humanEdge: 'Tone, relationship nuance, and sensitive conversations stay human.',
+  },
+  data_reporting: {
+    label: 'Data & reporting',
+    tone: 'from-sky-500/18 via-sky-500/8 to-transparent',
+    border: 'border-sky-500/20',
+    accent: 'text-sky-300',
+    posture: 'Build dashboards, generate recurring reports, and track KPIs automatically.',
+    humanEdge: 'Choosing what to measure and interpreting trends requires your expertise.',
+  },
 } as const;
 
 const workBlockColors: Record<string, string> = {
-  intake: '#06b6d4',      // cyan-500
-  analysis: '#6366f1',    // indigo-500
+  intake: '#06b6d4',       // cyan-500
+  analysis: '#6366f1',     // indigo-500
   documentation: '#8b5cf6', // violet-500
-  coordination: '#10b981', // emerald-500
-  exceptions: '#f59e0b',  // amber-500
+  coordination: '#10b981',  // emerald-500
+  exceptions: '#f59e0b',   // amber-500
+  learning: '#f43f5e',     // rose-500
+  research: '#14b8a6',     // teal-500
+  compliance: '#ef4444',   // red-500
+  communication: '#f97316', // orange-500
+  data_reporting: '#0ea5e9', // sky-500
 };
 
 const automationSolutionDefinitions = [
@@ -172,18 +217,53 @@ function inferWorkBlock(task: any) {
   const content = `${task.task_name || ''} ${task.task_description || ''} ${task.ai_how_it_helps || ''}`.toLowerCase();
   const category = String(task.ai_category || '').toLowerCase();
 
+  // New blocks — check these first (more specific)
+  if (
+    category === 'learning_education' || category.includes('training') ||
+    /(train|certif|skill gap|upskill|learn|course|curriculum|onboard|mentor|professional development)/.test(content)
+  ) {
+    return 'learning';
+  }
+
+  if (
+    category.includes('compliance') || category.includes('regulatory') || category.includes('safety_compliance') ||
+    /(regulat|compliance|audit|policy|licensure|accredit|legal requirement|safety protocol|hipaa|osha)/.test(content)
+  ) {
+    return 'compliance';
+  }
+
+  if (
+    category === 'data_analysis' || category.includes('reporting') ||
+    /(dashboard|kpi|metric|report generat|data visual|spreadsheet|tracking report|status report|analytics)/.test(content)
+  ) {
+    return 'data_reporting';
+  }
+
+  if (
+    category === 'research_discovery' || category.includes('market_research') || category.includes('competitive') ||
+    /(research|literature review|scan.*source|market intel|competitive|benchmark|survey|stay current|trend)/.test(content)
+  ) {
+    return 'research';
+  }
+
+  if (
+    (category === 'communication' && /(email|draft|present|stakeholder|client|newsletter|memo|brief)/.test(content)) ||
+    /(draft.*email|write.*update|prepare.*present|stakeholder.*update|client.*communicat|newsletter)/.test(content)
+  ) {
+    return 'communication';
+  }
+
+  // Original blocks
   if (
     category === 'communication' ||
-    /(schedule|follow[- ]?up|coordinate|communicat|notify|respond|meeting|handoff|route)/.test(content)
+    /(schedule|follow[- ]?up|coordinate|notify|respond|meeting|handoff|route)/.test(content)
   ) {
     return 'coordination';
   }
 
   if (
-    category === 'research_discovery' ||
-    category === 'data_analysis' ||
     category === 'decision_support' ||
-    /(analy|evaluat|compare|research|assess|forecast|estimate|study|review options)/.test(content)
+    /(analy|evaluat|compare|assess|forecast|estimate|study|review options|recommend)/.test(content)
   ) {
     return 'analysis';
   }
@@ -196,7 +276,7 @@ function inferWorkBlock(task: any) {
   }
 
   if (
-    /(inspect|validate|verify|check|monitor|audit|compliance|quality|exception)/.test(content)
+    /(inspect|validate|verify|check|monitor|quality|exception)/.test(content)
   ) {
     return 'exceptions';
   }

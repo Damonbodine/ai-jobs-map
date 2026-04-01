@@ -18,6 +18,11 @@ export const blockDefaultPattern: Record<string, AiPattern> = {
   documentation: 'structured-output',
   coordination: 'workflow-orchestrator',
   exceptions: 'scheduled-monitor',
+  learning: 'rag-system',
+  research: 'rag-system',
+  compliance: 'scheduled-monitor',
+  communication: 'workflow-orchestrator',
+  data_reporting: 'structured-output',
 };
 
 // Pattern display labels and descriptions
@@ -118,6 +123,11 @@ export const blockRoleTemplates: Record<string, (occupation: string) => string> 
   documentation: (occ) => `Drafts reports, fills templates, and produces formatted deliverables for ${occ} — first drafts that are 80% there.`,
   coordination: (occ) => `Tracks follow-ups, sends reminders, and keeps work moving across people for ${occ} — nothing falls through the cracks.`,
   exceptions: (occ) => `Monitors for outliers, flags compliance issues, and surfaces edge cases for ${occ} — catches what you'd otherwise miss.`,
+  learning: (occ) => `Curates training materials, tracks certifications, and identifies skill gaps for ${occ} — keeps you current without the busywork.`,
+  research: (occ) => `Scans sources, synthesizes findings, and delivers briefings for ${occ} — so you stay informed without the manual digging.`,
+  compliance: (occ) => `Tracks regulatory changes, prepares audit documentation, and monitors policy adherence for ${occ} — compliance on autopilot.`,
+  communication: (occ) => `Drafts emails, prepares presentations, and writes stakeholder updates for ${occ} — polished communication in minutes, not hours.`,
+  data_reporting: (occ) => `Builds dashboards, generates reports, and tracks KPIs for ${occ} — your data story, always up to date.`,
 };
 
 // Automation approach templates based on tier + category
@@ -154,4 +164,9 @@ export const blockToPainMap: Record<string, string> = {
   documentation: 'reporting',
   coordination: 'coordination',
   exceptions: 'reporting',
+  learning: 'research',
+  research: 'research',
+  compliance: 'reporting',
+  communication: 'coordination',
+  data_reporting: 'reporting',
 };

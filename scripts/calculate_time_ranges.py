@@ -24,29 +24,50 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from scripts.pipeline.db import get_db
 
 # Work block classification — maps task text to work block categories
-BLOCK_PATTERNS = {
-    'coordination': re.compile(
+# Check new blocks first (more specific), then original blocks
+BLOCK_PATTERNS_ORDERED = [
+    ('learning', re.compile(
+        r'train|certif|skill gap|upskill|learn|course|curriculum|onboard|mentor|professional develop',
+        re.IGNORECASE
+    )),
+    ('compliance', re.compile(
+        r'regulat|compliance|audit|policy|licensure|accredit|legal require|safety protocol|hipaa|osha',
+        re.IGNORECASE
+    )),
+    ('data_reporting', re.compile(
+        r'dashboard|kpi|metric|report generat|data visual|spreadsheet|tracking report|status report|analytics',
+        re.IGNORECASE
+    )),
+    ('research', re.compile(
+        r'research|literature review|scan.*source|market intel|competitive|benchmark|survey|stay current|trend',
+        re.IGNORECASE
+    )),
+    ('communication', re.compile(
+        r'draft.*email|write.*update|prepare.*present|stakeholder.*update|client.*communicat|newsletter|memo|brief',
+        re.IGNORECASE
+    )),
+    ('coordination', re.compile(
         r'schedul|follow[- ]?up|coordinat|communicat|notify|respond|meeting|handoff|route|confer|consult|collab',
         re.IGNORECASE
-    ),
-    'analysis': re.compile(
-        r'analy|evaluat|compar|research|assess|forecast|estimat|study|review|examin|interpret|diagnos|investigat|determin',
+    )),
+    ('analysis', re.compile(
+        r'analy|evaluat|compar|assess|forecast|estimat|study|review|examin|interpret|diagnos|investigat|determin|recommend',
         re.IGNORECASE
-    ),
-    'documentation': re.compile(
+    )),
+    ('documentation', re.compile(
         r'design|draft|document|report|write|plan|layout|prepar|record|maintain.*record|compil|summar|creat.*report',
         re.IGNORECASE
-    ),
-    'exceptions': re.compile(
-        r'inspect|validat|verif|check|monitor|audit|complian|quality|exception|test|calibrat',
+    )),
+    ('exceptions', re.compile(
+        r'inspect|validat|verif|check|monitor|quality|exception|calibrat',
         re.IGNORECASE
-    ),
-}
+    )),
+]
 
 
 def classify_task_block(task_text):
     """Assign a task to a work block based on text content."""
-    for block, pattern in BLOCK_PATTERNS.items():
+    for block, pattern in BLOCK_PATTERNS_ORDERED:
         if pattern.search(task_text):
             return block
     return 'intake'  # default
@@ -102,9 +123,11 @@ def run():
         else:
             mult = 0.5
 
-        # Per-block accumulators
-        block_low = {'intake': 0, 'analysis': 0, 'documentation': 0, 'coordination': 0, 'exceptions': 0}
-        block_high = {'intake': 0, 'analysis': 0, 'documentation': 0, 'coordination': 0, 'exceptions': 0}
+        # Per-block accumulators (all 10 blocks)
+        all_blocks = ['intake', 'analysis', 'documentation', 'coordination', 'exceptions',
+                      'learning', 'research', 'compliance', 'communication', 'data_reporting']
+        block_low = {b: 0 for b in all_blocks}
+        block_high = {b: 0 for b in all_blocks}
 
         total_low = 0
         total_high = 0
@@ -142,7 +165,7 @@ def run():
 
         # Merge into per-block ranges
         block_ranges = {}
-        for block in ['intake', 'analysis', 'documentation', 'coordination', 'exceptions']:
+        for block in all_blocks:
             lo = blocks_low_scaled.get(block, 0)
             hi = blocks_high_scaled.get(block, 0)
             if lo > 0 or hi > 0:

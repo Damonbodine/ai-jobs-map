@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: 40 33% 98%;
+    --foreground: 30 10% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 30 10% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 10% 12%;
+    --primary: 30 10% 12%;
+    --primary-foreground: 40 33% 98%;
+    --secondary: 36 20% 93%;
+    --secondary-foreground: 30 10% 12%;
+    --muted: 36 20% 93%;
+    --muted-foreground: 30 8% 42%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 33 18% 88%;
+    --input: 33 18% 85%;
+    --ring: 217 91% 60%;
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: 30 10% 8%;
+    --foreground: 36 20% 90%;
+    --card: 30 8% 11%;
+    --card-foreground: 36 20% 90%;
+    --popover: 30 8% 11%;
+    --popover-foreground: 36 20% 90%;
+    --primary: 36 20% 90%;
+    --primary-foreground: 30 10% 8%;
+    --secondary: 30 8% 15%;
+    --secondary-foreground: 36 20% 90%;
+    --muted: 30 8% 15%;
+    --muted-foreground: 30 10% 55%;
+    --accent: 217 91% 65%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 40%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 30 8% 18%;
+    --input: 30 8% 18%;
+    --ring: 217 91% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}

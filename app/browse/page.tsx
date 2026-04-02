@@ -26,26 +26,35 @@ export default async function BrowsePage(props: {
 
   try {
     const supabase = createServerClient()
+    const from = (page - 1) * PAGE_SIZE
 
-    let query = supabase
-      .from("occupations")
-      .select(
-        "id, title, slug, major_category, occupation_automation_profile(composite_score,time_range_high)",
-        { count: "exact" }
-      )
+    async function runQuery(selectShape: string) {
+      let query = supabase
+        .from("occupations")
+        .select(selectShape, { count: "exact" })
 
-    if (category) {
-      query = query.eq("major_category", category)
+      if (category) {
+        query = query.eq("major_category", category)
+      }
+
+      query = query.order("title").range(from, from + PAGE_SIZE - 1)
+      return query
     }
 
-    query = query.order("title")
+    const primary = await runQuery(
+      "id, title, slug, major_category, occupation_automation_profile(composite_score,time_range_high)"
+    )
 
-    const from = (page - 1) * PAGE_SIZE
-    query = query.range(from, from + PAGE_SIZE - 1)
-
-    const { data, count } = await query
-    results = data ?? []
-    totalCount = count ?? 0
+    if (primary.error) {
+      const fallback = await runQuery(
+        "id, title, slug, major_category, occupation_automation_profile(composite_score)"
+      )
+      results = fallback.data ?? []
+      totalCount = fallback.count ?? 0
+    } else {
+      results = primary.data ?? []
+      totalCount = primary.count ?? 0
+    }
   } catch {
     // silently fall back to empty results if DB unavailable
   }
@@ -117,6 +126,8 @@ export default async function BrowsePage(props: {
             const profile = Array.isArray(profileRaw) ? profileRaw[0] : profileRaw
             const upperBoundMinutes = profile?.time_range_high
               ? Math.round(profile.time_range_high)
+              : profile?.composite_score
+                ? Math.round(profile.composite_score)
               : null
 
             return (

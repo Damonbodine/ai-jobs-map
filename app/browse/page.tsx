@@ -6,6 +6,9 @@ import { createServerClient } from "@/lib/supabase/server"
 import { CATEGORIES } from "@/lib/categories"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 import { BrowseFilters } from "./filters"
+import { computeDisplayedTimeback } from "@/lib/timeback"
+import { generateBlueprint } from "@/lib/blueprint"
+import type { AutomationProfile, MicroTask, Occupation } from "@/types"
 
 const PAGE_SIZE = 24
 
@@ -23,6 +26,7 @@ export default async function BrowsePage(props: {
 
   let results: any[] = []
   let totalCount = 0
+  let tasksByOccupation = new Map<number, MicroTask[]>()
 
   try {
     const supabase = createServerClient()
@@ -70,20 +74,54 @@ export default async function BrowsePage(props: {
       results = primary.data ?? []
       totalCount = primary.count ?? 0
     }
+
+    const occupationIds = results
+      .map((occupation) => occupation.id)
+      .filter((id): id is number => typeof id === "number")
+
+    if (occupationIds.length > 0) {
+      const { data: taskRows } = await supabase
+        .from("job_micro_tasks")
+        .select(
+          "id, occupation_id, task_name, task_description, frequency, ai_applicable, ai_how_it_helps, ai_impact_level, ai_effort_to_implement, ai_category, ai_tools"
+        )
+        .in("occupation_id", occupationIds)
+
+      tasksByOccupation = new Map<number, MicroTask[]>()
+      for (const task of taskRows ?? []) {
+        const existing = tasksByOccupation.get(task.occupation_id) ?? []
+        existing.push(task)
+        tasksByOccupation.set(task.occupation_id, existing)
+      }
+    }
   } catch {
     // silently fall back to empty results if DB unavailable
+  }
+
+  const browseEstimates = new Map<number, number>()
+  for (const occupation of results) {
+    const profileRaw = occupation.occupation_automation_profile
+    const profile = (Array.isArray(profileRaw)
+      ? profileRaw[0]
+      : profileRaw) as AutomationProfile | null
+    const tasks = tasksByOccupation.get(occupation.id) ?? []
+    const blueprint = generateBlueprint(occupation as Occupation, tasks, profile)
+    const { displayedMinutes } = computeDisplayedTimeback(
+      profile,
+      tasks,
+      blueprint.totalMinutesSaved
+    )
+
+    browseEstimates.set(
+      occupation.id,
+      displayedMinutes || Math.round(profile?.time_range_high ?? profile?.composite_score ?? 0)
+    )
   }
 
   // Client-side sort by time saved when requested
   if (sort === "time_back") {
     results = [...results].sort((a, b) => {
-      const aP = Array.isArray(a.occupation_automation_profile)
-        ? a.occupation_automation_profile[0]
-        : a.occupation_automation_profile
-      const bP = Array.isArray(b.occupation_automation_profile)
-        ? b.occupation_automation_profile[0]
-        : b.occupation_automation_profile
-      return (bP?.time_range_high ?? 0) - (aP?.time_range_high ?? 0)
+      return (browseEstimates.get(b.id) ?? 0) - (browseEstimates.get(a.id) ?? 0)
     })
   }
 
@@ -137,13 +175,7 @@ export default async function BrowsePage(props: {
           staggerDelay={0.04}
         >
           {results.map((occ) => {
-            const profileRaw = occ.occupation_automation_profile
-            const profile = Array.isArray(profileRaw) ? profileRaw[0] : profileRaw
-            const upperBoundMinutes = profile?.time_range_high
-              ? Math.round(profile.time_range_high)
-              : profile?.composite_score
-                ? Math.round(profile.composite_score)
-              : null
+            const upperBoundMinutes = browseEstimates.get(occ.id) ?? null
 
             return (
               <StaggerItem key={occ.id}>

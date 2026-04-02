@@ -26,17 +26,56 @@ const STATS = [
   { icon: Users, value: "847", label: "Occupations" },
 ]
 
+const DATA_SOURCES = [
+  "Bureau of Labor Statistics",
+  "O*NET",
+  "12,000+ tasks analyzed",
+  "35 named capabilities",
+]
+
 export default async function HomePage() {
-  // Fetch category counts server-side
   let categoryCounts: Record<string, number> = {}
+  let featuredExample: { title: string; slug: string; minutes: number; topAreas: string[] } | null = null
+
   try {
     const supabase = createServerClient()
+
+    // Fetch category counts
     const { data } = await supabase.from("occupations").select("major_category")
     for (const row of data ?? []) {
       categoryCounts[row.major_category] = (categoryCounts[row.major_category] || 0) + 1
     }
+
+    // Pick a rotating featured example based on the day of the week
+    const examples = [
+      { slug: "registered-nurses", areas: ["documentation", "coordination", "analysis"] },
+      { slug: "construction-managers", areas: ["communication", "compliance", "documentation"] },
+      { slug: "software-developers", areas: ["documentation", "research", "analysis"] },
+      { slug: "financial-and-investment-analysts", areas: ["research", "analysis", "data reporting"] },
+      { slug: "human-resources-managers", areas: ["coordination", "communication", "documentation"] },
+      { slug: "project-management-specialists", areas: ["coordination", "communication", "documentation"] },
+      { slug: "accountants-and-auditors", areas: ["documentation", "compliance", "data reporting"] },
+    ]
+    const todayIndex = new Date().getDay() % examples.length
+    const pick = examples[todayIndex]
+
+    const { data: occ } = await supabase
+      .from("occupations")
+      .select("title, slug")
+      .eq("slug", pick.slug)
+      .single()
+
+    if (occ) {
+      const matched = POPULAR_OCCUPATIONS.find((p) => p.slug === pick.slug)
+      featuredExample = {
+        title: occ.title,
+        slug: occ.slug,
+        minutes: matched?.minutes ?? 50,
+        topAreas: pick.areas,
+      }
+    }
   } catch {
-    // silently fall back to no counts if DB is unavailable
+    // silently fall back
   }
 
   return (
@@ -60,6 +99,27 @@ export default async function HomePage() {
             Explore AI-assisted time savings across 800+ occupations — grounded in O*NET task data.
           </p>
         </FadeIn>
+
+        {/* Concrete example — rotates daily */}
+        {featuredExample && (
+          <FadeIn delay={0.25}>
+            <Link
+              href={`/occupation/${featuredExample.slug}`}
+              className="mt-6 inline-flex items-center gap-3 rounded-xl border border-border bg-card px-5 py-3 text-sm hover:border-ring/40 hover:shadow-md transition-all group"
+            >
+              <span className="text-muted-foreground">For example:</span>
+              <span className="font-medium text-foreground group-hover:text-foreground/80">
+                {featuredExample.title}
+              </span>
+              <span className="font-semibold text-[hsl(var(--accent))]">
+                {featuredExample.minutes} min/day
+              </span>
+              <span className="text-muted-foreground hidden sm:inline">
+                in {featuredExample.topAreas.join(", ")}
+              </span>
+            </Link>
+          </FadeIn>
+        )}
 
         <FadeIn delay={0.3} className="mt-8">
           <LandingSearch />
@@ -106,6 +166,21 @@ export default async function HomePage() {
             ))}
           </Stagger>
         </div>
+      </section>
+
+      {/* Data credibility strip */}
+      <section className="container mx-auto px-4 py-6">
+        <FadeIn>
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
+            <span className="font-medium uppercase tracking-wider">Built on</span>
+            {DATA_SOURCES.map((src) => (
+              <span key={src} className="flex items-center gap-1.5">
+                <span className="w-1 h-1 rounded-full bg-accent" />
+                {src}
+              </span>
+            ))}
+          </div>
+        </FadeIn>
       </section>
 
       {/* Browse by Category */}

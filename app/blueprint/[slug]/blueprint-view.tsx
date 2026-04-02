@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useMemo, useState } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
+import { useMemo, useState, useEffect, useCallback } from "react"
 import {
   ChevronRight, Cpu, ArrowRight, Shield,
   Plus, X,
@@ -76,13 +77,52 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
     () => Object.keys(BLOCK_LABELS),
     []
   )
-  const [selectedModules, setSelectedModules] = useState<string[]>(recommendedModuleKeys)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // Initialize from URL if modules param exists, otherwise use recommended
+  const initialModules = useMemo(() => {
+    const urlModules = searchParams.get("modules")
+    if (urlModules) {
+      const parsed = urlModules.split(",").filter((m) => allModuleKeys.includes(m))
+      return parsed.length > 0 ? parsed : recommendedModuleKeys
+    }
+    return recommendedModuleKeys
+  }, [searchParams, allModuleKeys, recommendedModuleKeys])
+
+  const [selectedModules, setSelectedModules] = useState<string[]>(initialModules)
+
+  // Sync selections to URL for shareability
+  const syncUrl = useCallback((modules: string[], custom: string[]) => {
+    const params = new URLSearchParams()
+    // Only add modules param if different from recommended
+    const isDefault = modules.length === recommendedModuleKeys.length &&
+      modules.every((m) => recommendedModuleKeys.includes(m))
+    if (!isDefault) {
+      params.set("modules", modules.join(","))
+    }
+    if (custom.length > 0) {
+      params.set("custom", custom.join("|"))
+    }
+    const qs = params.toString()
+    const newUrl = `/blueprint/${slug}${qs ? `?${qs}` : ""}`
+    router.replace(newUrl, { scroll: false })
+  }, [recommendedModuleKeys, slug, router])
   const [moduleQuery, setModuleQuery] = useState("")
-  const [customRequests, setCustomRequests] = useState<string[]>([])
+  const initialCustom = useMemo(() => {
+    const urlCustom = searchParams.get("custom")
+    return urlCustom ? urlCustom.split("|").filter(Boolean) : []
+  }, [searchParams])
+  const [customRequests, setCustomRequests] = useState<string[]>(initialCustom)
   const [newRequest, setNewRequest] = useState("")
   const [contactName, setContactName] = useState("")
   const [contactEmail, setContactEmail] = useState("")
+  useEffect(() => {
+    syncUrl(selectedModules, customRequests)
+  }, [selectedModules, customRequests, syncUrl])
+
   const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
   const selectableModules = allModuleKeys.filter((key) => {
     if (selectedModules.includes(key)) return false
     if (!moduleQuery.trim()) return true
@@ -131,7 +171,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
         })
 
       if (error) throw error
-      toast.success("Assistant request submitted. We'll turn this blueprint into a working plan.")
+      setSubmitted(true)
     } catch {
       toast.error("Could not submit the assistant request. Please try again.")
     } finally {
@@ -221,6 +261,65 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
         {/* Assistant Builder */}
         <FadeIn delay={0.2}>
           <div id="assistant-builder" className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+            {submitted ? (
+              <div className="py-4 text-center sm:text-left">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 mb-4">
+                  <ArrowRight className="h-5 w-5 text-green-600 dark:text-green-400" />
+                </div>
+                <h2 className="font-heading text-2xl font-semibold tracking-tight mb-2">
+                  We received your blueprint
+                </h2>
+                <p className="text-sm text-muted-foreground mb-6 max-w-lg">
+                  We'll review your setup for {occupation.title} and send a scoping document to <span className="font-medium text-foreground">{contactEmail}</span> within 48 hours.
+                </p>
+
+                <div className="rounded-xl border border-border bg-secondary/20 p-4 mb-6 text-left">
+                  <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                    What you requested
+                  </div>
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Role:</span>{" "}
+                      <span className="font-medium">{occupation.title}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Recommended tier:</span>{" "}
+                      <span className="font-medium">{recommendedTierLabel}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Modules ({selectedModules.length}):</span>{" "}
+                      <span className="font-medium">{selectedModules.map((k) => BLOCK_LABELS[k] ?? k).join(", ")}</span>
+                    </div>
+                    {customRequests.length > 0 && (
+                      <div>
+                        <span className="text-muted-foreground">Custom requests:</span>{" "}
+                        <span className="font-medium">{customRequests.join(", ")}</span>
+                      </div>
+                    )}
+                    <div>
+                      <span className="text-muted-foreground">Estimated time back:</span>{" "}
+                      <span className="font-medium">{displayedLow}–{displayedHigh} min/day</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-xs text-muted-foreground space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    We review your blueprint and map it to our capability vault
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    You receive a scoping document with timeline and deliverables
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    We build your system — you stay in control at every checkpoint
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
             <h2 className="font-heading text-xl font-semibold tracking-tight mb-1">
               Shape your assistant
             </h2>
@@ -365,6 +464,8 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                 </button>
               </div>
             </div>
+              </>
+            )}
           </div>
         </FadeIn>
       </div>

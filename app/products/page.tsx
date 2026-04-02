@@ -240,6 +240,90 @@ export default async function ProductsPage() {
         ))}
       </Stagger>
 
+      {/* ── Section 3.5: Worked Example ─────────────────────── */}
+      <FadeIn delay={0.22}>
+        <div className="mb-14">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Example
+            </h2>
+          </div>
+          <h3 className="font-heading text-xl sm:text-2xl font-bold mb-6">
+            What a system looks like in practice
+          </h3>
+
+          <div className="rounded-xl border border-border bg-card p-5 sm:p-6">
+            <div className="flex items-start justify-between gap-4 mb-5">
+              <div>
+                <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">Clinic Operations Manager</div>
+                <h4 className="font-heading text-lg font-semibold">Workflow Bundle — 4 modules, 2-week build</h4>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <div className="font-heading text-2xl font-bold text-accent">52</div>
+                <div className="text-[10px] text-muted-foreground">min/day back</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+              <div>
+                <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">Before</div>
+                <div className="space-y-1.5 text-xs text-muted-foreground">
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-orange-400 flex-shrink-0 mt-1" />
+                    45 min/day on patient scheduling changes and follow-ups
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-orange-400 flex-shrink-0 mt-1" />
+                    30 min/day drafting shift reports and status updates
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-orange-400 flex-shrink-0 mt-1" />
+                    20 min/day chasing compliance documentation
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-orange-400 flex-shrink-0 mt-1" />
+                    Staff spending time on data entry instead of patient care
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">After</div>
+                <div className="space-y-1.5 text-xs text-muted-foreground">
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1" />
+                    Scheduling Assistant handles rebooking and reminders automatically
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1" />
+                    Report Drafting agent prepares shift summaries by end of day
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1" />
+                    Audit Prep assistant keeps compliance docs organized continuously
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1" />
+                    Manager reviews and approves — doesn't assemble from scratch
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
+              {["Coordination & Scheduling", "Documentation", "Compliance & Policy", "Data & Reporting"].map((mod) => (
+                <span key={mod} className="text-[11px] font-medium px-2.5 py-1 rounded-full border border-border bg-secondary/30">
+                  {mod}
+                </span>
+              ))}
+              <span className="text-[11px] text-muted-foreground self-center ml-1">
+                Deployed in 2 weeks
+              </span>
+            </div>
+          </div>
+        </div>
+      </FadeIn>
+
       {/* ── Section 4: Trust ──────────────────────────────────── */}
       <FadeIn delay={0.25}>
         <div className="rounded-xl border border-border bg-card p-6 mb-14">

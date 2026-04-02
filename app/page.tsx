@@ -142,7 +142,7 @@ export default async function HomePage() {
               Ready to reclaim your time?
             </h2>
             <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-              Configure a system tailored to your role.
+              Start from a recommended assistant setup tailored to your role.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
@@ -152,10 +152,10 @@ export default async function HomePage() {
                 Browse All
               </Link>
               <Link
-                href="/factory"
+                href="/browse"
                 className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-[hsl(var(--accent))] text-white text-sm font-medium hover:opacity-90 transition-opacity"
               >
-                Get Started
+                Build your personal assistant
               </Link>
             </div>
           </div>

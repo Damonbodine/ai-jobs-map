@@ -21,8 +21,8 @@ export function Footer() {
               <Link href="/products" className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-0.5">
                 Products & Pricing
               </Link>
-              <Link href="/factory" className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-0.5">
-                Configure Your System
+              <Link href="/browse" className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-0.5">
+                Build Your Personal Assistant
               </Link>
             </div>
           </div>
@@ -36,7 +36,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-border text-center text-xs text-muted-foreground">
-          Data from Bureau of Labor Statistics and O*NET.
+          Built from public occupation data and our own task-level analysis.
         </div>
       </div>
     </footer>

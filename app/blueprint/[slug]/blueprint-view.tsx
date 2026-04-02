@@ -318,7 +318,7 @@ export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintVie
         <FadeIn delay={0.2}>
           <h2 className="font-heading text-xl font-semibold mb-4 flex items-center gap-2">
             <Users className="h-4 w-4 text-accent" />
-            Agent Details
+            Recommended assistant modules
           </h2>
         </FadeIn>
         <Stagger className="space-y-4 mb-8" staggerDelay={0.08}>
@@ -389,7 +389,7 @@ export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintVie
           <div className="rounded-xl border border-border bg-card p-5 mb-8">
             <h2 className="text-sm font-semibold mb-3 flex items-center gap-2">
               <Shield className="h-3.5 w-3.5 text-accent" />
-              Human Checkpoints
+              You stay in control
             </h2>
             <div className="space-y-2">
               {blueprint.humanCheckpoints.map((cp, i) => (

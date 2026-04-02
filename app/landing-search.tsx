@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Search } from "lucide-react"
-import { supabase } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 
 interface OccupationResult {
@@ -29,15 +28,17 @@ export function LandingSearch() {
       return
     }
     setLoading(true)
-    const { data } = await supabase
-      .from("occupations")
-      .select("id, title, slug, major_category")
-      .or(`title.ilike.%${q}%,major_category.ilike.%${q}%`)
-      .order("title")
-      .limit(10)
-    setResults(data ?? [])
-    setOpen(true)
-    setLoading(false)
+    try {
+      const response = await fetch(`/api/occupations/search?q=${encodeURIComponent(q)}`)
+      const payload = await response.json()
+      setResults(payload.results ?? [])
+      setOpen(true)
+    } catch {
+      setResults([])
+      setOpen(false)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => {

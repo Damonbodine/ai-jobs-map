@@ -30,7 +30,7 @@ export default async function BrowsePage(props: {
     let query = supabase
       .from("occupations")
       .select(
-        "id, title, slug, major_category, occupation_automation_profile(composite_score)",
+        "id, title, slug, major_category, occupation_automation_profile(composite_score,time_range_high)",
         { count: "exact" }
       )
 
@@ -59,7 +59,7 @@ export default async function BrowsePage(props: {
       const bP = Array.isArray(b.occupation_automation_profile)
         ? b.occupation_automation_profile[0]
         : b.occupation_automation_profile
-      return (bP?.composite_score ?? 0) - (aP?.composite_score ?? 0)
+      return (bP?.time_range_high ?? 0) - (aP?.time_range_high ?? 0)
     })
   }
 
@@ -115,8 +115,8 @@ export default async function BrowsePage(props: {
           {results.map((occ) => {
             const profileRaw = occ.occupation_automation_profile
             const profile = Array.isArray(profileRaw) ? profileRaw[0] : profileRaw
-            const score = profile?.composite_score
-              ? Math.round(profile.composite_score)
+            const upperBoundMinutes = profile?.time_range_high
+              ? Math.round(profile.time_range_high)
               : null
 
             return (
@@ -134,12 +134,12 @@ export default async function BrowsePage(props: {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 ml-3 shrink-0">
-                    {score !== null && (
+                    {upperBoundMinutes !== null && (
                       <div className="text-right">
                         <div className="font-heading text-lg font-bold text-[hsl(var(--accent))]">
-                          {score}
+                          {upperBoundMinutes}
                         </div>
-                        <div className="text-[10px] text-muted-foreground">readiness</div>
+                        <div className="text-[10px] text-muted-foreground">min/day</div>
                       </div>
                     )}
                     <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />

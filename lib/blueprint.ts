@@ -53,11 +53,85 @@ function classifyTier(task: MicroTask): AutomationTier {
 }
 
 function getBlockForTask(task: MicroTask): string {
+  const name = task.task_name.toLowerCase()
+  const description = task.task_description.toLowerCase()
+  const combined = `${name} ${description}`
+
+  // Strong task-name / task-description cues should beat broad category labels.
+  if (
+    combined.includes("schedule") ||
+    combined.includes("reschedul") ||
+    combined.includes("timeline") ||
+    combined.includes("calendar") ||
+    combined.includes("crew") ||
+    combined.includes("coordinate") ||
+    combined.includes("handoff")
+  ) {
+    return "coordination"
+  }
+  if (
+    combined.includes("report") ||
+    combined.includes("document") ||
+    combined.includes("record") ||
+    combined.includes("log") ||
+    combined.includes("note") ||
+    combined.includes("write") ||
+    combined.includes("paperwork") ||
+    combined.includes("summary")
+  ) {
+    return "documentation"
+  }
+  if (
+    combined.includes("email") ||
+    combined.includes("message") ||
+    combined.includes("communication") ||
+    combined.includes("stakeholder") ||
+    combined.includes("briefing") ||
+    combined.includes("update")
+  ) {
+    return "communication"
+  }
+  if (
+    combined.includes("data") ||
+    combined.includes("metric") ||
+    combined.includes("dashboard") ||
+    combined.includes("monitor") ||
+    combined.includes("track") ||
+    combined.includes("usage")
+  ) {
+    return "data_reporting"
+  }
+  if (
+    combined.includes("compliance") ||
+    combined.includes("regulat") ||
+    combined.includes("audit") ||
+    combined.includes("policy") ||
+    combined.includes("verify")
+  ) {
+    return "compliance"
+  }
+  if (
+    combined.includes("research") ||
+    combined.includes("search") ||
+    combined.includes("find") ||
+    combined.includes("compare")
+  ) {
+    return "research"
+  }
+  if (
+    combined.includes("analyz") ||
+    combined.includes("review") ||
+    combined.includes("assess") ||
+    combined.includes("decide") ||
+    combined.includes("plan")
+  ) {
+    return "analysis"
+  }
+
   if (task.ai_category) {
     return CATEGORY_TO_BLOCK[task.ai_category] || "intake"
   }
-  // Fallback: guess from task name
-  const name = task.task_name.toLowerCase()
+
   if (name.includes("report") || name.includes("document") || name.includes("write")) return "documentation"
   if (name.includes("analyz") || name.includes("review") || name.includes("assess")) return "analysis"
   if (name.includes("email") || name.includes("communicat") || name.includes("present")) return "communication"

@@ -10,9 +10,9 @@ import { LandingSearch } from "@/app/landing-search"
 const POPULAR_OCCUPATIONS = [
   { title: "Software Developer", slug: "software-developers", minutes: 52 },
   { title: "Registered Nurse", slug: "registered-nurses", minutes: 28 },
-  { title: "Financial Analyst", slug: "financial-analysts", minutes: 47 },
+  { title: "Financial Manager", slug: "financial-managers", minutes: 47 },
   { title: "Marketing Manager", slug: "marketing-managers", minutes: 61 },
-  { title: "Accountant", slug: "accountants", minutes: 42 },
+  { title: "Accountant", slug: "accountants-and-auditors", minutes: 42 },
   { title: "Project Manager", slug: "project-management-specialists", minutes: 55 },
   { title: "Human Resources Manager", slug: "human-resources-managers", minutes: 58 },
   { title: "Graphic Designer", slug: "graphic-designers", minutes: 44 },

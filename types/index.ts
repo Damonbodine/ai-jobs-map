@@ -61,6 +61,7 @@ export interface AutomationProfile {
   time_range_low: number
   time_range_high: number
   time_range_by_block: string
+  block_example_tasks?: string | null
   top_automatable_activities: string
   top_blocking_abilities: string
   physical_ability_avg: number | null
@@ -68,6 +69,19 @@ export interface AutomationProfile {
 
 export interface TimeRangeByBlock {
   [block: string]: { low: number; high: number }
+}
+
+export interface BlockExampleTask {
+  title: string
+  source: string
+  score?: number
+  estimated_minutes?: number
+}
+
+export interface BlockExampleMap {
+  [block: string]: {
+    examples: BlockExampleTask[]
+  }
 }
 
 // Blueprint types

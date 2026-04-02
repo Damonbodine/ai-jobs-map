@@ -10,7 +10,12 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "db:seed": "tsx scripts/seed-occupations.ts",
-    "browse:refresh": "tsx scripts/refresh-browse-metrics.ts"
+    "browse:refresh": "tsx scripts/refresh-browse-metrics.ts",
+    "coverage:audit": "python3 scripts/audit_occupation_coverage.py",
+    "microtasks:backfill": "python3 scripts/backfill_microtask_metadata.py",
+    "block-examples:audit": "python3 scripts/audit_block_example_coverage.py",
+    "block-examples:preview": "python3 scripts/preview_block_examples.py",
+    "block-examples:persist": "python3 scripts/persist_block_examples.py"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",

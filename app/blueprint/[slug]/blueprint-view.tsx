@@ -1,14 +1,19 @@
 "use client"
 
 import Link from "next/link"
+import { useMemo, useState } from "react"
 import {
   ChevronRight, Cpu, ArrowRight,
   Users, Workflow, CircleDot, Shield,
+  Search, Plus, X,
 } from "lucide-react"
 import { generateBlueprint } from "@/lib/blueprint"
 import { cn } from "@/lib/utils"
 import { PageTransition } from "@/components/PageTransition"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
+import { supabase } from "@/lib/supabase/client"
+import { toast } from "sonner"
+import { computeDisplayedTimeback } from "@/lib/timeback"
 import type {
   Occupation,
   MicroTask,
@@ -51,6 +56,19 @@ const TIER_STYLES: Record<AutomationTier, string> = {
   "human-only": "bg-gray-100 text-gray-600",
 }
 
+const MODULE_DESCRIPTIONS: Record<string, string> = {
+  intake: "Sort incoming requests and prep the next step.",
+  analysis: "Review inputs and surface patterns or decisions.",
+  documentation: "Draft recurring records, notes, and summaries.",
+  coordination: "Keep schedules, handoffs, and follow-through moving.",
+  exceptions: "Flag disruptions, edge cases, and escalations early.",
+  learning: "Track updates, standards, and best practices.",
+  research: "Pull supporting context and compare options quickly.",
+  compliance: "Check policy, process, and regulatory requirements.",
+  communication: "Prepare updates, messages, and stakeholder follow-through.",
+  data_reporting: "Keep metrics, reports, and status views current.",
+}
+
 interface BlueprintViewProps {
   occupation: Occupation
   profile: AutomationProfile | null
@@ -73,6 +91,88 @@ export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintVie
 
   const blueprint = generateBlueprint(occupation, tasks, profile ?? null)
   const archInfo = ARCHITECTURE_LABELS[blueprint.architecture]
+  const { displayedMinutes, displayedLow, displayedHigh } = computeDisplayedTimeback(
+    profile ?? null,
+    tasks,
+    blueprint.totalMinutesSaved
+  )
+  const blueprintScale = blueprint.totalMinutesSaved > 0 ? displayedMinutes / blueprint.totalMinutesSaved : 1
+  const recommendedTierLabel =
+    blueprint.architecture === "single-agent"
+      ? "Starter Assistant"
+      : blueprint.architecture === "multi-agent"
+        ? "Workflow Bundle"
+        : "Ops Layer"
+  const factoryTier =
+    blueprint.architecture === "single-agent"
+      ? "starter"
+      : blueprint.architecture === "multi-agent"
+        ? "workflow"
+        : "ops"
+  const recommendedModuleKeys = useMemo(
+    () => blueprint.agents.map((agent) => agent.blockName),
+    [blueprint.agents]
+  )
+  const allModuleKeys = useMemo(
+    () => Object.keys(BLOCK_LABELS),
+    []
+  )
+  const [selectedModules, setSelectedModules] = useState<string[]>(recommendedModuleKeys)
+  const [moduleQuery, setModuleQuery] = useState("")
+  const [customRequests, setCustomRequests] = useState<string[]>([])
+  const [newRequest, setNewRequest] = useState("")
+  const [contactName, setContactName] = useState("")
+  const [contactEmail, setContactEmail] = useState("")
+  const [submitting, setSubmitting] = useState(false)
+  const selectableModules = allModuleKeys.filter((key) => {
+    if (selectedModules.includes(key)) return false
+    if (!moduleQuery.trim()) return true
+    const label = BLOCK_LABELS[key] ?? key
+    return label.toLowerCase().includes(moduleQuery.toLowerCase())
+  })
+
+  async function submitAssistantRequest() {
+    if (!contactEmail.trim()) {
+      toast.error("Add an email so we know where to send your assistant plan.")
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      const selectedTools = Object.fromEntries(
+        selectedModules.map((moduleKey) => [
+          moduleKey,
+          blueprint.agents
+            .find((agent) => agent.blockName === moduleKey)
+            ?.toolAccess ?? [],
+        ])
+      )
+
+      const { error } = await supabase.functions.invoke("submit-config", {
+        body: {
+          occupation_title: occupation.title,
+          occupation_slug: slug,
+          selected_agents: selectedModules,
+          selected_tools: selectedTools,
+          custom_tasks: customRequests,
+          pain_points: [
+            `Requested from blueprint page for ${occupation.title}`,
+            `Recommended suite: ${recommendedTierLabel}`,
+          ],
+          contact_name: contactName,
+          contact_email: contactEmail,
+          tier: factoryTier,
+        },
+      })
+
+      if (error) throw error
+      toast.success("Assistant request submitted. We'll turn this blueprint into a working plan.")
+    } catch {
+      toast.error("Could not submit the assistant request. Please try again.")
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <PageTransition>
@@ -90,62 +190,59 @@ export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintVie
             {occupation.title}
           </Link>
           <ChevronRight className="h-3 w-3" />
-          <span className="text-foreground">Agent Blueprint</span>
+          <span className="text-foreground">Build your personal assistant</span>
         </nav>
 
         <FadeIn>
           <h1 className="font-heading text-3xl font-bold tracking-tight mb-1">
-            Agent Blueprint
+            Build your personal assistant
           </h1>
           <p className="text-muted-foreground mb-8">
-            AI system design for {occupation.title}
+            Start from the recommended setup for {occupation.title}, then adjust the support modules and request exactly what you want from one screen.
           </p>
         </FadeIn>
 
-        {/* Impact Summary */}
-        <FadeIn delay={0.1}>
-          <div className="rounded-2xl border border-border bg-card p-5 sm:p-8 mb-6 sm:mb-8">
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
-              <div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                  Total Time Back
+        <FadeIn delay={0.05}>
+          <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 mb-6">
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+              Recommended setup
+            </div>
+            <h2 className="font-heading text-2xl font-semibold tracking-tight mb-2">
+              {recommendedTierLabel} for {occupation.title}
+            </h2>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
+              This setup maps the strongest task clusters into a support system you can review, trim down, or expand. Use it as the starting point for the assistant request you want us to build.
+            </p>
+            <div className="mt-3 text-sm text-foreground/80">
+              Estimated impact: <span className="font-semibold">{displayedLow}–{displayedHigh} min/day</span> when the top modules are fully deployed.
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
+              <div className="rounded-xl bg-secondary/40 p-4">
+                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                  Total time back
                 </div>
-                <div className="font-heading text-3xl font-bold text-accent">
-                  {blueprint.totalMinutesSaved}
-                  <span className="text-base text-muted-foreground font-normal ml-1">
-                    min/day
-                  </span>
+                <div className="text-sm font-semibold mt-1">
+                  {displayedMinutes} min/day
                 </div>
               </div>
-              <div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                  Agents
+              <div className="rounded-xl bg-secondary/40 p-4">
+                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                  Assistant layers
                 </div>
-                <div className="font-heading text-3xl font-bold">
-                  {blueprint.agents.length}
-                </div>
+                <div className="text-sm font-semibold mt-1">{blueprint.agents.length}</div>
               </div>
-              <div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                  Architecture
+              <div className="rounded-xl bg-secondary/40 p-4">
+                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                  Tasks mapped
                 </div>
-                <div className="text-sm font-semibold mt-1">{archInfo.label}</div>
-                <div className="text-[11px] text-muted-foreground">{archInfo.description}</div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                  Orchestration
-                </div>
-                <div className="text-sm font-semibold mt-1 capitalize">
-                  {blueprint.orchestration}
-                </div>
+                <div className="text-sm font-semibold mt-1">{tasks.filter((task) => task.ai_applicable).length}</div>
               </div>
             </div>
           </div>
         </FadeIn>
 
         {/* Architecture Diagram */}
-        <FadeIn delay={0.2}>
+        <FadeIn delay={0.12}>
           <div className="rounded-2xl border border-border bg-card p-6 mb-8">
             <h2 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2">
               <Workflow className="h-4 w-4 text-accent" />
@@ -218,7 +315,7 @@ export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintVie
         </FadeIn>
 
         {/* Agent Cards */}
-        <FadeIn delay={0.3}>
+        <FadeIn delay={0.2}>
           <h2 className="font-heading text-xl font-semibold mb-4 flex items-center gap-2">
             <Users className="h-4 w-4 text-accent" />
             Agent Details
@@ -237,9 +334,9 @@ export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintVie
                   </div>
                   <div className="text-right">
                     <div className="font-heading text-xl font-bold text-accent">
-                      {agent.minutesSaved}
+                      {Math.max(1, Math.round(agent.minutesSaved * blueprintScale * 0.82))}–{Math.max(Math.round(agent.minutesSaved * blueprintScale * 0.82) + 1, Math.round(agent.minutesSaved * blueprintScale * 1.18))}
                     </div>
-                    <div className="text-[10px] text-muted-foreground">min/day saved</div>
+                    <div className="text-[10px] text-muted-foreground">min/day potential</div>
                   </div>
                 </div>
 
@@ -288,7 +385,7 @@ export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintVie
         </Stagger>
 
         {/* Human Checkpoints */}
-        <FadeIn delay={0.4}>
+        <FadeIn delay={0.3}>
           <div className="rounded-xl border border-border bg-card p-5 mb-8">
             <h2 className="text-sm font-semibold mb-3 flex items-center gap-2">
               <Shield className="h-3.5 w-3.5 text-accent" />
@@ -308,16 +405,167 @@ export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintVie
           </div>
         </FadeIn>
 
-        {/* CTA */}
-        <FadeIn delay={0.5}>
-          <div className="text-center py-6">
-            <Link
-              href={`/factory?occupation=${slug}`}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity"
-            >
-              Configure This System
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+        {/* Assistant Builder */}
+        <FadeIn delay={0.38}>
+          <div id="assistant-builder" className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+              Build your personal assistant
+            </div>
+            <h2 className="font-heading text-2xl font-semibold tracking-tight mb-2">
+              Review the recommendation and shape the request.
+            </h2>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
+              Keep the recommended modules that fit, remove the ones you do not want, search the rest of the support library, and send us the exact assistant you want built.
+            </p>
+
+            <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-6 mt-6">
+              <div>
+                <div className="text-sm font-semibold mb-3">Your assistant modules</div>
+                <div className="space-y-3">
+                  {selectedModules.map((moduleKey) => {
+                    const agent = blueprint.agents.find((item) => item.blockName === moduleKey)
+                    return (
+                      <div key={moduleKey} className="rounded-xl border border-border bg-secondary/20 p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="text-sm font-semibold">
+                              {BLOCK_LABELS[moduleKey] ?? moduleKey}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {MODULE_DESCRIPTIONS[moduleKey] ?? "Assistant support for this work area."}
+                            </div>
+                            {agent && (
+                              <div className="text-[11px] text-accent mt-2">
+                                {Math.max(1, Math.round(agent.minutesSaved * blueprintScale * 0.82))}–{Math.max(Math.round(agent.minutesSaved * blueprintScale * 0.82) + 1, Math.round(agent.minutesSaved * blueprintScale * 1.18))} min/day potential
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSelectedModules((prev) => prev.filter((key) => key !== moduleKey))
+                            }
+                            className="text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                <div>
+                  <div className="text-sm font-semibold mb-3">Add more support modules</div>
+                  <div className="relative mb-3">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      value={moduleQuery}
+                      onChange={(e) => setModuleQuery(e.target.value)}
+                      placeholder="Search support modules..."
+                      className="w-full h-10 pl-10 pr-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                    />
+                  </div>
+                  <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                    {selectableModules.map((moduleKey) => (
+                      <button
+                        key={moduleKey}
+                        type="button"
+                        onClick={() => setSelectedModules((prev) => [...prev, moduleKey])}
+                        className="w-full text-left rounded-lg border border-border bg-card px-3 py-3 hover:border-accent/30 hover:bg-secondary/20 transition-colors"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <div className="text-sm font-medium">{BLOCK_LABELS[moduleKey] ?? moduleKey}</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              {MODULE_DESCRIPTIONS[moduleKey] ?? "Add this module to your request."}
+                            </div>
+                          </div>
+                          <Plus className="h-4 w-4 text-accent flex-shrink-0" />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-sm font-semibold mb-3">Anything else you want included?</div>
+                  <div className="flex gap-2">
+                    <input
+                      value={newRequest}
+                      onChange={(e) => setNewRequest(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && newRequest.trim()) {
+                          setCustomRequests((prev) => [...prev, newRequest.trim()])
+                          setNewRequest("")
+                        }
+                      }}
+                      placeholder="Add a task, workflow, or requirement..."
+                      className="flex-1 h-10 px-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (newRequest.trim()) {
+                          setCustomRequests((prev) => [...prev, newRequest.trim()])
+                          setNewRequest("")
+                        }
+                      }}
+                      className="h-10 px-4 rounded-lg border border-border text-sm font-medium hover:bg-secondary transition-colors"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  {customRequests.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {customRequests.map((request, index) => (
+                        <span
+                          key={`${request}-${index}`}
+                          className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs"
+                        >
+                          {request}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setCustomRequests((prev) => prev.filter((_, itemIndex) => itemIndex !== index))
+                            }
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="rounded-xl border border-border bg-secondary/20 p-4 space-y-3">
+                  <div className="text-sm font-semibold">Send your request</div>
+                  <input
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    placeholder="Your name"
+                    className="w-full h-10 px-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                  />
+                  <input
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full h-10 px-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                  />
+                  <button
+                    type="button"
+                    onClick={submitAssistantRequest}
+                    disabled={submitting || !contactEmail.trim()}
+                    className="inline-flex items-center justify-center gap-2 w-full px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity"
+                  >
+                    {submitting ? "Submitting..." : "Build your personal assistant"}
+                    {!submitting && <ArrowRight className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </FadeIn>
       </div>

@@ -1,0 +1,52 @@
+{
+  "occupations": [
+    {
+      "title": "Commercial pilots",
+      "slug": "commercial-pilots",
+      "majorCategory": "Transportation and Material Moving",
+      "blocks": [
+        {
+          "block": "coordination",
+          "label": "Coordination",
+          "low": 1,
+          "high": 10,
+          "examples": [
+            {
+              "title": "Perform flight plan verification",
+              "source": "microtask",
+              "score": 5.3
+            },
+            {
+              "title": "Assess weather impact on routes",
+              "source": "microtask",
+              "score": 5.079999999999999
+            },
+            {
+              "title": "Update crew schedules",
+              "source": "microtask",
+              "score": 4.819999999999999
+            },
+            {
+              "title": "Coordinate with air traffic control",
+              "source": "microtask",
+              "score": 4.58
+            }
+          ]
+        },
+        {
+          "block": "exceptions",
+          "label": "Exceptions",
+          "low": 4,
+          "high": 6,
+          "examples": [
+            {
+              "title": "Resolve issues affecting transportation operations.",
+              "source": "dwa",
+              "score": 1.822857142857143
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

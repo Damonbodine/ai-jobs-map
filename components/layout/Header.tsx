@@ -56,10 +56,10 @@ export function Header() {
             )}
           </button>
           <Link
-            href="/factory"
+            href="/browse"
             className="text-sm font-semibold bg-foreground text-background px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
           >
-            Configure
+            Find Your Role
           </Link>
         </nav>
 
@@ -90,11 +90,11 @@ export function Header() {
           ))}
           <div className="pt-2 mt-1 border-t border-border flex items-center gap-2">
             <Link
-              href="/factory"
+              href="/browse"
               onClick={() => setMobileOpen(false)}
               className="flex-1 text-center py-2.5 text-sm font-semibold bg-foreground text-background rounded-lg active:opacity-80 transition-opacity"
             >
-              Configure
+              Find Your Role
             </Link>
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

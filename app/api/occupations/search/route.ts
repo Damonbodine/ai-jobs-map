@@ -10,12 +10,23 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = createServerClient()
-    const { data, error } = await supabase
+
+    // Split query into words and match each against the title.
+    // "Financial Analyst" becomes: title ilike '%financial%' AND title ilike '%analyst%'
+    const words = query.split(/\s+/).filter((w) => w.length >= 2)
+    if (words.length === 0) {
+      return NextResponse.json({ results: [] })
+    }
+
+    let builder = supabase
       .from("occupations")
       .select("id, title, slug, major_category")
-      .or(`title.ilike.%${query}%,major_category.ilike.%${query}%`)
-      .order("title")
-      .limit(10)
+
+    for (const word of words) {
+      builder = builder.ilike("title", `%${word}%`)
+    }
+
+    const { data, error } = await builder.order("title").limit(10)
 
     if (error) {
       return NextResponse.json({ results: [] }, { status: 200 })

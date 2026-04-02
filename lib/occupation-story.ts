@@ -1,4 +1,5 @@
 import { generateBlueprint } from "@/lib/blueprint"
+import { CATEGORY_TO_MODULE } from "@/lib/modules"
 import type {
   Occupation,
   MicroTask,
@@ -104,6 +105,12 @@ function dayChangeCopy(block: string, handles: string[]) {
       `Instead of rewriting updates and repetitive messages over and over, the support layer prepares ${handleText} so communication starts with a usable draft rather than a blank page.`,
     data_reporting:
       `Instead of pulling the same numbers and rebuilding the same status views every cycle, the support layer prepares ${handleText} so reporting becomes review work instead of assembly work.`,
+    research:
+      `Instead of spending time hunting for sources, comparing options, and assembling background context, the support layer gathers ${handleText} so the person starts from useful material rather than a blank search.`,
+    compliance:
+      `Instead of manually checking submissions against policies and tracking regulatory requirements, the support layer monitors ${handleText} so compliance work becomes a review step rather than a research project.`,
+    learning:
+      `Instead of manually tracking updates to standards, regulations, and best practices, the support layer monitors ${handleText} and surfaces what matters so the team stays current without the overhead.`,
   }
 
   return templates[block] || `The support layer helps with ${handleText}, reducing repetitive work so more of the day stays with human judgment.`
@@ -148,14 +155,16 @@ export function deriveOccupationStory(
 
   const handles = dedupe(primary.tasks.map((task) => normalizeHandle(task.name))).slice(0, 5)
   const topBlocks = blueprint.agents.slice(0, 2).map((agent) => BLOCK_LABELS[agent.blockName] || agent.blockName)
+  const roleTitle = occupation.title.toLowerCase()
   const recommendationReason =
     topBlocks.length > 0
-      ? `Recommended because this role loses the most time in ${sentenceList(topBlocks)}.`
-      : "Recommended because this is the clearest place to remove repetitive routine work first."
+      ? `Recommended because ${roleTitle} lose the most routine time in ${sentenceList(topBlocks)} and recommendation prep.`
+      : `Recommended because this is the clearest place to remove repetitive routine work for ${roleTitle} first.`
 
   const packageBridge = packageBridgeCopy(primary.blockName, blueprint.architecture)
 
-  const whyItFits = `The clearest time-back opportunity in ${occupation.title.toLowerCase()} work sits in ${sentenceList(topBlocks)}. This reduces setup work around the job so the human stays with judgment, exceptions, and final accountability.`
+  const taskExamples = handles.slice(0, 2).join(" and ")
+  const whyItFits = `For ${occupation.title.toLowerCase()}, the clearest time-back sits in ${sentenceList(topBlocks)} — work like ${taskExamples}. A support layer here reduces setup and assembly time so the person stays with judgment, decisions, and accountability.`
 
   return {
     startWith: `Start with ${primaryLabel}.`,

@@ -8,42 +8,7 @@ import type {
   AutomationTier,
   ArchitectureType,
 } from "@/types"
-
-const BLOCK_ROLES: Record<string, string> = {
-  intake: "Processes incoming requests, emails, and data inputs",
-  analysis: "Analyzes data, identifies patterns, generates insights",
-  documentation: "Writes reports, notes, summaries, and documentation",
-  coordination: "Manages scheduling, delegation, and workflow tracking",
-  exceptions: "Handles edge cases, escalations, and unusual situations",
-  learning: "Monitors best practices and emerging methods",
-  research: "Finds information, compares options, stays current",
-  compliance: "Checks regulations, validates processes",
-  communication: "Drafts messages, prepares presentations",
-  data_reporting: "Collects, organizes, and visualizes data",
-}
-
-const BLOCK_TOOLS: Record<string, string[]> = {
-  intake: ["Email AI", "Form Parser", "Ticket Router"],
-  analysis: ["Data Analyzer", "Trend Detector", "Pattern Scanner"],
-  documentation: ["Report Writer", "Summary Generator", "Template Engine"],
-  coordination: ["Calendar AI", "Task Tracker", "Status Updater"],
-  exceptions: ["Escalation Router", "Exception Handler", "Alert Manager"],
-  learning: ["Knowledge Base", "Skill Recommender", "News Monitor"],
-  research: ["Web Researcher", "Document Scanner", "Comparison Engine"],
-  compliance: ["Regulation Checker", "Audit Assistant", "Policy Validator"],
-  communication: ["Message Drafter", "Tone Adjuster", "Slide Builder"],
-  data_reporting: ["Dashboard Builder", "Report Scheduler", "Data Visualizer"],
-}
-
-const CATEGORY_TO_BLOCK: Record<string, string> = {
-  task_automation: "intake",
-  decision_support: "analysis",
-  research_discovery: "research",
-  communication: "communication",
-  creative_assistance: "documentation",
-  data_analysis: "data_reporting",
-  learning_education: "learning",
-}
+import { MODULE_ROLES, MODULE_TOOLS, CATEGORY_TO_MODULE } from "@/lib/modules"
 
 function classifyTier(task: MicroTask): AutomationTier {
   if (!task.ai_applicable) return "human-only"
@@ -52,93 +17,46 @@ function classifyTier(task: MicroTask): AutomationTier {
   return "human-only"
 }
 
+// Word-boundary-aware keyword patterns for block classification.
+// Using \b prevents "log" from matching "login" or "catalog".
+const BLOCK_PATTERNS: [RegExp, string][] = [
+  // Coordination — high specificity, check first
+  [/\b(schedul|reschedul|timeline|calendar|crew|coordinat|handoff|hand-off|shift\s+chang)\b/i, "coordination"],
+  // Documentation
+  [/\b(report|document|record\b(?!ing\b)|paperwork|summar|meeting\s+note|draft\s+(report|summar))\b/i, "documentation"],
+  [/\b(log)\b(?!in|istic)/i, "documentation"],
+  [/\b(note|write)\b/i, "documentation"],
+  // Communication
+  [/\b(email|e-mail|messag|communicat|stakeholder|briefing|corresponden|announce)\b/i, "communication"],
+  // Data & Reporting
+  [/\b(dashboard|metric|KPI|visualiz|data\s+(entry|collect|analys|organiz))\b/i, "data_reporting"],
+  [/\b(monitor|track|usage)\b/i, "data_reporting"],
+  // Compliance
+  [/\b(complian|regulat|audit|policy|certif|inspect)\b/i, "compliance"],
+  // Research
+  [/\b(research|investigat|compar|benchmark|literature)\b/i, "research"],
+  // Analysis
+  [/\b(analyz|assess|evaluat|diagnos|interpret|pattern)\b/i, "analysis"],
+  [/\b(review)\b/i, "analysis"],
+  // Exceptions
+  [/\b(escalat|exception|edge\s+case|disruption|emergency|contingency)\b/i, "exceptions"],
+  // Learning
+  [/\b(train|onboard|mentor|best\s+practice|standard|curriculum)\b/i, "learning"],
+]
+
 function getBlockForTask(task: MicroTask): string {
-  const name = task.task_name.toLowerCase()
-  const description = task.task_description.toLowerCase()
-  const combined = `${name} ${description}`
+  const combined = `${task.task_name} ${task.task_description}`.toLowerCase()
 
-  // Strong task-name / task-description cues should beat broad category labels.
-  if (
-    combined.includes("schedule") ||
-    combined.includes("reschedul") ||
-    combined.includes("timeline") ||
-    combined.includes("calendar") ||
-    combined.includes("crew") ||
-    combined.includes("coordinate") ||
-    combined.includes("handoff")
-  ) {
-    return "coordination"
-  }
-  if (
-    combined.includes("report") ||
-    combined.includes("document") ||
-    combined.includes("record") ||
-    combined.includes("log") ||
-    combined.includes("note") ||
-    combined.includes("write") ||
-    combined.includes("paperwork") ||
-    combined.includes("summary")
-  ) {
-    return "documentation"
-  }
-  if (
-    combined.includes("email") ||
-    combined.includes("message") ||
-    combined.includes("communication") ||
-    combined.includes("stakeholder") ||
-    combined.includes("briefing") ||
-    combined.includes("update")
-  ) {
-    return "communication"
-  }
-  if (
-    combined.includes("data") ||
-    combined.includes("metric") ||
-    combined.includes("dashboard") ||
-    combined.includes("monitor") ||
-    combined.includes("track") ||
-    combined.includes("usage")
-  ) {
-    return "data_reporting"
-  }
-  if (
-    combined.includes("compliance") ||
-    combined.includes("regulat") ||
-    combined.includes("audit") ||
-    combined.includes("policy") ||
-    combined.includes("verify")
-  ) {
-    return "compliance"
-  }
-  if (
-    combined.includes("research") ||
-    combined.includes("search") ||
-    combined.includes("find") ||
-    combined.includes("compare")
-  ) {
-    return "research"
-  }
-  if (
-    combined.includes("analyz") ||
-    combined.includes("review") ||
-    combined.includes("assess") ||
-    combined.includes("decide") ||
-    combined.includes("plan")
-  ) {
-    return "analysis"
+  // Pass 1: Word-boundary keyword matching on task text
+  for (const [pattern, block] of BLOCK_PATTERNS) {
+    if (pattern.test(combined)) return block
   }
 
+  // Pass 2: ai_category mapping (reliable when present)
   if (task.ai_category) {
-    return CATEGORY_TO_BLOCK[task.ai_category] || "intake"
+    return CATEGORY_TO_MODULE[task.ai_category] || "intake"
   }
 
-  if (name.includes("report") || name.includes("document") || name.includes("write")) return "documentation"
-  if (name.includes("analyz") || name.includes("review") || name.includes("assess")) return "analysis"
-  if (name.includes("email") || name.includes("communicat") || name.includes("present")) return "communication"
-  if (name.includes("schedule") || name.includes("coordinat") || name.includes("meet")) return "coordination"
-  if (name.includes("research") || name.includes("search") || name.includes("find")) return "research"
-  if (name.includes("data") || name.includes("metric") || name.includes("dashboard")) return "data_reporting"
-  if (name.includes("compli") || name.includes("regulat") || name.includes("audit")) return "compliance"
   return "intake"
 }
 
@@ -188,17 +106,19 @@ export function generateBlueprint(
     .filter(([_, tasks]) => tasks.some((t) => t.tier !== "human-only"))
     .map(([block, tasks]) => ({
       blockName: block,
-      role: BLOCK_ROLES[block] || block,
+      role: MODULE_ROLES[block] || block,
       tasks,
-      toolAccess: BLOCK_TOOLS[block] || [],
+      toolAccess: MODULE_TOOLS[block] || [],
       minutesSaved: Math.round(tasks.reduce((sum, t) => sum + t.minutesSaved, 0)),
       pattern: tasks.length > 3 ? "workflow-orchestrator" : "autonomous-agent",
     }))
     .sort((a, b) => b.minutesSaved - a.minutesSaved)
 
   // Determine architecture
+  // Most roles have 4-6 active blocks, so Workflow Bundle should be the common tier.
+  // Ops Layer is reserved for roles with genuinely broad automation surface (7+).
   let architecture: ArchitectureType = "single-agent"
-  if (agents.length >= 5) architecture = "hub-and-spoke"
+  if (agents.length >= 7) architecture = "hub-and-spoke"
   else if (agents.length >= 2) architecture = "multi-agent"
 
   // Orchestration
@@ -225,5 +145,35 @@ export function generateBlueprint(
     totalMinutesSaved,
     orchestration,
     humanCheckpoints,
+  }
+}
+
+/**
+ * Enriches a blueprint with capability data from the database.
+ * Call this server-side after generateBlueprint() to add capabilities to each agent.
+ */
+export async function enrichBlueprintWithCapabilities(
+  blueprint: AgentBlueprint,
+  taskIds: number[]
+): Promise<AgentBlueprint> {
+  const { getAllCapabilities } = await import("@/lib/capabilities")
+  const { getCapabilitiesForTasks } = await import("@/lib/capabilities")
+
+  // Get capabilities that are mapped to this occupation's tasks
+  const taskCapabilities = await getCapabilitiesForTasks(taskIds)
+
+  // Fall back to all capabilities per module if no task mappings exist yet
+  const allCapabilities = Object.keys(taskCapabilities).length > 0
+    ? taskCapabilities
+    : await getAllCapabilities()
+
+  const enrichedAgents = blueprint.agents.map((agent) => ({
+    ...agent,
+    capabilities: allCapabilities[agent.blockName] || [],
+  }))
+
+  return {
+    ...blueprint,
+    agents: enrichedAgents,
   }
 }

@@ -4,77 +4,20 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import {
-  ArrowRight, ArrowLeft, Check, Plus, X,
-  Cpu, Mail, FileText, BarChart3, Users, Search,
-  Shield, BookOpen, MessageSquare, Database
+  ArrowRight, ArrowLeft, Check, Plus, X, Cpu, Search,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { supabase } from "@/lib/supabase/client"
 import { PageTransition } from "@/components/PageTransition"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
+import { MODULE_LIST, MODULE_TOOLS, CATEGORY_TO_MODULE } from "@/lib/modules"
 
 const BOOKING_URL = "https://calendly.com" // Replace with your actual booking URL
 
-const WORK_BLOCKS = [
-  { key: "intake", label: "Intake & Triage", icon: Mail, description: "Process incoming requests, emails, and data" },
-  { key: "analysis", label: "Analysis", icon: BarChart3, description: "Analyze data, identify patterns, generate insights" },
-  { key: "documentation", label: "Documentation", icon: FileText, description: "Write reports, notes, and summaries" },
-  { key: "coordination", label: "Coordination", icon: Users, description: "Schedule, delegate, and track workflows" },
-  { key: "research", label: "Research", icon: Search, description: "Find information, compare options, stay current" },
-  { key: "communication", label: "Communication", icon: MessageSquare, description: "Draft messages, prepare presentations" },
-  { key: "compliance", label: "Compliance", icon: Shield, description: "Check regulations, validate processes" },
-  { key: "learning", label: "Learning", icon: BookOpen, description: "Stay updated on best practices and new methods" },
-  { key: "data_reporting", label: "Data & Reporting", icon: Database, description: "Collect, organize, and visualize data" },
-]
+const WORK_BLOCKS = MODULE_LIST.filter((m) => m.key !== "exceptions")
 
-const TOOLS: Record<string, { name: string; category: string }[]> = {
-  intake: [
-    { name: "Email AI", category: "communication" },
-    { name: "Form Parser", category: "document_ai" },
-    { name: "Ticket Router", category: "automation" },
-  ],
-  analysis: [
-    { name: "Data Analyzer", category: "analytics" },
-    { name: "Trend Detector", category: "analytics" },
-    { name: "Anomaly Scanner", category: "analytics" },
-  ],
-  documentation: [
-    { name: "Report Writer", category: "document_ai" },
-    { name: "Summary Generator", category: "document_ai" },
-    { name: "Template Engine", category: "document_ai" },
-  ],
-  coordination: [
-    { name: "Calendar AI", category: "scheduling" },
-    { name: "Task Tracker", category: "project_mgmt" },
-    { name: "Status Updater", category: "communication" },
-  ],
-  research: [
-    { name: "Web Researcher", category: "research" },
-    { name: "Document Scanner", category: "document_ai" },
-    { name: "Comparison Engine", category: "analytics" },
-  ],
-  communication: [
-    { name: "Message Drafter", category: "communication" },
-    { name: "Tone Adjuster", category: "communication" },
-    { name: "Slide Builder", category: "creative" },
-  ],
-  compliance: [
-    { name: "Regulation Checker", category: "compliance" },
-    { name: "Audit Assistant", category: "compliance" },
-    { name: "Policy Validator", category: "compliance" },
-  ],
-  learning: [
-    { name: "Knowledge Base", category: "learning" },
-    { name: "Skill Recommender", category: "learning" },
-    { name: "News Monitor", category: "research" },
-  ],
-  data_reporting: [
-    { name: "Dashboard Builder", category: "analytics" },
-    { name: "Report Scheduler", category: "automation" },
-    { name: "Data Visualizer", category: "analytics" },
-  ],
-}
+const TOOLS: Record<string, string[]> = MODULE_TOOLS
 
 type Step = "role" | "agents" | "tools" | "custom" | "contact" | "done"
 
@@ -105,16 +48,7 @@ interface MicroTask {
 }
 
 function categoryToBlock(cat: string): string | null {
-  const map: Record<string, string> = {
-    task_automation: "intake",
-    decision_support: "analysis",
-    research_discovery: "research",
-    communication: "communication",
-    creative_assistance: "documentation",
-    data_analysis: "data_reporting",
-    learning_education: "learning",
-  }
-  return map[cat] || null
+  return CATEGORY_TO_MODULE[cat] || null
 }
 
 export function FactoryWizard() {
@@ -496,19 +430,19 @@ export function FactoryWizard() {
                       <h3 className="text-sm font-semibold">{block.label} Agent</h3>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      {tools.map((tool) => {
-                        const isSelected = selectedTools[agentKey]?.includes(tool.name) ?? false
+                      {tools.map((toolName) => {
+                        const isSelected = selectedTools[agentKey]?.includes(toolName) ?? false
                         return (
                           <button
-                            key={tool.name}
+                            key={toolName}
                             onClick={() => {
                               setSelectedTools((prev) => {
                                 const current = prev[agentKey] || []
                                 return {
                                   ...prev,
                                   [agentKey]: isSelected
-                                    ? current.filter((t) => t !== tool.name)
-                                    : [...current, tool.name],
+                                    ? current.filter((t) => t !== toolName)
+                                    : [...current, toolName],
                                 }
                               })
                             }}
@@ -520,10 +454,9 @@ export function FactoryWizard() {
                             )}
                           >
                             <div className="font-medium flex items-center justify-between">
-                              {tool.name}
+                              {toolName}
                               {isSelected && <Check className="h-3 w-3 text-accent" />}
                             </div>
-                            <div className="text-muted-foreground mt-0.5">{tool.category}</div>
                           </button>
                         )
                       })}

@@ -22,31 +22,7 @@ import type {
   BlockExampleMap,
 } from "@/types"
 
-const BLOCK_LABELS: Record<string, string> = {
-  intake: "Intake",
-  analysis: "Analysis",
-  documentation: "Documentation",
-  coordination: "Coordination",
-  research: "Research",
-  communication: "Communication",
-  exceptions: "Exceptions",
-  learning: "Learning",
-  compliance: "Compliance",
-  data_reporting: "Data & Reporting",
-}
-
-const BLOCK_STYLES: Record<string, string> = {
-  intake: "bg-cyan-50 text-cyan-700 border-cyan-200",
-  analysis: "bg-indigo-50 text-indigo-700 border-indigo-200",
-  documentation: "bg-violet-50 text-violet-700 border-violet-200",
-  coordination: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  research: "bg-teal-50 text-teal-700 border-teal-200",
-  communication: "bg-orange-50 text-orange-700 border-orange-200",
-  exceptions: "bg-amber-50 text-amber-700 border-amber-200",
-  learning: "bg-rose-50 text-rose-700 border-rose-200",
-  compliance: "bg-red-50 text-red-700 border-red-200",
-  data_reporting: "bg-sky-50 text-sky-700 border-sky-200",
-}
+import { MODULE_LABELS as BLOCK_LABELS, MODULE_COLORS as BLOCK_STYLES } from "@/lib/modules"
 
 function formatHandle(handle: string) {
   if (!handle) return handle
@@ -377,7 +353,7 @@ export default async function OccupationPage(props: {
                                   {examples.map((example) => (
                                     <div
                                       key={example}
-                                      className="rounded-lg bg-white/70 border border-white/80 px-3 py-2 text-xs leading-relaxed text-foreground/85"
+                                      className="rounded-lg bg-white/70 dark:bg-white/10 border border-white/80 dark:border-white/10 px-3 py-2 text-xs leading-relaxed text-foreground/85"
                                     >
                                       {example}
                                     </div>
@@ -472,6 +448,54 @@ export default async function OccupationPage(props: {
                       <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
+                </div>
+              </FadeIn>
+            )}
+
+            {/* Featured Routines — individual tasks AI would handle */}
+            {featuredRoutines.length > 0 && (
+              <FadeIn delay={0.5}>
+                <div>
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                    <Zap className="h-3.5 w-3.5 text-accent" />
+                    Top tasks your assistant would handle
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {featuredRoutines.map((task) => (
+                      <div
+                        key={task.id}
+                        className="rounded-lg border border-border bg-card px-3.5 py-3"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="text-sm font-medium leading-snug">{task.task_name}</div>
+                          <div className="text-xs text-accent font-semibold whitespace-nowrap">
+                            {task.displayLow}–{task.displayHigh}m
+                          </div>
+                        </div>
+                        <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed line-clamp-2">
+                          {task.ai_how_it_helps || task.task_description}
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="text-[10px] text-muted-foreground capitalize">{task.frequency}</span>
+                          {task.ai_impact_level && (
+                            <span className={cn(
+                              "text-[10px] font-medium px-1.5 py-0.5 rounded",
+                              task.ai_impact_level >= 4
+                                ? "bg-green-100 text-green-700"
+                                : "bg-blue-100 text-blue-700"
+                            )}>
+                              {task.ai_impact_level >= 4 ? "automated" : "assisted"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {extraRoutines.length > 0 && (
+                    <div className="text-xs text-muted-foreground mt-3">
+                      + {extraRoutines.length} more tasks mapped
+                    </div>
+                  )}
                 </div>
               </FadeIn>
             )}

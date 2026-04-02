@@ -3,9 +3,8 @@
 import Link from "next/link"
 import { useMemo, useState } from "react"
 import {
-  ChevronRight, Cpu, ArrowRight,
-  Users, Workflow, CircleDot, Shield,
-  Search, Plus, X,
+  ChevronRight, Cpu, ArrowRight, Shield,
+  Plus, X,
 } from "lucide-react"
 import { generateBlueprint } from "@/lib/blueprint"
 import { cn } from "@/lib/utils"
@@ -18,65 +17,26 @@ import type {
   Occupation,
   MicroTask,
   AutomationProfile,
-  ArchitectureType,
-  AutomationTier,
 } from "@/types"
 
-const BLOCK_LABELS: Record<string, string> = {
-  intake: "Intake & Triage",
-  analysis: "Analysis",
-  documentation: "Documentation",
-  coordination: "Coordination",
-  exceptions: "Exceptions",
-  learning: "Learning",
-  research: "Research",
-  compliance: "Compliance",
-  communication: "Communication",
-  data_reporting: "Data & Reporting",
-}
+import { MODULE_LABELS as BLOCK_LABELS, MODULE_DESCRIPTIONS as REGISTRY_DESCRIPTIONS, MODULE_COLORS } from "@/lib/modules"
+import { TimeDonut } from "./time-donut"
 
-const ARCHITECTURE_LABELS: Record<ArchitectureType, { label: string; description: string }> = {
-  "single-agent": {
-    label: "Single Agent",
-    description: "One focused agent handles all tasks sequentially",
-  },
-  "multi-agent": {
-    label: "Multi-Agent",
-    description: "Multiple agents work in parallel on different work areas",
-  },
-  "hub-and-spoke": {
-    label: "Hub & Spoke",
-    description: "Central orchestrator coordinates specialized agents",
-  },
-}
 
-const TIER_STYLES: Record<AutomationTier, string> = {
-  automated: "bg-green-100 text-green-700",
-  assisted: "bg-blue-100 text-blue-700",
-  "human-only": "bg-gray-100 text-gray-600",
-}
 
-const MODULE_DESCRIPTIONS: Record<string, string> = {
-  intake: "Sort incoming requests and prep the next step.",
-  analysis: "Review inputs and surface patterns or decisions.",
-  documentation: "Draft recurring records, notes, and summaries.",
-  coordination: "Keep schedules, handoffs, and follow-through moving.",
-  exceptions: "Flag disruptions, edge cases, and escalations early.",
-  learning: "Track updates, standards, and best practices.",
-  research: "Pull supporting context and compare options quickly.",
-  compliance: "Check policy, process, and regulatory requirements.",
-  communication: "Prepare updates, messages, and stakeholder follow-through.",
-  data_reporting: "Keep metrics, reports, and status views current.",
-}
+const MODULE_DESCRIPTIONS = REGISTRY_DESCRIPTIONS
+
+import type { ModuleCapability } from "@/types"
 
 interface BlueprintViewProps {
   occupation: Occupation
   profile: AutomationProfile | null
   tasks: MicroTask[]
   slug: string
+  capabilitiesByModule?: Record<string, ModuleCapability[]>
 }
 
-export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintViewProps) {
+export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesByModule = {} }: BlueprintViewProps) {
   if (!tasks || tasks.length === 0) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
@@ -90,7 +50,6 @@ export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintVie
   }
 
   const blueprint = generateBlueprint(occupation, tasks, profile ?? null)
-  const archInfo = ARCHITECTURE_LABELS[blueprint.architecture]
   const { displayedMinutes, displayedLow, displayedHigh } = computeDisplayedTimeback(
     profile ?? null,
     tasks,
@@ -139,31 +98,37 @@ export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintVie
 
     setSubmitting(true)
     try {
-      const selectedTools = Object.fromEntries(
-        selectedModules.map((moduleKey) => [
-          moduleKey,
-          blueprint.agents
-            .find((agent) => agent.blockName === moduleKey)
-            ?.toolAccess ?? [],
-        ])
+      const addedModules = selectedModules.filter((m) => !recommendedModuleKeys.includes(m))
+      const removedModules = recommendedModuleKeys.filter((m) => !selectedModules.includes(m))
+
+      // Collect capabilities for selected modules
+      const selectedCapabilities = selectedModules.flatMap(
+        (moduleKey) => (capabilitiesByModule[moduleKey] ?? []).map((c) => c.capability_key)
       )
 
-      const { error } = await supabase.functions.invoke("submit-config", {
-        body: {
-          occupation_title: occupation.title,
-          occupation_slug: slug,
-          selected_agents: selectedModules,
-          selected_tools: selectedTools,
-          custom_tasks: customRequests,
-          pain_points: [
-            `Requested from blueprint page for ${occupation.title}`,
-            `Recommended suite: ${recommendedTierLabel}`,
-          ],
-          contact_name: contactName,
-          contact_email: contactEmail,
-          tier: factoryTier,
-        },
-      })
+      const payload = {
+        occupation_title: occupation.title,
+        occupation_slug: slug,
+        recommended_modules: recommendedModuleKeys,
+        selected_modules: selectedModules,
+        added_modules: addedModules,
+        removed_modules: removedModules,
+        selected_capabilities: selectedCapabilities,
+        custom_requests: customRequests,
+        pain_points: [],
+        contact_name: contactName,
+        contact_email: contactEmail,
+        tier: factoryTier,
+        source: "blueprint",
+      }
+
+      // Insert directly into assistant_inquiries table
+      const { error } = await supabase
+        .from("assistant_inquiries")
+        .insert({
+          occupation_id: occupation.id,
+          ...payload,
+        })
 
       if (error) throw error
       toast.success("Assistant request submitted. We'll turn this blueprint into a working plan.")
@@ -227,9 +192,11 @@ export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintVie
               </div>
               <div className="rounded-xl bg-secondary/40 p-4">
                 <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  Assistant layers
+                  Support areas
                 </div>
-                <div className="text-sm font-semibold mt-1">{blueprint.agents.length}</div>
+                <div className="text-sm font-semibold mt-1">
+                  {blueprint.agents.length} working together
+                </div>
               </div>
               <div className="rounded-xl bg-secondary/40 p-4">
                 <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
@@ -241,329 +208,161 @@ export function BlueprintView({ occupation, profile, tasks, slug }: BlueprintVie
           </div>
         </FadeIn>
 
-        {/* Architecture Diagram */}
+        {/* Time-back breakdown chart */}
         <FadeIn delay={0.12}>
-          <div className="rounded-2xl border border-border bg-card p-6 mb-8">
-            <h2 className="font-heading text-lg font-semibold mb-4 flex items-center gap-2">
-              <Workflow className="h-4 w-4 text-accent" />
-              System Architecture
-            </h2>
-
-            {blueprint.architecture === "hub-and-spoke" && (
-              <div className="flex flex-col items-center gap-4">
-                <div className="rounded-xl bg-accent/10 border border-accent/30 p-4 text-center">
-                  <Cpu className="h-5 w-5 mx-auto mb-1 text-accent" />
-                  <div className="text-sm font-semibold">Orchestrator</div>
-                  <div className="text-[10px] text-muted-foreground">
-                    Routes tasks, monitors agents
-                  </div>
-                </div>
-                <div className="w-px h-6 bg-border" />
-                <div className="flex flex-wrap gap-3 justify-center">
-                  {blueprint.agents.map((agent) => (
-                    <div
-                      key={agent.blockName}
-                      className="rounded-lg border border-border p-3 text-center min-w-[120px]"
-                    >
-                      <div className="text-xs font-semibold">
-                        {BLOCK_LABELS[agent.blockName]}
-                      </div>
-                      <div className="text-[10px] text-accent mt-0.5">
-                        {agent.minutesSaved} min
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {blueprint.architecture === "multi-agent" && (
-              <div className="flex flex-wrap gap-3 justify-center">
-                {blueprint.agents.map((agent, i) => (
-                  <div key={agent.blockName} className="flex items-center gap-2">
-                    <div className="rounded-lg border border-border p-3 text-center min-w-[120px]">
-                      <div className="text-xs font-semibold">
-                        {BLOCK_LABELS[agent.blockName]}
-                      </div>
-                      <div className="text-[10px] text-accent mt-0.5">
-                        {agent.minutesSaved} min
-                      </div>
-                    </div>
-                    {i < blueprint.agents.length - 1 && (
-                      <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {blueprint.architecture === "single-agent" && (
-              <div className="flex justify-center">
-                <div className="rounded-xl bg-accent/10 border border-accent/30 p-6 text-center max-w-xs">
-                  <Cpu className="h-6 w-6 mx-auto mb-2 text-accent" />
-                  <div className="text-sm font-semibold">
-                    {BLOCK_LABELS[blueprint.agents[0]?.blockName]}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {blueprint.agents[0]?.tasks.length} tasks,{" "}
-                    {blueprint.agents[0]?.minutesSaved} min/day
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </FadeIn>
-
-        {/* Agent Cards */}
-        <FadeIn delay={0.2}>
-          <h2 className="font-heading text-xl font-semibold mb-4 flex items-center gap-2">
-            <Users className="h-4 w-4 text-accent" />
-            Recommended assistant modules
-          </h2>
-        </FadeIn>
-        <Stagger className="space-y-4 mb-8" staggerDelay={0.08}>
-          {blueprint.agents.map((agent) => (
-            <StaggerItem key={agent.blockName}>
-              <div className="rounded-xl border border-border bg-card p-5">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-base font-semibold">
-                      {BLOCK_LABELS[agent.blockName]} Agent
-                    </h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">{agent.role}</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-heading text-xl font-bold text-accent">
-                      {Math.max(1, Math.round(agent.minutesSaved * blueprintScale * 0.82))}–{Math.max(Math.round(agent.minutesSaved * blueprintScale * 0.82) + 1, Math.round(agent.minutesSaved * blueprintScale * 1.18))}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground">min/day potential</div>
-                  </div>
-                </div>
-
-                {/* Tasks */}
-                <div className="space-y-2 mb-4">
-                  {agent.tasks.map((task, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between py-1.5 border-b border-border last:border-0"
-                    >
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <CircleDot className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                        <span className="text-sm truncate">{task.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                        <span
-                          className={cn(
-                            "text-[10px] font-medium px-1.5 py-0.5 rounded",
-                            TIER_STYLES[task.tier]
-                          )}
-                        >
-                          {task.tier}
-                        </span>
-                        <span className="text-xs text-muted-foreground w-12 text-right">
-                          {task.minutesSaved}m
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Tool tags */}
-                <div className="flex flex-wrap gap-1.5">
-                  {agent.toolAccess.map((tool) => (
-                    <span
-                      key={tool}
-                      className="text-[10px] bg-secondary px-2 py-0.5 rounded"
-                    >
-                      {tool}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </StaggerItem>
-          ))}
-        </Stagger>
-
-        {/* Human Checkpoints */}
-        <FadeIn delay={0.3}>
-          <div className="rounded-xl border border-border bg-card p-5 mb-8">
-            <h2 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <Shield className="h-3.5 w-3.5 text-accent" />
-              You stay in control
-            </h2>
-            <div className="space-y-2">
-              {blueprint.humanCheckpoints.map((cp, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-2 text-sm text-muted-foreground"
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-orange-400 flex-shrink-0" />
-                  {cp}
-                </div>
-              ))}
-            </div>
-          </div>
+          <TimeDonut
+            agents={blueprint.agents}
+            capabilitiesByModule={capabilitiesByModule}
+            totalMinutes={displayedMinutes}
+            blueprintScale={blueprintScale}
+          />
         </FadeIn>
 
         {/* Assistant Builder */}
-        <FadeIn delay={0.38}>
+        <FadeIn delay={0.2}>
           <div id="assistant-builder" className="rounded-2xl border border-border bg-card p-5 sm:p-6">
-            <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-              Build your personal assistant
-            </div>
-            <h2 className="font-heading text-2xl font-semibold tracking-tight mb-2">
-              Review the recommendation and shape the request.
+            <h2 className="font-heading text-xl font-semibold tracking-tight mb-1">
+              Shape your assistant
             </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
-              Keep the recommended modules that fit, remove the ones you do not want, search the rest of the support library, and send us the exact assistant you want built.
+            <p className="text-sm text-muted-foreground mb-5">
+              Toggle modules on or off, add anything else you need, and send the request.
             </p>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-6 mt-6">
-              <div>
-                <div className="text-sm font-semibold mb-3">Your assistant modules</div>
-                <div className="space-y-3">
-                  {selectedModules.map((moduleKey) => {
-                    const agent = blueprint.agents.find((item) => item.blockName === moduleKey)
-                    return (
-                      <div key={moduleKey} className="rounded-xl border border-border bg-secondary/20 p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <div className="text-sm font-semibold">
-                              {BLOCK_LABELS[moduleKey] ?? moduleKey}
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              {MODULE_DESCRIPTIONS[moduleKey] ?? "Assistant support for this work area."}
-                            </div>
-                            {agent && (
-                              <div className="text-[11px] text-accent mt-2">
-                                {Math.max(1, Math.round(agent.minutesSaved * blueprintScale * 0.82))}–{Math.max(Math.round(agent.minutesSaved * blueprintScale * 0.82) + 1, Math.round(agent.minutesSaved * blueprintScale * 1.18))} min/day potential
-                              </div>
-                            )}
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setSelectedModules((prev) => prev.filter((key) => key !== moduleKey))
-                            }
-                            className="text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
+            {/* Module toggles — all 10 modules as interactive chips */}
+            <div className="mb-6">
+              <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">
+                Support modules
               </div>
-
-              <div className="space-y-5">
-                <div>
-                  <div className="text-sm font-semibold mb-3">Add more support modules</div>
-                  <div className="relative mb-3">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input
-                      value={moduleQuery}
-                      onChange={(e) => setModuleQuery(e.target.value)}
-                      placeholder="Search support modules..."
-                      className="w-full h-10 pl-10 pr-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
-                    />
-                  </div>
-                  <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                    {selectableModules.map((moduleKey) => (
-                      <button
-                        key={moduleKey}
-                        type="button"
-                        onClick={() => setSelectedModules((prev) => [...prev, moduleKey])}
-                        className="w-full text-left rounded-lg border border-border bg-card px-3 py-3 hover:border-accent/30 hover:bg-secondary/20 transition-colors"
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <div>
-                            <div className="text-sm font-medium">{BLOCK_LABELS[moduleKey] ?? moduleKey}</div>
-                            <div className="text-xs text-muted-foreground mt-0.5">
-                              {MODULE_DESCRIPTIONS[moduleKey] ?? "Add this module to your request."}
-                            </div>
-                          </div>
-                          <Plus className="h-4 w-4 text-accent flex-shrink-0" />
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-sm font-semibold mb-3">Anything else you want included?</div>
-                  <div className="flex gap-2">
-                    <input
-                      value={newRequest}
-                      onChange={(e) => setNewRequest(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && newRequest.trim()) {
-                          setCustomRequests((prev) => [...prev, newRequest.trim()])
-                          setNewRequest("")
-                        }
-                      }}
-                      placeholder="Add a task, workflow, or requirement..."
-                      className="flex-1 h-10 px-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
-                    />
+              <div className="flex flex-wrap gap-2">
+                {allModuleKeys.map((moduleKey) => {
+                  const isSelected = selectedModules.includes(moduleKey)
+                  const agent = blueprint.agents.find((a) => a.blockName === moduleKey)
+                  const scaledMin = agent ? Math.max(1, Math.round(agent.minutesSaved * blueprintScale)) : null
+                  return (
                     <button
+                      key={moduleKey}
                       type="button"
                       onClick={() => {
-                        if (newRequest.trim()) {
-                          setCustomRequests((prev) => [...prev, newRequest.trim()])
-                          setNewRequest("")
+                        if (isSelected) {
+                          setSelectedModules((prev) => prev.filter((k) => k !== moduleKey))
+                        } else {
+                          setSelectedModules((prev) => [...prev, moduleKey])
                         }
                       }}
-                      className="h-10 px-4 rounded-lg border border-border text-sm font-medium hover:bg-secondary transition-colors"
+                      className={cn(
+                        "inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium border transition-all",
+                        isSelected
+                          ? MODULE_COLORS[moduleKey] || "bg-accent/10 text-accent border-accent/30"
+                          : "bg-secondary/30 text-muted-foreground border-border hover:border-accent/30 hover:text-foreground"
+                      )}
                     >
-                      Add
+                      {BLOCK_LABELS[moduleKey] ?? moduleKey}
+                      {isSelected && scaledMin && (
+                        <span className="text-[10px] opacity-70">{scaledMin}m</span>
+                      )}
+                      {isSelected ? (
+                        <X className="h-3 w-3 opacity-60" />
+                      ) : (
+                        <Plus className="h-3 w-3 opacity-40" />
+                      )}
                     </button>
-                  </div>
-                  {customRequests.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {customRequests.map((request, index) => (
-                        <span
-                          key={`${request}-${index}`}
-                          className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs"
-                        >
-                          {request}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setCustomRequests((prev) => prev.filter((_, itemIndex) => itemIndex !== index))
-                            }
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                  )
+                })}
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-2">
+                {selectedModules.length} of {allModuleKeys.length} modules selected
+              </div>
+            </div>
 
-                <div className="rounded-xl border border-border bg-secondary/20 p-4 space-y-3">
-                  <div className="text-sm font-semibold">Send your request</div>
+            {/* Custom requests */}
+            <div className="mb-6">
+              <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">
+                Anything else?
+              </div>
+              <div className="flex gap-2">
+                <input
+                  value={newRequest}
+                  onChange={(e) => setNewRequest(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newRequest.trim()) {
+                      setCustomRequests((prev) => [...prev, newRequest.trim()])
+                      setNewRequest("")
+                    }
+                  }}
+                  placeholder="Add a task, workflow, or requirement..."
+                  className="flex-1 h-10 px-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (newRequest.trim()) {
+                      setCustomRequests((prev) => [...prev, newRequest.trim()])
+                      setNewRequest("")
+                    }
+                  }}
+                  className="h-10 px-4 rounded-lg border border-border text-sm font-medium hover:bg-secondary transition-colors"
+                >
+                  Add
+                </button>
+              </div>
+              {customRequests.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {customRequests.map((request, index) => (
+                    <span
+                      key={`${request}-${index}`}
+                      className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs"
+                    >
+                      {request}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCustomRequests((prev) => prev.filter((_, i) => i !== index))
+                        }
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Human oversight note */}
+            <div className="flex items-start gap-2 mb-6 text-xs text-muted-foreground">
+              <Shield className="h-3.5 w-3.5 flex-shrink-0 mt-0.5 text-accent" />
+              <span>You stay in control — final decisions, sensitive communication, and exceptions always stay with you.</span>
+            </div>
+
+            {/* Submit */}
+            <div className="rounded-xl border border-border bg-secondary/20 p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                <div>
+                  <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Name</label>
                   <input
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
                     placeholder="Your name"
-                    className="w-full h-10 px-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                    className="w-full h-10 mt-1 px-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
                   />
+                </div>
+                <div>
+                  <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Email</label>
                   <input
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full h-10 px-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                    className="w-full h-10 mt-1 px-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
                   />
-                  <button
-                    type="button"
-                    onClick={submitAssistantRequest}
-                    disabled={submitting || !contactEmail.trim()}
-                    className="inline-flex items-center justify-center gap-2 w-full px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity"
-                  >
-                    {submitting ? "Submitting..." : "Build your personal assistant"}
-                    {!submitting && <ArrowRight className="h-3.5 w-3.5" />}
-                  </button>
                 </div>
+                <button
+                  type="button"
+                  onClick={submitAssistantRequest}
+                  disabled={submitting || !contactEmail.trim()}
+                  className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity whitespace-nowrap"
+                >
+                  {submitting ? "Submitting..." : "Send request"}
+                  {!submitting && <ArrowRight className="h-3.5 w-3.5" />}
+                </button>
               </div>
             </div>
           </div>

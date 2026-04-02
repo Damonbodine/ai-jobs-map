@@ -103,6 +103,7 @@ export interface BlockAgent {
   toolAccess: string[]
   minutesSaved: number
   pattern: string
+  capabilities?: ModuleCapability[]
 }
 
 export interface AgentBlueprint {
@@ -112,6 +113,27 @@ export interface AgentBlueprint {
   totalMinutesSaved: number
   orchestration: string
   humanCheckpoints: string[]
+}
+
+// Module registry re-export
+export type { ModuleDefinition, ModuleKey } from "@/lib/modules"
+
+// Capability catalog types
+export interface ModuleCapability {
+  id: number
+  module_key: string
+  capability_key: string
+  capability_name: string
+  description: string
+  example_tasks: string[]
+  likely_systems: string[]
+}
+
+export interface TaskCapabilityMapping {
+  id: number
+  micro_task_id: number
+  capability_key: string
+  confidence: number
 }
 
 // Category type

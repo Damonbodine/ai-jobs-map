@@ -52,18 +52,26 @@ export function computeDisplayedTimeback(
       ? profile.time_range_high
       : 0
 
+  // When profile time ranges are missing or suspiciously uniform (e.g., 239 occupations
+  // at exactly time_range_high=90), lean on the task-level model for differentiation.
+  // Use composite_score as a scaling factor to spread estimates apart.
+  const scoreMultiplier = profile?.composite_score
+    ? 0.7 + (profile.composite_score / 100) * 0.6
+    : 1
+  const scaledTaskMinutes = Math.round(modeledTaskMinutes * scoreMultiplier)
+
   const displayedMinutes = Math.round(
     clamp(
       Math.max(
         profileMidMinutes > 0
-          ? profileMidMinutes * 0.35 +
-              optimisticProfileMinutes * 0.25 +
-              modeledTaskMinutes * 0.25 +
+          ? profileMidMinutes * 0.3 +
+              optimisticProfileMinutes * 0.2 +
+              scaledTaskMinutes * 0.35 +
               optimisticBlueprintMinutes * 0.15
-          : optimisticProfileMinutes * 0.35 +
-              modeledTaskMinutes * 0.45 +
-              optimisticBlueprintMinutes * 0.2,
-        modeledTaskMinutes,
+          : scaledTaskMinutes * 0.55 +
+              optimisticBlueprintMinutes * 0.25 +
+              (profile?.composite_score ?? 50) * 0.2,
+        scaledTaskMinutes,
         optimisticProfileMinutes,
         optimisticBlueprintMinutes
       ),

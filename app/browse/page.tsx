@@ -49,8 +49,23 @@ export default async function BrowsePage(props: {
       const fallback = await runQuery(
         "id, title, slug, major_category, occupation_automation_profile(composite_score)"
       )
-      results = fallback.data ?? []
-      totalCount = fallback.count ?? 0
+      if (fallback.error) {
+        let plainQuery = supabase
+          .from("occupations")
+          .select("id, title, slug, major_category", { count: "exact" })
+
+        if (category) {
+          plainQuery = plainQuery.eq("major_category", category)
+        }
+
+        plainQuery = plainQuery.order("title").range(from, from + PAGE_SIZE - 1)
+        const plain = await plainQuery
+        results = plain.data ?? []
+        totalCount = plain.count ?? 0
+      } else {
+        results = fallback.data ?? []
+        totalCount = fallback.count ?? 0
+      }
     } else {
       results = primary.data ?? []
       totalCount = primary.count ?? 0

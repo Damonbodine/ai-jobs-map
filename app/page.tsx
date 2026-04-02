@@ -107,12 +107,11 @@ export default async function HomePage() {
               href={`/occupation/${featuredExample.slug}`}
               className="mt-6 inline-flex items-center gap-3 rounded-xl border border-border bg-card px-5 py-3 text-sm hover:border-ring/40 hover:shadow-md transition-all group"
             >
-              <span className="text-muted-foreground">For example:</span>
               <span className="font-medium text-foreground group-hover:text-foreground/80">
                 {featuredExample.title}
               </span>
               <span className="font-semibold text-[hsl(var(--accent))]">
-                {featuredExample.minutes} min/day
+                Save {featuredExample.minutes} min/day
               </span>
               <span className="text-muted-foreground hidden sm:inline">
                 in {featuredExample.topAreas.join(", ")}
@@ -143,7 +142,7 @@ export default async function HomePage() {
                   {occ.title}
                 </span>
                 <span className="text-sm font-semibold text-[hsl(var(--accent))] ml-4 shrink-0">
-                  {occ.minutes} min/day
+                  Save {occ.minutes} min/day
                 </span>
               </Link>
             </StaggerItem>

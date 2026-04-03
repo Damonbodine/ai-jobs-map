@@ -353,7 +353,7 @@ export default async function OccupationPage(props: {
                                   {examples.map((example) => (
                                     <div
                                       key={example}
-                                      className="rounded-lg bg-white/70 dark:bg-white/10 border border-white/80 dark:border-white/10 px-3 py-2 text-xs leading-relaxed text-foreground/85"
+                                      className="rounded-lg bg-white/90 dark:bg-white/10 border border-black/5 dark:border-white/10 px-3 py-2 text-xs leading-relaxed text-foreground"
                                     >
                                       {example}
                                     </div>

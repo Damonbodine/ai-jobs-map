@@ -6,18 +6,21 @@ import { createServerClient } from "@/lib/supabase/server"
 import { CATEGORIES } from "@/lib/categories"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 import { LandingSearch } from "@/app/landing-search"
+import { computeDisplayedTimeback } from "@/lib/timeback"
+import { generateBlueprint } from "@/lib/blueprint"
+import type { Occupation, MicroTask, AutomationProfile } from "@/types"
 
-const POPULAR_OCCUPATIONS = [
-  { title: "Software Developer", slug: "software-developers", minutes: 52 },
-  { title: "Registered Nurse", slug: "registered-nurses", minutes: 28 },
-  { title: "Financial Manager", slug: "financial-managers", minutes: 47 },
-  { title: "Marketing Manager", slug: "marketing-managers", minutes: 61 },
-  { title: "Accountant", slug: "accountants-and-auditors", minutes: 42 },
-  { title: "Project Manager", slug: "project-management-specialists", minutes: 55 },
-  { title: "Human Resources Manager", slug: "human-resources-managers", minutes: 58 },
-  { title: "Graphic Designer", slug: "graphic-designers", minutes: 44 },
-  { title: "Dental Hygienist", slug: "dental-hygienists", minutes: 31 },
-  { title: "Civil Engineer", slug: "civil-engineers", minutes: 39 },
+const POPULAR_SLUGS = [
+  "software-developers",
+  "registered-nurses",
+  "financial-managers",
+  "marketing-managers",
+  "accountants-and-auditors",
+  "project-management-specialists",
+  "human-resources-managers",
+  "graphic-designers",
+  "dental-hygienists",
+  "civil-engineers",
 ]
 
 const STATS = [
@@ -35,6 +38,7 @@ const DATA_SOURCES = [
 
 export default async function HomePage() {
   let categoryCounts: Record<string, number> = {}
+  let popularOccupations: { title: string; slug: string; minutes: number }[] = []
   let featuredExample: { title: string; slug: string; minutes: number; topAreas: string[] } | null = null
 
   try {
@@ -46,7 +50,42 @@ export default async function HomePage() {
       categoryCounts[row.major_category] = (categoryCounts[row.major_category] || 0) + 1
     }
 
-    // Pick a rotating featured example based on the day of the week
+    // Fetch popular occupations with live time estimates
+    const { data: popOccs } = await supabase
+      .from("occupations")
+      .select("id, title, slug, major_category")
+      .in("slug", POPULAR_SLUGS)
+
+    if (popOccs && popOccs.length > 0) {
+      const popIds = popOccs.map((o) => o.id)
+
+      const [{ data: profiles }, { data: tasks }] = await Promise.all([
+        supabase.from("occupation_automation_profile").select("*").in("occupation_id", popIds),
+        supabase.from("job_micro_tasks").select("*").in("occupation_id", popIds),
+      ])
+
+      const profileMap = new Map((profiles ?? []).map((p: AutomationProfile) => [p.occupation_id, p]))
+      const taskMap = new Map<number, MicroTask[]>()
+      for (const t of (tasks ?? []) as MicroTask[]) {
+        const existing = taskMap.get(t.occupation_id) ?? []
+        existing.push(t)
+        taskMap.set(t.occupation_id, existing)
+      }
+
+      popularOccupations = POPULAR_SLUGS
+        .map((slug) => {
+          const occ = popOccs.find((o) => o.slug === slug)
+          if (!occ) return null
+          const profile = profileMap.get(occ.id) ?? null
+          const occTasks = taskMap.get(occ.id) ?? []
+          const blueprint = generateBlueprint(occ as Occupation, occTasks, profile)
+          const { displayedMinutes } = computeDisplayedTimeback(profile, occTasks, blueprint.totalMinutesSaved)
+          return { title: occ.title, slug: occ.slug, minutes: displayedMinutes }
+        })
+        .filter((o): o is { title: string; slug: string; minutes: number } => o !== null)
+    }
+
+    // Pick a rotating featured example from popular occupations
     const examples = [
       { slug: "registered-nurses", areas: ["documentation", "coordination", "analysis"] },
       { slug: "construction-managers", areas: ["communication", "compliance", "documentation"] },
@@ -58,20 +97,23 @@ export default async function HomePage() {
     ]
     const todayIndex = new Date().getDay() % examples.length
     const pick = examples[todayIndex]
+    const matchedPop = popularOccupations.find((p) => p.slug === pick.slug)
 
-    const { data: occ } = await supabase
-      .from("occupations")
-      .select("title, slug")
-      .eq("slug", pick.slug)
-      .single()
-
-    if (occ) {
-      const matched = POPULAR_OCCUPATIONS.find((p) => p.slug === pick.slug)
-      featuredExample = {
-        title: occ.title,
-        slug: occ.slug,
-        minutes: matched?.minutes ?? 50,
-        topAreas: pick.areas,
+    if (matchedPop) {
+      featuredExample = { ...matchedPop, topAreas: pick.areas }
+    } else {
+      // Fetch separately if not in popular list
+      const { data: occ } = await supabase
+        .from("occupations")
+        .select("id, title, slug, major_category")
+        .eq("slug", pick.slug)
+        .single()
+      if (occ) {
+        const { data: prof } = await supabase.from("occupation_automation_profile").select("*").eq("occupation_id", occ.id).single()
+        const { data: tsk } = await supabase.from("job_micro_tasks").select("*").eq("occupation_id", occ.id)
+        const bp = generateBlueprint(occ as Occupation, (tsk ?? []) as MicroTask[], prof)
+        const { displayedMinutes } = computeDisplayedTimeback(prof, (tsk ?? []) as MicroTask[], bp.totalMinutesSaved)
+        featuredExample = { title: occ.title, slug: occ.slug, minutes: displayedMinutes, topAreas: pick.areas }
       }
     }
   } catch {
@@ -132,7 +174,7 @@ export default async function HomePage() {
         </FadeIn>
 
         <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {POPULAR_OCCUPATIONS.map((occ) => (
+          {popularOccupations.map((occ) => (
             <StaggerItem key={occ.slug}>
               <Link
                 href={`/occupation/${occ.slug}`}

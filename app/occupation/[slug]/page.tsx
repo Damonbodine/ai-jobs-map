@@ -22,7 +22,21 @@ import type {
   BlockExampleMap,
 } from "@/types"
 
-import { MODULE_LABELS as BLOCK_LABELS, MODULE_COLORS as BLOCK_STYLES } from "@/lib/modules"
+import { MODULE_LABELS as BLOCK_LABELS, MODULE_COLORS as BLOCK_PILL_STYLES } from "@/lib/modules"
+
+// Muted card styles for the large featured block cards — white text on soft dark fills
+const BLOCK_CARD_STYLES: Record<string, string> = {
+  intake: "bg-cyan-700/80 text-white border-cyan-600/50 dark:bg-cyan-950/60 dark:text-cyan-200 dark:border-cyan-800",
+  analysis: "bg-indigo-700/80 text-white border-indigo-600/50 dark:bg-indigo-950/60 dark:text-indigo-200 dark:border-indigo-800",
+  documentation: "bg-violet-700/80 text-white border-violet-600/50 dark:bg-violet-950/60 dark:text-violet-200 dark:border-violet-800",
+  coordination: "bg-emerald-700/80 text-white border-emerald-600/50 dark:bg-emerald-950/60 dark:text-emerald-200 dark:border-emerald-800",
+  exceptions: "bg-amber-700/80 text-white border-amber-600/50 dark:bg-amber-950/60 dark:text-amber-200 dark:border-amber-800",
+  learning: "bg-rose-700/80 text-white border-rose-600/50 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-800",
+  research: "bg-teal-700/80 text-white border-teal-600/50 dark:bg-teal-950/60 dark:text-teal-200 dark:border-teal-800",
+  compliance: "bg-red-700/80 text-white border-red-600/50 dark:bg-red-950/60 dark:text-red-200 dark:border-red-800",
+  communication: "bg-orange-700/80 text-white border-orange-600/50 dark:bg-orange-950/60 dark:text-orange-200 dark:border-orange-800",
+  data_reporting: "bg-sky-700/80 text-white border-sky-600/50 dark:bg-sky-950/60 dark:text-sky-200 dark:border-sky-800",
+}
 
 function formatHandle(handle: string) {
   if (!handle) return handle
@@ -305,7 +319,7 @@ export default async function OccupationPage(props: {
                               key={`summary-${block}`}
                               className={cn(
                                 "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm",
-                                BLOCK_STYLES[block] || "bg-secondary/30 text-foreground border-border"
+                                BLOCK_PILL_STYLES[block] || "bg-secondary/30 text-foreground border-border"
                               )}
                             >
                               <span className="font-medium">
@@ -336,7 +350,7 @@ export default async function OccupationPage(props: {
                               key={block}
                               className={cn(
                                 "rounded-xl border p-4",
-                                BLOCK_STYLES[block] || "bg-secondary/30 text-foreground border-border"
+                                BLOCK_CARD_STYLES[block] || "bg-secondary/30 text-foreground border-border"
                               )}
                             >
                               <div className="flex items-end justify-between gap-3">
@@ -353,7 +367,7 @@ export default async function OccupationPage(props: {
                                   {examples.map((example) => (
                                     <div
                                       key={example}
-                                      className="rounded-lg bg-white/90 dark:bg-white/10 border border-black/5 dark:border-white/10 px-3 py-2 text-xs leading-relaxed text-foreground"
+                                      className="rounded-lg bg-white/15 border border-white/20 px-3 py-2 text-xs leading-relaxed text-white/90"
                                     >
                                       {example}
                                     </div>
@@ -377,7 +391,7 @@ export default async function OccupationPage(props: {
                               key={block}
                               className={cn(
                                 "rounded-lg border p-3 min-w-[120px] sm:min-w-0 flex-shrink-0 sm:flex-shrink",
-                                BLOCK_STYLES[block] || "bg-secondary/50 text-foreground border-border"
+                                BLOCK_CARD_STYLES[block] || "bg-secondary/50 text-foreground border-border"
                               )}
                             >
                               <div className="text-[11px] opacity-80 mb-1">

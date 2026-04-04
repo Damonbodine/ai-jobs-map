@@ -376,21 +376,6 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                               {scaledMin ? `${scaledMin}m saved` : "Time saved"}
                             </div>
                           </div>
-                          <div
-                            className={cn(
-                              "w-10 h-6 rounded-full flex items-center transition-colors px-0.5",
-                              isSelected ? "justify-end" : "bg-muted-foreground/20 justify-start"
-                            )}
-                            style={isSelected ? { backgroundColor: "hsl(var(--background) / 0.3)" } : undefined}
-                          >
-                            <div
-                              className={cn(
-                                "w-5 h-5 rounded-full transition-colors shadow-sm",
-                                !isSelected && "bg-muted-foreground/50"
-                              )}
-                              style={isSelected ? { backgroundColor: "hsl(var(--background))" } : undefined}
-                            />
-                          </div>
                         </button>
                       )
                     })}

@@ -362,23 +362,23 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                           className={cn(
                             "flex items-center justify-between rounded-xl px-4 py-3 border transition-all text-left",
                             isSelected
-                              ? "border-accent/40 bg-accent/5 text-foreground"
-                              : "border-border bg-card hover:border-accent/20 text-muted-foreground"
+                              ? "border-foreground bg-foreground text-background"
+                              : "border-border bg-card hover:border-accent/20"
                           )}
                         >
                           <div>
-                            <div className={cn("text-sm font-medium", isSelected ? "text-foreground" : "text-muted-foreground")}>{BLOCK_LABELS[moduleKey] ?? moduleKey}</div>
-                            <div className={cn("text-xs", isSelected ? "text-foreground/70" : "text-muted-foreground/60")}>
+                            <div className={cn("text-sm font-medium", isSelected ? "text-background" : "text-muted-foreground")}>{BLOCK_LABELS[moduleKey] ?? moduleKey}</div>
+                            <div className={cn("text-xs", isSelected ? "text-background/70" : "text-muted-foreground/60")}>
                               {scaledMin ? `${scaledMin}m saved` : "Time saved"}
                             </div>
                           </div>
                           <div className={cn(
                             "w-10 h-6 rounded-full flex items-center transition-colors px-0.5",
-                            isSelected ? "bg-accent justify-end" : "bg-muted-foreground/20 justify-start"
+                            isSelected ? "bg-background/30 justify-end" : "bg-muted-foreground/20 justify-start"
                           )}>
                             <div className={cn(
                               "w-5 h-5 rounded-full transition-colors shadow-sm",
-                              isSelected ? "bg-white" : "bg-muted-foreground/50"
+                              isSelected ? "bg-background" : "bg-muted-foreground/50"
                             )} />
                           </div>
                         </button>

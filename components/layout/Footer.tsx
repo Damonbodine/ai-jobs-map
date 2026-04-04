@@ -19,7 +19,7 @@ export function Footer() {
                 Browse All Occupations
               </Link>
               <Link href="/products" className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-0.5">
-                Products & Pricing
+                Pricing
               </Link>
               <Link href="/browse" className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-0.5">
                 Build Your Personal Assistant

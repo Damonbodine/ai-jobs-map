@@ -132,7 +132,7 @@ export default async function HomePage() {
 
         <FadeIn delay={0.1}>
           <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground max-w-3xl mx-auto leading-tight">
-            How much time could AI give you back?
+            How much time could AI give you back every single day?
           </h1>
         </FadeIn>
 
@@ -153,7 +153,7 @@ export default async function HomePage() {
                 {featuredExample.title}
               </span>
               <span className="font-semibold text-[hsl(var(--accent))]">
-                Save {featuredExample.minutes} min/day
+                Reclaim {featuredExample.minutes} minutes daily
               </span>
               <span className="text-muted-foreground hidden sm:inline">
                 in {featuredExample.topAreas.join(", ")}
@@ -184,7 +184,7 @@ export default async function HomePage() {
                   {occ.title}
                 </span>
                 <span className="text-sm font-semibold text-[hsl(var(--accent))] ml-4 shrink-0">
-                  Save {occ.minutes} min/day
+                  Reclaim {occ.minutes} min/day
                 </span>
               </Link>
             </StaggerItem>

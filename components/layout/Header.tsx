@@ -2,10 +2,16 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Search, Menu, X, Sun, Moon } from "lucide-react"
+import { Menu, X, Sun, Moon, ChevronDown } from "lucide-react"
 import { useState } from "react"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function Header() {
   const pathname = usePathname()
@@ -13,21 +19,36 @@ export function Header() {
   const { theme, setTheme } = useTheme()
 
   const links = [
-    { href: "/", label: "Map" },
-    { href: "/browse", label: "Browse" },
-    { href: "/products", label: "Products" },
     { href: "/about", label: "About" },
+    { href: "/browse", label: "Industries" },
+    { href: "/products", label: "Pricing" },
   ]
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
       <div className="container mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <Search className="h-4 w-4 text-accent transition-colors group-hover:text-foreground" />
-          <span className="font-heading text-lg font-semibold tracking-tight">
-            AI Jobs Map
-          </span>
-        </Link>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex items-center gap-1.5 group">
+            <span className="font-heading text-lg font-semibold tracking-tight">
+              AI Jobs Map
+            </span>
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-foreground" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem render={<Link href="/" />}>
+              Home
+            </DropdownMenuItem>
+            <DropdownMenuItem render={<Link href="/browse" />}>
+              Browse All
+            </DropdownMenuItem>
+            <DropdownMenuItem render={<Link href="/products" />}>
+              Pricing
+            </DropdownMenuItem>
+            <DropdownMenuItem render={<Link href="/about" />}>
+              About
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <nav className="hidden sm:flex items-center gap-6">
           {links.map((link) => (
@@ -56,10 +77,10 @@ export function Header() {
             )}
           </button>
           <Link
-            href="/browse"
-            className="text-sm font-semibold bg-foreground text-background px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
+            href="#"
+            className="text-sm font-semibold border border-foreground text-foreground px-4 py-1.5 rounded-lg hover:bg-foreground hover:text-background transition-colors"
           >
-            Find Your Role
+            Sign In
           </Link>
         </nav>
 
@@ -90,11 +111,11 @@ export function Header() {
           ))}
           <div className="pt-2 mt-1 border-t border-border flex items-center gap-2">
             <Link
-              href="/browse"
+              href="#"
               onClick={() => setMobileOpen(false)}
-              className="flex-1 text-center py-2.5 text-sm font-semibold bg-foreground text-background rounded-lg active:opacity-80 transition-opacity"
+              className="flex-1 text-center py-2.5 text-sm font-semibold border border-foreground text-foreground rounded-lg active:opacity-80 transition-opacity"
             >
-              Find Your Role
+              Sign In
             </Link>
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

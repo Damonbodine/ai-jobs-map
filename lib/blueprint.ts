@@ -44,7 +44,7 @@ const BLOCK_PATTERNS: [RegExp, string][] = [
   [/\b(train|onboard|mentor|best\s+practice|standard|curriculum)\b/i, "learning"],
 ]
 
-function getBlockForTask(task: MicroTask): string {
+export function getBlockForTask(task: MicroTask): string {
   const combined = `${task.task_name} ${task.task_description}`.toLowerCase()
 
   // Pass 1: Word-boundary keyword matching on task text

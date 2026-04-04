@@ -143,6 +143,20 @@ export interface OccupationCategory {
   dbValue: string
 }
 
+// Pricing types
+export interface PricingTier {
+  key: "starter" | "recommended" | "enterprise"
+  label: string
+  basePrice: number
+  maxModules: number
+}
+
+export interface ROIEstimate {
+  minutesPerDay: number
+  annualValue: number
+  hourlyWage: number
+}
+
 // Factory types
 export interface FactoryWizardData {
   role: string

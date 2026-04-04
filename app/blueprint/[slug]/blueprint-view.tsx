@@ -362,24 +362,34 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                           className={cn(
                             "flex items-center justify-between rounded-xl px-4 py-3 border transition-all text-left",
                             isSelected
-                              ? "border-foreground bg-foreground text-background"
+                              ? "border-transparent"
                               : "border-border bg-card hover:border-accent/20"
                           )}
+                          style={isSelected ? {
+                            backgroundColor: "hsl(var(--foreground))",
+                            color: "hsl(var(--background))",
+                          } : undefined}
                         >
                           <div>
-                            <div className={cn("text-sm font-medium", isSelected ? "text-background" : "text-muted-foreground")}>{BLOCK_LABELS[moduleKey] ?? moduleKey}</div>
-                            <div className={cn("text-xs", isSelected ? "text-background/70" : "text-muted-foreground/60")}>
+                            <div className="text-sm font-medium" style={isSelected ? { color: "hsl(var(--background))" } : undefined}>{BLOCK_LABELS[moduleKey] ?? moduleKey}</div>
+                            <div className="text-xs text-muted-foreground" style={isSelected ? { color: "hsl(var(--background) / 0.7)" } : undefined}>
                               {scaledMin ? `${scaledMin}m saved` : "Time saved"}
                             </div>
                           </div>
-                          <div className={cn(
-                            "w-10 h-6 rounded-full flex items-center transition-colors px-0.5",
-                            isSelected ? "bg-background/30 justify-end" : "bg-muted-foreground/20 justify-start"
-                          )}>
-                            <div className={cn(
-                              "w-5 h-5 rounded-full transition-colors shadow-sm",
-                              isSelected ? "bg-background" : "bg-muted-foreground/50"
-                            )} />
+                          <div
+                            className={cn(
+                              "w-10 h-6 rounded-full flex items-center transition-colors px-0.5",
+                              isSelected ? "justify-end" : "bg-muted-foreground/20 justify-start"
+                            )}
+                            style={isSelected ? { backgroundColor: "hsl(var(--background) / 0.3)" } : undefined}
+                          >
+                            <div
+                              className={cn(
+                                "w-5 h-5 rounded-full transition-colors shadow-sm",
+                                !isSelected && "bg-muted-foreground/50"
+                              )}
+                              style={isSelected ? { backgroundColor: "hsl(var(--background))" } : undefined}
+                            />
                           </div>
                         </button>
                       )

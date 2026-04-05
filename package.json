@@ -6,6 +6,7 @@
     "dev": "next dev --port 3050",
     "build": "next build",
     "start": "next start -p 3050",
+    "test:e2e": "playwright test",
     "preview:fresh": "zsh scripts/preview-fresh.sh 3050",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
@@ -37,6 +38,7 @@
     "tailwindcss": "4.2.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "4.2.2",
     "@types/node": "22.19.15",
     "@types/react": "19.2.14",

@@ -11,10 +11,10 @@ import { computeDisplayedTimeback, estimateTaskMinutes, inferArchetypeMultiplier
 import { getBlockForTask } from "@/lib/blueprint"
 import { computeAnnualValue } from "@/lib/pricing"
 import { getAllCapabilities } from "@/lib/capabilities"
-import type { MicroTask, AutomationProfile } from "@/types"
+import type { MicroTask, AutomationProfile, ModuleCapability } from "@/types"
 
 import { OccupationDonut } from "./occupation-donut"
-import { TaskSelector } from "./task-selector"
+import { OccupationBuilder } from "./occupation-builder"
 
 export default async function OccupationPage(props: {
   params: Promise<{ slug: string }>
@@ -161,14 +161,18 @@ export default async function OccupationPage(props: {
                 Tasks your AI assistant would handle
               </h2>
               <p className="text-sm text-muted-foreground">
-                Select the tasks you want automated. Your selections carry to the blueprint builder.
+                Select the tasks you want automated, then shape the build request without leaving this page.
               </p>
             </div>
-            <TaskSelector
+            <OccupationBuilder
               tasks={routineCards}
               slug={slug}
               totalMinutes={displayedMinutes}
               annualValue={annualValue}
+              occupationId={occupation.id}
+              occupationTitle={occupation.title}
+              hourlyWage={occupation.hourly_wage}
+              capabilitiesByModule={capabilitiesByModule as Record<string, ModuleCapability[]>}
             />
           </FadeIn>
         )}

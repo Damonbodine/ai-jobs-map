@@ -14,7 +14,12 @@ import { FadeIn } from "@/components/FadeIn"
 import { supabase } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { computeDisplayedTimeback } from "@/lib/timeback"
-import { computeAnnualValue, computeDynamicPrice, PRICING_TIERS } from "@/lib/pricing"
+import {
+  computeAnnualValue,
+  computeDynamicPrice,
+  PRICING_TIERS,
+  TEAM_SIZES,
+} from "@/lib/pricing"
 import { decodeTaskSelections, tasksToModuleKeys } from "@/lib/task-selection"
 import type {
   Occupation,
@@ -35,13 +40,6 @@ interface BlueprintViewProps {
   slug: string
   capabilitiesByModule?: Record<string, ModuleCapability[]>
 }
-
-const TEAM_SIZES = [
-  { label: "1 person", multiplier: 1 },
-  { label: "2–5 people", multiplier: 3 },
-  { label: "5–10 people", multiplier: 7 },
-  { label: "10+ people", multiplier: 12 },
-]
 
 export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesByModule = {} }: BlueprintViewProps) {
   if (!tasks || tasks.length === 0) {

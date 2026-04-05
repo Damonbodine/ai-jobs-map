@@ -6,6 +6,13 @@ export const PRICING_TIERS: PricingTier[] = [
   { key: "enterprise", label: "Enterprise", basePrice: 55000, maxModules: 10 },
 ]
 
+export const TEAM_SIZES = [
+  { label: "1 person", multiplier: 1 },
+  { label: "2–5 people", multiplier: 3 },
+  { label: "5–10 people", multiplier: 7 },
+  { label: "10+ people", multiplier: 12 },
+] as const
+
 export function computeDynamicPrice(selectedModuleCount: number): PricingTier {
   if (selectedModuleCount <= 3) return PRICING_TIERS[0]
   if (selectedModuleCount <= 7) return PRICING_TIERS[1]

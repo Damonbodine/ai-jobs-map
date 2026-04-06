@@ -2,16 +2,10 @@ export const dynamic = "force-dynamic"
 
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ChevronRight, Info } from "lucide-react"
+import { ArrowRight, ChevronRight } from "lucide-react"
 import { createServerClient } from "@/lib/supabase/server"
 import { FadeIn } from "@/components/FadeIn"
 import { PageTransition } from "@/components/PageTransition"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { deriveOccupationStory } from "@/lib/occupation-story"
 import { computeDisplayedTimeback, estimateTaskMinutes, inferArchetypeMultiplier } from "@/lib/timeback"
 import { getBlockForTask } from "@/lib/blueprint"
@@ -19,6 +13,7 @@ import { computeAnnualValue } from "@/lib/pricing"
 import { getAllCapabilities } from "@/lib/capabilities"
 import type { MicroTask, AutomationProfile, ModuleCapability } from "@/types"
 
+import { EstimateInfo } from "./estimate-info"
 import { OccupationDonut } from "./occupation-donut"
 import { OccupationBuilder } from "./occupation-builder"
 
@@ -129,66 +124,65 @@ export default async function OccupationPage(props: {
 
         {/* Hero */}
         <FadeIn>
-          <div className="mb-8 text-center max-w-2xl mx-auto">
+          <div className="mb-8 text-center max-w-3xl mx-auto">
             <div className="inline-block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 border border-border rounded-full px-3 py-1">
               Occupation
             </div>
-            <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight mb-3">
-              {occupation.title} &ndash; Reclaim {displayedMinutes} minutes every single day
-              <TooltipProvider delay={120}>
-                <Tooltip>
-                  <TooltipTrigger
-                    className="ml-2 inline-flex align-middle rounded-full border border-border/70 p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-                    aria-label="How this estimate is calculated"
-                  >
-                    <Info className="h-4 w-4" />
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-sm items-start gap-0 px-3 py-2 text-left leading-relaxed">
-                    <div>
-                      We estimate how much daily time in this role sits in repeatable work AI can assist or automate.
-                    </div>
-                    <div className="mt-2 text-background/80">
-                      The range reflects conservative and optimistic assumptions, and your selected tasks below change the custom build estimate.
-                    </div>
-                    <div className="mt-2 text-background/70">
-                      This is an estimate, not a guarantee.
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+            <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight text-balance">
+              {occupation.title}
             </h1>
-            <div className="text-sm text-muted-foreground mb-4">
-              Range {displayedLow}&ndash;{displayedHigh} min
+            <div className="mt-3 flex items-center justify-center gap-2">
+              <p className="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight text-balance">
+                Reclaim {displayedMinutes} minutes every single day
+              </p>
+              <EstimateInfo />
             </div>
             {story && (
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-muted-foreground leading-relaxed">
                 {story.dayChanges}
               </p>
             )}
+            <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+              <a
+                href="#assistant-builder"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity w-full sm:w-auto"
+              >
+                Build Your Custom Assistant
+                <ArrowRight className="h-4 w-4" />
+              </a>
+              <a
+                href="#assistant-breakdown"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                See what&apos;s included
+              </a>
+            </div>
           </div>
         </FadeIn>
 
         {/* Donut Chart */}
         {donutAgents.length > 0 && (
           <FadeIn delay={0.15}>
-            <OccupationDonut
-              agents={donutAgents}
-              capabilitiesByModule={capabilitiesByModule}
-              totalMinutes={displayedMinutes}
-              blueprintScale={blueprintScale}
-            />
+            <div id="assistant-breakdown">
+              <OccupationDonut
+                agents={donutAgents}
+                capabilitiesByModule={capabilitiesByModule}
+                totalMinutes={displayedMinutes}
+                blueprintScale={blueprintScale}
+              />
+            </div>
           </FadeIn>
         )}
 
         {/* Task Table with Checkboxes */}
         {routineCards.length > 0 && (
           <FadeIn delay={0.25}>
-            <div className="mb-4">
+            <div id="assistant-builder" className="mb-4 scroll-mt-24">
               <h2 className="font-heading text-xl font-semibold mb-1">
-                Select the work you want included
+                Build Your Custom Assistant
               </h2>
               <p className="text-sm text-muted-foreground">
-                Choose the tasks you want covered, then request a custom assistant plan without leaving this page.
+                Choose the tasks you want covered, then request a custom assistant plan.
               </p>
             </div>
             <OccupationBuilder

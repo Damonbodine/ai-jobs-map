@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { ArrowRight, Check, ChevronDown, Shield, X } from "lucide-react"
 import { toast } from "sonner"
+import { MODULE_REGISTRY } from "@/lib/modules"
 import { supabase } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { computeAnnualValue, computeDynamicPrice, TEAM_SIZES } from "@/lib/pricing"
@@ -31,6 +32,19 @@ interface OccupationBuilderProps {
 
 type BuilderPhase = "select" | "build" | "done"
 
+const MODULE_ACCENTS: Record<string, string> = {
+  intake: "#06b6d4",
+  analysis: "#6366f1",
+  documentation: "#8b5cf6",
+  coordination: "#10b981",
+  exceptions: "#f59e0b",
+  learning: "#f43f5e",
+  research: "#14b8a6",
+  compliance: "#ef4444",
+  communication: "#f97316",
+  data_reporting: "#0ea5e9",
+}
+
 export function OccupationBuilder({
   tasks,
   slug,
@@ -52,12 +66,41 @@ export function OccupationBuilder({
   const [contactEmail, setContactEmail] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const builderRef = useRef<HTMLDivElement | null>(null)
+  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
 
   function toggle(id: number) {
     setSelected((prev) => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
       else next.add(id)
+      return next
+    })
+  }
+
+  function toggleModule(moduleKey: string) {
+    const moduleTaskIds = tasks
+      .filter((task) => task.moduleKey === moduleKey)
+      .map((task) => task.id)
+
+    setSelected((prev) => {
+      const next = new Set(prev)
+      const allSelected = moduleTaskIds.every((id) => next.has(id))
+
+      if (allSelected) {
+        moduleTaskIds.forEach((id) => next.delete(id))
+      } else {
+        moduleTaskIds.forEach((id) => next.add(id))
+      }
+
+      return next
+    })
+  }
+
+  function toggleExpandedModule(moduleKey: string) {
+    setExpandedModules((prev) => {
+      const next = new Set(prev)
+      if (next.has(moduleKey)) next.delete(moduleKey)
+      else next.add(moduleKey)
       return next
     })
   }
@@ -85,6 +128,38 @@ export function OccupationBuilder({
     () => Array.from(new Set(selectedTasks.map((task) => task.moduleKey))),
     [selectedTasks]
   )
+  const assistantGroups = useMemo(() => {
+    const groups = new Map<string, TaskItem[]>()
+
+    for (const task of tasks) {
+      const existing = groups.get(task.moduleKey) ?? []
+      existing.push(task)
+      groups.set(task.moduleKey, existing)
+    }
+
+    return Array.from(groups.entries())
+      .map(([moduleKey, groupTasks]) => {
+        const moduleDefinition = MODULE_REGISTRY[moduleKey as keyof typeof MODULE_REGISTRY]
+        const groupMinutes = groupTasks.reduce(
+          (sum, task) => sum + Math.round((task.displayLow + task.displayHigh) / 2),
+          0
+        )
+        const selectedCount = groupTasks.filter((task) => selected.has(task.id)).length
+
+        return {
+          moduleKey,
+          definition: moduleDefinition,
+          tasks: groupTasks.sort((a, b) => {
+            const aMid = (a.displayLow + a.displayHigh) / 2
+            const bMid = (b.displayLow + b.displayHigh) / 2
+            return bMid - aMid
+          }),
+          groupMinutes,
+          selectedCount,
+        }
+      })
+      .sort((a, b) => b.groupMinutes - a.groupMinutes)
+  }, [selected, tasks])
   const currentTier = useMemo(
     () => computeDynamicPrice(selectedModules.length),
     [selectedModules.length]
@@ -165,51 +240,177 @@ export function OccupationBuilder({
   return (
     <div>
       <div className="rounded-2xl border border-border bg-card overflow-hidden">
-        <div className="grid grid-cols-[1fr_auto_auto] gap-3 px-4 py-3 sm:px-5 border-b border-border bg-secondary/30">
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            Task
-          </div>
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide text-right min-w-[80px]">
-            Current Time
-          </div>
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide text-right min-w-[140px]">
-            AI Capability
-          </div>
-        </div>
-
-        {tasks.map((task) => {
-          const isSelected = selected.has(task.id)
+        {assistantGroups.map((group) => {
+          const { moduleKey, definition, tasks: groupTasks, groupMinutes, selectedCount } = group
+          const isExpanded = expandedModules.has(moduleKey)
+          const allSelected = selectedCount === groupTasks.length
+          const someSelected = selectedCount > 0
+          const accent = MODULE_ACCENTS[moduleKey] ?? "#6b7280"
+          const Icon = definition?.icon
 
           return (
-            <button
-              key={task.id}
-              type="button"
-              onClick={() => toggle(task.id)}
+            <div
+              key={moduleKey}
+              role="button"
+              tabIndex={0}
+              onClick={() => toggleModule(moduleKey)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault()
+                  toggleModule(moduleKey)
+                }
+              }}
               className={cn(
-                "grid grid-cols-[1fr_auto_auto] gap-3 px-4 py-3.5 sm:px-5 w-full text-left border-b border-border last:border-b-0 transition-colors",
-                isSelected ? "bg-card" : "bg-card/50 opacity-60"
+                "border-b border-border last:border-b-0 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-inset",
+                allSelected
+                  ? "bg-white text-black"
+                  : someSelected
+                    ? "bg-secondary/10"
+                    : "bg-card"
               )}
             >
-              <div className="text-sm font-medium leading-snug">
-                {task.task_name}
-              </div>
-              <div className="text-sm text-muted-foreground tabular-nums text-right min-w-[80px]">
-                {task.displayLow}&ndash;{task.displayHigh}m
-              </div>
-              <div className="flex items-center justify-end gap-2 min-w-[140px]">
-                <div
-                  className={cn(
-                    "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                    isSelected
-                      ? "bg-accent text-white"
-                      : "bg-secondary text-muted-foreground"
-                  )}
-                >
-                  <Check className="h-3 w-3" />
-                  Include in my build
+              <div
+                className={cn(
+                  "border-l-4 px-4 py-4 sm:px-5",
+                  allSelected ? "bg-white" : someSelected ? "bg-secondary/10" : "bg-card"
+                )}
+                style={{ borderLeftColor: accent }}
+              >
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start gap-3">
+                      {Icon ? (
+                        <div
+                          className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-background"
+                          style={{ borderColor: `${accent}40`, color: accent }}
+                        >
+                          <Icon className="h-4 w-4" />
+                        </div>
+                      ) : null}
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                          <h3 className={cn(
+                            "font-heading text-lg font-semibold tracking-tight",
+                            allSelected ? "text-black" : "text-foreground"
+                          )}>
+                            {definition?.label ?? moduleKey}
+                          </h3>
+                          <div className={cn(
+                            "text-sm font-medium tabular-nums",
+                            allSelected ? "text-black/80" : "text-foreground/80"
+                          )}>
+                            {groupMinutes} min/day
+                          </div>
+                        </div>
+                        <p className={cn(
+                          "mt-1 text-sm",
+                          allSelected ? "text-black/75" : "text-muted-foreground"
+                        )}>
+                          {definition?.description ?? "Bundle related work into one assistant scope."}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            toggleExpandedModule(moduleKey)
+                          }}
+                          onKeyDown={(event) => event.stopPropagation()}
+                          className={cn(
+                            "mt-2 text-sm font-medium underline-offset-4 hover:underline transition-colors",
+                            allSelected
+                              ? "text-black/70 hover:text-black"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          {isExpanded ? "Hide tasks" : `Show ${groupTasks.length} tasks`}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex shrink-0 items-center gap-3 lg:pl-4">
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        toggleModule(moduleKey)
+                      }}
+                      className={cn(
+                        "inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors min-w-[150px]",
+                        allSelected
+                          ? "bg-black text-white hover:opacity-90"
+                          : someSelected
+                            ? "bg-secondary text-foreground hover:bg-secondary/80"
+                            : "bg-accent text-white hover:opacity-90"
+                      )}
+                    >
+                      <Check className="h-4 w-4" />
+                      {allSelected ? "Included" : someSelected ? "Partially included" : "Include assistant"}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </button>
+
+              {isExpanded && (
+                <div className="border-t border-border bg-background/40">
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-3 px-5 py-3 sm:px-6 border-b border-border bg-secondary/20">
+                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                      Task
+                    </div>
+                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide text-right min-w-[80px]">
+                      Avg per day
+                    </div>
+                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide text-right min-w-[140px]">
+                      Scope
+                    </div>
+                  </div>
+
+                  {groupTasks.map((task) => {
+                    const isSelected = selected.has(task.id)
+
+                    return (
+                      <button
+                        key={task.id}
+                        type="button"
+                        onClick={() => toggle(task.id)}
+                        className={cn(
+                          "grid grid-cols-[1fr_auto_auto] gap-3 px-5 py-3.5 sm:px-6 w-full text-left border-b border-border last:border-b-0 transition-all",
+                          isSelected
+                            ? "bg-white text-black"
+                            : "bg-transparent hover:bg-secondary/30"
+                        )}
+                      >
+                        <div className={cn(
+                          "text-sm font-medium leading-snug",
+                          isSelected ? "text-black" : "text-foreground/85"
+                        )}>
+                          {task.task_name}
+                        </div>
+                        <div className={cn(
+                          "text-sm tabular-nums text-right min-w-[80px]",
+                          isSelected ? "text-black/80" : "text-muted-foreground"
+                        )}>
+                          {task.displayLow}&ndash;{task.displayHigh}m
+                        </div>
+                        <div className="flex items-center justify-end gap-2 min-w-[140px]">
+                          <div
+                            className={cn(
+                              "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                              isSelected
+                                ? "bg-black text-white shadow-sm"
+                                : "bg-secondary text-muted-foreground"
+                            )}
+                          >
+                            <Check className="h-3 w-3" />
+                            {isSelected ? "Included" : "Excluded"}
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
           )
         })}
       </div>
@@ -418,12 +619,13 @@ export function OccupationBuilder({
       )}
 
       {phase !== "done" && (
-        <div className="sticky bottom-0 z-40 mt-6 -mx-4 px-4 py-4 bg-background/95 backdrop-blur border-t border-border">
-          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="sticky bottom-0 z-40 mt-6 px-2 sm:px-0 py-4">
+          <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-background shadow-[0_-10px_30px_rgba(0,0,0,0.18)]">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-4 sm:px-5">
             {phase === "select" ? (
               <>
                 <div className="text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">{selected.size}</span> tasks selected
+                  <span className="font-semibold text-foreground">{selectedModules.length}</span> assistant types selected
                   {" "}&middot;{" "}
                   <span className="font-semibold text-foreground">{selectedMinutes} min/day</span>
                   {" "}&middot;{" "}
@@ -461,6 +663,7 @@ export function OccupationBuilder({
                 </button>
               </>
             )}
+            </div>
           </div>
         </div>
       )}

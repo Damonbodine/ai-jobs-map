@@ -6,6 +6,7 @@ import { Menu, X, Sun, Moon, ChevronDown } from "lucide-react"
 import { useState } from "react"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
+import { DARK_MODE_ENABLED } from "@/lib/features"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -65,17 +66,19 @@ export function Header() {
               {link.label}
             </Link>
           ))}
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-lg hover:bg-secondary transition-colors"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </button>
+          {DARK_MODE_ENABLED ? (
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-lg hover:bg-secondary transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </button>
+          ) : null}
           <Link
             href="#"
             className="text-sm font-semibold border border-foreground text-foreground px-4 py-1.5 rounded-lg hover:bg-foreground hover:text-background transition-colors"
@@ -117,13 +120,15 @@ export function Header() {
             >
               Sign In
             </Link>
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="h-10 w-10 flex items-center justify-center rounded-lg border border-border active:bg-secondary transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
+            {DARK_MODE_ENABLED ? (
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="h-10 w-10 flex items-center justify-center rounded-lg border border-border active:bg-secondary transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+            ) : null}
           </div>
         </div>
       )}

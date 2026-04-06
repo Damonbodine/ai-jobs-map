@@ -23,7 +23,8 @@ npm install
 
 ```bash
 cp .env.example .env.local
-# Edit .env.local with your Supabase DATABASE_URL
+# Edit .env.local with your Supabase credentials
+# Optional: set NEXT_PUBLIC_ENABLE_DARK_MODE=true to re-enable dark mode
 ```
 
 ### 3. Run migrations

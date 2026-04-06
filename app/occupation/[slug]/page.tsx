@@ -2,10 +2,16 @@ export const dynamic = "force-dynamic"
 
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, Info } from "lucide-react"
 import { createServerClient } from "@/lib/supabase/server"
 import { FadeIn } from "@/components/FadeIn"
 import { PageTransition } from "@/components/PageTransition"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { deriveOccupationStory } from "@/lib/occupation-story"
 import { computeDisplayedTimeback, estimateTaskMinutes, inferArchetypeMultiplier } from "@/lib/timeback"
 import { getBlockForTask } from "@/lib/blueprint"
@@ -129,9 +135,30 @@ export default async function OccupationPage(props: {
             </div>
             <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight mb-3">
               {occupation.title} &ndash; Reclaim {displayedMinutes} minutes every single day
+              <TooltipProvider delay={120}>
+                <Tooltip>
+                  <TooltipTrigger
+                    className="ml-2 inline-flex align-middle rounded-full border border-border/70 p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                    aria-label="How this estimate is calculated"
+                  >
+                    <Info className="h-4 w-4" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-sm items-start gap-0 px-3 py-2 text-left leading-relaxed">
+                    <div>
+                      We estimate how much daily time in this role sits in repeatable work AI can assist or automate.
+                    </div>
+                    <div className="mt-2 text-background/80">
+                      The range reflects conservative and optimistic assumptions, and your selected tasks below change the custom build estimate.
+                    </div>
+                    <div className="mt-2 text-background/70">
+                      This is an estimate, not a guarantee.
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </h1>
             <div className="text-sm text-muted-foreground mb-4">
-              Range {displayedLow}&ndash;{displayedHigh} min &bull; Based on BLS/O*NET data
+              Range {displayedLow}&ndash;{displayedHigh} min
             </div>
             {story && (
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">

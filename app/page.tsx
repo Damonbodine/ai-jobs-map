@@ -138,7 +138,7 @@ export default async function HomePage() {
 
         <FadeIn delay={0.2}>
           <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto">
-            Explore AI-assisted time savings across 800+ occupations — grounded in O*NET task data.
+            Explore AI-assisted time savings across 800+ occupations.
           </p>
         </FadeIn>
 

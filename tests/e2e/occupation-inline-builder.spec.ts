@@ -8,7 +8,7 @@ test("occupation page supports inline builder flow", async ({ page }) => {
   ).toBeVisible()
 
   const stickyBuildButton = page.getByRole("button", {
-    name: /build your custom ai assistant/i,
+    name: /request your custom ai assistant plan/i,
   })
   await expect(stickyBuildButton).toBeVisible()
 
@@ -19,7 +19,7 @@ test("occupation page supports inline builder flow", async ({ page }) => {
   await stickyBuildButton.click()
 
   await expect(
-    page.getByRole("heading", { name: /shape your assistant/i })
+    page.getByRole("heading", { name: /request your custom ai assistant plan/i })
   ).toBeVisible()
 
   await page.getByRole("combobox").selectOption({ label: "10+ people" })
@@ -36,11 +36,11 @@ test("occupation page supports inline builder flow", async ({ page }) => {
     .fill(`playwright-${Date.now()}@example.com`)
 
   await page
-    .getByRole("button", { name: "Send Custom Build Request Form" })
+    .getByRole("button", { name: "Request Your Custom AI Assistant Plan Form" })
     .click()
 
   await expect(
-    page.getByRole("heading", { name: /we received your request/i })
+    page.getByRole("heading", { name: /we received your plan request/i })
   ).toBeVisible()
   await expect(page.getByText(/request summary/i)).toBeVisible()
 })

@@ -185,10 +185,10 @@ export default async function OccupationPage(props: {
           <FadeIn delay={0.25}>
             <div className="mb-4">
               <h2 className="font-heading text-xl font-semibold mb-1">
-                Tasks your AI assistant would handle
+                Select the work you want included
               </h2>
               <p className="text-sm text-muted-foreground">
-                Select the tasks you want automated, then shape the build request without leaving this page.
+                Choose the tasks you want covered, then request a custom assistant plan without leaving this page.
               </p>
             </div>
             <OccupationBuilder

@@ -211,10 +211,10 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
         {/* Hero headline */}
         <FadeIn>
           <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-1">
-            Build Your {occupation.title} AI Assistant
+            Request Your {occupation.title} AI Assistant Plan
           </h1>
           <p className="text-lg text-muted-foreground mb-6">
-            Start from the recommended blueprint
+            Start from the recommended blueprint, then request a scoped plan
           </p>
         </FadeIn>
 
@@ -276,10 +276,10 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                   <Check className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
                 <h2 className="font-heading text-2xl font-semibold tracking-tight mb-2">
-                  We received your blueprint
+                  We received your plan request
                 </h2>
                 <p className="text-sm text-muted-foreground mb-6 max-w-lg">
-                  We&apos;ll review your setup for {occupation.title} and send a scoping document to <span className="font-medium text-foreground">{contactEmail}</span> within 48 hours.
+                  We&apos;ll review your setup for {occupation.title} and send a scoping plan to <span className="font-medium text-foreground">{contactEmail}</span> within 48 hours.
                 </p>
 
                 <div className="rounded-xl border border-border bg-secondary/20 p-4 mb-6 text-left">
@@ -330,10 +330,10 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
             ) : (
               <>
                 <h2 className="font-heading text-xl font-semibold tracking-tight mb-1">
-                  Shape your assistant
+                  Request your custom AI assistant plan
                 </h2>
                 <p className="text-sm text-muted-foreground mb-5">
-                  Toggle modules on or off, add anything else you need, and send the request.
+                  Toggle modules on or off, add anything else you need, and request a scoped plan.
                 </p>
 
                 {/* Module toggle grid — 3 column cards */}
@@ -492,7 +492,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                         disabled={submitting || !contactEmail.trim()}
                         className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity whitespace-nowrap"
                       >
-                        {submitting ? "Submitting..." : "Send request"}
+                        {submitting ? "Submitting..." : "Request plan"}
                         {!submitting && <ArrowRight className="h-3.5 w-3.5" />}
                       </button>
                     </div>
@@ -533,7 +533,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                 disabled={submitting || (showContactForm && !contactEmail.trim())}
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50 transition-opacity w-full sm:w-auto"
               >
-                {submitting ? "Submitting..." : "Send Custom Build Request"}
+                {submitting ? "Submitting..." : "Request Your Custom AI Assistant Plan"}
                 {!submitting && <ArrowRight className="h-4 w-4" />}
               </button>
             </div>

@@ -220,10 +220,10 @@ export function OccupationBuilder({
           className="mt-6 rounded-2xl border border-border bg-card p-5 sm:p-6"
         >
           <h3 className="font-heading text-xl font-semibold tracking-tight mb-1">
-            Shape your assistant
+            Request your custom AI assistant plan
           </h3>
           <p className="text-sm text-muted-foreground mb-5">
-            Confirm the scope, add anything missing, and send the build request.
+            Confirm the scope, add anything missing, and we will send back a recommended build plan.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr_1fr] gap-3 mb-6">
@@ -350,11 +350,11 @@ export function OccupationBuilder({
             type="button"
             onClick={() => void submitAssistantRequest()}
             disabled={submitting || !contactEmail.trim() || selectedModules.length === 0}
-            aria-label="Send Custom Build Request Form"
+            aria-label="Request Your Custom AI Assistant Plan Form"
             data-testid="occupation-builder-submit-form"
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity disabled:opacity-50 w-full sm:w-auto"
           >
-            {submitting ? "Submitting..." : "Send Custom Build Request"}
+            {submitting ? "Submitting..." : "Request Your Custom AI Assistant Plan"}
             {!submitting && <ArrowRight className="h-4 w-4" />}
           </button>
         </div>
@@ -369,10 +369,10 @@ export function OccupationBuilder({
             <Check className="h-5 w-5 text-green-600" />
           </div>
           <h3 className="font-heading text-2xl font-semibold tracking-tight mb-2">
-            We received your request
+            We received your plan request
           </h3>
           <p className="text-sm text-slate-600 mb-6 max-w-lg">
-            We&apos;ll review the build for {occupationTitle} and send the next-step plan to{" "}
+            We&apos;ll review the build scope for {occupationTitle} and send the recommended plan to{" "}
             <span className="font-medium text-slate-900">{contactEmail}</span>.
           </p>
 
@@ -436,7 +436,7 @@ export function OccupationBuilder({
                   disabled={selected.size === 0}
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity disabled:opacity-40 w-full sm:w-auto"
                 >
-                  Build Your Custom AI Assistant
+                  Request Your Custom AI Assistant Plan
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </>
@@ -452,11 +452,11 @@ export function OccupationBuilder({
                 <button
                   onClick={handlePrimaryAction}
                   disabled={submitting || !contactEmail.trim() || selectedModules.length === 0}
-                  aria-label="Send Custom Build Request Sticky Bar"
+                  aria-label="Request Your Custom AI Assistant Plan Sticky Bar"
                   data-testid="occupation-builder-submit-sticky"
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-50 w-full sm:w-auto"
                 >
-                  {submitting ? "Submitting..." : "Send Custom Build Request"}
+                  {submitting ? "Submitting..." : "Request Your Custom AI Assistant Plan"}
                   {!submitting && <ArrowRight className="h-4 w-4" />}
                 </button>
               </>

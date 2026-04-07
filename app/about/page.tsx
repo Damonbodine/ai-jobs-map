@@ -1,11 +1,11 @@
 import Link from "next/link"
-import { Database, Brain, Target, Users } from "lucide-react"
+import { Database, Brain, Target, Users, ArrowRight } from "lucide-react"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
+import { AGENCY, PROOF_POINTS, SITE } from "@/lib/site"
 
 export const metadata = {
-  title: "About — AI Jobs Map",
-  description:
-    "Task-level AI analysis grounded in real occupational data from the BLS and O*NET.",
+  title: `About — ${SITE.name}`,
+  description: `${SITE.name} is built by ${AGENCY.name}. Task-level AI analysis grounded in real occupational data from the BLS and O*NET, delivered as concrete implementation plans.`,
 }
 
 const INFO_SECTIONS = [
@@ -32,17 +32,41 @@ const INFO_SECTIONS = [
 ]
 
 export default function AboutPage() {
+  const valise = PROOF_POINTS[0]
+
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">
       <FadeIn>
+        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-3">
+          A project by {AGENCY.name}
+        </p>
         <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-          About AI Jobs Map
+          We help teams build AI systems that actually ship.
         </h1>
         <p className="text-lg text-muted-foreground leading-relaxed mb-10">
-          We help professionals understand exactly how AI can save time in their
-          specific role — not with vague predictions, but with task-level analysis
-          grounded in real occupational data.
+          {SITE.name} is the research arm of {AGENCY.name} — a small studio that
+          designs and implements custom AI systems for knowledge-work teams. We
+          built this site because every engagement starts with the same
+          question: <em>where, concretely, is the time?</em> Now you can answer
+          that question for your role in under a minute, and — if the numbers
+          make sense — talk to us about building the system.
         </p>
+      </FadeIn>
+
+      <FadeIn delay={0.15}>
+        <div className="rounded-2xl border border-accent/30 bg-accent/5 p-6 mb-12">
+          <p className="text-xs uppercase tracking-[0.14em] text-accent font-semibold mb-2">
+            Recent work
+          </p>
+          <p className="font-heading text-lg font-semibold mb-1">
+            {valise.client}
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {valise.outcome}. We mapped their operations team&apos;s week, built a
+            task-level blueprint like the ones on this site, then implemented
+            the system end-to-end.
+          </p>
+        </div>
       </FadeIn>
 
       <Stagger className="space-y-8 mb-12" staggerDelay={0.1}>
@@ -66,19 +90,22 @@ export default function AboutPage() {
       </Stagger>
 
       <FadeIn delay={0.5}>
-        <div className="rounded-2xl border border-border bg-card p-8">
-          <h2 className="font-heading text-xl font-semibold mb-3">Our Methodology</h2>
+        <div className="rounded-2xl border border-border bg-card p-8 mb-10">
+          <h2 className="font-heading text-xl font-semibold mb-3">
+            Our Methodology
+          </h2>
           <div className="text-sm text-muted-foreground leading-relaxed space-y-3">
             <p>
-              Each occupation&apos;s automation profile combines multiple signals: O*NET
-              task descriptions and their AI applicability scores, ability
-              requirements (physical vs cognitive), knowledge domains, and
-              work activity patterns.
+              Each occupation&apos;s automation profile combines multiple signals:
+              O*NET task descriptions and their AI applicability scores, ability
+              requirements (physical vs cognitive), knowledge domains, and work
+              activity patterns.
             </p>
             <p>
-              The composite score (0–100) reflects overall AI readiness. Time-back
-              estimates are given as conservative-to-optimistic ranges, broken down
-              by work block (intake, analysis, documentation, coordination, etc.).
+              The composite score (0–100) reflects overall AI readiness.
+              Time-back estimates are given as conservative-to-optimistic
+              ranges, broken down by work block (intake, analysis,
+              documentation, coordination, etc.).
             </p>
             <p>
               We classify occupations by archetype — desk/digital, mixed, or
@@ -90,12 +117,48 @@ export default function AboutPage() {
       </FadeIn>
 
       <FadeIn delay={0.6}>
-        <div className="mt-10 text-center">
+        <div className="rounded-2xl border border-border bg-card p-8 mb-10">
+          <h2 className="font-heading text-xl font-semibold mb-3">
+            How we work
+          </h2>
+          <ol className="text-sm text-muted-foreground leading-relaxed space-y-3 list-decimal list-inside">
+            <li>
+              <strong className="text-foreground">Discover.</strong> We use
+              this site (and a 45-min call) to map where your team&apos;s time
+              actually goes.
+            </li>
+            <li>
+              <strong className="text-foreground">Blueprint.</strong> You get a
+              concrete implementation plan — tools, integrations, human
+              checkpoints, and an honest ROI estimate. No fluff.
+            </li>
+            <li>
+              <strong className="text-foreground">Build.</strong> We implement
+              the system with your team. Weekly demos, real code, no vendor
+              lock-in.
+            </li>
+            <li>
+              <strong className="text-foreground">Support.</strong> Ongoing
+              tuning, monitoring, and improvements once you&apos;re live.
+            </li>
+          </ol>
+        </div>
+      </FadeIn>
+
+      <FadeIn delay={0.7}>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             href="/browse"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity"
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
           >
             Explore Occupations
+          </Link>
+          <Link
+            href="/contact"
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity"
+          >
+            Book a scoping call
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </FadeIn>

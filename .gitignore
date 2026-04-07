@@ -33,6 +33,13 @@ yarn-error.log*
 # Vercel
 .vercel
 
+# Worktrees
+.worktrees/
+
+# Playwright
+test-results/
+playwright-report/
+
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts

@@ -7,6 +7,14 @@ import {
   computeDepartmentTotals,
   type RoleData,
 } from "@/lib/build-a-team/compute"
+import type { MicroTask } from "@/types"
+import { getAllCapabilities } from "@/lib/capabilities"
+import {
+  computeDisplayedTimeback,
+  estimateTaskMinutes,
+  inferArchetypeMultiplier,
+} from "@/lib/timeback"
+import { computeAnnualValue } from "@/lib/pricing"
 import { Cart } from "./cart"
 import { Results } from "./results"
 import { TemplatePicker } from "./template-picker"
@@ -44,6 +52,25 @@ export default async function BuildATeamPage({
 
   // Fetch all occupations in the cart server-side.
   let totals: ReturnType<typeof computeDepartmentTotals> | null = null
+  let roleTaskData: Array<{
+    slug: string
+    title: string
+    occupationId: number
+    hourlyWage: number | null
+    tasks: Array<{
+      id: number
+      task_name: string
+      displayLow: number
+      displayHigh: number
+      ai_impact_level: number | null
+      ai_how_it_helps: string | null
+      moduleKey: string
+    }>
+    displayedMinutes: number
+    annualValue: number
+  }> = []
+  let capabilitiesByModule: Record<string, import("@/types").ModuleCapability[]> = {}
+
   if (cart.length > 0) {
     const supabase = createServerClient()
     const slugs = cart.map((r) => r.slug)
@@ -54,7 +81,7 @@ export default async function BuildATeamPage({
 
     if (occupations && occupations.length > 0) {
       const occupationIds = occupations.map((o) => o.id)
-      const [{ data: profiles }, { data: tasks }] = await Promise.all([
+      const [{ data: profiles }, { data: tasks }, capabilities] = await Promise.all([
         supabase
           .from("occupation_automation_profile")
           .select("*")
@@ -63,7 +90,10 @@ export default async function BuildATeamPage({
           .from("job_micro_tasks")
           .select("*")
           .in("occupation_id", occupationIds),
+        getAllCapabilities(),
       ])
+
+      capabilitiesByModule = capabilities
 
       const roleDataBySlug = new Map<string, RoleData>()
       for (const occ of occupations) {
@@ -76,6 +106,43 @@ export default async function BuildATeamPage({
       }
 
       totals = computeDepartmentTotals(cart, roleDataBySlug)
+
+      // Compute per-role task items with display-minute scaling
+      for (const [slug, roleData] of roleDataBySlug) {
+        const archetypeMultiplier = inferArchetypeMultiplier(roleData.profile)
+        const aiTasks = roleData.tasks.filter(t => t.ai_applicable)
+        const rawTotal = aiTasks.reduce((s, t) => s + estimateTaskMinutes(t) * archetypeMultiplier, 0)
+        const { displayedMinutes } = computeDisplayedTimeback(roleData.profile, roleData.tasks, rawTotal)
+
+        const taskItems = aiTasks.map(task => {
+          const raw = estimateTaskMinutes(task) * archetypeMultiplier
+          const share = rawTotal > 0 && displayedMinutes > 0
+            ? Math.max(1, Math.round((raw / rawTotal) * displayedMinutes))
+            : Math.max(1, Math.round(raw))
+          const low = Math.max(1, Math.round(share * 0.78))
+          const high = Math.max(low + 1, Math.round(share * 1.22))
+          return {
+            id: task.id,
+            task_name: task.task_name,
+            displayLow: low,
+            displayHigh: high,
+            ai_impact_level: task.ai_impact_level ?? null,
+            ai_how_it_helps: task.ai_how_it_helps ?? null,
+            moduleKey: (task as MicroTask & { module_key?: string }).module_key ?? "general",
+          }
+        })
+
+        const occ = roleData.occupation
+        roleTaskData.push({
+          slug,
+          title: occ.title,
+          occupationId: occ.id,
+          hourlyWage: occ.hourly_wage ?? null,
+          tasks: taskItems,
+          displayedMinutes,
+          annualValue: computeAnnualValue(displayedMinutes, occ.hourly_wage),
+        })
+      }
     }
   }
 
@@ -105,7 +172,12 @@ export default async function BuildATeamPage({
       ) : null}
 
       <FadeIn delay={0.15}>
-        <Cart initialCart={cart} shareUrl={shareUrl} />
+        <Cart
+          initialCart={cart}
+          shareUrl={shareUrl}
+          roleTaskData={roleTaskData}
+          capabilitiesByModule={capabilitiesByModule}
+        />
       </FadeIn>
 
       {totals && totals.rows.length > 0 ? (

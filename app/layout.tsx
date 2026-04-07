@@ -3,6 +3,7 @@ import { Newsreader, Manrope } from "next/font/google"
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import { Header } from "@/components/layout/Header"
 import { Footer } from "@/components/layout/Footer"
+import { SITE, AGENCY } from "@/lib/site"
 import "./globals.css"
 
 const newsreader = Newsreader({
@@ -18,9 +19,27 @@ const manrope = Manrope({
 })
 
 export const metadata: Metadata = {
-  title: "AI Jobs Map",
-  description:
-    "Discover how AI can save time in your specific occupation. Task-level analysis for 800+ roles.",
+  metadataBase: new URL(SITE.url),
+  title: {
+    default: SITE.name,
+    template: `%s — ${SITE.name}`,
+  },
+  description: SITE.description,
+  openGraph: {
+    title: SITE.name,
+    description: SITE.description,
+    url: SITE.url,
+    siteName: SITE.name,
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE.name,
+    description: SITE.description,
+  },
+  authors: [{ name: AGENCY.name, url: AGENCY.url }],
+  creator: AGENCY.name,
+  publisher: AGENCY.name,
 }
 
 export default function RootLayout({

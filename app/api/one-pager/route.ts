@@ -31,7 +31,8 @@ export async function POST(request: Request) {
   if (
     isRateLimited("one-pager", ipHash, {
       windowMs: 10 * 60 * 1000,
-      max: 10,
+      // PDF generation per call is expensive — keep the cap tight.
+      max: 5,
     })
   ) {
     return NextResponse.json(
@@ -115,16 +116,22 @@ export async function POST(request: Request) {
     ),
   }))
 
-  // Save the capture first — the row is the source of truth.
-  const { error: dbError } = await supabase.from("one_pager_requests").insert({
-    email,
-    occupation_slug: occupation.slug,
-    occupation_title: occupation.title,
-    user_agent: userAgent,
-    ip_hash: ipHash,
-  })
+  // Save the capture first — the row is the source of truth. Capture
+  // the inserted id so we can update pdf_sent_at / pdf_send_error after
+  // the email attempt.
+  const { data: insertedRow, error: dbError } = await supabase
+    .from("one_pager_requests")
+    .insert({
+      email,
+      occupation_slug: occupation.slug,
+      occupation_title: occupation.title,
+      user_agent: userAgent,
+      ip_hash: ipHash,
+    })
+    .select("id")
+    .single()
 
-  if (dbError) {
+  if (dbError || !insertedRow) {
     console.error("[one-pager] supabase insert failed", dbError)
     return NextResponse.json(
       { error: "We couldn't process your request. Please try again shortly." },
@@ -135,6 +142,7 @@ export async function POST(request: Request) {
   const generatedAt = new Date().toISOString().slice(0, 10)
 
   let pdfBuffer: Buffer | null = null
+  let pdfError: string | null = null
   try {
     pdfBuffer = await renderBlueprintPdf({
       variant: "one-pager",
@@ -152,9 +160,12 @@ export async function POST(request: Request) {
       generatedAt,
     })
   } catch (err) {
+    pdfError = err instanceof Error ? err.message : String(err)
     console.error("[one-pager] pdf generation failed", err)
   }
 
+  let emailSent = false
+  let emailError: string | null = null
   try {
     const safeOccupation = escapeHtml(occupation.title)
     await sendEmail({
@@ -183,9 +194,20 @@ If the numbers make sense and you'd like to talk about a real build, book a scop
           ]
         : undefined,
     })
+    emailSent = true
   } catch (err) {
+    emailError = err instanceof Error ? err.message : String(err)
     console.error("[one-pager] delivery email failed", err)
   }
+
+  // Persist delivery state on the row so we can audit failures later.
+  await supabase
+    .from("one_pager_requests")
+    .update({
+      pdf_sent_at: emailSent ? new Date().toISOString() : null,
+      pdf_send_error: emailError ?? pdfError,
+    })
+    .eq("id", insertedRow.id)
 
   return NextResponse.json({ ok: true }, { status: 200 })
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Download, Loader2, CheckCircle2, X } from "lucide-react"
 import { onePagerSchema } from "@/lib/validation/one-pager"
 
@@ -18,6 +18,35 @@ export function OnePagerButton({
   const [email, setEmail] = useState("")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [fieldError, setFieldError] = useState<string | null>(null)
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
+  const emailInputRef = useRef<HTMLInputElement | null>(null)
+
+  // Escape closes the dialog, autofocus the email input on open,
+  // restore focus to the trigger on close, and lock body scroll while
+  // the modal is open. These are the standard a11y dialog behaviors
+  // expected by screen readers and keyboard users.
+  useEffect(() => {
+    if (!open) return
+    const previouslyFocused = document.activeElement as HTMLElement | null
+    document.body.style.overflow = "hidden"
+    // Defer focus to next tick so the input has actually mounted.
+    const id = window.setTimeout(() => emailInputRef.current?.focus(), 0)
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        e.preventDefault()
+        setOpen(false)
+      }
+    }
+    window.addEventListener("keydown", handleKey)
+    return () => {
+      window.clearTimeout(id)
+      window.removeEventListener("keydown", handleKey)
+      document.body.style.overflow = ""
+      // Restore focus to whatever opened the dialog (typically the
+      // trigger button).
+      previouslyFocused?.focus?.()
+    }
+  }, [open])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -70,6 +99,7 @@ export function OnePagerButton({
     <>
       <button
         type="button"
+        ref={triggerRef}
         onClick={() => {
           setOpen(true)
           setStatus("idle")
@@ -144,6 +174,7 @@ export function OnePagerButton({
                     </label>
                     <input
                       id="one-pager-email"
+                      ref={emailInputRef}
                       type="email"
                       required
                       autoComplete="email"

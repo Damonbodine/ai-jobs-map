@@ -8,14 +8,17 @@ import { z } from "zod"
  * Tier keys must stay in sync with lib/pricing.ts PRICING_TIERS.
  */
 export const inquirySchema = z.object({
-  occupationId: z.string().min(1, "Missing occupation id"),
+  // occupationId is numeric in this codebase (bigserial primary key).
+  // z.coerce.number() accepts JSON `123` or `"123"` — both round-trip safely.
+  occupationId: z.coerce.number().int().positive("Missing occupation id"),
   occupationTitle: z.string().trim().min(1).max(200),
   occupationSlug: z.string().trim().min(1).max(200),
   selectedModules: z
     .array(z.string().min(1))
     .min(1, "Select at least one module"),
   selectedCapabilities: z.array(z.string().min(1)).default([]),
-  selectedTaskIds: z.array(z.string().min(1)).default([]),
+  // Task IDs are also numeric in the schema. Coerce for flexibility.
+  selectedTaskIds: z.array(z.coerce.number().int()).default([]),
   customRequests: z
     .array(z.string().trim().min(1).max(500))
     .max(20)

@@ -1,12 +1,13 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { ArrowRight, Check, ChevronDown, Shield, X } from "lucide-react"
+import { ArrowRight, Check, CheckCircle2, ChevronDown, Mail, Shield, X } from "lucide-react"
 import { toast } from "sonner"
 import { MODULE_REGISTRY } from "@/lib/modules"
-import { supabase } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { computeAnnualValue, computeDynamicPrice, TEAM_SIZES } from "@/lib/pricing"
+import { CalendlyEmbed } from "@/components/CalendlyEmbed"
+import { CONTACT } from "@/lib/site"
 import type { ModuleCapability } from "@/types"
 
 interface TaskItem {
@@ -194,32 +195,48 @@ export function OccupationBuilder({
 
     setSubmitting(true)
     try {
-      const { error } = await supabase
-        .from("assistant_inquiries")
-        .insert({
-          occupation_id: occupationId,
-          occupation_title: occupationTitle,
-          occupation_slug: slug,
-          recommended_modules: selectedModules,
-          selected_modules: selectedModules,
-          added_modules: [],
-          removed_modules: [],
-          selected_capabilities: selectedModules.flatMap(
-            (moduleKey) =>
-              (capabilitiesByModule[moduleKey] ?? []).map((capability) => capability.capability_key)
+      const res = await fetch("/api/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          occupationId,
+          occupationTitle,
+          occupationSlug: slug,
+          selectedModules,
+          selectedCapabilities: selectedModules.flatMap((moduleKey) =>
+            (capabilitiesByModule[moduleKey] ?? []).map(
+              (capability) => capability.capability_key
+            )
           ),
-          custom_requests: customRequests,
-          pain_points: [],
-          contact_name: contactName,
-          contact_email: contactEmail,
-          tier: currentTier.key,
-          source: "occupation-inline",
-        })
+          selectedTaskIds: Array.from(selected),
+          customRequests,
+          teamSize: TEAM_SIZES[teamSizeIndex]?.label ?? "",
+          tierKey: currentTier.key,
+          displayedMinutes: selectedMinutes,
+          displayedAnnualValue: annualValue,
+          contactName,
+          contactEmail,
+          website: "", // honeypot — real users never see it
+        }),
+      })
 
-      if (error) throw error
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(
+          typeof body?.error === "string"
+            ? body.error
+            : "Could not submit the assistant request. Please try again."
+        )
+      }
+
       setPhase("done")
-    } catch {
-      toast.error("Could not submit the assistant request. Please try again.")
+    } catch (err) {
+      console.error("[builder] submit failed", err)
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Could not submit the assistant request. Please try again."
+      )
     } finally {
       setSubmitting(false)
     }
@@ -564,55 +581,53 @@ export function OccupationBuilder({
       {phase === "done" && (
         <div
           ref={builderRef}
-          className="mt-6 rounded-2xl border border-green-200 bg-green-50 p-5 sm:p-6"
+          className="mt-6"
         >
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white mb-4 border border-green-200">
-            <Check className="h-5 w-5 text-green-600" />
-          </div>
-          <h3 className="font-heading text-2xl font-semibold tracking-tight mb-2">
-            We received your plan request
-          </h3>
-          <p className="text-sm text-slate-600 mb-6 max-w-lg">
-            We&apos;ll review the build scope for {occupationTitle} and send the recommended plan to{" "}
-            <span className="font-medium text-slate-900">{contactEmail}</span>.
-          </p>
+          <div className="space-y-6">
+            <div
+              role="status"
+              aria-live="polite"
+              className="rounded-2xl border border-accent/30 bg-accent/5 p-6 sm:p-8"
+            >
+              <div className="flex items-start gap-3 mb-3">
+                <CheckCircle2 className="h-6 w-6 text-accent flex-shrink-0" />
+                <div>
+                  <h3 className="font-heading text-xl font-semibold mb-1">
+                    Your blueprint is in your inbox.
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    We just emailed a PDF of your custom AI assistant blueprint to{" "}
+                    <strong className="text-foreground">{contactEmail}</strong>.
+                    Share it with your team, push back on the numbers, and book a
+                    scoping call below whenever you&apos;re ready to talk specifics.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-          <div className="rounded-xl border border-green-200 bg-white p-4 mb-6 text-left">
-            <div className="text-[10px] font-medium text-slate-500 uppercase tracking-wide mb-3">
-              Request summary
+            <div>
+              <h3 className="font-heading text-lg font-semibold mb-3">
+                Book a 30-minute scoping call
+              </h3>
+              <CalendlyEmbed
+                prefill={{
+                  email: contactEmail,
+                  name: contactName || undefined,
+                }}
+              />
             </div>
-            <div className="space-y-3 text-sm">
-              <div>
-                <span className="text-slate-500">Occupation:</span>{" "}
-                <span className="font-medium text-slate-900">{occupationTitle}</span>
-              </div>
-              <div>
-                <span className="text-slate-500">Modules:</span>{" "}
-                <span className="font-medium text-slate-900">{selectedModules.length}</span>
-              </div>
-              <div>
-                <span className="text-slate-500">Tier:</span>{" "}
-                <span className="font-medium text-slate-900">{currentTier.label}</span>
-              </div>
-              <div>
-                <span className="text-slate-500">Time estimate:</span>{" "}
-                <span className="font-medium text-slate-900">{selectedMinutes} min/day</span>
-              </div>
-            </div>
-          </div>
 
-          <div className="text-xs text-slate-600 space-y-1.5">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-600" />
-              We review the selected workflows and map them to the right assistant modules.
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-600" />
-              You receive a scoped build recommendation with timeline and deliverables.
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-600" />
-              We confirm checkpoints before implementation starts.
+            <div className="text-sm text-muted-foreground flex items-center gap-2 pt-2">
+              <Mail className="h-4 w-4 text-accent" />
+              <span>
+                Prefer email?{" "}
+                <a
+                  href={`mailto:${CONTACT.email}`}
+                  className="text-foreground hover:text-accent transition-colors"
+                >
+                  {CONTACT.email}
+                </a>
+              </span>
             </div>
           </div>
         </div>

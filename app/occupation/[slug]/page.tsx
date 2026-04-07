@@ -16,6 +16,7 @@ import type { MicroTask, AutomationProfile, ModuleCapability } from "@/types"
 import { EstimateInfo } from "./estimate-info"
 import { OccupationDonut } from "./occupation-donut"
 import { OccupationBuilder } from "./occupation-builder"
+import { OnePagerButton } from "./one-pager-button"
 
 export default async function OccupationPage(props: {
   params: Promise<{ slug: string }>
@@ -150,6 +151,10 @@ export default async function OccupationPage(props: {
                 Build Your Custom Assistant
                 <ArrowRight className="h-4 w-4" />
               </a>
+              <OnePagerButton
+                occupationSlug={slug}
+                occupationTitle={occupation.title}
+              />
               <a
                 href="#assistant-breakdown"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"

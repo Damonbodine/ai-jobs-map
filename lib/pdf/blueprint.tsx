@@ -5,34 +5,20 @@ import {
   Text,
   View,
   StyleSheet,
-  Font,
 } from "@react-pdf/renderer"
 
-// Register Newsreader + Manrope to match site typography. The Google
-// Fonts CDN URLs are the same ones next/font uses under the hood. If
-// CDN fetches at build time become a problem, ship the TTFs in /public.
-Font.register({
-  family: "Newsreader",
-  fonts: [
-    {
-      src: "https://fonts.gstatic.com/s/newsreader/v20/cY9qfjOCX1hbuyalUrK49dLac06G1ZGsZBtoBCzBDXXD9JVF439RWpWlsA.ttf",
-      fontWeight: 700,
-    },
-  ],
-})
-Font.register({
-  family: "Manrope",
-  fonts: [
-    {
-      src: "https://fonts.gstatic.com/s/manrope/v15/xn7gYHE41ni1AdIRggexSg.ttf",
-      fontWeight: 400,
-    },
-    {
-      src: "https://fonts.gstatic.com/s/manrope/v15/xn7gYHE41ni1AdIRggSxSg.ttf",
-      fontWeight: 600,
-    },
-  ],
-})
+// PDF intentionally uses react-pdf's built-in Helvetica family rather
+// than registering Newsreader / Manrope from a CDN. Google Fonts'
+// gstatic URLs are versioned and unstable for hardcoded use, and a
+// 404 on font fetch fails the entire renderToBuffer call — losing the
+// PDF attachment for an otherwise-successful submission. The two-
+// writes-no-silent-failure pattern catches it (the lead row still
+// lands), but the user gets an email with no attachment.
+//
+// TODO (future plan): vendor TTFs of Newsreader (heading) + Manrope
+// (body) into /public/fonts and Font.register from local file:// or
+// imported binary URLs. Then we can match the site's brand typography
+// in the PDF without depending on a third-party CDN at runtime.
 
 const COLORS = {
   bg: "#fafaf7",
@@ -48,7 +34,8 @@ const styles = StyleSheet.create({
   page: {
     backgroundColor: COLORS.bg,
     padding: 48,
-    fontFamily: "Manrope",
+    // No fontFamily — react-pdf defaults to its built-in Helvetica.
+    // See file header for the rationale and the vendor-fonts TODO.
     fontSize: 10,
     color: COLORS.fg,
     lineHeight: 1.5,
@@ -67,7 +54,6 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   title: {
-    fontFamily: "Newsreader",
     fontSize: 26,
     fontWeight: 700,
     color: COLORS.fg,
@@ -98,7 +84,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   statValue: {
-    fontFamily: "Newsreader",
     fontSize: 20,
     fontWeight: 700,
     color: COLORS.fg,
@@ -112,7 +97,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontFamily: "Newsreader",
     fontSize: 14,
     fontWeight: 700,
     marginBottom: 10,
@@ -155,7 +139,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   calloutTitle: {
-    fontFamily: "Newsreader",
     fontSize: 13,
     fontWeight: 700,
     marginBottom: 4,

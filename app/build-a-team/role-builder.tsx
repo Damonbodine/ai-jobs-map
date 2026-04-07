@@ -46,9 +46,7 @@ export function RoleBuilder({
   onToggleModule: (moduleKey: string, taskIds: number[]) => void
   onToggleTask: (id: number) => void
 }) {
-  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
-
-  // Group tasks by module
+  // Group tasks by module first so we can initialise expandedModules with all keys
   const groups: ModuleGroup[] = []
   const seen = new Map<string, TaskItem[]>()
   for (const task of tasks) {
@@ -61,6 +59,11 @@ export function RoleBuilder({
     const selectedCount = moduleTasks.filter(t => selected.has(t.id)).length
     groups.push({ moduleKey, tasks: moduleTasks, groupMinutes, selectedCount })
   }
+
+  // All modules start expanded so tasks are visible on first click
+  const [expandedModules, setExpandedModules] = useState<Set<string>>(
+    () => new Set(groups.map(g => g.moduleKey))
+  )
 
   function toggleExpand(moduleKey: string) {
     setExpandedModules(prev => {

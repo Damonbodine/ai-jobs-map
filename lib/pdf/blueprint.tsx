@@ -20,15 +20,7 @@ import {
 // imported binary URLs. Then we can match the site's brand typography
 // in the PDF without depending on a third-party CDN at runtime.
 
-const COLORS = {
-  bg: "#fafaf7",
-  fg: "#221f1c",
-  muted: "#6b6661",
-  accent: "#2563eb",
-  accentSoft: "#eff6ff",
-  border: "#e5e0d8",
-  cardBg: "#ffffff",
-}
+import { PDF_COLORS as COLORS } from "./styles"
 
 const styles = StyleSheet.create({
   page: {

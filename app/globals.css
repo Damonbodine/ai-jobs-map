@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/*
+ * Tailwind v4 does NOT auto-load v3-style tailwind.config.js. Without this
+ * @config directive, the custom color utilities defined there (bg-foreground,
+ * text-accent, bg-card, border-border, etc.) silently fall back to default
+ * Tailwind and the entire design system breaks — elements that should be
+ * blue-accented render in the default foreground color. This one line
+ * restores the v3 config while we consider a longer-term migration to v4
+ * @theme blocks.
+ */
+@config "../tailwind.config.js";
+
 @layer base {
   :root {
     --background: 40 33% 98%;

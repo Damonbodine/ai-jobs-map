@@ -1,38 +1,11 @@
 import { NextResponse } from "next/server"
-import { createHash } from "node:crypto"
 import { contactFormSchema } from "@/lib/validation/contact"
 import { sendEmail } from "@/lib/resend"
 import { createServerClient } from "@/lib/supabase/server"
 import { CONTACT, AGENCY, SITE } from "@/lib/site"
+import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
-
-// Minimal in-memory rate limit: 5 submissions per IP per 10 minutes.
-// This resets on every cold start — good enough as a speed bump against
-// casual abuse. For real protection, add Vercel BotID or upstash ratelimit
-// in Plan 4 (instrumentation).
-const WINDOW_MS = 10 * 60 * 1000
-const MAX_PER_WINDOW = 5
-const hits = new Map<string, number[]>()
-
-function isRateLimited(ipHash: string): boolean {
-  const now = Date.now()
-  const recent = (hits.get(ipHash) ?? []).filter((t) => now - t < WINDOW_MS)
-  if (recent.length >= MAX_PER_WINDOW) {
-    hits.set(ipHash, recent)
-    return true
-  }
-  recent.push(now)
-  hits.set(ipHash, recent)
-  return false
-}
-
-function hashIp(ip: string | null): string {
-  return createHash("sha256")
-    .update(ip ?? "unknown")
-    .digest("hex")
-    .slice(0, 32)
-}
 
 function escapeHtml(value: string): string {
   return value
@@ -47,14 +20,16 @@ export async function POST(request: Request) {
   // `x-forwarded-for` is trusted because this route runs behind Vercel's edge,
   // which sets the header and strips any incoming value. If this code ever runs
   // outside Vercel, revisit — the header is spoofable on bare Node hosts.
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    null
+  const ip = getClientIp(request)
   const ipHash = hashIp(ip)
   const userAgent = request.headers.get("user-agent") ?? null
 
-  if (isRateLimited(ipHash)) {
+  if (
+    isRateLimited("contact", ipHash, {
+      windowMs: 10 * 60 * 1000,
+      max: 5,
+    })
+  ) {
     return NextResponse.json(
       { error: "Too many requests. Please try again in a few minutes." },
       { status: 429 }

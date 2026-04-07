@@ -22,6 +22,7 @@ export function Header() {
   const links = [
     { href: "/about", label: "About" },
     { href: "/browse", label: "Industries" },
+    { href: "/build-a-team", label: "Build a Team" },
     { href: "/products", label: "Pricing" },
   ]
 
@@ -41,6 +42,9 @@ export function Header() {
             </DropdownMenuItem>
             <DropdownMenuItem render={<Link href="/browse" />}>
               Browse All
+            </DropdownMenuItem>
+            <DropdownMenuItem render={<Link href="/build-a-team" />}>
+              Build a Team
             </DropdownMenuItem>
             <DropdownMenuItem render={<Link href="/products" />}>
               Pricing

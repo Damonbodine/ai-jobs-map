@@ -164,6 +164,14 @@ export default async function HomePage() {
 
         <FadeIn delay={0.3} className="mt-8">
           <LandingSearch />
+          <div className="flex justify-center">
+            <Link
+              href="/build-a-team"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mt-3"
+            >
+              Or build a whole team →
+            </Link>
+          </div>
         </FadeIn>
       </section>
 

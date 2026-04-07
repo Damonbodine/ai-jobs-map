@@ -155,6 +155,12 @@ export default async function OccupationPage(props: {
                 occupationSlug={slug}
                 occupationTitle={occupation.title}
               />
+              <Link
+                href={`/build-a-team?roles=${occupation.slug}:1`}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
+              >
+                Add to Team
+              </Link>
               <a
                 href="#assistant-breakdown"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"

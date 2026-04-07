@@ -2,7 +2,7 @@ import { FadeIn } from "@/components/FadeIn"
 import { AGENCY, CONTACT, SITE } from "@/lib/site"
 
 export const metadata = {
-  title: `Terms of Service — ${SITE.name}`,
+  title: "Terms of Service",
   description: `Terms of Service for ${SITE.name}, a project by ${AGENCY.name}.`,
 }
 

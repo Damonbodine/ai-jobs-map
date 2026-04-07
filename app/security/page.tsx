@@ -4,7 +4,7 @@ import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 import { AGENCY, CONTACT, SITE } from "@/lib/site"
 
 export const metadata = {
-  title: `Trust & Security — ${SITE.name}`,
+  title: "Trust & Security",
   description: `How ${AGENCY.name} handles data, LLM interactions, and security during AI implementation engagements.`,
 }
 

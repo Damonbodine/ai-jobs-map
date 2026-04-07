@@ -2,7 +2,7 @@ import { FadeIn } from "@/components/FadeIn"
 import { AGENCY, CONTACT, SITE } from "@/lib/site"
 
 export const metadata = {
-  title: `Privacy Policy — ${SITE.name}`,
+  title: "Privacy Policy",
   description: `How ${SITE.name} collects, uses, and protects your information.`,
 }
 

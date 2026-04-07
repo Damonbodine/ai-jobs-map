@@ -4,7 +4,7 @@ import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 import { AGENCY, PROOF_POINTS, SITE } from "@/lib/site"
 
 export const metadata = {
-  title: `About — ${SITE.name}`,
+  title: "About",
   description: `${SITE.name} is built by ${AGENCY.name}. Task-level AI analysis grounded in real occupational data from the BLS and O*NET, delivered as concrete implementation plans.`,
 }
 

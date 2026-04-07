@@ -4,7 +4,7 @@ import { ContactForm } from "./contact-form"
 import { AGENCY, CONTACT, SITE } from "@/lib/site"
 
 export const metadata = {
-  title: `Contact — ${SITE.name}`,
+  title: "Contact",
   description: `Talk to ${AGENCY.name} about building an AI system for your team. We read every message personally.`,
 }
 

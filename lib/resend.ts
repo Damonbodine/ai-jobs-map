@@ -26,6 +26,10 @@ type SendArgs = {
   html: string
   text: string
   replyTo?: string
+  attachments?: Array<{
+    filename: string
+    content: Buffer | string
+  }>
 }
 
 /**
@@ -45,6 +49,7 @@ export async function sendEmail(args: SendArgs): Promise<void> {
     html: args.html,
     text: args.text,
     replyTo: args.replyTo ?? CONTACT.replyTo,
+    attachments: args.attachments,
   })
   if (error) {
     // Surface the full error to the server logs — do NOT swallow it.

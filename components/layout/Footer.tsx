@@ -17,7 +17,7 @@ export function Footer() {
               <a
                 href={AGENCY.url}
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer"
                 className="text-foreground hover:text-accent transition-colors"
               >
                 {AGENCY.name}

@@ -44,6 +44,9 @@ function escapeHtml(value: string): string {
 }
 
 export async function POST(request: Request) {
+  // `x-forwarded-for` is trusted because this route runs behind Vercel's edge,
+  // which sets the header and strips any incoming value. If this code ever runs
+  // outside Vercel, revisit — the header is spoofable on bare Node hosts.
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     request.headers.get("x-real-ip") ||
@@ -68,6 +71,20 @@ export async function POST(request: Request) {
     )
   }
 
+  // Honeypot check BEFORE zod validation. If a bot fills the hidden field,
+  // we short-circuit to 200 without ever revealing whether the rest of the
+  // payload would have validated. This denies bots the signal that would
+  // let them iterate on bypassing the filter.
+  if (
+    typeof body === "object" &&
+    body !== null &&
+    "website" in body &&
+    typeof (body as { website: unknown }).website === "string" &&
+    (body as { website: string }).website.length > 0
+  ) {
+    return NextResponse.json({ ok: true }, { status: 200 })
+  }
+
   const parsed = contactFormSchema.safeParse(body)
   if (!parsed.success) {
     return NextResponse.json(
@@ -77,12 +94,6 @@ export async function POST(request: Request) {
       },
       { status: 400 }
     )
-  }
-
-  // Honeypot: if `website` is non-empty, pretend success but do nothing.
-  // This is intentional — we don't want bots learning they were detected.
-  if (parsed.data.website && parsed.data.website.length > 0) {
-    return NextResponse.json({ ok: true }, { status: 200 })
   }
 
   const { name, email, company, message } = parsed.data

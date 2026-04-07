@@ -83,7 +83,11 @@ export function ContactForm() {
 
   if (status === "success") {
     return (
-      <div className="rounded-2xl border border-accent/30 bg-accent/5 p-8 text-center">
+      <div
+        role="status"
+        aria-live="polite"
+        className="rounded-2xl border border-accent/30 bg-accent/5 p-8 text-center"
+      >
         <CheckCircle2 className="h-10 w-10 text-accent mx-auto mb-4" />
         <h2 className="font-heading text-xl font-semibold mb-2">
           Message received
@@ -157,16 +161,27 @@ export function ContactForm() {
           rows={6}
           required
           minLength={10}
-          className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+          aria-invalid={fieldErrors.message ? true : undefined}
+          aria-describedby={
+            fieldErrors.message ? "contact-message-error" : undefined
+          }
+          className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors aria-invalid:border-destructive aria-invalid:focus:ring-destructive/30"
           placeholder="Tell us about your team, the workflow you'd like to automate, and any constraints we should know about."
         />
         {fieldErrors.message ? (
-          <p className="text-xs text-red-600">{fieldErrors.message}</p>
+          <p
+            id="contact-message-error"
+            className="text-xs text-destructive"
+          >
+            {fieldErrors.message}
+          </p>
         ) : null}
       </div>
 
       {errorMessage ? (
-        <p className="text-sm text-red-600">{errorMessage}</p>
+        <p role="alert" className="text-sm text-destructive">
+          {errorMessage}
+        </p>
       ) : null}
 
       <button
@@ -202,23 +217,31 @@ function Field({
   autoComplete?: string
   error?: string
 }) {
+  const inputId = `contact-${name}`
+  const errorId = `${inputId}-error`
   return (
     <div className="space-y-1.5">
       <label
-        htmlFor={`contact-${name}`}
+        htmlFor={inputId}
         className="block text-sm font-medium text-foreground"
       >
         {label}
       </label>
       <input
-        id={`contact-${name}`}
+        id={inputId}
         type={type}
         name={name}
         required={required}
         autoComplete={autoComplete}
-        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
+        className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors aria-invalid:border-destructive aria-invalid:focus:ring-destructive/30"
       />
-      {error ? <p className="text-xs text-red-600">{error}</p> : null}
+      {error ? (
+        <p id={errorId} className="text-xs text-destructive">
+          {error}
+        </p>
+      ) : null}
     </div>
   )
 }

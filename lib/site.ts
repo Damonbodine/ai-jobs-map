@@ -10,6 +10,9 @@ export const SITE = {
   tagline: "Task-level AI analysis for 800+ occupations",
   description:
     "Discover how AI can save time in your specific occupation. Task-level analysis grounded in Bureau of Labor Statistics and O*NET data, delivered as a concrete implementation plan by Place To Stand Agency.",
+  // The fallback is intentional for local dev and preview builds. In production,
+  // always set NEXT_PUBLIC_SITE_URL to the real canonical domain — otherwise
+  // OpenGraph, canonical URLs, and emails will point at the vercel.app subdomain.
   url:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
     "https://ai-jobs-map.vercel.app",

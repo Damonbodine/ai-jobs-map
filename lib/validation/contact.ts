@@ -31,8 +31,11 @@ export const contactFormSchema = z.object({
     .min(10, "Please include a few details about what you're looking to build")
     .max(5000, "Message is too long (max 5000 characters)"),
   // Honeypot: real users leave it empty. Bots fill every field.
-  // If this has ANY value, silently succeed but don't do anything.
-  website: z.string().max(0).optional().or(z.literal("")),
+  // Accept any string here so the server can see the value — the route
+  // handler intentionally short-circuits to a 200 when it's non-empty,
+  // which is silently effective. Enforcing `max(0)` here would 400 bots
+  // instead, teaching them they were detected.
+  website: z.string().optional(),
 })
 
 export type ContactFormInput = z.infer<typeof contactFormSchema>

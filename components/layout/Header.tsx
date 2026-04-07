@@ -80,10 +80,10 @@ export function Header() {
             </button>
           ) : null}
           <Link
-            href="#"
-            className="text-sm font-semibold border border-foreground text-foreground px-4 py-1.5 rounded-lg hover:bg-foreground hover:text-background transition-colors"
+            href="/contact"
+            className="text-sm font-semibold bg-foreground text-background px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
           >
-            Sign In
+            Book a Call
           </Link>
         </nav>
 
@@ -114,11 +114,11 @@ export function Header() {
           ))}
           <div className="pt-2 mt-1 border-t border-border flex items-center gap-2">
             <Link
-              href="#"
+              href="/contact"
               onClick={() => setMobileOpen(false)}
-              className="flex-1 text-center py-2.5 text-sm font-semibold border border-foreground text-foreground rounded-lg active:opacity-80 transition-opacity"
+              className="flex-1 text-center py-2.5 text-sm font-semibold bg-foreground text-background rounded-lg active:opacity-80 transition-opacity"
             >
-              Sign In
+              Book a Call
             </Link>
             {DARK_MODE_ENABLED ? (
               <button

@@ -6,10 +6,10 @@
  */
 
 export const SITE = {
-  name: "AI Jobs Map",
-  tagline: "Task-level AI analysis for 800+ occupations",
+  name: "AI Timeback",
+  tagline: "See exactly how much time AI gives back — role by role.",
   description:
-    "Discover how AI can save time in your specific occupation. Task-level analysis grounded in Bureau of Labor Statistics and O*NET data, delivered as a concrete implementation plan by Place To Stand Agency.",
+    "Discover how much time AI gives back in your specific occupation. Task-level analysis grounded in Bureau of Labor Statistics and O*NET data, delivered as a concrete implementation plan by Place To Stand Agency.",
   // The fallback is intentional for local dev and preview builds. In production,
   // always set NEXT_PUBLIC_SITE_URL to the real canonical domain — otherwise
   // OpenGraph, canonical URLs, and emails will point at the vercel.app subdomain.

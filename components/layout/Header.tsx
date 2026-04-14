@@ -32,7 +32,7 @@ export function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1.5 group">
             <span className="font-heading text-lg font-semibold tracking-tight">
-              AI Jobs Map
+              AI Timeback
             </span>
             <ChevronDown className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-foreground" />
           </DropdownMenuTrigger>

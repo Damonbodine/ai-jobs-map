@@ -18,7 +18,7 @@ export async function generateMetadata(props: {
   const cat = getCategoryBySlug(categorySlug)
   if (!cat) return {}
   return {
-    title: `${cat.label} Occupations — AI Jobs Map`,
+    title: `${cat.label} Occupations — AI Timeback`,
     description: `Explore AI time-savings potential for ${cat.label} occupations.`,
   }
 }

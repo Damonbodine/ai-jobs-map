@@ -40,7 +40,7 @@ type SendArgs = {
 export async function sendEmail(args: SendArgs): Promise<void> {
   const from =
     process.env.RESEND_FROM_EMAIL ||
-    `AI Jobs Map <onboarding@resend.dev>` // dev fallback only
+    `AI Timeback <onboarding@resend.dev>` // dev fallback only
   const resend = getClient()
   const { error } = await resend.emails.send({
     from,

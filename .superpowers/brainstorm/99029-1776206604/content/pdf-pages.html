@@ -1,0 +1,244 @@
+<h2>Page-by-page layout for both PDFs</h2>
+<p class="subtitle">Click any page to flag concerns. These are the exact sections we'll build.</p>
+
+<h3 style="margin-top:24px;margin-bottom:12px">TEAM INQUIRY DECK — 8 pages</h3>
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px">
+
+  <div class="card" data-choice="deck-p1" onclick="toggleSelect(this)" style="margin:0">
+    <div class="card-image" style="background:#1a1a1a;padding:16px;min-height:120px;display:flex;flex-direction:column;justify-content:space-between">
+      <div>
+        <div style="font-size:7px;letter-spacing:2px;color:rgba(255,255,255,0.4);margin-bottom:6px">AI TIMEBACK · TEAM BLUEPRINT</div>
+        <div style="font-size:14px;font-weight:700;color:white;line-height:1.3">Your team reclaims<br/><span style="color:#60a5fa">847 hours</span><br/>every year.</div>
+      </div>
+      <div style="font-size:7px;color:rgba(255,255,255,0.4)">Prepared by Place To Stand Agency</div>
+    </div>
+    <div class="card-body" style="padding:8px">
+      <div style="font-size:9px;font-weight:700;color:#888">PAGE 1</div>
+      <div style="font-size:10px;font-weight:600">Cover</div>
+      <div style="font-size:8px;color:#888">Role list, total team time savings headline, agency byline</div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="deck-p2" onclick="toggleSelect(this)" style="margin:0">
+    <div class="card-image" style="background:#faf9f7;padding:12px;min-height:120px">
+      <div style="font-size:8px;font-weight:700;margin-bottom:8px;color:#333">TEAM AT A GLANCE</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+        <div style="background:white;border:1px solid #e5e5e5;border-radius:4px;padding:8px;text-align:center">
+          <div style="font-size:7px;color:#888">Hours reclaimed/yr</div>
+          <div style="font-size:16px;font-weight:700">847</div>
+        </div>
+        <div style="background:white;border:1px solid #e5e5e5;border-radius:4px;padding:8px;text-align:center">
+          <div style="font-size:7px;color:#888">Annual value</div>
+          <div style="font-size:16px;font-weight:700">$42K</div>
+        </div>
+      </div>
+      <div style="background:white;border:1px solid #e5e5e5;border-radius:4px;padding:6px">
+        <div style="font-size:7px;font-weight:600;margin-bottom:4px">Roles in this blueprint</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <div style="background:#eff6ff;color:#1d4ed8;padding:2px 6px;border-radius:3px;font-size:7px">Registered Nurses ×4</div>
+          <div style="background:#f0fdf4;color:#166534;padding:2px 6px;border-radius:3px;font-size:7px">Software Devs ×2</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:8px">
+      <div style="font-size:9px;font-weight:700;color:#888">PAGE 2</div>
+      <div style="font-size:10px;font-weight:600">Team Overview</div>
+      <div style="font-size:8px;color:#888">Total savings, annual value, roles + headcount, custom requests</div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="deck-p3" onclick="toggleSelect(this)" style="margin:0">
+    <div class="card-image" style="background:#faf9f7;padding:12px;min-height:120px">
+      <div style="font-size:8px;font-weight:700;margin-bottom:8px;color:#333">HOW YOU GOT HERE</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="width:20px;height:20px;border-radius:50%;background:#1a1a1a;color:white;font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">1</div>
+          <div style="font-size:8px;color:#555">BLS + O*NET task data for each role</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="width:20px;height:20px;border-radius:50%;background:#1a1a1a;color:white;font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">2</div>
+          <div style="font-size:8px;color:#555">AI impact scored per task (1–5 scale)</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="width:20px;height:20px;border-radius:50%;background:#1a1a1a;color:white;font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">3</div>
+          <div style="font-size:8px;color:#555">Grouped into AI agent modules</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="width:20px;height:20px;border-radius:50%;background:#1a1a1a;color:white;font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">4</div>
+          <div style="font-size:8px;color:#555">Your selections applied as the filter</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:8px">
+      <div style="font-size:9px;font-weight:700;color:#888">PAGE 3</div>
+      <div style="font-size:10px;font-weight:600">Methodology</div>
+      <div style="font-size:8px;color:#888">Data sources, how scores are calculated — builds trust</div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="deck-p4" onclick="toggleSelect(this)" style="margin:0">
+    <div class="card-image" style="background:#faf9f7;padding:12px;min-height:120px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+        <div style="width:8px;height:24px;background:#6366f1;border-radius:2px"></div>
+        <div>
+          <div style="font-size:9px;font-weight:700">REGISTERED NURSES</div>
+          <div style="font-size:7px;color:#888">4 people · 78 min/day · $29,600/yr</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;background:white;border:1px solid #eee;border-radius:3px;padding:4px 6px">
+          <div style="font-size:7px;font-weight:600">📋 Documentation</div>
+          <div style="font-size:8px;font-weight:700;color:#6366f1">28 min</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:white;border:1px solid #eee;border-radius:3px;padding:4px 6px">
+          <div style="font-size:7px;font-weight:600">📥 Intake</div>
+          <div style="font-size:8px;font-weight:700;color:#06b6d4">18 min</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;background:white;border:1px solid #eee;border-radius:3px;padding:4px 6px">
+          <div style="font-size:7px;font-weight:600">🤝 Coordination</div>
+          <div style="font-size:8px;font-weight:700;color:#10b981">14 min</div>
+        </div>
+      </div>
+      <div style="font-size:7px;color:#888">Top task: Patient note drafting — 18 min/day</div>
+    </div>
+    <div class="card-body" style="padding:8px">
+      <div style="font-size:9px;font-weight:700;color:#888">PAGE 4+</div>
+      <div style="font-size:10px;font-weight:600">Role Section (one per role)</div>
+      <div style="font-size:8px;color:#888">Role headline stats → modules with time savings → top tasks listed</div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="deck-p5" onclick="toggleSelect(this)" style="margin:0">
+    <div class="card-image" style="background:#faf9f7;padding:12px;min-height:120px">
+      <div style="font-size:8px;font-weight:700;margin-bottom:8px;color:#333">DOCUMENTATION MODULE — RN</div>
+      <div style="font-size:7px;color:#555;margin-bottom:8px">AI drafts patient notes from voice or structured input. RN reviews + signs off in under 2 minutes.</div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <div style="display:flex;gap:6px;align-items:flex-start">
+          <div style="font-size:8px;color:#6366f1;font-weight:600;flex-shrink:0">·</div>
+          <div>
+            <div style="font-size:7px;font-weight:600">Patient Note Drafting</div>
+            <div style="font-size:7px;color:#888">18 min → 3 min · Tools: GPT-4, DAX Copilot</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-start">
+          <div style="font-size:8px;color:#6366f1;font-weight:600;flex-shrink:0">·</div>
+          <div>
+            <div style="font-size:7px;font-weight:600">Discharge Summary Generation</div>
+            <div style="font-size:7px;color:#888">10 min → 2 min · Tools: GPT-4, Epic integration</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:8px">
+      <div style="font-size:9px;font-weight:700;color:#888">MODULE PAGE</div>
+      <div style="font-size:10px;font-weight:600">Module Deep-Dive</div>
+      <div style="font-size:8px;color:#888">Per module: what the agent does, tasks + before/after time, specific tools</div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="deck-p6" onclick="toggleSelect(this)" style="margin:0">
+    <div class="card-image" style="background:#faf9f7;padding:12px;min-height:120px">
+      <div style="font-size:8px;font-weight:700;margin-bottom:6px;color:#333">IMPLEMENTATION ROADMAP</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="background:#dcfce7;border-radius:4px;padding:6px">
+          <div style="font-size:7px;font-weight:700;color:#166534">PHASE 1 · Weeks 1–4</div>
+          <div style="font-size:7px;color:#555">Note drafting + intake triage (quick wins, high impact)</div>
+        </div>
+        <div style="background:#eff6ff;border-radius:4px;padding:6px">
+          <div style="font-size:7px;font-weight:700;color:#1d4ed8">PHASE 2 · Month 2–3</div>
+          <div style="font-size:7px;color:#555">Coordination + handoff automation</div>
+        </div>
+        <div style="background:#faf5ff;border-radius:4px;padding:6px">
+          <div style="font-size:7px;font-weight:700;color:#7e22ce">PHASE 3 · Month 4+</div>
+          <div style="font-size:7px;color:#555">Full team integration + custom workflows</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:8px">
+      <div style="font-size:9px;font-weight:700;color:#888">SECOND TO LAST</div>
+      <div style="font-size:10px;font-weight:600">Phased Roadmap</div>
+      <div style="font-size:8px;color:#888">3-phase rollout derived from effort scores — low effort first</div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="deck-p7" onclick="toggleSelect(this)" style="margin:0">
+    <div class="card-image" style="background:#1a1a1a;padding:16px;min-height:120px;display:flex;flex-direction:column;justify-content:space-between">
+      <div>
+        <div style="font-size:7px;letter-spacing:2px;color:rgba(255,255,255,0.4);margin-bottom:6px">NEXT STEP</div>
+        <div style="font-size:11px;font-weight:700;color:white;line-height:1.4;margin-bottom:8px">Book a 30-minute scoping call.</div>
+        <div style="font-size:8px;color:rgba(255,255,255,0.6);line-height:1.5">We'll walk through this blueprint with you, answer questions, and give you a fixed-price proposal within 48 hours.</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.1);border-radius:4px;padding:8px">
+        <div style="font-size:7px;color:rgba(255,255,255,0.5);margin-bottom:2px">Place To Stand Agency</div>
+        <div style="font-size:8px;color:white">damon@placetostandagency.com</div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:8px">
+      <div style="font-size:9px;font-weight:700;color:#888">LAST PAGE</div>
+      <div style="font-size:10px;font-weight:600">CTA</div>
+      <div style="font-size:8px;color:#888">Dark cover-style close, booking link, contact info</div>
+    </div>
+  </div>
+
+</div>
+
+<h3 style="margin-bottom:12px">ONE-PAGER UPGRADE — 2 pages</h3>
+
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:500px">
+
+  <div class="card" data-choice="op-p1" onclick="toggleSelect(this)" style="margin:0">
+    <div class="card-image" style="background:#faf9f7;padding:12px;min-height:120px">
+      <div style="font-size:8px;font-weight:700;margin-bottom:6px">REGISTERED NURSE</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:8px">
+        <div style="background:white;border:1px solid #eee;border-radius:3px;padding:5px;text-align:center">
+          <div style="font-size:7px;color:#888">Daily</div>
+          <div style="font-size:13px;font-weight:700">78m</div>
+        </div>
+        <div style="background:white;border:1px solid #eee;border-radius:3px;padding:5px;text-align:center">
+          <div style="font-size:7px;color:#888">Value</div>
+          <div style="font-size:13px;font-weight:700">$7K</div>
+        </div>
+        <div style="background:white;border:1px solid #eee;border-radius:3px;padding:5px;text-align:center">
+          <div style="font-size:7px;color:#888">Tasks</div>
+          <div style="font-size:13px;font-weight:700">14</div>
+        </div>
+      </div>
+      <div style="font-size:7px;color:#555;line-height:1.5">Top 8 tasks listed with time savings each. Data source noted.</div>
+    </div>
+    <div class="card-body" style="padding:8px">
+      <div style="font-size:9px;font-weight:700;color:#888">PAGE 1</div>
+      <div style="font-size:10px;font-weight:600">Stats + Top Tasks</div>
+      <div style="font-size:8px;color:#888">Same as current but better designed — task list includes before/after times</div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="op-p2" onclick="toggleSelect(this)" style="margin:0">
+    <div class="card-image" style="background:#faf9f7;padding:12px;min-height:120px">
+      <div style="font-size:8px;font-weight:700;margin-bottom:6px">AI MODULES FOR THIS ROLE</div>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;background:white;border-left:3px solid #6366f1;border:1px solid #eee;border-left:3px solid #6366f1;padding:4px 6px;border-radius:0 3px 3px 0">
+          <div style="font-size:7px;font-weight:600">📋 Documentation</div>
+          <div style="font-size:7px;color:#6366f1;font-weight:700">28 min</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;background:white;border:1px solid #eee;border-left:3px solid #06b6d4;padding:4px 6px;border-radius:0 3px 3px 0">
+          <div style="font-size:7px;font-weight:600">📥 Intake</div>
+          <div style="font-size:7px;color:#06b6d4;font-weight:700">18 min</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;background:white;border:1px solid #eee;border-left:3px solid #10b981;padding:4px 6px;border-radius:0 3px 3px 0">
+          <div style="font-size:7px;font-weight:600">🤝 Coordination</div>
+          <div style="font-size:7px;color:#10b981;font-weight:700">14 min</div>
+        </div>
+      </div>
+      <div style="font-size:7px;color:#555">Ready to build? → placetostandagency.com</div>
+    </div>
+    <div class="card-body" style="padding:8px">
+      <div style="font-size:9px;font-weight:700;color:#888">PAGE 2</div>
+      <div style="font-size:10px;font-weight:600">Module Breakdown + CTA</div>
+      <div style="font-size:8px;color:#888">Color-coded modules with time savings, 2-3 top tasks each, booking CTA</div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:20px">Click any page thumbnail to flag it for discussion. Or confirm below if this looks right.</p>

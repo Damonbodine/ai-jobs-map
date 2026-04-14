@@ -16,7 +16,7 @@ describe("impactRetentionFactor", () => {
   it("returns 0.85 for impact level 1 (15% reduction)", () => {
     expect(impactRetentionFactor(1)).toBe(0.85)
   })
-  it("clamps to 0.50 for null/undefined impact level", () => {
+  it("returns 0.50 for null impact level (default)", () => {
     expect(impactRetentionFactor(null)).toBe(0.50)
   })
 })

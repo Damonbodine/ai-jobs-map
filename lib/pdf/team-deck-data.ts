@@ -1,10 +1,3 @@
-import type { MicroTask, AutomationProfile } from "@/types"
-import { estimateTaskMinutes, inferArchetypeMultiplier, computeDisplayedTimeback } from "@/lib/timeback"
-import { getBlockForTask } from "@/lib/blueprint"
-import { MODULE_REGISTRY } from "@/lib/modules"
-import { computeAnnualValue } from "@/lib/pricing"
-import { PDF_MODULE_ACCENTS } from "./styles"
-
 /**
  * What fraction of the original task time remains after AI assistance,
  * derived from ai_impact_level. Impact 5 = 85% reduction = 0.15 retained.

@@ -13,3 +13,16 @@ export const PDF_COLORS = {
   border: "#e5e0d8",
   cardBg: "#ffffff",
 } as const
+
+export const PDF_MODULE_ACCENTS: Record<string, string> = {
+  intake: "#06b6d4",
+  analysis: "#6366f1",
+  documentation: "#8b5cf6",
+  coordination: "#10b981",
+  exceptions: "#f59e0b",
+  learning: "#f43f5e",
+  research: "#14b8a6",
+  compliance: "#ef4444",
+  communication: "#f97316",
+  data_reporting: "#0ea5e9",
+}

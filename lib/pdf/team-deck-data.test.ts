@@ -84,8 +84,32 @@ describe("computeRoleSections", () => {
     const cart = [{ slug: "registered-nurses", count: 1, selectedTaskIds: [1] }]
     const sections = computeRoleSections(cart, roleData)
     const task = sections[0].modules[0].topTasks[0]
-    // impact level 5 → retention 0.15 → afterMinutes = beforeMinutes * 0.15
-    expect(task.afterMinutes).toBeCloseTo(task.beforeMinutes * 0.15, 1)
+    // impact level 5 → retention 0.15 → afterMinutes = round(beforeMinutes * 0.15), floored to 1
+    // Verify the calculation: afterMinutes should equal max(1, round(beforeMinutes * 0.15))
+    const expected = Math.max(1, Math.round(task.beforeMinutes * 0.15))
+    expect(task.afterMinutes).toBe(expected)
+  })
+
+  it("returns empty array when slug not found in roleData", () => {
+    const roleData = new Map<string, any>()
+    const cart = [{ slug: "unknown-role", count: 1, selectedTaskIds: [1] }]
+    const sections = computeRoleSections(cart, roleData)
+    expect(sections).toHaveLength(0)
+  })
+
+  it("returns section with empty modules when no tasks selected", () => {
+    const roleData = new Map([
+      ["registered-nurses", {
+        occupation: { id: 1, slug: "registered-nurses", title: "Registered Nurses", hourly_wage: 38 },
+        profile: mockProfile,
+        tasks: mockTasks,
+      }],
+    ])
+    const cart = [{ slug: "registered-nurses", count: 1, selectedTaskIds: [] }]
+    const sections = computeRoleSections(cart, roleData)
+    expect(sections).toHaveLength(1)
+    expect(sections[0].modules).toHaveLength(0)
+    expect(sections[0].topTasks).toHaveLength(0)
   })
 })
 

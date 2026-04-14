@@ -75,6 +75,10 @@ export function computeRoleSections(
     const rawTotal = selectedTasks.reduce(
       (sum, t) => sum + estimateTaskMinutes(t) * archetypeMultiplier, 0
     )
+    // displayedMinutes is derived from ALL ai_applicable tasks (not just selected ones).
+    // This reflects the role's full time budget and serves as the denominator for
+    // proportional scaling of selected tasks, ensuring consistent visualization across
+    // different selection sizes.
     const { displayedMinutes } = computeDisplayedTimeback(
       data.profile,
       data.tasks,
@@ -98,7 +102,7 @@ export function computeRoleSections(
         impactLevel: t.ai_impact_level ?? 3,
         effortLevel: t.ai_effort_to_implement ?? 3,
         beforeMinutes: scaled,
-        afterMinutes: Math.max(1, scaled * retention),
+        afterMinutes: Math.max(1, Math.round(scaled * retention)),
         moduleKey: getBlockForTask(t),
       }
     })

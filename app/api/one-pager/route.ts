@@ -11,6 +11,9 @@ import {
   inferArchetypeMultiplier,
 } from "@/lib/timeback"
 import { computeAnnualValue } from "@/lib/pricing"
+import { getBlockForTask } from "@/lib/blueprint"
+import { MODULE_REGISTRY } from "@/lib/modules"
+import { PDF_MODULE_ACCENTS } from "@/lib/pdf/styles"
 
 export const runtime = "nodejs"
 
@@ -108,6 +111,28 @@ export async function POST(request: Request) {
   )
   const annualValue = computeAnnualValue(displayedMinutes, occupation.hourly_wage)
 
+  // Compute module breakdown for one-pager page 2
+  const moduleMap = new Map<string, { rawMinutes: number; taskNames: string[] }>()
+  for (const task of aiTasks) {
+    const key = getBlockForTask(task)
+    const existing = moduleMap.get(key) ?? { rawMinutes: 0, taskNames: [] }
+    existing.rawMinutes += estimateTaskMinutes(task) * archetypeMultiplier
+    if (existing.taskNames.length < 3) existing.taskNames.push(task.task_name)
+    moduleMap.set(key, existing)
+  }
+  const moduleBreakdown = [...moduleMap.entries()]
+    .map(([moduleKey, data]) => ({
+      moduleKey,
+      label: MODULE_REGISTRY[moduleKey as keyof typeof MODULE_REGISTRY]?.label ?? moduleKey,
+      accentColor: PDF_MODULE_ACCENTS[moduleKey] ?? "#6b7280",
+      // Scale raw minutes proportionally to displayedMinutes
+      minutesPerDay: totalBlueprintMinutes > 0
+        ? Math.max(1, Math.round((data.rawMinutes / totalBlueprintMinutes) * displayedMinutes))
+        : Math.max(1, Math.round(data.rawMinutes)),
+      topTaskNames: data.taskNames,
+    }))
+    .sort((a, b) => b.minutesPerDay - a.minutesPerDay)
+
   const topTasks = aiTasks.slice(0, 10).map((task) => ({
     name: task.task_name,
     minutesPerDay: Math.max(
@@ -155,6 +180,7 @@ export async function POST(request: Request) {
       selectedTasks: topTasks,
       recommendedModules: [],
       contact: { email },
+      moduleBreakdown,
       siteUrl: SITE.url,
       agencyName: AGENCY.name,
       generatedAt,

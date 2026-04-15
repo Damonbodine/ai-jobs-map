@@ -151,6 +151,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  moduleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+    padding: 10,
+    backgroundColor: COLORS.cardBg,
+    border: `1 solid ${COLORS.border}`,
+    borderRadius: 6,
+  },
+  page2Callout: {
+    backgroundColor: COLORS.accentSoft,
+    borderRadius: 8,
+    padding: 14,
+    marginTop: 24,
+  },
 })
 
 export type BlueprintPdfProps = {
@@ -186,6 +201,13 @@ export type BlueprintPdfProps = {
   siteUrl: string
   agencyName: string
   generatedAt: string // ISO date string
+  moduleBreakdown?: Array<{
+    moduleKey: string
+    label: string
+    accentColor: string
+    minutesPerDay: number
+    topTaskNames: string[]
+  }>
 }
 
 export function BlueprintPdf(props: BlueprintPdfProps) {
@@ -326,6 +348,47 @@ export function BlueprintPdf(props: BlueprintPdfProps) {
           <Text>Generated {props.generatedAt}</Text>
         </View>
       </Page>
+
+      {props.variant === "one-pager" && props.moduleBreakdown && props.moduleBreakdown.length > 0 ? (
+        <Page size="LETTER" style={styles.page}>
+          <View style={styles.header}>
+            <Text style={styles.kicker}>AI MODULES FOR THIS ROLE</Text>
+            <Text style={styles.title}>{props.occupation.title}</Text>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>AI Modules for this role</Text>
+            {props.moduleBreakdown.map(mod => (
+              <View
+                key={mod.moduleKey}
+                style={[styles.moduleRow, { borderLeftWidth: 4, borderLeftColor: mod.accentColor }]}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.moduleName}>{mod.label}</Text>
+                  <Text style={styles.moduleBlurb}>{mod.topTaskNames.join(" · ")}</Text>
+                </View>
+                <Text style={{ fontSize: 13, fontWeight: 700, color: mod.accentColor }}>
+                  {mod.minutesPerDay} min/day
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.page2Callout}>
+            <Text style={[styles.calloutTitle, { marginBottom: 6 }]}>
+              Want this built for your team?
+            </Text>
+            <Text style={styles.calloutBody}>
+              {props.siteUrl}/build-a-team — configure your team, select the modules that matter, and receive a full blueprint like this one for every role.
+            </Text>
+          </View>
+
+          <View style={styles.footer} fixed>
+            <Text>{props.agencyName} · {props.siteUrl}</Text>
+            <Text>Generated {props.generatedAt}</Text>
+          </View>
+        </Page>
+      ) : null}
     </Document>
   )
 }

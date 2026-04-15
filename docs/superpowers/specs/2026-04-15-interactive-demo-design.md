@@ -32,6 +32,18 @@ This has specific implications for every design and copy decision:
 
 **Copy rule:** Every agent narrative ends with how little the human had to do — not how much the AI did. The power move is the human's new job is *3 minutes of approval*, not 45 minutes of work. That's what sells it.
 
+**The AI plays a different role for each agent** — and the narrative copy should name it, because it's what makes the demo feel personal rather than generic. Examples:
+- Intake Agent → chief of staff ("already sorted your morning before you opened your laptop")
+- Documentation Agent → ghostwriter who was in the room with you
+- Exceptions Agent → experienced colleague who knows exactly who to call
+- Coordination Agent → the person who remembers everything you forgot to schedule
+- Analysis Agent → the analyst who ran the numbers overnight
+- Research Agent → the smart intern who read everything so you don't have to
+- Compliance Agent → the risk officer who checks everything before you sign
+- Communication Agent → the editor who says what you meant but better
+
+The goal is for visitors to think: *"I have needed this person my entire career."*
+
 ---
 
 ## Placement

@@ -1,6 +1,8 @@
+import React from "react"
 import { renderToBuffer } from "@react-pdf/renderer"
 import { BlueprintPdf, type BlueprintPdfProps } from "./blueprint"
 import { DepartmentPdf, type DepartmentPdfProps } from "./department"
+import { TeamDeckPdf, type TeamDeckProps } from "./team-deck"
 
 /**
  * Renders the Blueprint PDF React tree to a Node Buffer suitable for
@@ -18,4 +20,10 @@ export async function renderDepartmentPdf(
   props: DepartmentPdfProps
 ): Promise<Buffer> {
   return renderToBuffer(<DepartmentPdf {...props} />)
+}
+
+export async function renderTeamDeckPdf(
+  props: TeamDeckProps
+): Promise<Buffer> {
+  return renderToBuffer(<TeamDeckPdf {...props} />)
 }

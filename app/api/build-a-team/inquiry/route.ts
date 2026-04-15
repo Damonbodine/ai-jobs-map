@@ -2,7 +2,8 @@ import { NextResponse } from "next/server"
 import { buildATeamInquirySchema } from "@/lib/validation/build-a-team-inquiry"
 import { sendEmail } from "@/lib/resend"
 import { createServerClient } from "@/lib/supabase/server"
-import { renderDepartmentPdf } from "@/lib/pdf/render"
+import { renderTeamDeckPdf } from "@/lib/pdf/render"
+import { computeRoleSections, computeTopModules, computePhases, type CartItemWithSelection } from "@/lib/pdf/team-deck-data"
 import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
 import { AGENCY, CONTACT, SITE } from "@/lib/site"
 import { computeDepartmentTotals, type RoleData } from "@/lib/build-a-team/compute"
@@ -112,21 +113,25 @@ export async function POST(request: Request) {
   let pdfError: string | null = null
 
   try {
-    pdfBuffer = await renderDepartmentPdf({
+    const cartWithSelections: CartItemWithSelection[] = input.roles.map(r => ({
+      slug: r.slug,
+      count: r.count,
+      selectedTaskIds: r.selectedTaskIds,
+    }))
+    const roleSections = computeRoleSections(cartWithSelections, roleDataBySlug)
+    const topModules = computeTopModules(roleSections)
+    const allTasks = roleSections.flatMap(r => r.topTasks)
+    const phases = computePhases(allTasks)
+
+    pdfBuffer = await renderTeamDeckPdf({
       teamLabel: `${input.contactName ?? input.contactEmail}'s team`,
-      totals: {
-        totalPeople: totals.totalPeople,
-        totalMinutesPerDay: totals.totalMinutesPerDay,
-        totalAnnualValue: totals.totalAnnualValue,
-        fteEquivalents: totals.fteEquivalents,
-      },
-      rows: totals.rows.map(r => ({
-        slug: r.slug, title: r.title, count: r.count,
-        minutesPerPerson: r.minutesPerPerson,
-        totalMinutesPerDay: r.totalMinutesPerDay,
-        totalAnnualValue: r.totalAnnualValue,
-      })),
       contactEmail: input.contactEmail,
+      contactName: input.contactName,
+      customRequests: input.customRequests,
+      totals,
+      roles: roleSections,
+      topModules,
+      phases,
       siteUrl: SITE.url,
       agencyName: AGENCY.name,
       generatedAt,

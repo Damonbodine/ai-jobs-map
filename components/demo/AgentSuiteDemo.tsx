@@ -30,6 +30,7 @@ export function AgentSuiteDemo({ roles }: Props) {
     autoAdvanceRef.current = setInterval(() => {
       setActiveAgentIndex((prev) => {
         const agents = roles.find((r) => r.slug === activeRoleSlug)?.agents ?? []
+        if (!agents.length) return prev
         return (prev + 1) % agents.length
       })
     }, AUTO_ADVANCE_INTERVAL)
@@ -60,6 +61,13 @@ export function AgentSuiteDemo({ roles }: Props) {
       startAutoAdvance()
     }
   }, [isUserInteracting, startAutoAdvance, stopAutoAdvance])
+
+  // Cleanup idle reset timer on unmount
+  useEffect(() => {
+    return () => {
+      if (idleResetRef.current) clearTimeout(idleResetRef.current)
+    }
+  }, [])
 
   const handleAgentSelect = useCallback(
     (index: number) => {

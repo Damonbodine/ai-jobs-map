@@ -61,7 +61,7 @@ export function buildDemoRoleStats(
     beforeMinutes = Math.max(1, beforeMinutes)
     afterMinutes = beforeMinutes > 1
       ? Math.max(1, Math.min(afterMinutes, beforeMinutes - 1))
-      : 1
+      : 0
     return { ...script, beforeMinutes, afterMinutes }
   })
 

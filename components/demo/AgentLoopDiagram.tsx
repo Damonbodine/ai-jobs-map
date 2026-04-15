@@ -75,7 +75,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
       </div>
 
       {/* Loop diagram */}
-      <div className="grid grid-cols-4 gap-0 p-4">
+      <div className="flex items-stretch gap-0 p-4">
         {/* Inputs */}
         <LoopBox
           active={isActive("inputs")}

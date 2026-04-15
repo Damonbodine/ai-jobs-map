@@ -52,7 +52,7 @@ describe("buildDemoRoleStats", () => {
       { occupation: { id: 10, title: "Test Role", slug: "test-role", major_category: "Test", sub_category: null, employment: null, hourly_wage: 60, annual_wage: null }, profile: mockProfile, tasks: mockTasks },
       mockPartialAgents
     )
-    expect(result.annualValueDollars).toBeGreaterThanOrEqual(0)
+    expect(result.annualValueDollars).toBeGreaterThan(0)
   })
 
   it("handles no ai_applicable tasks gracefully", () => {
@@ -61,6 +61,7 @@ describe("buildDemoRoleStats", () => {
       { occupation: { id: 10, title: "Test Role", slug: "test-role", major_category: "Test", sub_category: null, employment: null, hourly_wage: 60, annual_wage: null }, profile: null, tasks: allNonAi },
       mockPartialAgents
     )
+    expect(result.agents).toHaveLength(mockPartialAgents.length)
     expect(result.totalBeforeMinutes).toBeGreaterThanOrEqual(0)
   })
 })

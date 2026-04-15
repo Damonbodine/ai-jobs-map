@@ -148,3 +148,41 @@ export function computeRoleSections(
 
   return sections
 }
+
+export function computeTopModules(sections: RoleDeckSection[]): ModuleBreakdown[] {
+  const merged = new Map<string, ModuleBreakdown>()
+  for (const section of sections) {
+    for (const mod of section.modules) {
+      const existing = merged.get(mod.moduleKey)
+      if (existing) {
+        merged.set(mod.moduleKey, {
+          ...existing,
+          minutesPerDay: existing.minutesPerDay + mod.minutesPerDay,
+          topTasks: [...existing.topTasks, ...mod.topTasks]
+            .sort((a, b) => b.beforeMinutes - a.beforeMinutes)
+            .slice(0, 4),
+        })
+      } else {
+        merged.set(mod.moduleKey, { ...mod })
+      }
+    }
+  }
+  return [...merged.values()]
+    .sort((a, b) => b.minutesPerDay - a.minutesPerDay)
+    .slice(0, 4)
+}
+
+export type PhasedRoadmap = {
+  phase1: TaskWithTimes[]  // effortLevel <= 2: quick wins
+  phase2: TaskWithTimes[]  // effortLevel === 3: medium lift
+  phase3: TaskWithTimes[]  // effortLevel >= 4: heavy lift
+}
+
+export function computePhases(allTasks: TaskWithTimes[]): PhasedRoadmap {
+  const sorted = [...allTasks].sort((a, b) => b.impactLevel - a.impactLevel)
+  return {
+    phase1: sorted.filter(t => t.effortLevel <= 2),
+    phase2: sorted.filter(t => t.effortLevel === 3),
+    phase3: sorted.filter(t => t.effortLevel >= 4),
+  }
+}

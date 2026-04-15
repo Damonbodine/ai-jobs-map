@@ -1,4 +1,4 @@
-import { impactRetentionFactor, computeRoleSections, type RoleDeckSection } from "./team-deck-data"
+import { impactRetentionFactor, computeRoleSections, computeTopModules, computePhases, type RoleDeckSection, type TaskWithTimes } from "./team-deck-data"
 import type { MicroTask, AutomationProfile } from "@/types"
 
 const mockProfile: AutomationProfile = {
@@ -131,5 +131,51 @@ describe("impactRetentionFactor", () => {
   })
   it("returns 0.50 for null impact level (default)", () => {
     expect(impactRetentionFactor(null)).toBe(0.50)
+  })
+})
+
+const sampleSections: RoleDeckSection[] = [
+  {
+    title: "Registered Nurses", slug: "registered-nurses", count: 2,
+    minutesPerPerson: 60, annualValuePerPerson: 7000,
+    topTasks: [],
+    modules: [
+      { moduleKey: "documentation", label: "Documentation", accentColor: "#8b5cf6", minutesPerDay: 28,
+        topTasks: [
+          { name: "Notes", howItHelps: "", tools: "", frequency: "daily", impactLevel: 5, effortLevel: 1,
+            beforeMinutes: 18, afterMinutes: 3, moduleKey: "documentation" },
+        ]},
+      { moduleKey: "intake", label: "Intake", accentColor: "#06b6d4", minutesPerDay: 15,
+        topTasks: [
+          { name: "Triage", howItHelps: "", tools: "", frequency: "daily", impactLevel: 3, effortLevel: 2,
+            beforeMinutes: 12, afterMinutes: 6, moduleKey: "intake" },
+        ]},
+    ],
+  },
+]
+
+describe("computeTopModules", () => {
+  it("returns modules sorted by total minutesPerDay across all roles, capped at 4", () => {
+    const top = computeTopModules(sampleSections)
+    expect(top.length).toBeLessThanOrEqual(4)
+    expect(top[0].moduleKey).toBe("documentation")
+    expect(top[1].moduleKey).toBe("intake")
+  })
+})
+
+describe("computePhases", () => {
+  it("puts effortLevel <= 2 tasks in phase1", () => {
+    const allTasks: TaskWithTimes[] = [
+      { name: "A", howItHelps: "", tools: "", frequency: "daily", impactLevel: 5,
+        effortLevel: 1, beforeMinutes: 10, afterMinutes: 2, moduleKey: "documentation" },
+      { name: "B", howItHelps: "", tools: "", frequency: "daily", impactLevel: 3,
+        effortLevel: 3, beforeMinutes: 8, afterMinutes: 4, moduleKey: "intake" },
+      { name: "C", howItHelps: "", tools: "", frequency: "daily", impactLevel: 2,
+        effortLevel: 4, beforeMinutes: 6, afterMinutes: 4, moduleKey: "coordination" },
+    ]
+    const phases = computePhases(allTasks)
+    expect(phases.phase1.map(t => t.name)).toContain("A")
+    expect(phases.phase2.map(t => t.name)).toContain("B")
+    expect(phases.phase3.map(t => t.name)).toContain("C")
   })
 })

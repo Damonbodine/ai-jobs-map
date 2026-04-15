@@ -1,7 +1,7 @@
 // lib/pdf/team-deck.tsx
 import React from "react"
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer"
-import { PDF_COLORS as C, PDF_MODULE_ACCENTS } from "./styles"
+import { PDF_COLORS as C } from "./styles"
 import type { RoleDeckSection, ModuleBreakdown, PhasedRoadmap } from "./team-deck-data"
 import type { DepartmentTotals } from "@/lib/build-a-team/compute"
 
@@ -38,7 +38,6 @@ const s = StyleSheet.create({
   h1: { fontSize: 28, fontWeight: 700, lineHeight: 1.2, marginBottom: 12 },
   h2: { fontSize: 18, fontWeight: 700, marginBottom: 16 },
   h3: { fontSize: 13, fontWeight: 700, marginBottom: 8 },
-  body: { fontSize: 10, color: C.fg },
   muted: { fontSize: 9, color: C.muted },
   section: { marginBottom: 24 },
   // ── Stats ──
@@ -319,29 +318,29 @@ function CtaPage({ props }: { props: TeamDeckProps }) {
       <View style={{ backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 8, padding: 16 }}>
         <Text style={{ fontSize: 8, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>Place To Stand Agency</Text>
         <Text style={{ fontSize: 10, color: C.bg }}>{props.agencyName}</Text>
-        <Text style={{ fontSize: 10, color: "#60a5fa", marginTop: 2 }}>{props.siteUrl}/contact</Text>
+        <Text style={{ fontSize: 10, color: "#60a5fa", marginTop: 2 }}>{props.contactEmail}</Text>
+        <Text style={{ fontSize: 10, color: "#60a5fa" }}>{props.siteUrl}/contact</Text>
       </View>
     </Page>
   )
 }
 
 export function TeamDeckPdf(props: TeamDeckProps) {
-  // page numbers: 1=cover, 2=overview, 3=methodology, 4..=roles, then modules, roadmap, cta
-  let pageNum = 3
+  const roleStart = 4
+  const moduleStart = roleStart + props.roles.length
+  const roadmapPageNum = moduleStart + props.topModules.length
   return (
     <Document title={`AI Team Blueprint — ${props.teamLabel}`} author={props.agencyName}>
       <CoverPage props={props} />
       <OverviewPage props={props} />
       <MethodologyPage props={props} />
-      {props.roles.map(role => {
-        pageNum++
-        return <RoleSectionPage key={role.slug} role={role} pageNum={pageNum} props={props} />
-      })}
-      {props.topModules.map(mod => {
-        pageNum++
-        return <ModuleDeepDivePage key={mod.moduleKey} mod={mod} pageNum={pageNum} props={props} />
-      })}
-      <RoadmapPage phases={props.phases} pageNum={++pageNum} props={props} />
+      {props.roles.map((role, i) => (
+        <RoleSectionPage key={role.slug} role={role} pageNum={roleStart + i} props={props} />
+      ))}
+      {props.topModules.map((mod, i) => (
+        <ModuleDeepDivePage key={mod.moduleKey} mod={mod} pageNum={moduleStart + i} props={props} />
+      ))}
+      <RoadmapPage phases={props.phases} pageNum={roadmapPageNum} props={props} />
       <CtaPage props={props} />
     </Document>
   )

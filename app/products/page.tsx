@@ -8,6 +8,7 @@ import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 import { MODULE_LIST } from "@/lib/modules"
 import { getAllCapabilities } from "@/lib/capabilities"
 import type { ModuleCapability } from "@/types"
+import { DemoTeaser } from "@/components/demo/DemoTeaser"
 
 export const dynamic = "force-dynamic"
 
@@ -348,6 +349,11 @@ export default async function ProductsPage() {
           </div>
         </div>
       </FadeIn>
+
+      {/* ── Demo teaser ─────────────────────────────────────── */}
+      <section className="mt-12 mb-10">
+        <DemoTeaser />
+      </section>
 
       {/* ── CTA ───────────────────────────────────────────────── */}
       <FadeIn delay={0.3}>

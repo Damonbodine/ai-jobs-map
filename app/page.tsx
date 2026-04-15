@@ -9,6 +9,7 @@ import { LandingSearch } from "@/app/landing-search"
 import { computeDisplayedTimeback } from "@/lib/timeback"
 import { generateBlueprint } from "@/lib/blueprint"
 import type { Occupation, MicroTask, AutomationProfile } from "@/types"
+import { DemoTeaser } from "@/components/demo/DemoTeaser"
 
 const POPULAR_SLUGS = [
   "software-developers",
@@ -230,6 +231,11 @@ export default async function HomePage() {
             ))}
           </div>
         </FadeIn>
+      </section>
+
+      {/* ── Demo teaser ─────────────────────────────────────── */}
+      <section className="mt-12 mb-10">
+        <DemoTeaser />
       </section>
 
       {/* Browse by Category */}

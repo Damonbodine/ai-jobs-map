@@ -16,6 +16,24 @@ Build a role-switchable, full-workflow demo that shows the complete AI agent sui
 
 ---
 
+## Vision & Tone
+
+The demo should feel like the AI is a **co-pilot that lives inside the workday** — not a tool you open, but a presence that runs alongside everything the person does. The human is the decision-maker; the AI is the engine driving the day.
+
+This has specific implications for every design and copy decision:
+
+**Narrative voice:** Write in present tense, first-person proximity. Not "the agent helps with notes" — "while Mark is in his 10am, the agent is already sorting what comes next." The AI is *already running*. It never sleeps. It doesn't wait to be asked.
+
+**Visual behavior:** The loop animation should feel **ambient and continuous** — it never fully stops, even between agents. When the user isn't interacting, the timeline auto-advances slowly (one agent every 8 seconds), like a real day passing. This creates a hypnotic quality: the work is just... happening.
+
+**Pacing:** Don't make the user feel like they're watching a slideshow. The demo breathes on its own. Clicking an agent is zooming in on something that was already running, not starting it.
+
+**Color:** Lead with dark backgrounds for the expanded agent view. The loop diagram lives in near-black (#0f0f0e). The output types into a dark terminal-like surface. Light only for the timeline nav and the before/after panels. Dark = the AI's world; light = the human's moment of review.
+
+**Copy rule:** Every agent narrative ends with how little the human had to do — not how much the AI did. The power move is the human's new job is *3 minutes of approval*, not 45 minutes of work. That's what sells it.
+
+---
+
 ## Placement
 
 Three surfaces, one shared component at different depths:
@@ -196,6 +214,10 @@ Four phases animate sequentially using Framer Motion `animate` with `transition`
 User can click a **pause/play button** (top-right of the loop diagram) to freeze the animation on the current frame.
 
 Switching to a different agent: current animation fades out over 0.3s, new animation starts from phase 1.
+
+**Auto-advance:** When the user is not interacting, the timeline automatically advances to the next agent every 8 seconds (after the current agent's loop completes at least once). This makes the demo feel alive — the day is progressing whether or not the user clicks. Clicking any agent in the timeline overrides auto-advance and locks focus on that agent until the user clicks away or 30 seconds pass with no interaction, at which point auto-advance resumes.
+
+**Ambient state:** The loop animation never fully stops. Even when transitioning between agents, a faint pulse on the center "AI" block persists — the AI is always running.
 
 ### AgentOutputPanel
 

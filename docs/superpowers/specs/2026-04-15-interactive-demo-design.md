@@ -46,6 +46,29 @@ The goal is for visitors to think: *"I have needed this person my entire career.
 
 ---
 
+## Agent Names
+
+Every agent has a name. Not "the Documentation Agent" — **Quill**. Names are displayed in the demo as the primary label, with the module type as a secondary badge. They appear in the timeline nav, the expanded view header, and anywhere the agent is referenced in copy.
+
+Names are human-sounding but not generic. Each hints at what the agent does without being on-the-nose.
+
+| Module | Name | Why |
+|--------|------|-----|
+| intake | **Scout** | First one in. Always watching. Already sorted your morning. |
+| documentation | **Quill** | The ghostwriter who was in the room with you. |
+| coordination | **Cal** | Remembers everything you forgot to schedule. |
+| analysis | **Iris** | Sees the pattern in the noise. |
+| exceptions | **Reed** | Steady under pressure. Knows exactly who to call. |
+| research | **Wren** | Read everything so you don't have to. |
+| compliance | **Nora** | Checks everything before you sign. Nothing gets past her. |
+| communication | **Cleo** | Says what you meant, but better. |
+| data_reporting | **Lex** | The analyst who ran the numbers overnight. |
+| learning | **Coda** | Always adding. Always current. |
+
+In the demo UI, each agent card shows: **[Name]** in large type, the module label in small caps below it (e.g. "INTAKE & TRIAGE"), and the accent color dot. The loop diagram header reads e.g. "Scout is processing your morning queue."
+
+---
+
 ## Placement
 
 Three surfaces, one shared component at different depths:

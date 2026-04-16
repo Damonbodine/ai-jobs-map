@@ -129,7 +129,7 @@ export default async function OccupationPage(props: {
           <span className="text-foreground">{occupation.title}</span>
         </nav>
 
-        {/* Hero */}
+        {/* Hero — compact so the demo lands in the first viewport */}
         <FadeIn>
           <div className="mb-8 text-center max-w-3xl mx-auto">
             <div className="inline-block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 border border-border rounded-full px-3 py-1">
@@ -138,25 +138,50 @@ export default async function OccupationPage(props: {
             <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight text-balance">
               {occupation.title}
             </h1>
-            <div className="mt-3 flex items-center justify-center gap-2">
-              <p className="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight text-balance">
-                Reclaim {claimedMinutes} minutes every single day
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <p className="font-heading text-2xl sm:text-3xl font-semibold tracking-tight leading-tight text-balance text-muted-foreground">
+                Custom AI agents built to reclaim your{" "}
+                <span className="text-foreground font-bold">{claimedMinutes} minutes</span>{" "}
+                a day
               </p>
               <EstimateInfo />
             </div>
-            {story && (
-              <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-muted-foreground leading-relaxed">
-                {story.dayChanges}
-              </p>
-            )}
-            <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <a
-                href="#agent-demo"
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity w-full sm:w-auto"
+            <div className="mt-6 flex justify-center">
+              <Link
+                href="/contact"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
               >
-                See the agents in action
+                Book a scoping call
                 <ArrowRight className="h-4 w-4" />
-              </a>
+              </Link>
+            </div>
+          </div>
+        </FadeIn>
+
+        {/* AI Agent Demo — streams in, positioned above breakdown for max impact */}
+        <div id="agent-demo" className="scroll-mt-8">
+          <Suspense fallback={<OccupationDemoSectionSkeleton />}>
+            <OccupationDemoSection
+              slug={slug}
+              occupationTitle={occupation.title}
+            />
+          </Suspense>
+        </div>
+
+        {/* Post-demo context + secondary CTAs — recovers the lead-magnets the hero dropped */}
+        <FadeIn delay={0.1}>
+          <div className="my-12 max-w-2xl mx-auto text-center">
+            {story && (
+              <>
+                <h2 className="font-heading text-xl font-semibold mb-3">
+                  What a day looks like
+                </h2>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  {story.dayChanges}
+                </p>
+              </>
+            )}
+            <div className={`${story ? "mt-6 " : ""}flex flex-col items-center gap-3 sm:flex-row sm:justify-center`}>
               <OnePagerButton
                 occupationSlug={slug}
                 occupationTitle={occupation.title}
@@ -171,21 +196,11 @@ export default async function OccupationPage(props: {
                 href="#assistant-builder"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
-                Build your assistant
+                Build your assistant ↓
               </a>
             </div>
           </div>
         </FadeIn>
-
-        {/* AI Agent Demo — streams in, positioned above breakdown for max impact */}
-        <div id="agent-demo" className="scroll-mt-8">
-          <Suspense fallback={<OccupationDemoSectionSkeleton />}>
-            <OccupationDemoSection
-              slug={slug}
-              occupationTitle={occupation.title}
-            />
-          </Suspense>
-        </div>
 
         {/* Donut Chart */}
         {donutAgents.length > 0 && (

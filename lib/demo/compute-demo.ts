@@ -105,7 +105,7 @@ async function fetchRoleData(slug: string): Promise<RoleInput | null> {
       .eq("occupation_id", occupation.id),
     supabase
       .from("automation_profiles")
-      .select("id, occupation_id, composite_score, work_activity_automation_potential, time_range_low, time_range_high, physical_ability_avg")
+      .select("id, occupation_id, composite_score, work_activity_automation_potential, time_range_low, time_range_high, time_range_by_block, top_automatable_activities, top_blocking_abilities, physical_ability_avg")
       .eq("occupation_id", occupation.id)
       .single(),
   ])

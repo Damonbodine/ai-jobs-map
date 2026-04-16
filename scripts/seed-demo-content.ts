@@ -48,7 +48,7 @@ async function seedOccupation(occupation: Occupation) {
         .select("id")
         .eq("occupation_id", occupation.id)
         .eq("module_key", mod.moduleKey)
-        .single()
+        .maybeSingle()
 
       if (existing) {
         console.log(`  ↩ ${occupation.title} / ${mod.moduleKey} (cached, skipping)`)

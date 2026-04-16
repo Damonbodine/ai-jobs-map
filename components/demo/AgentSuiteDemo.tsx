@@ -8,22 +8,39 @@ import { DemoTimeline } from "./DemoTimeline"
 import { AgentExpandedView } from "./AgentExpandedView"
 import type { DemoRoleData } from "@/lib/demo/types"
 
-const AUTO_ADVANCE_INTERVAL = 8000  // ms per agent
+const AUTO_ADVANCE_INTERVAL = 13000  // ms per agent
 const IDLE_RESET_DELAY = 30000      // ms before auto-advance resumes after interaction
 
 type Props = {
   roles: DemoRoleData[]
+  occupationTitle?: string
 }
 
-export function AgentSuiteDemo({ roles }: Props) {
+export function AgentSuiteDemo({ roles, occupationTitle }: Props) {
   const [activeRoleSlug, setActiveRoleSlug] = useState(roles[0]?.slug ?? "")
   const [activeAgentIndex, setActiveAgentIndex] = useState(0)
   const [isUserInteracting, setIsUserInteracting] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
 
   const autoAdvanceRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const idleResetRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const activeRole = roles.find((r) => r.slug === activeRoleSlug) ?? roles[0]
+
+  // Viewport detection via IntersectionObserver
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting)
+      },
+      { threshold: 0.2 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   const startAutoAdvance = useCallback(() => {
     if (autoAdvanceRef.current) clearInterval(autoAdvanceRef.current)
@@ -47,20 +64,15 @@ export function AgentSuiteDemo({ roles }: Props) {
     }, IDLE_RESET_DELAY)
   }, [])
 
-  // Start auto-advance when role changes (or on mount)
+  // Pause/resume based on visibility and user interaction
   useEffect(() => {
-    startAutoAdvance()
-    return () => stopAutoAdvance()
-  }, [startAutoAdvance, stopAutoAdvance])
-
-  // Pause/resume based on user interaction
-  useEffect(() => {
-    if (isUserInteracting) {
-      stopAutoAdvance()
-    } else {
+    if (isVisible && !isUserInteracting) {
       startAutoAdvance()
+    } else {
+      stopAutoAdvance()
     }
-  }, [isUserInteracting, startAutoAdvance, stopAutoAdvance])
+    return () => stopAutoAdvance()
+  }, [isVisible, isUserInteracting, startAutoAdvance, stopAutoAdvance])
 
   // Cleanup idle reset timer on unmount
   useEffect(() => {
@@ -88,9 +100,14 @@ export function AgentSuiteDemo({ roles }: Props) {
 
   const activeAgent = activeRole.agents[activeAgentIndex]
   const minutesSaved = activeRole.totalBeforeMinutes - activeRole.totalAfterMinutes
+  const isAutoAdvancing = isVisible && !isUserInteracting
+
+  const ctaLabel = occupationTitle
+    ? `Build this for my ${occupationTitle} team`
+    : "Build this for my team"
 
   return (
-    <div className="rounded-2xl border border-border overflow-hidden bg-background shadow-sm">
+    <div ref={containerRef} className="rounded-2xl border border-border overflow-hidden bg-background shadow-sm">
       {/* Demo header bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-muted/30">
         <div className="flex items-center gap-2">
@@ -104,16 +121,42 @@ export function AgentSuiteDemo({ roles }: Props) {
         </span>
       </div>
 
+      {/* Mobile: horizontal tab row (below md) */}
+      <div className="flex gap-2 overflow-x-auto px-4 py-2 border-b border-border md:hidden">
+        {activeRole.agents.map((agent, i) => {
+          const isActive = i === activeAgentIndex
+          return (
+            <button
+              key={agent.moduleKey}
+              onClick={() => handleAgentSelect(i)}
+              className={`flex items-center gap-1.5 shrink-0 text-[11px] font-semibold px-3 py-1.5 rounded-full transition-colors ${
+                isActive
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full shrink-0"
+                style={{ backgroundColor: agent.accentColor }}
+              />
+              {agent.agentName}
+            </button>
+          )
+        })}
+      </div>
+
       {/* Main layout: timeline left, expanded view right */}
       <div className="flex min-h-[560px]">
-        {/* Timeline */}
-        <div className="w-52 shrink-0 border-r border-border bg-muted/10">
+        {/* Timeline — hidden on mobile, visible on md+ */}
+        <div className="hidden md:block w-52 shrink-0 border-r border-border bg-muted/10">
           <DemoTimeline
             roles={roles}
             activeRoleSlug={activeRoleSlug}
             activeAgentIndex={activeAgentIndex}
             onRoleChange={handleRoleChange}
             onAgentSelect={handleAgentSelect}
+            isAutoAdvancing={isAutoAdvancing}
+            autoAdvanceInterval={AUTO_ADVANCE_INTERVAL}
           />
         </div>
 
@@ -144,7 +187,7 @@ export function AgentSuiteDemo({ roles }: Props) {
             href="/build-a-team"
             className="flex items-center gap-1.5 text-xs font-semibold bg-foreground text-background rounded-full px-4 py-2 hover:opacity-90 transition-opacity"
           >
-            Build this for my team
+            {ctaLabel}
             <ArrowRight className="w-3 h-3" />
           </Link>
         </div>

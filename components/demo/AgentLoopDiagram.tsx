@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Check } from "lucide-react"
+import { Check, ShieldCheck } from "lucide-react"
 import type { AgentLoopContent } from "@/lib/demo/types"
 
 type Phase = "inputs" | "ai" | "outputs" | "human" | "pause"
@@ -13,7 +13,7 @@ const PHASE_DURATIONS: Record<Phase, number> = {
   ai: 2000,
   outputs: 1500,
   human: 1000,
-  pause: 2000,
+  pause: 4500,
 }
 
 const PHASES: Phase[] = ["inputs", "ai", "outputs", "human", "pause"]
@@ -176,7 +176,12 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
           phase="human"
           currentPhase={phase}
           dashed
+          humanBox
         >
+          <span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-white/60 inline-flex items-center gap-1 mb-1">
+            <ShieldCheck className="w-2.5 h-2.5" />
+            Your approval required
+          </span>
           <motion.p
             initial={{ opacity: 0 }}
             animate={isActive("human") ? { opacity: 1 } : { opacity: 0 }}
@@ -219,6 +224,7 @@ function LoopBox({
   children,
   isAi = false,
   dashed = false,
+  humanBox = false,
 }: {
   active: boolean
   accentColor: string
@@ -228,7 +234,14 @@ function LoopBox({
   children: React.ReactNode
   isAi?: boolean
   dashed?: boolean
+  humanBox?: boolean
 }) {
+  const borderColor = humanBox && active
+    ? "rgba(255,255,255,0.55)"
+    : active
+    ? `${accentColor}66`
+    : "rgba(255,255,255,0.08)"
+
   return (
     <motion.div
       animate={{ opacity: active ? 1 : 0.35 }}
@@ -236,9 +249,7 @@ function LoopBox({
       className="relative flex flex-col gap-1 p-3 rounded-lg min-h-[100px]"
       style={{
         background: isAi ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.03)",
-        border: `1px ${dashed ? "dashed" : "solid"} ${
-          active ? `${accentColor}66` : "rgba(255,255,255,0.08)"
-        }`,
+        border: `1px ${dashed ? "dashed" : "solid"} ${borderColor}`,
       }}
     >
       {isAi && (

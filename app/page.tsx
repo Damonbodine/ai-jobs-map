@@ -9,6 +9,7 @@ import { LandingSearch } from "@/app/landing-search"
 import { computeDisplayedTimeback } from "@/lib/timeback"
 import { generateBlueprint } from "@/lib/blueprint"
 import type { Occupation, MicroTask, AutomationProfile } from "@/types"
+import { Suspense } from "react"
 import { DemoTeaser } from "@/components/demo/DemoTeaser"
 
 const POPULAR_SLUGS = [
@@ -235,7 +236,9 @@ export default async function HomePage() {
 
       {/* ── Demo teaser ─────────────────────────────────────── */}
       <section className="mt-12 mb-10">
-        <DemoTeaser />
+        <Suspense fallback={<div className="h-64 rounded-2xl bg-muted/10 border border-border animate-pulse" />}>
+          <DemoTeaser />
+        </Suspense>
       </section>
 
       {/* Browse by Category */}

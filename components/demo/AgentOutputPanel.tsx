@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from "react"
 import type { AgentOutput } from "@/lib/demo/types"
 
-const CHARS_PER_SECOND = 40
+const CHARS_PER_SECOND = 80
 
 type Props = {
   output: AgentOutput

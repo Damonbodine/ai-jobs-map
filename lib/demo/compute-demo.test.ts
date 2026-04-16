@@ -44,7 +44,7 @@ const mockPartialAgents: Omit<DemoAgentStep, "beforeMinutes" | "afterMinutes">[]
 describe("buildDemoRoleStats", () => {
   it("returns afterMinutes <= beforeMinutes for each agent", () => {
     const result = buildDemoRoleStats(
-      { occupation: { id: 10, title: "Test Role", slug: "test-role", major_category: "Test", sub_category: null, employment: null, hourly_wage: 60, annual_wage: null }, profile: mockProfile, tasks: mockTasks },
+      { occupation: { id: 10, title: "Test Role", slug: "test-role", major_category: "Test", sub_category: null, employment: null, hourly_wage: 60, annual_wage: null }, profile: mockProfile, tasks: mockTasks, blueprintMinutes: 0 },
       mockPartialAgents
     )
     for (const agent of result.agents) {
@@ -54,7 +54,7 @@ describe("buildDemoRoleStats", () => {
 
   it("totalBeforeMinutes equals sum of agent beforeMinutes", () => {
     const result = buildDemoRoleStats(
-      { occupation: { id: 10, title: "Test Role", slug: "test-role", major_category: "Test", sub_category: null, employment: null, hourly_wage: 60, annual_wage: null }, profile: mockProfile, tasks: mockTasks },
+      { occupation: { id: 10, title: "Test Role", slug: "test-role", major_category: "Test", sub_category: null, employment: null, hourly_wage: 60, annual_wage: null }, profile: mockProfile, tasks: mockTasks, blueprintMinutes: 0 },
       mockPartialAgents
     )
     const sum = result.agents.reduce((s, a) => s + a.beforeMinutes, 0)
@@ -63,7 +63,7 @@ describe("buildDemoRoleStats", () => {
 
   it("annualValueDollars is positive when hourly_wage is set", () => {
     const result = buildDemoRoleStats(
-      { occupation: { id: 10, title: "Test Role", slug: "test-role", major_category: "Test", sub_category: null, employment: null, hourly_wage: 60, annual_wage: null }, profile: mockProfile, tasks: mockTasks },
+      { occupation: { id: 10, title: "Test Role", slug: "test-role", major_category: "Test", sub_category: null, employment: null, hourly_wage: 60, annual_wage: null }, profile: mockProfile, tasks: mockTasks, blueprintMinutes: 0 },
       mockPartialAgents
     )
     expect(result.annualValueDollars).toBeGreaterThan(0)
@@ -72,7 +72,7 @@ describe("buildDemoRoleStats", () => {
   it("handles no ai_applicable tasks gracefully", () => {
     const allNonAi = mockTasks.map((t) => ({ ...t, ai_applicable: false }))
     const result = buildDemoRoleStats(
-      { occupation: { id: 10, title: "Test Role", slug: "test-role", major_category: "Test", sub_category: null, employment: null, hourly_wage: 60, annual_wage: null }, profile: null, tasks: allNonAi },
+      { occupation: { id: 10, title: "Test Role", slug: "test-role", major_category: "Test", sub_category: null, employment: null, hourly_wage: 60, annual_wage: null }, profile: null, tasks: allNonAi, blueprintMinutes: 0 },
       mockPartialAgents
     )
     expect(result.agents).toHaveLength(mockPartialAgents.length)
@@ -113,6 +113,7 @@ describe("computeDemoForSlug", () => {
       const terminal = () => Promise.resolve({ data: resolvedData, error: null })
       chain.select = () => chain
       chain.eq = () => chain
+      chain.order = () => chain
       chain.single = terminal
       // For non-single queries (tasks list), the chain itself is a thenable
       if (!isSingle) {
@@ -126,7 +127,7 @@ describe("computeDemoForSlug", () => {
       from: vi.fn((table: string) => {
         if (table === "occupations") return makeChain(occupationData, true)
         if (table === "job_micro_tasks") return makeChain(tasksData, false)
-        if (table === "automation_profiles") return makeChain(profileData, true)
+        if (table === "occupation_automation_profile") return makeChain(profileData, true)
         return makeChain(null, false)
       }),
     }

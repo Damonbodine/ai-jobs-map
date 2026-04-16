@@ -17,36 +17,60 @@ type ResolveInput = {
   occupationTitle: string
   moduleKey: string
   tasks: MicroTask[]
+  beforeMinutes?: number
+  afterMinutes?: number
 }
 
 export async function resolveAgentContent(input: ResolveInput): Promise<ResolvedAgentContent> {
-  const { occupationId, occupationTitle, moduleKey, tasks } = input
+  const { occupationId, occupationTitle, moduleKey, tasks, beforeMinutes, afterMinutes } = input
   const supabase = createServerClient()
 
-  // 1. Check cache
-  const { data: cached } = await supabase
+  // 1. Check v2 cache first
+  const { data: cachedV2 } = await supabase
+    .from("demo_agent_content_v2")
+    .select("narrative, loop_data, output_data")
+    .eq("occupation_id", occupationId)
+    .eq("module_key", moduleKey)
+    .single()
+
+  if (cachedV2) {
+    return {
+      narrative: cachedV2.narrative,
+      loop:      cachedV2.loop_data as AgentLoopContent,
+      output:    cachedV2.output_data as AgentOutput,
+    }
+  }
+
+  // 2. Fall back to v1 cache
+  const { data: cachedV1 } = await supabase
     .from("demo_agent_content")
     .select("narrative, loop_data, output_data")
     .eq("occupation_id", occupationId)
     .eq("module_key", moduleKey)
     .single()
 
-  if (cached) {
+  if (cachedV1) {
     return {
-      narrative: cached.narrative,
-      loop:      cached.loop_data as AgentLoopContent,
-      output:    cached.output_data as AgentOutput,
+      narrative: cachedV1.narrative,
+      loop:      cachedV1.loop_data as AgentLoopContent,
+      output:    cachedV1.output_data as AgentOutput,
     }
   }
 
-  // 2. Generate fresh content
-  const generated = await generateDemoContent({ occupationTitle, moduleKey, tasks })
+  // 3. Generate fresh content
+  const generated = await generateDemoContent({
+    occupationTitle,
+    moduleKey,
+    tasks,
+    beforeMinutes,
+    afterMinutes,
+  })
 
   const meta = getAgentMetadata(moduleKey as ModuleKey)
   if (!meta) throw new Error(`Unknown moduleKey: ${moduleKey}`)
 
-  // 3. Upsert into cache (ignore conflicts — concurrent request may have written first)
-  const { error: upsertError } = await supabase.from("demo_agent_content").upsert(
+  // 4. Upsert into v2 cache only (ignore conflicts — concurrent request may have written first)
+  const { error: upsertError } = await supabase.from("demo_agent_content_v2").upsert(
     {
       occupation_id: occupationId,
       module_key:    moduleKey,
@@ -60,7 +84,7 @@ export async function resolveAgentContent(input: ResolveInput): Promise<Resolved
     },
     { onConflict: "occupation_id,module_key" }
   )
-  if (upsertError) console.error("[resolveAgentContent] upsert failed:", upsertError)
+  if (upsertError) console.error("[resolveAgentContent] upsert to v2 failed:", upsertError)
 
   return {
     narrative: generated.narrative,

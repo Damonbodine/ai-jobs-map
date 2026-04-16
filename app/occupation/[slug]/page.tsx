@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic"
+export const revalidate = 3600
 
 import { Suspense } from "react"
 import { notFound } from "next/navigation"
@@ -12,7 +12,12 @@ import { computeDisplayedTimeback, estimateTaskMinutes, inferArchetypeMultiplier
 import { getBlockForTask } from "@/lib/blueprint"
 import { computeAnnualValue } from "@/lib/pricing"
 import { getAllCapabilities } from "@/lib/capabilities"
-import type { MicroTask, AutomationProfile, ModuleCapability } from "@/types"
+import {
+  getOccupationBySlug,
+  getOccupationProfile,
+  getOccupationTasks,
+} from "@/lib/occupation-data"
+import type { ModuleCapability } from "@/types"
 
 import { EstimateInfo } from "./estimate-info"
 import { OccupationDonut } from "./occupation-donut"
@@ -20,45 +25,44 @@ import { OccupationBuilder } from "./occupation-builder"
 import { OnePagerButton } from "./one-pager-button"
 import { OccupationDemoSection, OccupationDemoSectionSkeleton } from "@/components/demo/OccupationDemoSection"
 
+export async function generateStaticParams() {
+  const supabase = createServerClient()
+  const { data } = await supabase
+    .from("occupations")
+    .select("slug, employment")
+    .order("employment", { ascending: false, nullsFirst: false })
+    .limit(20)
+  return (data ?? []).map((o) => ({ slug: o.slug }))
+}
+
 export default async function OccupationPage(props: {
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await props.params
-  const supabase = createServerClient()
 
-  const { data: occupation } = await supabase
-    .from("occupations")
-    .select("*")
-    .eq("slug", slug)
-    .single()
-
+  const occupation = await getOccupationBySlug(slug)
   if (!occupation) notFound()
 
-  const [{ data: profile }, { data: tasks }, capabilitiesByModule] = await Promise.all([
-    supabase
-      .from("occupation_automation_profile")
-      .select("*")
-      .eq("occupation_id", occupation.id)
-      .single(),
-    supabase
-      .from("job_micro_tasks")
-      .select("*")
-      .eq("occupation_id", occupation.id)
-      .order("ai_impact_level", { ascending: false }),
+  const [profile, tasks, capabilitiesByModule] = await Promise.all([
+    getOccupationProfile(occupation.id),
+    getOccupationTasks(occupation.id),
     getAllCapabilities(),
   ])
 
-  const story = deriveOccupationStory(occupation, tasks ?? [], profile ?? null)
+  const story = deriveOccupationStory(occupation, tasks, profile)
   const blueprint = story?.blueprint ?? null
 
-  const aiTasks = (tasks ?? []).filter((task) => task.ai_applicable)
+  const aiTasks = tasks.filter((task) => task.ai_applicable)
   const { displayedMinutes, displayedLow, displayedHigh } = computeDisplayedTimeback(
-    profile ?? null,
-    tasks ?? [],
+    profile,
+    tasks,
     blueprint?.totalMinutesSaved ?? 0
   )
-  const archetypeMultiplier = inferArchetypeMultiplier(profile ?? null)
-  const annualValue = computeAnnualValue(displayedMinutes, occupation.hourly_wage)
+  const archetypeMultiplier = inferArchetypeMultiplier(profile)
+  // Use displayedHigh (optimistic end of BLS range) as the headline claim so
+  // the hero "Reclaim X minutes" matches what the agent demo footer shows.
+  const claimedMinutes = displayedHigh > 0 ? displayedHigh : displayedMinutes
+  const annualValue = computeAnnualValue(claimedMinutes, occupation.hourly_wage)
 
   // Compute per-task display minutes scaled to displayed total
   const rawTaskTotal = aiTasks.reduce(
@@ -70,8 +74,8 @@ export default async function OccupationPage(props: {
     .map((task) => {
       const raw = estimateTaskMinutes(task) * archetypeMultiplier
       const share =
-        rawTaskTotal > 0 && displayedMinutes > 0
-          ? Math.max(1, Math.round((raw / rawTaskTotal) * displayedMinutes))
+        rawTaskTotal > 0 && claimedMinutes > 0
+          ? Math.max(1, Math.round((raw / rawTaskTotal) * claimedMinutes))
           : Math.max(1, Math.round(raw))
 
       const low = Math.max(1, Math.round(share * 0.78))
@@ -96,7 +100,7 @@ export default async function OccupationPage(props: {
 
   // Prepare donut data from blueprint agents
   const blueprintScale = blueprint && blueprint.totalMinutesSaved > 0
-    ? displayedMinutes / blueprint.totalMinutesSaved
+    ? claimedMinutes / blueprint.totalMinutesSaved
     : 1
 
   const donutAgents = (blueprint?.agents ?? []).map((agent) => ({
@@ -136,7 +140,7 @@ export default async function OccupationPage(props: {
             </h1>
             <div className="mt-3 flex items-center justify-center gap-2">
               <p className="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight text-balance">
-                Reclaim {displayedMinutes} minutes every single day
+                Reclaim {claimedMinutes} minutes every single day
               </p>
               <EstimateInfo />
             </div>
@@ -147,10 +151,10 @@ export default async function OccupationPage(props: {
             )}
             <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <a
-                href="#assistant-builder"
+                href="#agent-demo"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity w-full sm:w-auto"
               >
-                Build Your Custom Assistant
+                See the agents in action
                 <ArrowRight className="h-4 w-4" />
               </a>
               <OnePagerButton
@@ -164,14 +168,24 @@ export default async function OccupationPage(props: {
                 Add to Team
               </Link>
               <a
-                href="#assistant-breakdown"
+                href="#assistant-builder"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
-                See what&apos;s included
+                Build your assistant
               </a>
             </div>
           </div>
         </FadeIn>
+
+        {/* AI Agent Demo — streams in, positioned above breakdown for max impact */}
+        <div id="agent-demo" className="scroll-mt-8">
+          <Suspense fallback={<OccupationDemoSectionSkeleton />}>
+            <OccupationDemoSection
+              slug={slug}
+              occupationTitle={occupation.title}
+            />
+          </Suspense>
+        </div>
 
         {/* Donut Chart */}
         {donutAgents.length > 0 && (
@@ -180,7 +194,7 @@ export default async function OccupationPage(props: {
               <OccupationDonut
                 agents={donutAgents}
                 capabilitiesByModule={capabilitiesByModule}
-                totalMinutes={displayedMinutes}
+                totalMinutes={claimedMinutes}
                 blueprintScale={blueprintScale}
               />
             </div>
@@ -201,7 +215,7 @@ export default async function OccupationPage(props: {
             <OccupationBuilder
               tasks={routineCards}
               slug={slug}
-              totalMinutes={displayedMinutes}
+              totalMinutes={claimedMinutes}
               annualValue={annualValue}
               occupationId={occupation.id}
               occupationTitle={occupation.title}
@@ -210,14 +224,6 @@ export default async function OccupationPage(props: {
             />
           </FadeIn>
         )}
-
-        {/* AI Agent Demo — streams in after main page content */}
-        <Suspense fallback={<OccupationDemoSectionSkeleton />}>
-          <OccupationDemoSection
-            slug={slug}
-            occupationTitle={occupation.title}
-          />
-        </Suspense>
       </div>
     </PageTransition>
   )

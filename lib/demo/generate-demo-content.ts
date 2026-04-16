@@ -14,15 +14,33 @@ type GenerateInput = {
   occupationTitle: string
   moduleKey: string
   tasks: MicroTask[]
+  beforeMinutes?: number  // actual projected before-AI time for this module
+  afterMinutes?: number   // actual projected after-AI time for this module
 }
 
 function buildPrompt(input: GenerateInput): string {
-  const { occupationTitle, moduleKey, tasks } = input
+  const { occupationTitle, moduleKey, tasks, beforeMinutes, afterMinutes } = input
   const meta = getAgentMetadata(moduleKey as ModuleKey)
   if (!meta) throw new Error(`Unknown moduleKey: ${moduleKey}`)
   const taskSample = tasks.slice(0, 4).map((t) => `- ${t.task_name}: ${t.task_description}`).join("\n")
 
-  return `You are writing demo content for an AI agent product targeting knowledge workers.
+  const hasTimings = typeof beforeMinutes === "number" && typeof afterMinutes === "number"
+  const timingSection = hasTimings
+    ? `
+ACTUAL TIME IMPACT FOR THIS MODULE:
+Before AI: ${beforeMinutes} min/day on ${meta.label} tasks
+After AI: ${afterMinutes} min/day (review + approve only)
+Daily savings: ${beforeMinutes - afterMinutes!} min
+
+Use these EXACT numbers in the content. The narrative and output should reference "${beforeMinutes} min → ${afterMinutes} min" or "${beforeMinutes - afterMinutes!} minutes saved" where natural.
+`
+    : ""
+
+  const outputTimingHint = hasTimings
+    ? `- Reference the actual time savings (${beforeMinutes} min → ${afterMinutes} min) in the output content where it makes sense\n- Make the output feel like real software that saved ${beforeMinutes! - afterMinutes!} minutes\n`
+    : ""
+
+  return `You are generating UI copy for a product demo. Be specific and direct. No filler words.
 
 ROLE: ${occupationTitle}
 AGENT: ${meta.agentName} — ${meta.label}
@@ -30,22 +48,36 @@ TIME: ${meta.timeOfDay}
 
 SAMPLE TASKS THIS AGENT HANDLES:
 ${taskSample || "- General " + meta.label.toLowerCase() + " work"}
+${timingSection}
+Generate demo content for ${meta.agentName} helping a ${occupationTitle} with ${meta.label.toLowerCase()} tasks.
 
-Write realistic, specific demo content for how ${meta.agentName} helps a ${occupationTitle} with ${meta.label.toLowerCase()} tasks. Use a realistic first name for the worker (not "the user"). Make it feel like a real workday.
+The content has two styles — follow each exactly:
+
+VISUAL ELEMENTS (short, emoji-led, for animated UI boxes):
+- narrative: 2-3 punchy lines, second person, emoji at start, max 12 words each
+- loop labels: emoji + 2-4 words only
+- humanAction: emoji + 4-7 words
+
+OUTPUT CONTENT (detailed, realistic, for a typewriter panel — this is the payoff):
+- Write 6-10 lines of realistic software output that looks like actual agent work product
+- Use specific numbers, names, dates, statuses — make it feel real
+- Format it like a real document: headers, bullet points, data rows, or status lines
+${outputTimingHint}- 250-400 chars total
+- Should make the viewer think "wow, it actually did that work"
 
 Respond ONLY with valid JSON in this exact shape:
 {
-  "narrative": "<1-2 sentences: what changed for this worker — personal and specific>",
+  "narrative": "<2-3 emoji-led second-person lines, \\n separated. E.g.: '📧 Your inbox sorted before you open it.\\n⚡ Priority flags set automatically.\\n🎯 You focus on what matters.'>",
   "loop": {
-    "inputs":     ["<exactly 3 specific inputs the agent receives>", "...", "..."],
-    "actions":    ["<exactly 3 things the AI does>", "...", "..."],
-    "outputs":    ["<exactly 3 concrete outputs delivered>", "...", "..."],
-    "humanAction": "<1 sentence: what the worker reviews/approves and how long it takes>"
+    "inputs":     ["<emoji + 2-4 word label>", "<emoji + 2-4 word label>", "<emoji + 2-4 word label>"],
+    "actions":    ["<emoji + short action phrase>", "<emoji + short action phrase>", "<emoji + short action phrase>"],
+    "outputs":    ["<emoji + short result label>", "<emoji + short result label>", "<emoji + short result label>"],
+    "humanAction": "<emoji + 4-7 word direct phrase>"
   },
   "output": {
-    "format":  "prose",
-    "label":   "<3-4 word ALL CAPS label, e.g. 'MORNING BRIEFING'>",
-    "content": "<realistic 150-250 word output the agent would produce — formatted, specific>"
+    "format":  "text",
+    "label":   "<3-4 word ALL CAPS label>",
+    "content": "<6-10 lines of realistic, specific output with real-looking data, formatted as the agent would actually produce it>"
   }
 }
 
@@ -66,7 +98,7 @@ async function callOpenRouter(prompt: string): Promise<string> {
     body: JSON.stringify({
       model: "anthropic/claude-haiku-4-5",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 1024,
+      max_tokens: 1500,
       temperature: 0.7,
     }),
   })

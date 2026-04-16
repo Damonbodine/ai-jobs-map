@@ -1,13 +1,17 @@
 // lib/demo/compute-demo.ts
 import { unstable_cache } from "next/cache"
-import { createServerClient } from "@/lib/supabase/server"
+import {
+  getOccupationBySlug,
+  getOccupationProfile,
+  getOccupationTasks,
+} from "@/lib/occupation-data"
 import {
   estimateTaskMinutes,
   inferArchetypeMultiplier,
   computeDisplayedTimeback,
 } from "@/lib/timeback"
 import { impactRetentionFactor } from "@/lib/pdf/team-deck-data"
-import { getBlockForTask } from "@/lib/blueprint"
+import { getBlockForTask, generateBlueprint } from "@/lib/blueprint"
 import { computeAnnualValue } from "@/lib/pricing"
 import { DEMO_ROLE_SCRIPTS } from "./demo-scripts"
 import { selectDemoModules } from "./select-demo-modules"
@@ -21,24 +25,85 @@ type RoleInput = {
   occupation: Occupation
   profile: AutomationProfile | null
   tasks: MicroTask[]
+  blueprintMinutes: number
 }
 
 type PartialAgentScript = Omit<DemoAgentStep, "beforeMinutes" | "afterMinutes">
+
+export function computeModuleTimes(
+  input: RoleInput,
+  selectedModuleKeys: string[]
+): Map<string, { beforeMinutes: number; afterMinutes: number }> {
+  const { profile, tasks, blueprintMinutes } = input
+  const aiTasks = tasks.filter((t) => t.ai_applicable)
+  const archetypeMultiplier = inferArchetypeMultiplier(profile)
+  const { displayedHigh } = computeDisplayedTimeback(profile, tasks, blueprintMinutes)
+  const totalRawMinutes = aiTasks.reduce(
+    (sum, t) => sum + estimateTaskMinutes(t) * archetypeMultiplier,
+    0
+  )
+  const scaleFactor = displayedHigh / Math.max(totalRawMinutes, 1)
+
+  // Group tasks by module
+  const moduleTaskMap = new Map<string, MicroTask[]>()
+  for (const task of aiTasks) {
+    const key = getBlockForTask(task)
+    const existing = moduleTaskMap.get(key) ?? []
+    existing.push(task)
+    moduleTaskMap.set(key, existing)
+  }
+
+  // Compute raw before/after per selected module
+  const rawTimes = new Map<string, { before: number; after: number }>()
+  for (const moduleKey of selectedModuleKeys) {
+    const moduleTasks = moduleTaskMap.get(moduleKey) ?? []
+    let before = 0
+    let after = 0
+    for (const t of moduleTasks) {
+      const raw = estimateTaskMinutes(t) * archetypeMultiplier
+      const scaled = Math.round(raw * scaleFactor)
+      const retention = impactRetentionFactor(t.ai_impact_level)
+      before += scaled
+      after += Math.max(1, Math.round(scaled * retention))
+    }
+    before = Math.max(1, before)
+    after = before > 1 ? Math.max(1, Math.min(after, before - 1)) : 0
+    rawTimes.set(moduleKey, { before, after })
+  }
+
+  // Apply correction so total savings = displayedHigh
+  const rawTotalSaved = Array.from(rawTimes.values()).reduce(
+    (s, t) => s + (t.before - t.after),
+    0
+  )
+  const correction =
+    rawTotalSaved > 0 && displayedHigh > 0 ? displayedHigh / rawTotalSaved : 1
+
+  const result = new Map<string, { beforeMinutes: number; afterMinutes: number }>()
+  for (const [key, t] of rawTimes) {
+    const before = Math.round(t.before * correction)
+    let after = Math.max(1, Math.round(t.after * correction))
+    if (after >= before) after = Math.max(1, before - 1)
+    result.set(key, { beforeMinutes: before, afterMinutes: after })
+  }
+  return result
+}
 
 export function buildDemoRoleStats(
   input: RoleInput,
   scriptAgents: PartialAgentScript[]
 ): DemoRoleData {
-  const { occupation, profile, tasks } = input
+  const { occupation, profile, tasks, blueprintMinutes } = input
   const aiTasks = tasks.filter((t) => t.ai_applicable)
   const archetypeMultiplier = inferArchetypeMultiplier(profile)
 
-  const { displayedMinutes } = computeDisplayedTimeback(profile, tasks, 0)
+  const { displayedMinutes, displayedHigh } = computeDisplayedTimeback(profile, tasks, blueprintMinutes)
   const totalRawMinutes = aiTasks.reduce(
     (sum, t) => sum + estimateTaskMinutes(t) * archetypeMultiplier,
     0
   )
-  const displayedScaleFactor = displayedMinutes / Math.max(totalRawMinutes, 1)
+  // Use the high end of the range for demo display — aspirational but defensible
+  const displayedScaleFactor = displayedHigh / Math.max(totalRawMinutes, 1)
 
   // Group tasks by module key
   const moduleTaskMap = new Map<string, MicroTask[]>()
@@ -69,6 +134,20 @@ export function buildDemoRoleStats(
     return { ...script, beforeMinutes, afterMinutes }
   })
 
+  // Scale agent savings so total matches displayedHigh — the demo shows a subset
+  // of all tasks, so raw savings will always be less than the full occuption claim.
+  const rawSaved = agents.reduce((s, a) => s + (a.beforeMinutes - a.afterMinutes), 0)
+  if (rawSaved > 0 && displayedHigh > rawSaved) {
+    const correction = displayedHigh / rawSaved
+    for (const a of agents) {
+      a.beforeMinutes = Math.round(a.beforeMinutes * correction)
+      a.afterMinutes = Math.max(1, Math.round(a.afterMinutes * correction))
+      if (a.afterMinutes >= a.beforeMinutes) {
+        a.afterMinutes = Math.max(1, a.beforeMinutes - 1)
+      }
+    }
+  }
+
   const totalBeforeMinutes = agents.reduce((s, a) => s + a.beforeMinutes, 0)
   const totalAfterMinutes = agents.reduce((s, a) => s + a.afterMinutes, 0)
   const minutesSaved = totalBeforeMinutes - totalAfterMinutes
@@ -88,32 +167,21 @@ export function buildDemoRoleStats(
 }
 
 async function fetchRoleData(slug: string): Promise<RoleInput | null> {
-  const supabase = createServerClient()
-
-  const { data: occupation } = await supabase
-    .from("occupations")
-    .select("id, title, slug, major_category, sub_category, employment, hourly_wage, annual_wage")
-    .eq("slug", slug)
-    .single()
-
+  const occupation = await getOccupationBySlug(slug)
   if (!occupation) return null
 
-  const [{ data: tasks }, { data: profile }] = await Promise.all([
-    supabase
-      .from("job_micro_tasks")
-      .select("id, occupation_id, task_name, task_description, frequency, ai_applicable, ai_how_it_helps, ai_impact_level, ai_effort_to_implement, ai_category, ai_tools")
-      .eq("occupation_id", occupation.id),
-    supabase
-      .from("automation_profiles")
-      .select("id, occupation_id, composite_score, work_activity_automation_potential, time_range_low, time_range_high, physical_ability_avg")
-      .eq("occupation_id", occupation.id)
-      .single(),
+  const [tasks, profile] = await Promise.all([
+    getOccupationTasks(occupation.id),
+    getOccupationProfile(occupation.id),
   ])
 
+  const blueprint = generateBlueprint(occupation, tasks, profile)
+
   return {
-    occupation: occupation as Occupation,
-    profile: (profile ?? null) as AutomationProfile | null,
-    tasks: (tasks ?? []) as MicroTask[],
+    occupation,
+    profile,
+    tasks,
+    blueprintMinutes: blueprint.totalMinutesSaved,
   }
 }
 
@@ -135,7 +203,7 @@ export const computeDemoRoles: () => Promise<DemoRoleData[]> = unstable_cache(
   { revalidate: 60 }
 )
 
-export async function computeDemoForSlug(slug: string): Promise<DemoRoleData | null> {
+async function _computeDemoForSlug(slug: string): Promise<DemoRoleData | null> {
   const roleData = await fetchRoleData(slug)
   if (!roleData) return null
 
@@ -144,16 +212,22 @@ export async function computeDemoForSlug(slug: string): Promise<DemoRoleData | n
 
   if (selectedModules.length === 0) return null
 
+  const selectedModuleKeys = selectedModules.map((m) => m.moduleKey)
+  const moduleTimes = computeModuleTimes(roleData, selectedModuleKeys)
+
   // Resolve agent content for each selected module (parallel)
   const resolvedContents = await Promise.all(
-    selectedModules.map((mod) =>
-      resolveAgentContent({
+    selectedModules.map((mod) => {
+      const times = moduleTimes.get(mod.moduleKey)
+      return resolveAgentContent({
         occupationId:    occupation.id,
         occupationTitle: occupation.title,
         moduleKey:       mod.moduleKey,
         tasks:           mod.tasks,
+        beforeMinutes:   times?.beforeMinutes,
+        afterMinutes:    times?.afterMinutes,
       })
-    )
+    })
   )
 
   // Build PartialAgentScript array (everything except beforeMinutes/afterMinutes)
@@ -183,4 +257,12 @@ export async function computeDemoForSlug(slug: string): Promise<DemoRoleData | n
   }
 
   return roleStats
+}
+
+export function computeDemoForSlug(slug: string): Promise<DemoRoleData | null> {
+  return unstable_cache(
+    () => _computeDemoForSlug(slug),
+    [`demo-slug-${slug}`],
+    { revalidate: 3600 }
+  )()
 }

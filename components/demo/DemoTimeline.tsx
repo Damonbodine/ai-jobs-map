@@ -10,6 +10,8 @@ type Props = {
   activeAgentIndex: number
   onRoleChange: (slug: string) => void
   onAgentSelect: (index: number) => void
+  isAutoAdvancing: boolean
+  autoAdvanceInterval: number
 }
 
 export function DemoTimeline({
@@ -18,6 +20,8 @@ export function DemoTimeline({
   activeAgentIndex,
   onRoleChange,
   onAgentSelect,
+  isAutoAdvancing,
+  autoAdvanceInterval,
 }: Props) {
   const activeRole = roles.find((r) => r.slug === activeRoleSlug) ?? roles[0]
 
@@ -57,7 +61,7 @@ export function DemoTimeline({
                 initial={false}
                 animate={isActive ? { backgroundColor: "hsl(var(--foreground))" } : { backgroundColor: "transparent" }}
                 className={cn(
-                  "w-full text-left rounded-lg px-3 py-2.5 transition-colors",
+                  "relative w-full text-left rounded-lg px-3 py-2.5 transition-colors overflow-hidden",
                   isActive ? "text-background" : "hover:bg-muted/50"
                 )}
               >
@@ -80,6 +84,17 @@ export function DemoTimeline({
                   <div className="text-[9px] mt-1 pl-3.5 font-semibold text-emerald-400">
                     {agent.beforeMinutes} min → {agent.afterMinutes} min
                   </div>
+                )}
+                {/* Progress bar — only shown when active and auto-advancing */}
+                {isActive && isAutoAdvancing && (
+                  <motion.div
+                    key={activeAgentIndex}
+                    initial={{ width: "0%" }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: autoAdvanceInterval / 1000, ease: "linear" }}
+                    className="absolute bottom-0 left-0 h-[2px] rounded-b-lg"
+                    style={{ backgroundColor: agent.accentColor }}
+                  />
                 )}
               </motion.button>
             )

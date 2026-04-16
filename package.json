@@ -12,6 +12,7 @@
     "type-check": "tsc --noEmit",
     "db:seed": "tsx scripts/seed-occupations.ts",
     "seed:demo": "tsx scripts/seed-demo-content.ts",
+    "seed:demo:v2": "tsx scripts/seed-demo-content-v2.ts",
     "browse:refresh": "tsx scripts/refresh-browse-metrics.ts",
     "coverage:audit": "python3 scripts/audit_occupation_coverage.py",
     "microtasks:backfill": "python3 scripts/backfill_microtask_metadata.py",

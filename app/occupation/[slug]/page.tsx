@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic"
 
+import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, ChevronRight } from "lucide-react"
@@ -17,6 +18,7 @@ import { EstimateInfo } from "./estimate-info"
 import { OccupationDonut } from "./occupation-donut"
 import { OccupationBuilder } from "./occupation-builder"
 import { OnePagerButton } from "./one-pager-button"
+import { OccupationDemoSection, OccupationDemoSectionSkeleton } from "@/components/demo/OccupationDemoSection"
 
 export default async function OccupationPage(props: {
   params: Promise<{ slug: string }>
@@ -208,6 +210,14 @@ export default async function OccupationPage(props: {
             />
           </FadeIn>
         )}
+
+        {/* AI Agent Demo — streams in after main page content */}
+        <Suspense fallback={<OccupationDemoSectionSkeleton />}>
+          <OccupationDemoSection
+            slug={slug}
+            occupationTitle={occupation.title}
+          />
+        </Suspense>
       </div>
     </PageTransition>
   )

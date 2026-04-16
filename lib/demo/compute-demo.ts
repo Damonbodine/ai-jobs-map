@@ -10,8 +10,12 @@ import { impactRetentionFactor } from "@/lib/pdf/team-deck-data"
 import { getBlockForTask } from "@/lib/blueprint"
 import { computeAnnualValue } from "@/lib/pricing"
 import { DEMO_ROLE_SCRIPTS } from "./demo-scripts"
+import { selectDemoModules } from "./select-demo-modules"
+import { resolveAgentContent } from "./resolve-demo-content"
+import { getAgentMetadata } from "./agent-metadata"
 import type { DemoRoleData, DemoAgentStep } from "./types"
 import type { Occupation, MicroTask, AutomationProfile } from "@/types"
+import type { ModuleKey } from "@/lib/modules"
 
 type RoleInput = {
   occupation: Occupation
@@ -130,3 +134,53 @@ export const computeDemoRoles: () => Promise<DemoRoleData[]> = unstable_cache(
   ["demo-roles"],
   { revalidate: 60 }
 )
+
+export async function computeDemoForSlug(slug: string): Promise<DemoRoleData | null> {
+  const roleData = await fetchRoleData(slug)
+  if (!roleData) return null
+
+  const { occupation, tasks } = roleData
+  const selectedModules = selectDemoModules(tasks, 5)
+
+  if (selectedModules.length === 0) return null
+
+  // Resolve agent content for each selected module (parallel)
+  const resolvedContents = await Promise.all(
+    selectedModules.map((mod) =>
+      resolveAgentContent({
+        occupationId:    occupation.id,
+        occupationTitle: occupation.title,
+        moduleKey:       mod.moduleKey,
+        tasks:           mod.tasks,
+      })
+    )
+  )
+
+  // Build PartialAgentScript array (everything except beforeMinutes/afterMinutes)
+  const scriptAgents: PartialAgentScript[] = selectedModules.map((mod, i) => {
+    const meta = getAgentMetadata(mod.moduleKey as ModuleKey)
+    const content = resolvedContents[i]
+    return {
+      moduleKey:   mod.moduleKey,
+      agentName:   meta.agentName,
+      label:       meta.label,
+      accentColor: meta.accentColor,
+      timeOfDay:   meta.timeOfDay,
+      narrative:   content.narrative,
+      loop:        content.loop,
+      output:      content.output,
+    }
+  })
+
+  const roleStats = buildDemoRoleStats(roleData, scriptAgents)
+
+  // Dynamic tagline for roles not in DEMO_ROLE_SCRIPTS
+  if (!roleStats.tagline) {
+    return {
+      ...roleStats,
+      tagline: `A full workday for ${occupation.title}, transformed by AI.`,
+    }
+  }
+
+  return roleStats
+}

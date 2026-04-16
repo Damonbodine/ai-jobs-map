@@ -43,9 +43,10 @@ export async function resolveAgentContent(input: ResolveInput): Promise<Resolved
   const generated = await generateDemoContent({ occupationTitle, moduleKey, tasks })
 
   const meta = getAgentMetadata(moduleKey as ModuleKey)
+  if (!meta) throw new Error(`Unknown moduleKey: ${moduleKey}`)
 
   // 3. Upsert into cache (ignore conflicts — concurrent request may have written first)
-  await supabase.from("demo_agent_content").upsert(
+  const { error: upsertError } = await supabase.from("demo_agent_content").upsert(
     {
       occupation_id: occupationId,
       module_key:    moduleKey,
@@ -59,6 +60,7 @@ export async function resolveAgentContent(input: ResolveInput): Promise<Resolved
     },
     { onConflict: "occupation_id,module_key" }
   )
+  if (upsertError) console.error("[resolveAgentContent] upsert failed:", upsertError)
 
   return {
     narrative: generated.narrative,

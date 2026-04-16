@@ -19,6 +19,7 @@ type GenerateInput = {
 function buildPrompt(input: GenerateInput): string {
   const { occupationTitle, moduleKey, tasks } = input
   const meta = getAgentMetadata(moduleKey as ModuleKey)
+  if (!meta) throw new Error(`Unknown moduleKey: ${moduleKey}`)
   const taskSample = tasks.slice(0, 4).map((t) => `- ${t.task_name}: ${t.task_description}`).join("\n")
 
   return `You are writing demo content for an AI agent product targeting knowledge workers.

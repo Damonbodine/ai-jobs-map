@@ -1,9 +1,10 @@
 import { estimateTaskMinutes } from "@/lib/timeback"
 import { getBlockForTask } from "@/lib/blueprint"
 import type { MicroTask } from "@/types"
+import type { ModuleKey } from "@/lib/modules"
 
 export type SelectedModule = {
-  moduleKey: string
+  moduleKey: ModuleKey
   tasks: MicroTask[]
   totalMinutes: number
 }
@@ -11,9 +12,9 @@ export type SelectedModule = {
 export function selectDemoModules(tasks: MicroTask[], maxModules = 5): SelectedModule[] {
   const aiTasks = tasks.filter((t) => t.ai_applicable)
 
-  const moduleMap = new Map<string, MicroTask[]>()
+  const moduleMap = new Map<ModuleKey, MicroTask[]>()
   for (const task of aiTasks) {
-    const key = getBlockForTask(task)
+    const key = getBlockForTask(task) as ModuleKey
     const existing = moduleMap.get(key) ?? []
     existing.push(task)
     moduleMap.set(key, existing)

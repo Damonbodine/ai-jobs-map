@@ -1,0 +1,153 @@
+<h2>Timeline + agent loop animation</h2>
+<p class="subtitle">Click an agent on the timeline → it expands to show the full loop in action. Here's what that looks like with Intake expanded.</p>
+
+<div class="mockup">
+  <div class="mockup-header">/ demo — Registered Nurse · Full AI Agent Suite</div>
+  <div class="mockup-body" style="padding:0;display:flex;min-height:480px;">
+
+    <!-- LEFT: Timeline nav -->
+    <div style="width:200px;flex-shrink:0;border-right:1px solid #e5e5e5;padding:20px 0;background:#fafaf7;">
+      <div style="padding:0 16px 12px;font-size:7px;letter-spacing:1.5px;font-weight:700;color:#888;text-transform:uppercase;">Sarah's day</div>
+
+      <!-- Active agent -->
+      <div style="background:#1a1a1a;margin:0 8px;border-radius:6px;padding:10px 12px;margin-bottom:4px;cursor:pointer">
+        <div style="font-size:7px;letter-spacing:1px;color:rgba(255,255,255,0.45);margin-bottom:3px">7:00 AM</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="width:6px;height:6px;border-radius:50%;background:#06b6d4;flex-shrink:0"></div>
+          <div style="font-size:9px;font-weight:700;color:white">Intake &amp; Triage</div>
+        </div>
+        <div style="font-size:8px;color:rgba(255,255,255,0.5);margin-top:3px;padding-left:12px">22 min → 3 min</div>
+      </div>
+
+      <!-- Other agents -->
+      <div style="padding:8px 20px;cursor:pointer;opacity:0.6">
+        <div style="font-size:7px;color:#999;margin-bottom:2px">8:30 AM</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="width:5px;height:5px;border-radius:50%;background:#8b5cf6;flex-shrink:0"></div>
+          <div style="font-size:9px;font-weight:600;color:#333">Documentation</div>
+        </div>
+      </div>
+      <div style="padding:8px 20px;cursor:pointer;opacity:0.6">
+        <div style="font-size:7px;color:#999;margin-bottom:2px">10:00 AM</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="width:5px;height:5px;border-radius:50%;background:#6366f1;flex-shrink:0"></div>
+          <div style="font-size:9px;font-weight:600;color:#333">Analysis</div>
+        </div>
+      </div>
+      <div style="padding:8px 20px;cursor:pointer;opacity:0.6">
+        <div style="font-size:7px;color:#999;margin-bottom:2px">2:00 PM</div>
+        <div style="display:flex;align-items:center;gap=6px">
+          <div style="width:5px;height:5px;border-radius:50%;background:#10b981;flex-shrink:0;margin-right:6px"></div>
+          <div style="font-size:9px;font-weight:600;color:#333">Coordination</div>
+        </div>
+      </div>
+      <div style="padding:8px 20px;cursor:pointer;opacity:0.6">
+        <div style="font-size:7px;color:#999;margin-bottom:2px">3:30 PM</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="width:5px;height:5px;border-radius:50%;background:#f59e0b;flex-shrink:0"></div>
+          <div style="font-size:9px;font-weight:600;color:#333">Exceptions</div>
+        </div>
+      </div>
+      <div style="padding:8px 20px;cursor:pointer;opacity:0.6">
+        <div style="font-size:7px;color:#999;margin-bottom:2px">4:45 PM</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="width:5px;height:5px;border-radius:50%;background:#0ea5e9;flex-shrink:0"></div>
+          <div style="font-size:9px;font-weight:600;color:#333">Data &amp; Reporting</div>
+        </div>
+      </div>
+
+      <!-- Summary at bottom -->
+      <div style="margin:16px 8px 0;padding:10px 12px;background:#eff6ff;border-radius:6px;border:1px solid #bfdbfe">
+        <div style="font-size:7px;color:#1d4ed8;font-weight:700;letter-spacing:0.5px;margin-bottom:4px">TOTAL RECLAIMED</div>
+        <div style="font-size:16px;font-weight:800;color:#1d4ed8">78 min</div>
+        <div style="font-size:7px;color:#3b82f6">every single day</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Expanded agent view -->
+    <div style="flex:1;padding:24px;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#06b6d4"></div>
+        <div style="font-size:8px;letter-spacing:1.5px;font-weight:700;color:#06b6d4;text-transform:uppercase">Intake &amp; Triage Agent</div>
+      </div>
+      <div style="font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:4px">Sorting what matters before the shift starts</div>
+      <div style="font-size:9px;color:#888;margin-bottom:20px">7:00 AM · Every morning · Saves 19 minutes daily</div>
+
+      <!-- VIDEO / ANIMATION AREA -->
+      <div style="background:#1a1a1a;border-radius:10px;overflow:hidden;margin-bottom:20px;">
+        <!-- Simulated animation frames -->
+        <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:8px">
+          <div style="width:8px;height:8px;border-radius:50%;background:#ef4444"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:#22c55e"></div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.3);margin-left:8px">intake-agent-loop.mp4</div>
+          <div style="margin-left:auto;font-size:7px;color:rgba(255,255,255,0.3)">▶ 0:42</div>
+        </div>
+        <!-- Animated loop diagram inside the "video" -->
+        <div style="padding:20px;display:flex;align-items:center;justify-content:center;gap:0">
+          <!-- Step 1 -->
+          <div style="text-align:center;flex:1">
+            <div style="background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.4);border-radius:8px;padding:10px;margin-bottom:6px">
+              <div style="font-size:18px;margin-bottom:4px">📥</div>
+              <div style="font-size:7px;color:#06b6d4;font-weight:700;letter-spacing:0.5px">INPUTS</div>
+              <div style="font-size:7px;color:rgba(255,255,255,0.5);margin-top:3px;line-height:1.4">4 new alerts<br>Lab results<br>Handoff notes</div>
+            </div>
+          </div>
+          <!-- Arrow -->
+          <div style="font-size:14px;color:rgba(255,255,255,0.2);padding:0 6px;padding-bottom:24px">→</div>
+          <!-- Step 2 -->
+          <div style="text-align:center;flex:1">
+            <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:10px;margin-bottom:6px;position:relative">
+              <div style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:#06b6d4;color:white;font-size:6px;font-weight:700;padding:2px 6px;border-radius:10px;letter-spacing:0.5px">AI</div>
+              <div style="font-size:18px;margin-bottom:4px">⚡</div>
+              <div style="font-size:7px;color:rgba(255,255,255,0.7);font-weight:700;letter-spacing:0.5px">PROCESSES</div>
+              <div style="font-size:7px;color:rgba(255,255,255,0.4);margin-top:3px;line-height:1.4">Scores urgency<br>Groups by type<br>Flags escalations</div>
+            </div>
+          </div>
+          <!-- Arrow -->
+          <div style="font-size:14px;color:rgba(255,255,255,0.2);padding:0 6px;padding-bottom:24px">→</div>
+          <!-- Step 3 -->
+          <div style="text-align:center;flex:1">
+            <div style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:10px;margin-bottom:6px">
+              <div style="font-size:18px;margin-bottom:4px">📋</div>
+              <div style="font-size:7px;color:#10b981;font-weight:700;letter-spacing:0.5px">OUTPUTS</div>
+              <div style="font-size:7px;color:rgba(255,255,255,0.5);margin-top:3px;line-height:1.4">Priority queue<br>1 escalation flag<br>Shift briefing draft</div>
+            </div>
+          </div>
+          <!-- Arrow -->
+          <div style="font-size:14px;color:rgba(255,255,255,0.2);padding:0 6px;padding-bottom:24px">→</div>
+          <!-- Step 4 -->
+          <div style="text-align:center;flex:1">
+            <div style="background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.2);border-radius:8px;padding:10px;margin-bottom:6px">
+              <div style="font-size:18px;margin-bottom:4px">👩‍⚕️</div>
+              <div style="font-size:7px;color:rgba(255,255,255,0.5);font-weight:700;letter-spacing:0.5px">SARAH REVIEWS</div>
+              <div style="font-size:7px;color:rgba(255,255,255,0.35);margin-top:3px;line-height:1.4">Confirms queue<br>Approves escalation<br>3 min total</div>
+            </div>
+          </div>
+        </div>
+        <!-- Progress bar / scrubber -->
+        <div style="padding:0 16px 14px">
+          <div style="background:rgba(255,255,255,0.1);height:2px;border-radius:1px;position:relative">
+            <div style="background:#06b6d4;height:2px;width:35%;border-radius:1px"></div>
+            <div style="position:absolute;top:-3px;left:35%;width:8px;height:8px;border-radius:50%;background:white;transform:translateX(-50%)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- What changed -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:#fef2f2;border-radius:6px;padding:10px">
+          <div style="font-size:7px;color:#dc2626;font-weight:700;margin-bottom:6px;letter-spacing:0.5px">BEFORE</div>
+          <div style="font-size:8px;color:#333;line-height:1.6">Sarah manually sorts every alert, decides urgency herself, writes the briefing from scratch.<br><br><span style="font-weight:700;color:#dc2626">22 minutes. Every. Morning.</span></div>
+        </div>
+        <div style="background:#f0fdf4;border-radius:6px;padding:10px">
+          <div style="font-size:7px;color:#16a34a;font-weight:700;margin-bottom:6px;letter-spacing:0.5px">AFTER</div>
+          <div style="font-size:8px;color:#333;line-height:1.6">Agent pre-sorts overnight. Sarah opens a clean priority queue, confirms the one escalation flagged, and moves on.<br><br><span style="font-weight:700;color:#16a34a">3 minutes. Done.</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:16px">Each agent on the left nav gets its own loop animation. The "video" is actually an SVG/CSS animation — no video hosting needed. Click a different agent → new loop plays.</p>

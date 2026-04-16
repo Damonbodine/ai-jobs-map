@@ -1,0 +1,5 @@
+{"type":"server-started","port":58221,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:58221","screen_dir":"/Users/damonbodine/ai-jobs-map/.superpowers/brainstorm/92523-1776219589/content","state_dir":"/Users/damonbodine/ai-jobs-map/.superpowers/brainstorm/92523-1776219589/state"}
+{"type":"screen-added","file":"/Users/damonbodine/ai-jobs-map/.superpowers/brainstorm/92523-1776219589/content/demo-format.html"}
+{"type":"screen-added","file":"/Users/damonbodine/ai-jobs-map/.superpowers/brainstorm/92523-1776219589/content/timeline-expanded.html"}
+{"type":"screen-added","file":"/Users/damonbodine/ai-jobs-map/.superpowers/brainstorm/92523-1776219589/content/waiting.html"}
+{"type":"server-stopped","reason":"idle timeout"}

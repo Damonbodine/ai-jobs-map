@@ -66,6 +66,21 @@ export default async function DemoPage() {
         <OccupationSearch />
       </section>
 
+      {/* Custom-task CTA */}
+      <section className="max-w-2xl mx-auto px-4 pb-10">
+        <Link
+          href="/demo/try"
+          className="group block rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-white px-5 py-4 text-center hover:border-cyan-400 hover:shadow-sm transition-all"
+        >
+          <p className="text-xs font-semibold text-cyan-700 uppercase tracking-widest mb-1">
+            ✨ New — live custom demo
+          </p>
+          <p className="text-sm font-semibold text-gray-800 group-hover:text-cyan-700 transition-colors">
+            Don&apos;t see your role? Describe your task and we&apos;ll build the demo live →
+          </p>
+        </Link>
+      </section>
+
       {/* Featured roles */}
       <section className="max-w-4xl mx-auto px-4 pb-16">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest text-center mb-5">

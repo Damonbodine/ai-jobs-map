@@ -41,6 +41,67 @@
   50%      { background-position: 100% 50%; }
 }
 
+/* Orbital builder — outer orbit rotates counter-clockwise, slower + dimmer */
+@keyframes orbit-outer {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+/* Inner orbit rotates clockwise, faster, carrying selected modules */
+@keyframes orbit-inner {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Node dock-pull: a brief magnetic flash when a module arrives at the core */
+@keyframes dock-pull {
+  0%   { transform: scale(1);    filter: brightness(1);   }
+  40%  { transform: scale(1.22); filter: brightness(1.8); }
+  100% { transform: scale(1);    filter: brightness(1);   }
+}
+
+/* Transmit-shake: horizontal jitter used for the Transmit button on error */
+@keyframes transmit-shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-5px); }
+  80%      { transform: translateX(5px); }
+}
+
+/* Particle burst: radial ejection from core, used for Phase 3 confirmation.
+ * Direction is supplied by --burst-x / --burst-y custom props on each particle. */
+@keyframes particle-burst {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform:
+      translate(calc(var(--burst-x, 0) * 1px), calc(var(--burst-y, 0) * 1px))
+      scale(0.2);
+    opacity: 0;
+  }
+}
+
+/* Reduced motion: kill rotation and particle animations, keep the functional
+ * selection behavior. Orbits become static; dock-pull fades to opacity instead
+ * of scaling. */
+@media (prefers-reduced-motion: reduce) {
+  .type-city-root .orbit-outer-ring,
+  .type-city-root .orbit-inner-ring {
+    animation: none !important;
+  }
+  .type-city-root .dock-pull-target {
+    animation: none !important;
+    transition: opacity 0.2s ease;
+  }
+  .type-city-root .particle {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}
+
 .type-city-root {
   font-family: var(--tc-body, "Space Grotesk"), system-ui, sans-serif;
   background: #05060e;

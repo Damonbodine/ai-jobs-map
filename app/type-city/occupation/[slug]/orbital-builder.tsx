@@ -674,6 +674,7 @@ export function OrbitalBuilder({
   const [contactName, setContactName] = useState("")
   const [contactEmail, setContactEmail] = useState("")
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [liveAnnouncement, setLiveAnnouncement] = useState("")
 
   // Guard setState calls in handleSubmit against unmount during the 3s minDuration
   // timeline (e.g. user navigates away mid-transmit). Without this, React logs a
@@ -703,10 +704,17 @@ export function OrbitalBuilder({
   )
 
   function toggle(moduleKey: string) {
+    const group = moduleGroups.find((g) => g.moduleKey === moduleKey)
     setSelected((prev) => {
       const next = new Set(prev)
-      if (next.has(moduleKey)) next.delete(moduleKey)
-      else next.add(moduleKey)
+      const wasSelected = next.has(moduleKey)
+      if (wasSelected) {
+        next.delete(moduleKey)
+        if (group) setLiveAnnouncement(`${group.label} module removed. Your stack has ${next.size} agents.`)
+      } else {
+        next.add(moduleKey)
+        if (group) setLiveAnnouncement(`${group.label} module added, ${group.groupMinutes} minutes per day. Your stack has ${next.size} agents.`)
+      }
       return next
     })
   }
@@ -796,6 +804,14 @@ export function OrbitalBuilder({
         overflow: "hidden",
       }}
     >
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 }}
+      >
+        {liveAnnouncement}
+      </div>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <div
           style={{

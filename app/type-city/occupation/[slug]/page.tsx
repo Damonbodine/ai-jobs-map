@@ -162,7 +162,7 @@ export default async function NeonOccupationPage(props: {
     <NeonOccupation
       slug={slug}
       title={occupation.title}
-      category={occupation.category ?? "Occupation"}
+      category={occupation.major_category ?? "Occupation"}
       employment={occupation.employment ?? null}
       hourlyWage={occupation.hourly_wage ?? null}
       claimedMinutes={claimedMinutes}

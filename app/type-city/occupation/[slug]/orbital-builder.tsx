@@ -708,12 +708,14 @@ export function OrbitalBuilder({
     setSelected((prev) => {
       const next = new Set(prev)
       const wasSelected = next.has(moduleKey)
-      if (wasSelected) {
-        next.delete(moduleKey)
-        if (group) setLiveAnnouncement(`${group.label} module removed. Your stack has ${next.size} agents.`)
-      } else {
-        next.add(moduleKey)
-        if (group) setLiveAnnouncement(`${group.label} module added, ${group.groupMinutes} minutes per day. Your stack has ${next.size} agents.`)
+      if (wasSelected) next.delete(moduleKey)
+      else next.add(moduleKey)
+      if (group) {
+        const label = next.size === 1 ? "agent" : "agents"
+        const action = wasSelected
+          ? `${group.label} module removed.`
+          : `${group.label} module added, ${group.groupMinutes} minutes per day.`
+        setLiveAnnouncement(`${action} Your stack has ${next.size} ${label}.`)
       }
       return next
     })
@@ -987,7 +989,7 @@ export function OrbitalBuilder({
               }}
               aria-live="polite"
             >
-              {inner.length} agents &middot; {totalMinutes} min/day &middot; ${annualValue.toLocaleString()}/yr
+              {inner.length} {inner.length === 1 ? "agent" : "agents"} &middot; {totalMinutes} min/day &middot; ${annualValue.toLocaleString()}/yr
             </div>
 
             <button

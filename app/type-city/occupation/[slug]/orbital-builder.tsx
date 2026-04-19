@@ -102,6 +102,9 @@ function ModuleNode({
         e.currentTarget.style.boxShadow = selected
           ? `0 0 30px ${group.color}aa, inset 0 0 20px ${group.color}66`
           : `0 0 12px ${group.color}44`
+        // Mirror onMouseLeave so tabbing away from a hovered node doesn't leave
+        // a stuck scale(1.05) when the mouse is still sitting on top of it.
+        e.currentTarget.style.transform = `translate(-50%, -50%) translate(${position.x}px, ${position.y}px)`
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = `translate(-50%, -50%) translate(${position.x}px, ${position.y}px) scale(1.05)`

@@ -3,6 +3,7 @@
 import { Archivo, Archivo_Black, DM_Mono, Fraunces, Space_Grotesk } from "next/font/google"
 import Link from "next/link"
 import { useEffect, useRef, useState, type CSSProperties } from "react"
+import { useInView, useCountUp } from "../../_lib/motion"
 import "../../type-city.css"
 
 // -----------------------------------------------------------------------------
@@ -32,47 +33,6 @@ const NEON = {
   green: "#00FF88",
   orange: "#FF6B00",
 } as const
-
-// -----------------------------------------------------------------------------
-// Hooks
-
-function useInView<T extends Element>(threshold = 0.2) {
-  const ref = useRef<T | null>(null)
-  const [seen, setSeen] = useState(false)
-  useEffect(() => {
-    if (!ref.current) return
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setSeen(true)
-          io.disconnect()
-        }
-      },
-      { threshold },
-    )
-    io.observe(ref.current)
-    return () => io.disconnect()
-  }, [threshold])
-  return [ref, seen] as const
-}
-
-function useCountUp(target: number, duration = 1400, active = true) {
-  const [val, setVal] = useState(0)
-  useEffect(() => {
-    if (!active) return
-    let raf = 0
-    const t0 = performance.now()
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - t0) / duration)
-      const eased = 1 - Math.pow(1 - p, 3)
-      setVal(target * eased)
-      if (p < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [target, duration, active])
-  return val
-}
 
 // -----------------------------------------------------------------------------
 // Background primitives (aurora + grid). Full-viewport fixed layer.

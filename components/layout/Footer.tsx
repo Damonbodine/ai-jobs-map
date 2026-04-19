@@ -1,7 +1,13 @@
+"use client"
+
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { AGENCY, CONTACT, SITE } from "@/lib/site"
 
 export function Footer() {
+  const pathname = usePathname()
+  if (pathname === "/type-city") return null
+
   const year = new Date().getFullYear()
 
   return (

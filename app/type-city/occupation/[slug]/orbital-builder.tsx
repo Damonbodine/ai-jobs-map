@@ -184,6 +184,328 @@ function OrbitCore({
 }
 
 // -----------------------------------------------------------------------------
+// FormPanel — dark-glass form panel that slides in from the right (Phase 2)
+
+function FormPanel({
+  teamSizeIndex,
+  setTeamSizeIndex,
+  customRequests,
+  setCustomRequests,
+  newRequest,
+  setNewRequest,
+  contactName,
+  setContactName,
+  contactEmail,
+  setContactEmail,
+  totalMinutes,
+  scaledAnnualValue,
+  dockedCount,
+  submitError,
+  phase,
+  onSubmit,
+}: {
+  teamSizeIndex: number
+  setTeamSizeIndex: (i: number) => void
+  customRequests: string[]
+  setCustomRequests: (next: string[] | ((prev: string[]) => string[])) => void
+  newRequest: string
+  setNewRequest: (v: string) => void
+  contactName: string
+  setContactName: (v: string) => void
+  contactEmail: string
+  setContactEmail: (v: string) => void
+  totalMinutes: number
+  scaledAnnualValue: number
+  dockedCount: number
+  submitError: string | null
+  phase: Phase
+  onSubmit: () => void
+}) {
+  const scaledCount = useCountUp(scaledAnnualValue, 900, true)
+
+  function addCustomRequest() {
+    const trimmed = newRequest.trim()
+    if (!trimmed) return
+    setCustomRequests((prev) => [...prev, trimmed])
+    setNewRequest("")
+  }
+
+  const canSubmit = dockedCount > 0 && contactEmail.trim().length > 0 && phase === "form"
+
+  return (
+    <div
+      style={{
+        flex: "1 1 70%",
+        background: "rgba(5,6,14,0.65)",
+        border: `1px solid ${NEON.cyan}44`,
+        borderRadius: 20,
+        padding: 32,
+        backdropFilter: "blur(12px)",
+        boxShadow: `0 20px 60px rgba(0,229,255,0.12)`,
+        animation: "sunrise 600ms ease-out both",
+      }}
+    >
+      <div style={{ fontFamily: F.fraunces, fontStyle: "italic", fontSize: 28, color: "#fff", marginBottom: 4 }}>
+        Assembly protocol
+      </div>
+      <div style={{ fontFamily: F.mono, fontSize: 12, color: "rgba(255,255,255,0.55)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 24 }}>
+        what do we send you?
+      </div>
+
+      {/* Team size pills */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontFamily: F.mono, fontSize: 11, color: "rgba(255,255,255,0.6)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 10 }}>
+          team size
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {TEAM_SIZES.map((size, index) => {
+            const active = teamSizeIndex === index
+            return (
+              <button
+                key={size.label}
+                type="button"
+                onClick={() => setTeamSizeIndex(index)}
+                style={{
+                  fontFamily: F.mono,
+                  fontSize: 13,
+                  color: active ? "#05060e" : "#fff",
+                  background: active ? NEON.cyan : "transparent",
+                  border: `1px solid ${active ? NEON.cyan : "rgba(255,255,255,0.2)"}`,
+                  borderRadius: 999,
+                  padding: "8px 16px",
+                  cursor: "pointer",
+                  boxShadow: active ? `0 0 20px ${NEON.cyan}66` : "none",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                {size.label}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Live value card */}
+      <div
+        style={{
+          marginBottom: 24,
+          padding: 20,
+          borderRadius: 12,
+          background: `linear-gradient(135deg, ${NEON.cyan}15, ${NEON.purple}15)`,
+          border: `1px solid ${NEON.cyan}33`,
+        }}
+      >
+        <div style={{ fontFamily: F.mono, fontSize: 11, color: "rgba(255,255,255,0.6)", letterSpacing: "0.15em", textTransform: "uppercase" }}>
+          estimated annual value
+        </div>
+        <div
+          style={{
+            fontFamily: F.black,
+            fontSize: 40,
+            color: "#fff",
+            background: `linear-gradient(90deg, ${NEON.cyan}, ${NEON.purple})`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            marginTop: 4,
+          }}
+        >
+          ${Math.round(scaledCount).toLocaleString()}
+        </div>
+        <div style={{ fontFamily: F.mono, fontSize: 11, color: "rgba(255,255,255,0.5)", marginTop: 4 }}>
+          {totalMinutes} min/day &middot; {TEAM_SIZES[teamSizeIndex].label}
+        </div>
+      </div>
+
+      {/* Custom requests */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontFamily: F.mono, fontSize: 11, color: "rgba(255,255,255,0.6)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 10 }}>
+          anything specific?
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <input
+            value={newRequest}
+            onChange={(e) => setNewRequest(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault()
+                addCustomRequest()
+              }
+            }}
+            placeholder="a task, workflow, integration..."
+            style={{
+              flex: 1,
+              fontFamily: F.grotesk,
+              fontSize: 14,
+              color: "#fff",
+              background: "rgba(255,255,255,0.04)",
+              border: `1px solid ${NEON.cyan}33`,
+              borderRadius: 8,
+              padding: "10px 14px",
+              outline: "none",
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.boxShadow = `0 0 0 3px ${NEON.cyan}22`
+              e.currentTarget.style.borderColor = NEON.cyan
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.boxShadow = "none"
+              e.currentTarget.style.borderColor = `${NEON.cyan}33`
+            }}
+          />
+          <button
+            type="button"
+            onClick={addCustomRequest}
+            style={{
+              fontFamily: F.mono,
+              fontSize: 13,
+              color: "#fff",
+              background: "transparent",
+              border: `1px solid ${NEON.cyan}55`,
+              borderRadius: 8,
+              padding: "10px 16px",
+              cursor: "pointer",
+            }}
+          >
+            Add
+          </button>
+        </div>
+        {customRequests.length > 0 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+            {customRequests.map((request, index) => (
+              <span
+                key={`${request}-${index}`}
+                style={{
+                  fontFamily: F.mono,
+                  fontSize: 11,
+                  color: "#fff",
+                  background: `${NEON.cyan}15`,
+                  border: `1px solid ${NEON.cyan}44`,
+                  borderRadius: 999,
+                  padding: "4px 10px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                {request}
+                <button
+                  type="button"
+                  onClick={() => setCustomRequests((prev) => prev.filter((_, i) => i !== index))}
+                  style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: 14, lineHeight: 1 }}
+                  aria-label={`Remove ${request}`}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Name + email */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
+        <div>
+          <label style={{ fontFamily: F.mono, fontSize: 11, color: "rgba(255,255,255,0.6)", letterSpacing: "0.15em", textTransform: "uppercase" }}>
+            name
+          </label>
+          <input
+            value={contactName}
+            onChange={(e) => setContactName(e.target.value)}
+            style={{
+              width: "100%",
+              marginTop: 6,
+              fontFamily: F.grotesk,
+              fontSize: 14,
+              color: "#fff",
+              background: "rgba(255,255,255,0.04)",
+              border: `1px solid ${NEON.cyan}33`,
+              borderRadius: 8,
+              padding: "10px 14px",
+              outline: "none",
+            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = NEON.cyan }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = `${NEON.cyan}33` }}
+          />
+        </div>
+        <div>
+          <label style={{ fontFamily: F.mono, fontSize: 11, color: "rgba(255,255,255,0.6)", letterSpacing: "0.15em", textTransform: "uppercase" }}>
+            email <span style={{ color: NEON.magenta }}>*</span>
+          </label>
+          <input
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
+            required
+            style={{
+              width: "100%",
+              marginTop: 6,
+              fontFamily: F.grotesk,
+              fontSize: 14,
+              color: "#fff",
+              background: "rgba(255,255,255,0.04)",
+              border: `1px solid ${NEON.cyan}33`,
+              borderRadius: 8,
+              padding: "10px 14px",
+              outline: "none",
+            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = NEON.cyan }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = `${NEON.cyan}33` }}
+          />
+        </div>
+      </div>
+
+      {/* Transmit button */}
+      <button
+        type="button"
+        disabled={!canSubmit}
+        onClick={onSubmit}
+        className={submitError ? "transmit-shake-target" : ""}
+        style={{
+          fontFamily: F.black,
+          fontSize: 20,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          color: canSubmit ? "#05060e" : "rgba(255,255,255,0.4)",
+          background: canSubmit ? NEON.cyan : "rgba(255,255,255,0.08)",
+          border: "none",
+          borderRadius: 999,
+          padding: "18px 36px",
+          width: "100%",
+          cursor: canSubmit ? "pointer" : "not-allowed",
+          boxShadow: canSubmit ? `0 10px 40px ${NEON.cyan}66` : "none",
+          animation: submitError
+            ? "transmit-shake 0.4s ease-in-out"
+            : canSubmit
+              ? "btn-breathe 2s ease-in-out infinite"
+              : "none",
+          transition: "all 0.2s ease",
+        }}
+      >
+        Transmit →
+      </button>
+
+      {submitError && (
+        <div
+          role="alert"
+          style={{
+            marginTop: 12,
+            fontFamily: F.mono,
+            fontSize: 12,
+            color: NEON.magenta,
+            letterSpacing: "0.05em",
+          }}
+        >
+          {submitError}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// -----------------------------------------------------------------------------
 // Top-level builder
 
 export function OrbitalBuilder({
@@ -193,6 +515,12 @@ export function OrbitalBuilder({
   const [sectionRef, seen] = useInView<HTMLElement>(0.2)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [phase, setPhase] = useState<Phase>("select")
+  const [teamSizeIndex, setTeamSizeIndex] = useState(0)
+  const [customRequests, setCustomRequests] = useState<string[]>([])
+  const [newRequest, setNewRequest] = useState("")
+  const [contactName, setContactName] = useState("")
+  const [contactEmail, setContactEmail] = useState("")
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // Split into outer (unselected) and inner (selected) orbits
   const outer = useMemo(() => moduleGroups.filter((g) => !selected.has(g.moduleKey)), [moduleGroups, selected])
@@ -205,6 +533,10 @@ export function OrbitalBuilder({
   const annualValue = useMemo(
     () => computeAnnualValue(totalMinutes, hourlyWage),
     [totalMinutes, hourlyWage],
+  )
+  const scaledAnnualValue = useMemo(
+    () => annualValue * TEAM_SIZES[teamSizeIndex].multiplier,
+    [annualValue, teamSizeIndex],
   )
 
   function toggle(moduleKey: string) {
@@ -279,138 +611,186 @@ export function OrbitalBuilder({
           minutes reclaimed, dollars recovered, zero lock-in.
         </p>
 
-        {/* Orbit visualization */}
-        <div
-          style={{
-            position: "relative",
-            width: "min(820px, 100%)",
-            aspectRatio: "1 / 1",
-            margin: "0 auto 48px",
-          }}
-        >
-          {/* Outer ring guide (dashed) */}
-          <div
-            className="orbit-outer-ring"
-            style={{
-              position: "absolute",
-              left: "50%",
-              top: "50%",
-              width: outerRadius * 2,
-              height: outerRadius * 2,
-              transform: "translate(-50%, -50%)",
-              borderRadius: "50%",
-              border: `1px dashed rgba(0,229,255,0.25)`,
-              animation: seen ? "orbit-outer 50s linear infinite" : "none",
-            }}
-          />
-
-          {/* Inner ring guide (solid, brighter) */}
-          <div
-            className="orbit-inner-ring"
-            style={{
-              position: "absolute",
-              left: "50%",
-              top: "50%",
-              width: innerRadius * 2,
-              height: innerRadius * 2,
-              transform: "translate(-50%, -50%)",
-              borderRadius: "50%",
-              border: `1px solid rgba(0,229,255,0.45)`,
-              boxShadow: `0 0 20px rgba(0,229,255,0.15)`,
-              animation: seen ? "orbit-inner 30s linear infinite" : "none",
-            }}
-          />
-
-          {/* Outer nodes (unselected) */}
-          {outer.map((group, i) => (
-            <ModuleNode
-              key={group.moduleKey}
-              group={group}
-              selected={false}
-              position={polar(i, outer.length, outerRadius)}
-              onToggle={() => toggle(group.moduleKey)}
-            />
-          ))}
-
-          {/* Inner nodes (selected) */}
-          {inner.map((group, i) => (
-            <ModuleNode
-              key={group.moduleKey}
-              group={group}
-              selected={true}
-              position={polar(i, inner.length, innerRadius)}
-              onToggle={() => toggle(group.moduleKey)}
-            />
-          ))}
-
-          {/* Core */}
-          <OrbitCore totalMinutes={totalMinutes} annualValue={annualValue} docked={inner.length} />
-        </div>
-
-        {/* Footer bar */}
+        {/* Orbit + FormPanel flex container */}
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 16,
+            flexDirection: phase === "select" ? "column" : "row",
+            alignItems: "flex-start",
+            gap: 32,
+            transition: "all 600ms cubic-bezier(.2,1,.3,1)",
           }}
         >
+          {/* Compressible orbit wrapper */}
           <div
             style={{
-              fontFamily: F.mono,
-              fontSize: 13,
-              color: "rgba(255,255,255,0.7)",
-              letterSpacing: "0.05em",
+              flex: phase === "select" ? "1 1 auto" : "0 0 30%",
+              width: "100%",
+              transform: phase === "select" ? "scale(1)" : "scale(0.75)",
+              transformOrigin: "top left",
+              transition: "all 600ms cubic-bezier(.2,1,.3,1)",
             }}
-            aria-live="polite"
           >
-            {inner.length} agents &middot; {totalMinutes} min/day &middot; ${annualValue.toLocaleString()}/yr
+            {/* Orbit visualization */}
+            <div
+              style={{
+                position: "relative",
+                width: "min(820px, 100%)",
+                aspectRatio: "1 / 1",
+                margin: "0 auto 48px",
+              }}
+            >
+              {/* Outer ring guide (dashed) */}
+              <div
+                className="orbit-outer-ring"
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: outerRadius * 2,
+                  height: outerRadius * 2,
+                  transform: "translate(-50%, -50%)",
+                  borderRadius: "50%",
+                  border: `1px dashed rgba(0,229,255,0.25)`,
+                  animation: seen ? "orbit-outer 50s linear infinite" : "none",
+                }}
+              />
+
+              {/* Inner ring guide (solid, brighter) */}
+              <div
+                className="orbit-inner-ring"
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: innerRadius * 2,
+                  height: innerRadius * 2,
+                  transform: "translate(-50%, -50%)",
+                  borderRadius: "50%",
+                  border: `1px solid rgba(0,229,255,0.45)`,
+                  boxShadow: `0 0 20px rgba(0,229,255,0.15)`,
+                  animation: seen ? "orbit-inner 30s linear infinite" : "none",
+                }}
+              />
+
+              {/* Outer nodes (unselected) */}
+              {outer.map((group, i) => (
+                <ModuleNode
+                  key={group.moduleKey}
+                  group={group}
+                  selected={false}
+                  position={polar(i, outer.length, outerRadius)}
+                  onToggle={() => toggle(group.moduleKey)}
+                />
+              ))}
+
+              {/* Inner nodes (selected) */}
+              {inner.map((group, i) => (
+                <ModuleNode
+                  key={group.moduleKey}
+                  group={group}
+                  selected={true}
+                  position={polar(i, inner.length, innerRadius)}
+                  onToggle={() => toggle(group.moduleKey)}
+                />
+              ))}
+
+              {/* Core */}
+              <OrbitCore totalMinutes={totalMinutes} annualValue={annualValue} docked={inner.length} />
+            </div>
           </div>
 
-          <button
-            type="button"
-            disabled={inner.length === 0}
-            onClick={() => setPhase("form")}
+          {(phase === "form" || phase === "transmit") && (
+            <FormPanel
+              teamSizeIndex={teamSizeIndex}
+              setTeamSizeIndex={setTeamSizeIndex}
+              customRequests={customRequests}
+              setCustomRequests={setCustomRequests}
+              newRequest={newRequest}
+              setNewRequest={setNewRequest}
+              contactName={contactName}
+              setContactName={setContactName}
+              contactEmail={contactEmail}
+              setContactEmail={setContactEmail}
+              totalMinutes={totalMinutes}
+              scaledAnnualValue={scaledAnnualValue}
+              dockedCount={inner.length}
+              submitError={submitError}
+              phase={phase}
+              onSubmit={() => {
+                // wiring lives in Task 7
+                setPhase("transmit")
+              }}
+            />
+          )}
+        </div>
+
+        {/* Footer bar — only shown during select phase */}
+        {phase === "select" && (
+          <div
             style={{
-              fontFamily: F.black,
-              fontSize: 18,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: inner.length === 0 ? "rgba(255,255,255,0.4)" : "#05060e",
-              background: inner.length === 0 ? "rgba(255,255,255,0.1)" : NEON.cyan,
-              border: "none",
-              borderRadius: 999,
-              padding: "18px 40px",
-              cursor: inner.length === 0 ? "not-allowed" : "pointer",
-              boxShadow: inner.length === 0 ? "none" : `0 10px 40px ${NEON.cyan}66`,
-              animation: inner.length === 0 ? "none" : "btn-breathe 2s ease-in-out infinite",
-              transition: "transform 0.15s ease",
-            }}
-            onMouseEnter={(e) => {
-              if (inner.length > 0) e.currentTarget.style.transform = "translateY(-2px)"
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)"
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 16,
             }}
           >
-            Build my agent stack →
-          </button>
-
-          {inner.length === 0 && (
             <div
               style={{
                 fontFamily: F.mono,
-                fontSize: 11,
-                color: "rgba(255,255,255,0.45)",
-                letterSpacing: "0.15em",
+                fontSize: 13,
+                color: "rgba(255,255,255,0.7)",
+                letterSpacing: "0.05em",
+              }}
+              aria-live="polite"
+            >
+              {inner.length} agents &middot; {totalMinutes} min/day &middot; ${annualValue.toLocaleString()}/yr
+            </div>
+
+            <button
+              type="button"
+              disabled={inner.length === 0}
+              onClick={() => setPhase("form")}
+              style={{
+                fontFamily: F.black,
+                fontSize: 18,
+                letterSpacing: "0.08em",
                 textTransform: "uppercase",
+                color: inner.length === 0 ? "rgba(255,255,255,0.4)" : "#05060e",
+                background: inner.length === 0 ? "rgba(255,255,255,0.1)" : NEON.cyan,
+                border: "none",
+                borderRadius: 999,
+                padding: "18px 40px",
+                cursor: inner.length === 0 ? "not-allowed" : "pointer",
+                boxShadow: inner.length === 0 ? "none" : `0 10px 40px ${NEON.cyan}66`,
+                animation: inner.length === 0 ? "none" : "btn-breathe 2s ease-in-out infinite",
+                transition: "transform 0.15s ease",
+              }}
+              onMouseEnter={(e) => {
+                if (inner.length > 0) e.currentTarget.style.transform = "translateY(-2px)"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)"
               }}
             >
-              click a module to begin
-            </div>
-          )}
-        </div>
+              Build my agent stack →
+            </button>
+
+            {inner.length === 0 && (
+              <div
+                style={{
+                  fontFamily: F.mono,
+                  fontSize: 11,
+                  color: "rgba(255,255,255,0.45)",
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                }}
+              >
+                click a module to begin
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* phase !== "select" UI lands in Task 6/7 */}

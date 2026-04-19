@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useEffect, useRef, useState, type CSSProperties } from "react"
 import { useInView, useCountUp } from "../../_lib/motion"
 import "../../type-city.css"
+import { OrbitalBuilder } from "./orbital-builder"
 
 // -----------------------------------------------------------------------------
 // Font setup (page-scoped, mirrors /type-city homepage)
@@ -1463,6 +1464,8 @@ export function NeonOccupation({
   whyItFits,
   taskCards,
   agents,
+  moduleGroups,
+  occupationId,
 }: {
   slug: string
   title: string
@@ -1486,6 +1489,16 @@ export function NeonOccupation({
     assistedCount: number
     topTasks: string[]
   }[]
+  moduleGroups: {
+    moduleKey: string
+    label: string
+    description: string
+    color: string
+    taskCount: number
+    groupMinutes: number
+    taskIds: number[]
+  }[]
+  occupationId: number
 }) {
   return (
     <div className={`type-city-root ${FONT_VARS}`}>
@@ -1505,6 +1518,14 @@ export function NeonOccupation({
       <TaskRail tasks={taskCards} />
 
       {agents.length > 0 && <AgentAnatomy agents={agents} claimed={claimedMinutes} />}
+
+      <OrbitalBuilder
+        slug={slug}
+        occupationId={occupationId}
+        occupationTitle={title}
+        hourlyWage={hourlyWage}
+        moduleGroups={moduleGroups}
+      />
 
       <BigNumberMoment
         claimed={claimedMinutes}

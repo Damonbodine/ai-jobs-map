@@ -5,7 +5,7 @@ import { createServerClient } from "@/lib/supabase/server"
 import { deriveOccupationStory } from "@/lib/occupation-story"
 import { computeDisplayedTimeback, estimateTaskMinutes, inferArchetypeMultiplier } from "@/lib/timeback"
 import { getBlockForTask } from "@/lib/blueprint"
-import { MODULE_REGISTRY } from "@/lib/modules"
+import { MODULE_REGISTRY, type ModuleKey } from "@/lib/modules"
 import { computeAnnualValue } from "@/lib/pricing"
 import {
   getOccupationBySlug,
@@ -30,7 +30,7 @@ const AGENT_COLORS = ["#00E5FF", "#B56CFF", "#FF3EA5", "#00FF88", "#FFD400", "#F
 /** Neon-mapped module accents — same key set as MODULE_ACCENTS on the cream
  * builder, but saturated for the dark orbital surface. Order preserves the
  * module→color associations users already see on the cream page. */
-const NEON_MODULE_ACCENTS: Record<string, string> = {
+const NEON_MODULE_ACCENTS: Record<ModuleKey, string> = {
   intake:        "#00E5FF", // cyan
   analysis:      "#7A8BFF", // indigo
   documentation: "#B56CFF", // violet
@@ -134,7 +134,7 @@ export default async function NeonOccupationPage(props: {
           moduleKey,
           label: def?.label ?? moduleKey,
           description: def?.description ?? "",
-          color: NEON_MODULE_ACCENTS[moduleKey] ?? "#00E5FF",
+          color: NEON_MODULE_ACCENTS[moduleKey as ModuleKey] ?? "#00E5FF",
           taskCount: r.taskCount,
           groupMinutes,
           taskIds: r.taskIds,

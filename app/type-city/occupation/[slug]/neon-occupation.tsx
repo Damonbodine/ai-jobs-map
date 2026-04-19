@@ -1489,6 +1489,7 @@ export function NeonOccupation({
     assistedCount: number
     topTasks: string[]
   }[]
+  // Keep in sync with ModuleGroup in ./page
   moduleGroups: {
     moduleKey: string
     label: string

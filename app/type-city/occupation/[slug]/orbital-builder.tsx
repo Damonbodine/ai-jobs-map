@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState, type CSSProperties } from "react"
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
 import { useInView, useCountUp } from "../../_lib/motion"
 import { computeAnnualValue, TEAM_SIZES } from "@/lib/pricing"
 import type { ModuleGroup } from "./page"
@@ -675,6 +675,16 @@ export function OrbitalBuilder({
   const [contactEmail, setContactEmail] = useState("")
   const [submitError, setSubmitError] = useState<string | null>(null)
 
+  // Guard setState calls in handleSubmit against unmount during the 3s minDuration
+  // timeline (e.g. user navigates away mid-transmit). Without this, React logs a
+  // "setState on unmounted component" warning in dev and we'd waste a render.
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
   // Split into outer (unselected) and inner (selected) orbits
   const outer = useMemo(() => moduleGroups.filter((g) => !selected.has(g.moduleKey)), [moduleGroups, selected])
   const inner = useMemo(() => moduleGroups.filter((g) => selected.has(g.moduleKey)), [moduleGroups, selected])
@@ -747,8 +757,10 @@ export function OrbitalBuilder({
 
     try {
       const [res] = await Promise.all([fetchPromise, minDuration])
+      if (!mountedRef.current) return
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
+        if (!mountedRef.current) return
         const message =
           typeof body?.error === "string"
             ? body.error
@@ -760,6 +772,7 @@ export function OrbitalBuilder({
       setPhase("done")
     } catch (err) {
       console.error("[orbital-builder] submit failed", err)
+      if (!mountedRef.current) return
       setSubmitError("Transmission failed. Check your connection and try again.")
       setPhase("form")
     }

@@ -4,6 +4,8 @@ import { useMemo, useState, type CSSProperties } from "react"
 import { useInView, useCountUp } from "../../_lib/motion"
 import { computeAnnualValue, TEAM_SIZES } from "@/lib/pricing"
 import type { ModuleGroup } from "./page"
+import { CalendlyEmbed } from "@/components/CalendlyEmbed"
+import { CONTACT } from "@/lib/site"
 
 // -----------------------------------------------------------------------------
 // Fonts / palette — mirror neon-occupation.tsx so the builder inherits the look.
@@ -506,11 +508,162 @@ function FormPanel({
 }
 
 // -----------------------------------------------------------------------------
+// TransmitSequence — full-screen particle burst overlay shown during Phase 3
+
+function TransmitSequence({ colors }: { colors: string[] }) {
+  const particleCount = 36
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        pointerEvents: "none",
+        zIndex: 100,
+      }}
+      aria-hidden="true"
+    >
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 120,
+          height: 120,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(0,229,255,0.6) 40%, transparent 70%)",
+          animation: "logo-pulse 1.5s ease-in-out infinite",
+        }}
+      />
+      {Array.from({ length: particleCount }).map((_, i) => {
+        const angle = (i / particleCount) * Math.PI * 2
+        const distance = 300 + Math.random() * 200
+        const x = Math.cos(angle) * distance
+        const y = Math.sin(angle) * distance
+        const color = colors[i % colors.length] ?? "#00E5FF"
+        const delay = 1.5 + Math.random() * 0.3
+        const duration = 1.2 + Math.random() * 0.4
+
+        return (
+          <div
+            key={i}
+            className="particle"
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              background: color,
+              boxShadow: `0 0 12px ${color}`,
+              transform: "translate(-50%, -50%)",
+              animation: `particle-burst ${duration}s ease-out ${delay}s forwards`,
+              "--burst-x": x,
+              "--burst-y": y,
+            } as CSSProperties & { "--burst-x": number; "--burst-y": number }}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+// -----------------------------------------------------------------------------
+// DoneState — success screen with Calendly embed + mail fallback
+
+function DoneState({
+  email,
+  name,
+}: {
+  email: string
+  name: string
+}) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        marginTop: 40,
+        padding: 48,
+        borderRadius: 24,
+        background: `linear-gradient(135deg, rgba(0,229,255,0.08), rgba(181,108,255,0.08))`,
+        border: `1px solid ${NEON.cyan}55`,
+        boxShadow: `0 20px 80px ${NEON.cyan}22`,
+      }}
+    >
+      <h3
+        style={{
+          fontFamily: F.black,
+          fontSize: "clamp(36px, 5vw, 64px)",
+          color: "#fff",
+          letterSpacing: "-0.03em",
+          textTransform: "uppercase",
+          margin: 0,
+          marginBottom: 16,
+        }}
+      >
+        Transmitted.
+      </h3>
+      <p
+        style={{
+          fontFamily: F.mono,
+          fontSize: 14,
+          color: "rgba(255,255,255,0.75)",
+          letterSpacing: "0.05em",
+          margin: "0 0 32px",
+        }}
+      >
+        Your blueprint is en route to <strong style={{ color: NEON.cyan }}>{email}</strong>. Book a 30-min scoping call below whenever you&apos;re ready.
+      </p>
+
+      {/* Neon-framed Calendly embed — the CalendlyEmbed component is kept
+       * unmodified; we just wrap it in our own container. */}
+      <div
+        style={{
+          borderRadius: 20,
+          padding: 4,
+          background: `linear-gradient(135deg, ${NEON.cyan}66, ${NEON.purple}66)`,
+          marginBottom: 16,
+        }}
+      >
+        <div style={{ borderRadius: 18, overflow: "hidden", background: "#05060e" }}>
+          <CalendlyEmbed
+            prefill={{ email, name: name || undefined }}
+          />
+        </div>
+      </div>
+
+      <div
+        style={{
+          fontFamily: F.mono,
+          fontSize: 12,
+          color: "rgba(255,255,255,0.55)",
+          letterSpacing: "0.05em",
+        }}
+      >
+        prefer email?{" "}
+        <a
+          href={`mailto:${CONTACT.email}`}
+          style={{ color: NEON.cyan, textDecoration: "underline", textUnderlineOffset: 4 }}
+        >
+          {CONTACT.email}
+        </a>
+      </div>
+    </div>
+  )
+}
+
+// -----------------------------------------------------------------------------
 // Top-level builder
 
 export function OrbitalBuilder({
-  moduleGroups,
+  slug,
+  occupationId,
+  occupationTitle,
   hourlyWage,
+  moduleGroups,
 }: OrbitalBuilderProps) {
   const [sectionRef, seen] = useInView<HTMLElement>(0.2)
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -546,6 +699,70 @@ export function OrbitalBuilder({
       else next.add(moduleKey)
       return next
     })
+  }
+
+  async function handleSubmit() {
+    if (inner.length === 0) {
+      setSubmitError("Dock at least one module before transmitting.")
+      return
+    }
+    if (!contactEmail.trim()) {
+      setSubmitError("Email is required so we can send your blueprint.")
+      return
+    }
+
+    setSubmitError(null)
+    setPhase("transmit")
+
+    // Fire the inquiry immediately; animation runs in parallel for ~3s so the
+    // user sees the spectacle even on a fast network. If the server responds
+    // before the animation finishes, we still wait out the timeline.
+    const minDuration = new Promise<void>((resolve) => setTimeout(resolve, 3000))
+
+    const tierKey: "starter" | "recommended" | "enterprise" =
+      inner.length <= 3 ? "starter" : inner.length <= 7 ? "recommended" : "enterprise"
+
+    const selectedTaskIds = inner.flatMap((g) => g.taskIds)
+
+    const fetchPromise = fetch("/api/inquiries", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        occupationId,
+        occupationTitle,
+        occupationSlug: slug,
+        selectedModules: inner.map((g) => g.moduleKey),
+        selectedCapabilities: [],
+        selectedTaskIds,
+        customRequests,
+        teamSize: TEAM_SIZES[teamSizeIndex].label,
+        tierKey,
+        displayedMinutes: totalMinutes,
+        displayedAnnualValue: annualValue, // unscaled — matches what the core shows
+        contactName,
+        contactEmail,
+        website: "", // honeypot
+      }),
+    })
+
+    try {
+      const [res] = await Promise.all([fetchPromise, minDuration])
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        const message =
+          typeof body?.error === "string"
+            ? body.error
+            : "Transmission failed. Please try again."
+        setSubmitError(message)
+        setPhase("form")
+        return
+      }
+      setPhase("done")
+    } catch (err) {
+      console.error("[orbital-builder] submit failed", err)
+      setSubmitError("Transmission failed. Check your connection and try again.")
+      setPhase("form")
+    }
   }
 
   // Orbit radii — sized so 140px nodes don't overlap the 220px core.
@@ -717,10 +934,7 @@ export function OrbitalBuilder({
               dockedCount={inner.length}
               submitError={submitError}
               phase={phase}
-              onSubmit={() => {
-                // wiring lives in Task 7
-                setPhase("transmit")
-              }}
+              onSubmit={handleSubmit}
             />
           )}
         </div>
@@ -793,11 +1007,12 @@ export function OrbitalBuilder({
         )}
       </div>
 
-      {/* phase !== "select" UI lands in Task 6/7 */}
-      {phase !== "select" && (
-        <div style={{ marginTop: 40, color: "#fff", fontFamily: F.mono, textAlign: "center" }}>
-          phase: {phase} (placeholder — Task 6+)
-        </div>
+      {phase === "transmit" && (
+        <TransmitSequence colors={inner.map((g) => g.color)} />
+      )}
+
+      {phase === "done" && (
+        <DoneState email={contactEmail} name={contactName} />
       )}
     </section>
   )

@@ -242,7 +242,7 @@ function FormPanel({
         padding: 32,
         backdropFilter: "blur(12px)",
         boxShadow: `0 20px 60px rgba(0,229,255,0.12)`,
-        animation: "sunrise 600ms ease-out both",
+        animation: "formpanel-in 600ms cubic-bezier(.2,1,.3,1) both",
       }}
     >
       <div style={{ fontFamily: F.fraunces, fontStyle: "italic", fontSize: 28, color: "#fff", marginBottom: 4 }}>

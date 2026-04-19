@@ -60,6 +60,14 @@
   100% { transform: scale(1);    filter: brightness(1);   }
 }
 
+/* Form panel slide-in: one-shot translate-from-right + fade. Don't reuse the
+ * sunrise keyframe for this — sunrise is a looping hero pulse with a fixed
+ * translateX(-50%) that would leave this panel permanently off-canvas. */
+@keyframes formpanel-in {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
 /* Transmit-shake: horizontal jitter used for the Transmit button on error */
 @keyframes transmit-shake {
   0%, 100% { transform: translateX(0); }

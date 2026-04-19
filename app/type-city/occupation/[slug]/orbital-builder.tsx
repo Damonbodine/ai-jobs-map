@@ -758,7 +758,9 @@ export function OrbitalBuilder({
         teamSize: TEAM_SIZES[teamSizeIndex].label,
         tierKey,
         displayedMinutes: totalMinutes,
-        displayedAnnualValue: annualValue, // unscaled — matches what the core shows
+        // Clamp to the server-side cap in lib/validation/inquiry.ts so high-wage
+        // occupations can't produce a payload the schema rejects.
+        displayedAnnualValue: Math.min(annualValue, 1_000_000),
         contactName,
         contactEmail,
         website: "", // honeypot
@@ -987,7 +989,6 @@ export function OrbitalBuilder({
                 color: "rgba(255,255,255,0.7)",
                 letterSpacing: "0.05em",
               }}
-              aria-live="polite"
             >
               {inner.length} {inner.length === 1 ? "agent" : "agents"} &middot; {totalMinutes} min/day &middot; ${annualValue.toLocaleString()}/yr
             </div>

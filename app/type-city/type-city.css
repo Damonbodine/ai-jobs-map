@@ -50,6 +50,11 @@
   position: relative;
   min-height: 100vh;
 }
+/* Force body dark for the whole /type-city/* page tree so the cream site
+ * background doesn't flash through during load or past the root div. */
+body:has(.type-city-root) {
+  background: #05060e !important;
+}
 .type-city-root *,
 .type-city-root *::before,
 .type-city-root *::after {

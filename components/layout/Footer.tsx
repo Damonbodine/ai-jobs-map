@@ -6,7 +6,7 @@ import { AGENCY, CONTACT, SITE } from "@/lib/site"
 
 export function Footer() {
   const pathname = usePathname()
-  if (pathname === "/type-city") return null
+  if (pathname?.startsWith("/type-city")) return null
 
   const year = new Date().getFullYear()
 

@@ -19,7 +19,7 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { theme, setTheme } = useTheme()
 
-  if (pathname === "/type-city") return null
+  if (pathname?.startsWith("/type-city")) return null
 
   const links = [
     { href: "/about", label: "About" },

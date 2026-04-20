@@ -1,10 +1,12 @@
 import type { DepartmentTotals } from "@/lib/build-a-team/compute"
+import { computeAnnualHours } from "@/lib/pricing"
 
 export function Results({ totals }: { totals: DepartmentTotals }) {
+  const totalHoursPerYear = computeAnnualHours(totals.totalMinutesPerDay)
   return (
     <div className="mt-8 rounded-2xl border border-accent/30 bg-accent/5 p-6 sm:p-8">
       <h2 className="font-heading text-xl font-semibold mb-5">
-        What this team is worth with AI
+        What AI gives this team back
       </h2>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
@@ -15,8 +17,8 @@ export function Results({ totals }: { totals: DepartmentTotals }) {
           unit="min"
         />
         <Stat
-          label="Annual value"
-          value={`$${Math.round(totals.totalAnnualValue).toLocaleString()}`}
+          label="Hours reclaimed / yr"
+          value={totalHoursPerYear.toLocaleString()}
         />
         <Stat
           label="Equivalent FTEs"
@@ -31,7 +33,7 @@ export function Results({ totals }: { totals: DepartmentTotals }) {
               <th className="text-left font-semibold py-2">Role</th>
               <th className="text-center font-semibold py-2">People</th>
               <th className="text-right font-semibold py-2">Min/day each</th>
-              <th className="text-right font-semibold py-2">Annual value</th>
+              <th className="text-right font-semibold py-2">Hrs/yr reclaimed</th>
             </tr>
           </thead>
           <tbody>
@@ -41,7 +43,7 @@ export function Results({ totals }: { totals: DepartmentTotals }) {
                 <td className="py-2 text-center">{row.count}</td>
                 <td className="py-2 text-right">{row.minutesPerPerson}</td>
                 <td className="py-2 text-right">
-                  ${Math.round(row.totalAnnualValue).toLocaleString()}
+                  {computeAnnualHours(row.totalMinutesPerDay).toLocaleString()}
                 </td>
               </tr>
             ))}
@@ -52,7 +54,7 @@ export function Results({ totals }: { totals: DepartmentTotals }) {
                 {Math.round(totals.totalMinutesPerDay).toLocaleString()}
               </td>
               <td className="py-2 text-right">
-                ${Math.round(totals.totalAnnualValue).toLocaleString()}
+                {totalHoursPerYear.toLocaleString()}
               </td>
             </tr>
           </tbody>

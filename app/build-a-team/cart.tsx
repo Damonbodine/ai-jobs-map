@@ -61,7 +61,7 @@ export function Cart({
   // Contact form result (set when done)
   const [doneEmail, setDoneEmail] = useState("")
   const [doneTotalPeople, setDoneTotalPeople] = useState(0)
-  const [doneAnnualValue, setDoneAnnualValue] = useState(0)
+  const [doneMinutesPerDay, setDoneMinutesPerDay] = useState(0)
 
   function commit(next: CartRow[]) {
     setCart(next)
@@ -180,14 +180,14 @@ export function Cart({
 
     // Compute totals for done screen
     const totalPeople = cart.reduce((s, r) => s + r.count, 0)
-    const totalAnnualValue = roleTaskData.reduce((s, rd) => {
+    const totalMinutesPerDay = roleTaskData.reduce((s, rd) => {
       const cartRow = cart.find(r => r.slug === rd.slug)
-      return s + rd.annualValue * (cartRow?.count ?? 0)
+      return s + rd.displayedMinutes * (cartRow?.count ?? 0)
     }, 0)
 
     setDoneEmail(data.contactEmail)
     setDoneTotalPeople(totalPeople)
-    setDoneAnnualValue(totalAnnualValue)
+    setDoneMinutesPerDay(totalMinutesPerDay)
     setPhase("done")
   }
 
@@ -197,7 +197,7 @@ export function Cart({
       <TeamDone
         email={doneEmail}
         totalPeople={doneTotalPeople}
-        annualValue={doneAnnualValue}
+        totalMinutesPerDay={doneMinutesPerDay}
       />
     )
   }

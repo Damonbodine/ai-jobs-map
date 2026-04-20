@@ -254,7 +254,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
         {/* Donut Chart */}
         <FadeIn delay={0.12}>
           <div className="mb-2">
-            <h2 className="font-heading text-xl font-semibold mb-1">Start Savings</h2>
+            <h2 className="font-heading text-xl font-semibold mb-1">Where your time goes</h2>
             <p className="text-sm text-muted-foreground mb-4">
               See where your time goes — hover or tap each segment for details.
             </p>

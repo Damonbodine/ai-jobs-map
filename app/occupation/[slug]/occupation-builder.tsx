@@ -5,7 +5,12 @@ import { ArrowRight, Check, CheckCircle2, ChevronDown, Mail, Shield, X } from "l
 import { toast } from "sonner"
 import { MODULE_REGISTRY } from "@/lib/modules"
 import { cn } from "@/lib/utils"
-import { computeAnnualValue, computeDynamicPrice, TEAM_SIZES } from "@/lib/pricing"
+import {
+  computeAnnualHours,
+  computeAnnualValue,
+  computeDynamicPrice,
+  TEAM_SIZES,
+} from "@/lib/pricing"
 import { CalendlyEmbed } from "@/components/CalendlyEmbed"
 import { CONTACT } from "@/lib/site"
 import type { ModuleCapability } from "@/types"
@@ -118,13 +123,6 @@ export function OccupationBuilder({
       ),
     [selectedTasks]
   )
-  const selectedValue = useMemo(
-    () =>
-      totalMinutes > 0
-        ? Math.round((selectedMinutes / totalMinutes) * annualValue)
-        : 0,
-    [annualValue, selectedMinutes, totalMinutes]
-  )
   const selectedModules = useMemo(
     () => Array.from(new Set(selectedTasks.map((task) => task.moduleKey))),
     [selectedTasks]
@@ -169,6 +167,18 @@ export function OccupationBuilder({
     const baseValue = computeAnnualValue(selectedMinutes, hourlyWage)
     return baseValue * TEAM_SIZES[teamSizeIndex].multiplier
   }, [hourlyWage, selectedMinutes, teamSizeIndex])
+
+  // Hours/year framing for public display. Keeps the dollar figure in state
+  // for the inquiry payload + PDF (buyer context), but strips labor-cost
+  // math from surfaces any visitor can see.
+  const scaledHoursPerYear = useMemo(
+    () => computeAnnualHours(selectedMinutes * TEAM_SIZES[teamSizeIndex].multiplier),
+    [selectedMinutes, teamSizeIndex]
+  )
+  const selectedHoursPerYear = useMemo(
+    () => computeAnnualHours(selectedMinutes),
+    [selectedMinutes]
+  )
 
   useEffect(() => {
     if (phase !== "build" || !builderRef.current) return
@@ -463,9 +473,9 @@ export function OccupationBuilder({
               </div>
             </div>
             <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
-              <div className="text-xs text-muted-foreground mb-1">Estimated annual value</div>
+              <div className="text-xs text-muted-foreground mb-1">Hours reclaimed / yr</div>
               <div className="font-heading text-2xl font-bold text-accent">
-                ${scaledAnnualValue.toLocaleString()}
+                {scaledHoursPerYear.toLocaleString()}
               </div>
             </div>
             <div className="rounded-xl border border-border bg-card p-4">
@@ -645,7 +655,7 @@ export function OccupationBuilder({
                   <span className="font-semibold text-foreground">{selectedMinutes} min/day</span>
                   {" "}&middot;{" "}
                   <span className="font-semibold text-accent">
-                    ${selectedValue.toLocaleString()}/yr value
+                    ~{selectedHoursPerYear.toLocaleString()} hrs/yr reclaimed
                   </span>
                 </div>
                 <button

@@ -27,7 +27,8 @@ const INFO_SECTIONS = [
   {
     icon: Users,
     title: "Human-Centered Approach",
-    body: "AI should augment your work, not replace you. Our blueprints identify tasks where AI excels and where human judgment remains essential — including explicit checkpoints where people stay in the loop.",
+    body: "AI should augment your work, not replace you. Our blueprints identify tasks where AI excels and where human judgment remains essential — including explicit checkpoints where people stay in the loop. Read our full principles for how we think about time reclaimed, human oversight, and the limits of our numbers.",
+    link: { href: "/principles", label: "Our principles →" },
   },
 ]
 
@@ -70,23 +71,34 @@ export default function AboutPage() {
       </FadeIn>
 
       <Stagger className="space-y-8 mb-12" staggerDelay={0.1}>
-        {INFO_SECTIONS.map(({ icon: Icon, title, body }) => (
-          <StaggerItem key={title}>
-            <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-                <Icon className="h-4 w-4 text-accent" />
+        {INFO_SECTIONS.map((section) => {
+          const Icon = section.icon
+          return (
+            <StaggerItem key={section.title}>
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <Icon className="h-4 w-4 text-accent" />
+                </div>
+                <div>
+                  <h3 className="font-heading text-base font-semibold mb-1">
+                    {section.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {section.body}
+                  </p>
+                  {"link" in section && section.link && (
+                    <Link
+                      href={section.link.href}
+                      className="mt-2 inline-block text-sm font-medium text-accent hover:underline"
+                    >
+                      {section.link.label}
+                    </Link>
+                  )}
+                </div>
               </div>
-              <div>
-                <h3 className="font-heading text-base font-semibold mb-1">
-                  {title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {body}
-                </p>
-              </div>
-            </div>
-          </StaggerItem>
-        ))}
+            </StaggerItem>
+          )
+        })}
       </Stagger>
 
       <FadeIn delay={0.5}>

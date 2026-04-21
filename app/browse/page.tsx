@@ -184,7 +184,10 @@ export default async function BrowsePage(props: {
                   className="group flex items-center justify-between rounded-xl border border-border bg-card p-4 hover:shadow-md hover:border-ring/40 transition-all"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold truncate group-hover:text-foreground/80 transition-colors">
+                    <div
+                      title={occ.title}
+                      className="text-sm font-semibold line-clamp-2 leading-snug group-hover:text-foreground/80 transition-colors"
+                    >
                       {occ.title}
                     </div>
                     <div className="text-xs text-muted-foreground mt-0.5 truncate">

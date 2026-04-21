@@ -134,13 +134,14 @@ export default async function HomePage() {
 
         <FadeIn delay={0.1}>
           <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground max-w-3xl mx-auto leading-tight">
-            How much time could AI give you back every single day?
+            Where, concretely, is the time?
           </h1>
         </FadeIn>
 
         <FadeIn delay={0.2}>
           <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto">
-            Explore AI-assisted time savings across 800+ occupations.
+            800+ occupations mapped task-by-task to the work AI can genuinely handle.
+            See the honest time-back estimate for your role in under a minute — and if the numbers fit, we build the system with you.
           </p>
         </FadeIn>
 
@@ -216,6 +217,12 @@ export default async function HomePage() {
               </StaggerItem>
             ))}
           </Stagger>
+          <p className="mt-6 text-center text-xs text-muted-foreground">
+            Derived from BLS &amp; O*NET task data.{" "}
+            <Link href="/about" className="text-accent hover:underline">
+              See methodology →
+            </Link>
+          </p>
         </div>
       </section>
 
@@ -275,20 +282,20 @@ export default async function HomePage() {
               Ready to reclaim your time?
             </h2>
             <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-              Start from a recommended assistant setup tailored to your role.
+              Explore a single role, or plan a whole team of AI assistants.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/browse"
                 className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg border border-border bg-secondary text-foreground text-sm font-medium hover:bg-muted transition-colors"
               >
-                Browse All
+                Browse all occupations
               </Link>
               <Link
-                href="/browse"
+                href="/build-a-team"
                 className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-[hsl(var(--accent))] text-white text-sm font-medium hover:opacity-90 transition-opacity"
               >
-                Build your personal assistant
+                Plan my team
               </Link>
             </div>
           </div>

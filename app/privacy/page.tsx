@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { FadeIn } from "@/components/FadeIn"
 import { AGENCY, CONTACT, SITE } from "@/lib/site"
 
@@ -201,6 +202,23 @@ export default function PrivacyPage() {
               .
             </p>
           </section>
+        </div>
+
+        <div className="mt-10 rounded-2xl border border-border bg-card p-6 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+          <div>
+            <h3 className="font-heading text-base font-semibold text-foreground mb-1">
+              Still have questions about how we handle your data?
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              We&apos;d rather talk it through than leave anything ambiguous. Start a conversation.
+            </p>
+          </div>
+          <Link
+            href="/contact"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
+          >
+            Book a scoping call
+          </Link>
         </div>
       </FadeIn>
     </div>

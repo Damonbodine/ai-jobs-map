@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { FadeIn } from "@/components/FadeIn"
 import { AGENCY, CONTACT, SITE } from "@/lib/site"
 
@@ -145,6 +146,23 @@ export default function TermsPage() {
               .
             </p>
           </section>
+        </div>
+
+        <div className="mt-10 rounded-2xl border border-border bg-card p-6 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+          <div>
+            <h3 className="font-heading text-base font-semibold text-foreground mb-1">
+              Not a legal question?
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              For anything outside formal legal review, a scoping call is usually the fastest path to a clear answer.
+            </p>
+          </div>
+          <Link
+            href="/contact"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
+          >
+            Book a scoping call
+          </Link>
         </div>
       </FadeIn>
     </div>

@@ -72,16 +72,22 @@ export default async function CategoryPage(props: {
       </FadeIn>
 
       {/* Other category pills */}
-      <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible mb-6 sm:mb-8 scrollbar-hide">
-        {otherCategories.map((c) => (
-          <Link
-            key={c.slug}
-            href={`/category/${c.slug}`}
-            className="px-3 py-1.5 rounded-lg border border-border text-xs font-medium hover:bg-secondary transition-colors whitespace-nowrap flex-shrink-0"
-          >
-            {c.label}
-          </Link>
-        ))}
+      <div className="relative -mx-4 sm:mx-0 mb-6 sm:mb-8">
+        <div className="flex gap-2 overflow-x-auto pb-2 px-4 sm:px-0 sm:flex-wrap sm:overflow-visible scrollbar-hide">
+          {otherCategories.map((c) => (
+            <Link
+              key={c.slug}
+              href={`/category/${c.slug}`}
+              className="px-3 py-1.5 rounded-lg border border-border text-xs font-medium hover:bg-secondary transition-colors whitespace-nowrap flex-shrink-0"
+            >
+              {c.label}
+            </Link>
+          ))}
+        </div>
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background via-background/80 to-transparent sm:hidden"
+        />
       </div>
 
       {/* Occupation grid */}
@@ -109,7 +115,10 @@ export default async function CategoryPage(props: {
                   className="group flex items-center justify-between rounded-xl border border-border bg-card p-4 hover:shadow-md hover:border-ring/40 transition-all"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-semibold truncate group-hover:text-foreground/80 transition-colors">
+                    <div
+                      title={occ.title}
+                      className="text-sm font-semibold line-clamp-2 leading-snug group-hover:text-foreground/80 transition-colors"
+                    >
                       {occ.title}
                     </div>
                     {occ.employment && (

@@ -31,3 +31,21 @@ export const getOccupationTasks = cache(async (occupationId: number): Promise<Mi
     .order("ai_impact_level", { ascending: false })
   return (data ?? []) as MicroTask[]
 })
+
+export type RelatedOccupation = Pick<Occupation, "id" | "title" | "slug" | "major_category">
+
+export const getRelatedOccupations = cache(async (
+  occupationId: number,
+  majorCategory: string,
+  limit = 4,
+): Promise<RelatedOccupation[]> => {
+  const supabase = createServerClient()
+  const { data } = await supabase
+    .from("occupations")
+    .select("id, title, slug, major_category")
+    .eq("major_category", majorCategory)
+    .neq("id", occupationId)
+    .order("employment", { ascending: false, nullsFirst: false })
+    .limit(limit)
+  return (data ?? []) as RelatedOccupation[]
+})

@@ -27,7 +27,8 @@ const INFO_SECTIONS = [
   {
     icon: Users,
     title: "Human-Centered Approach",
-    body: "AI should augment your work, not replace you. Our blueprints identify tasks where AI excels and where human judgment remains essential — including explicit checkpoints where people stay in the loop.",
+    body: "AI should augment your work, not replace you. Our blueprints identify tasks where AI excels and where human judgment remains essential — including explicit checkpoints where people stay in the loop. Read our full principles for how we think about time reclaimed, human oversight, and the limits of our numbers.",
+    link: { href: "/principles", label: "Our principles →" },
   },
 ]
 
@@ -43,13 +44,23 @@ export default function AboutPage() {
         <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-4">
           We help teams build AI systems that actually ship.
         </h1>
-        <p className="text-lg text-muted-foreground leading-relaxed mb-10">
+        <p className="text-lg text-muted-foreground leading-relaxed mb-3">
           {SITE.name} is the research arm of {AGENCY.name} — a small studio that
           designs and implements custom AI systems for knowledge-work teams. We
           built this site because every engagement starts with the same
           question: <em>where, concretely, is the time?</em> Now you can answer
           that question for your role in under a minute, and — if the numbers
           make sense — talk to us about building the system.
+        </p>
+        <p className="text-sm text-muted-foreground mb-10">
+          See also:{" "}
+          <Link href="/principles" className="text-accent hover:underline">
+            our principles
+          </Link>
+          {" · "}
+          <Link href="/security" className="text-accent hover:underline">
+            security &amp; data handling
+          </Link>
         </p>
       </FadeIn>
 
@@ -70,23 +81,34 @@ export default function AboutPage() {
       </FadeIn>
 
       <Stagger className="space-y-8 mb-12" staggerDelay={0.1}>
-        {INFO_SECTIONS.map(({ icon: Icon, title, body }) => (
-          <StaggerItem key={title}>
-            <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-                <Icon className="h-4 w-4 text-accent" />
+        {INFO_SECTIONS.map((section) => {
+          const Icon = section.icon
+          return (
+            <StaggerItem key={section.title}>
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <Icon className="h-4 w-4 text-accent" />
+                </div>
+                <div>
+                  <h3 className="font-heading text-base font-semibold mb-1">
+                    {section.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {section.body}
+                  </p>
+                  {"link" in section && section.link && (
+                    <Link
+                      href={section.link.href}
+                      className="mt-2 inline-block text-sm font-medium text-accent hover:underline"
+                    >
+                      {section.link.label}
+                    </Link>
+                  )}
+                </div>
               </div>
-              <div>
-                <h3 className="font-heading text-base font-semibold mb-1">
-                  {title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {body}
-                </p>
-              </div>
-            </div>
-          </StaggerItem>
-        ))}
+            </StaggerItem>
+          )
+        })}
       </Stagger>
 
       <FadeIn delay={0.5}>

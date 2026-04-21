@@ -39,7 +39,19 @@ export function Footer() {
                 href="/browse"
                 className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Browse Occupations
+                Browse
+              </Link>
+              <Link
+                href="/demo"
+                className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Demo
+              </Link>
+              <Link
+                href="/build-a-team"
+                className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Build a Team
               </Link>
               <Link
                 href="/products"
@@ -58,6 +70,12 @@ export function Footer() {
                 className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 About
+              </Link>
+              <Link
+                href="/principles"
+                className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Principles
               </Link>
               <Link
                 href="/contact"

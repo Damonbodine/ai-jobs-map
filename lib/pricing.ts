@@ -19,12 +19,20 @@ export function computeDynamicPrice(selectedModuleCount: number): PricingTier {
   return PRICING_TIERS[2]
 }
 
+const WORK_DAYS_PER_YEAR = 250
+
 export function computeAnnualValue(
   minutesPerDay: number,
   hourlyWage: number | null
 ): number {
   const wage = hourlyWage ?? 100
-  return Math.round((minutesPerDay / 60) * wage * 250)
+  return Math.round((minutesPerDay / 60) * wage * WORK_DAYS_PER_YEAR)
+}
+
+// Public-facing companion to computeAnnualValue — same day count, hours only.
+// Used on surfaces where showing dollars reads as labor-cost math.
+export function computeAnnualHours(minutesPerDay: number): number {
+  return Math.round((minutesPerDay * WORK_DAYS_PER_YEAR) / 60)
 }
 
 export function computeROI(

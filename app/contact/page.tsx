@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { Mail } from "lucide-react"
 import { FadeIn } from "@/components/FadeIn"
 import { ContactForm } from "./contact-form"
@@ -26,7 +27,9 @@ export default function ContactPage() {
       </FadeIn>
 
       <FadeIn delay={0.15}>
-        <ContactForm />
+        <Suspense fallback={<div className="h-96" />}>
+          <ContactForm />
+        </Suspense>
       </FadeIn>
 
       <FadeIn delay={0.3}>

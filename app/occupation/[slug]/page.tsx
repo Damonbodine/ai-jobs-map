@@ -27,13 +27,21 @@ import { OnePagerButton } from "./one-pager-button"
 import { OccupationDemoSection, OccupationDemoSectionSkeleton } from "@/components/demo/OccupationDemoSection"
 
 export async function generateStaticParams() {
-  const supabase = createServerClient()
-  const { data } = await supabase
-    .from("occupations")
-    .select("slug, employment")
-    .order("employment", { ascending: false, nullsFirst: false })
-    .limit(20)
-  return (data ?? []).map((o) => ({ slug: o.slug }))
+  // Build-time Supabase fetch is best-effort: if env vars aren't available in
+  // this build scope (e.g. Vercel Preview without DB creds), skip pre-rendering
+  // and let all slugs SSR on demand. Production has the creds and pre-renders.
+  try {
+    const supabase = createServerClient()
+    const { data } = await supabase
+      .from("occupations")
+      .select("slug, employment")
+      .order("employment", { ascending: false, nullsFirst: false })
+      .limit(20)
+    return (data ?? []).map((o) => ({ slug: o.slug }))
+  } catch (err) {
+    console.warn("[generateStaticParams] skipping pre-render:", (err as Error).message)
+    return []
+  }
 }
 
 export default async function OccupationPage(props: {

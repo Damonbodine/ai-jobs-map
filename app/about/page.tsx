@@ -44,13 +44,23 @@ export default function AboutPage() {
         <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-4">
           We help teams build AI systems that actually ship.
         </h1>
-        <p className="text-lg text-muted-foreground leading-relaxed mb-10">
+        <p className="text-lg text-muted-foreground leading-relaxed mb-3">
           {SITE.name} is the research arm of {AGENCY.name} — a small studio that
           designs and implements custom AI systems for knowledge-work teams. We
           built this site because every engagement starts with the same
           question: <em>where, concretely, is the time?</em> Now you can answer
           that question for your role in under a minute, and — if the numbers
           make sense — talk to us about building the system.
+        </p>
+        <p className="text-sm text-muted-foreground mb-10">
+          See also:{" "}
+          <Link href="/principles" className="text-accent hover:underline">
+            our principles
+          </Link>
+          {" · "}
+          <Link href="/security" className="text-accent hover:underline">
+            security &amp; data handling
+          </Link>
         </p>
       </FadeIn>
 

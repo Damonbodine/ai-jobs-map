@@ -37,6 +37,8 @@ export const inquirySchema = z.object({
     .toLowerCase()
     .email("Please enter a valid email")
     .max(254),
+  // Which surface originated the submission — preserved for audit.
+  source: z.enum(["occupation-inline", "blueprint"]).default("occupation-inline"),
   website: z.string().optional(), // honeypot
 })
 

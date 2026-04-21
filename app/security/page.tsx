@@ -49,8 +49,18 @@ export default function SecurityPage() {
           That means we touch sensitive operational data during engagements —
           and we treat that as a responsibility, not a footnote.
         </p>
-        <p className="text-sm text-muted-foreground mb-10">
+        <p className="text-sm text-muted-foreground mb-3">
           Last updated: {LAST_UPDATED}
+        </p>
+        <p className="text-sm text-muted-foreground mb-10">
+          See also:{" "}
+          <Link href="/principles" className="text-accent hover:underline">
+            our principles
+          </Link>
+          {" · "}
+          <Link href="/about" className="text-accent hover:underline">
+            how we work
+          </Link>
         </p>
       </FadeIn>
 
@@ -142,11 +152,13 @@ export default function SecurityPage() {
           </h2>
           <div className="text-sm text-muted-foreground leading-relaxed space-y-3">
             <p>
-              We are not currently executing HIPAA, PCI, or FedRAMP-scoped
-              engagements, but we can scope them on request. For HIPAA-capable
-              builds, we work with covered entities to sign a BAA, deploy
-              exclusively to client-hosted infrastructure, and use LLM
-              providers that support BAAs (AWS Bedrock, Azure OpenAI).
+              HIPAA-, PCI-, and FedRAMP-eligible architecture is available on
+              request — scoped per engagement. For HIPAA-capable builds, we
+              work with covered entities to sign a BAA, deploy exclusively to
+              client-hosted infrastructure, and use LLM providers that support
+              BAAs (AWS Bedrock, Azure OpenAI). If a specific framework is
+              load-bearing for your deployment, tell us up front and we&apos;ll
+              confirm scope before kickoff.
             </p>
             <p>
               If you have a specific compliance requirement, tell us up front —
@@ -189,12 +201,21 @@ export default function SecurityPage() {
       </FadeIn>
 
       <FadeIn delay={0.8}>
-        <div className="text-sm text-muted-foreground text-center">
-          Questions we didn&apos;t answer here?{" "}
-          <Link href="/contact" className="text-foreground hover:text-accent transition-colors">
-            Start a conversation
+        <div className="rounded-2xl border border-border bg-card p-6 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+          <div>
+            <h3 className="font-heading text-base font-semibold text-foreground mb-1">
+              Want to discuss your security requirements?
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Tell us about your compliance needs and data-handling constraints. We&apos;ll scope it honestly before any work starts.
+            </p>
+          </div>
+          <Link
+            href="/contact"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
+          >
+            Book a scoping call
           </Link>
-          .
         </div>
       </FadeIn>
     </div>

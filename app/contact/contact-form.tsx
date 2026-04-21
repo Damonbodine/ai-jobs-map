@@ -1,12 +1,35 @@
 "use client"
 
 import { useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { Loader2, CheckCircle2 } from "lucide-react"
 import { contactFormSchema } from "@/lib/validation/contact"
 
 type Status = "idle" | "submitting" | "success" | "error"
 
+function buildPrefilledMessage(source: string | null, role: string | null): string {
+  if (source === "demo-try" && role) {
+    return `I just tried the custom demo for "${role}" work. Curious whether you could help build something like this for our team.\n\n`
+  }
+  if (source === "demo-try") {
+    return `I just tried the custom demo and want to talk about building something similar for our team.\n\n`
+  }
+  if (source === "demo-slug" && role) {
+    return `I saw the demo for ${role} and want to talk about what it would take to build something like this for our team.\n\n`
+  }
+  if (role) {
+    return `I'm interested in AI assistance for ${role} work. Here's what we're trying to figure out:\n\n`
+  }
+  return ""
+}
+
 export function ContactForm() {
+  const searchParams = useSearchParams()
+  const defaultMessage = buildPrefilledMessage(
+    searchParams.get("source"),
+    searchParams.get("role")
+  )
+
   const [status, setStatus] = useState<Status>("idle")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<
@@ -161,6 +184,7 @@ export function ContactForm() {
           rows={6}
           required
           minLength={10}
+          defaultValue={defaultMessage}
           aria-invalid={fieldErrors.message ? true : undefined}
           aria-describedby={
             fieldErrors.message ? "contact-message-error" : undefined

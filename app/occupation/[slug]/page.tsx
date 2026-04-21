@@ -16,6 +16,7 @@ import {
   getOccupationBySlug,
   getOccupationProfile,
   getOccupationTasks,
+  getRelatedOccupations,
 } from "@/lib/occupation-data"
 import type { ModuleCapability } from "@/types"
 
@@ -43,10 +44,11 @@ export default async function OccupationPage(props: {
   const occupation = await getOccupationBySlug(slug)
   if (!occupation) notFound()
 
-  const [profile, tasks, capabilitiesByModule] = await Promise.all([
+  const [profile, tasks, capabilitiesByModule, relatedRoles] = await Promise.all([
     getOccupationProfile(occupation.id),
     getOccupationTasks(occupation.id),
     getAllCapabilities(),
+    getRelatedOccupations(occupation.id, occupation.major_category, 4),
   ])
 
   const story = deriveOccupationStory(occupation, tasks, profile)
@@ -236,6 +238,7 @@ export default async function OccupationPage(props: {
               occupationTitle={occupation.title}
               hourlyWage={occupation.hourly_wage}
               capabilitiesByModule={capabilitiesByModule as Record<string, ModuleCapability[]>}
+              relatedRoles={relatedRoles}
             />
           </FadeIn>
         )}

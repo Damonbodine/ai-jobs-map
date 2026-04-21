@@ -19,11 +19,9 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { theme, setTheme } = useTheme()
 
-  if (pathname === "/type-city") return null
-
   const links = [
     { href: "/about", label: "About" },
-    { href: "/browse", label: "Industries" },
+    { href: "/browse", label: "Browse" },
     { href: "/demo", label: "Demo" },
     { href: "/build-a-team", label: "Build a Team" },
     { href: "/products", label: "Pricing" },
@@ -44,7 +42,10 @@ export function Header() {
               Home
             </DropdownMenuItem>
             <DropdownMenuItem render={<Link href="/browse" />}>
-              Browse All
+              Browse
+            </DropdownMenuItem>
+            <DropdownMenuItem render={<Link href="/demo" />}>
+              Demo
             </DropdownMenuItem>
             <DropdownMenuItem render={<Link href="/build-a-team" />}>
               Build a Team
@@ -54,6 +55,9 @@ export function Header() {
             </DropdownMenuItem>
             <DropdownMenuItem render={<Link href="/about" />}>
               About
+            </DropdownMenuItem>
+            <DropdownMenuItem render={<Link href="/principles" />}>
+              Principles
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { RotateCcw } from "lucide-react"
 import type { DemoRoleData } from "@/lib/demo/types"
 import { AgentSuiteDemo } from "./AgentSuiteDemo"
@@ -14,6 +15,10 @@ type Props = {
 }
 
 export function CustomDemoResult({ role, taskDescription, occupationContext, onReset }: Props) {
+  const contactHref = occupationContext
+    ? `/contact?source=demo-try&role=${encodeURIComponent(occupationContext)}`
+    : "/contact?source=demo-try"
+
   return (
     <DemoFadeIn>
       <div className="space-y-6">
@@ -37,6 +42,16 @@ export function CustomDemoResult({ role, taskDescription, occupationContext, onR
           taskDescription={taskDescription}
           occupationContext={occupationContext}
         />
+
+        <p className="text-center text-xs text-muted-foreground">
+          Prefer to talk directly?{" "}
+          <Link
+            href={contactHref}
+            className="underline hover:text-foreground transition-colors"
+          >
+            Book a scoping call instead →
+          </Link>
+        </p>
       </div>
     </DemoFadeIn>
   )

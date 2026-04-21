@@ -14,6 +14,8 @@ import {
 import { CalendlyEmbed } from "@/components/CalendlyEmbed"
 import { CONTACT } from "@/lib/site"
 import type { ModuleCapability } from "@/types"
+import type { RelatedOccupation } from "@/lib/occupation-data"
+import Link from "next/link"
 
 interface TaskItem {
   id: number
@@ -34,6 +36,7 @@ interface OccupationBuilderProps {
   occupationTitle: string
   hourlyWage: number | null
   capabilitiesByModule: Record<string, ModuleCapability[]>
+  relatedRoles?: RelatedOccupation[]
 }
 
 type BuilderPhase = "select" | "build" | "done"
@@ -60,6 +63,7 @@ export function OccupationBuilder({
   occupationTitle,
   hourlyWage,
   capabilitiesByModule,
+  relatedRoles = [],
 }: OccupationBuilderProps) {
   const [phase, setPhase] = useState<BuilderPhase>("select")
   const [selected, setSelected] = useState<Set<number>>(
@@ -380,7 +384,7 @@ export function OccupationBuilder({
 
               {isExpanded && (
                 <div className="border-t border-border bg-background/40">
-                  <div className="grid grid-cols-[1fr_auto_auto] gap-3 px-5 py-3 sm:px-6 border-b border-border bg-secondary/20">
+                  <div className="hidden sm:grid grid-cols-[1fr_auto_auto] gap-3 px-5 py-3 sm:px-6 border-b border-border bg-secondary/20">
                     <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                       Task
                     </div>
@@ -401,7 +405,7 @@ export function OccupationBuilder({
                         type="button"
                         onClick={() => toggle(task.id)}
                         className={cn(
-                          "grid grid-cols-[1fr_auto_auto] gap-3 px-5 py-3.5 sm:px-6 w-full text-left border-b border-border last:border-b-0 transition-all",
+                          "flex flex-col sm:grid sm:grid-cols-[1fr_auto_auto] gap-2 sm:gap-3 px-5 py-3.5 sm:px-6 w-full text-left border-b border-border last:border-b-0 transition-all",
                           isSelected
                             ? "bg-white text-black"
                             : "bg-transparent hover:bg-secondary/30"
@@ -413,23 +417,28 @@ export function OccupationBuilder({
                         )}>
                           {task.task_name}
                         </div>
-                        <div className={cn(
-                          "text-sm tabular-nums text-right min-w-[80px]",
-                          isSelected ? "text-black/80" : "text-muted-foreground"
-                        )}>
-                          {task.displayLow}&ndash;{task.displayHigh}m
-                        </div>
-                        <div className="flex items-center justify-end gap-2 min-w-[140px]">
-                          <div
-                            className={cn(
-                              "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                              isSelected
-                                ? "bg-black text-white shadow-sm"
-                                : "bg-secondary text-muted-foreground"
-                            )}
-                          >
-                            <Check className="h-3 w-3" />
-                            {isSelected ? "Included" : "Excluded"}
+                        <div className="flex items-center justify-between gap-3 sm:contents">
+                          <div className={cn(
+                            "text-xs sm:text-sm tabular-nums sm:text-right sm:min-w-[80px]",
+                            isSelected ? "text-black/70 sm:text-black/80" : "text-muted-foreground"
+                          )}>
+                            <span className="sm:hidden uppercase tracking-wide mr-1 font-semibold">
+                              Avg/day:
+                            </span>
+                            {task.displayLow}&ndash;{task.displayHigh}m
+                          </div>
+                          <div className="flex items-center justify-end gap-2 sm:min-w-[140px]">
+                            <div
+                              className={cn(
+                                "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                                isSelected
+                                  ? "bg-black text-white shadow-sm"
+                                  : "bg-secondary text-muted-foreground"
+                              )}
+                            >
+                              <Check className="h-3 w-3" />
+                              {isSelected ? "Included" : "Excluded"}
+                            </div>
                           </div>
                         </div>
                       </button>
@@ -639,6 +648,44 @@ export function OccupationBuilder({
                 </a>
               </span>
             </div>
+
+            {relatedRoles.length > 0 && (
+              <div className="pt-6 border-t border-border">
+                <h3 className="font-heading text-lg font-semibold mb-1">
+                  Also worth a look
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Nearby roles in {relatedRoles[0].major_category} — same builder, different workflow.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {relatedRoles.map((role) => (
+                    <Link
+                      key={role.id}
+                      href={`/occupation/${role.slug}`}
+                      className="group flex items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 hover:border-accent/50 hover:bg-accent/5 transition-colors"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">
+                          {role.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {role.major_category}
+                        </p>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-accent shrink-0" />
+                    </Link>
+                  ))}
+                </div>
+                <div className="mt-4">
+                  <Link
+                    href="/browse"
+                    className="text-sm font-medium text-accent hover:underline"
+                  >
+                    Back to all occupations →
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

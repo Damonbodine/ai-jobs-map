@@ -22,11 +22,11 @@ export default async function ProductsPage() {
       <FadeIn>
         <div className="text-center mb-10 sm:mb-14">
           <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-3">
-            Personal AI assistants built for your role
+            Custom AI systems, built for your role in 1–4 weeks.
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            We build custom support systems from a library of proven assistant modules.
-            Each system is shaped around the work you actually do — not a generic product.
+            We assemble each engagement from a library of proven modules — not a generic SaaS product.
+            Every system is shaped around the work you actually do, with human checkpoints at every stage and admin access handed to your team at the end of the build.
           </p>
         </div>
       </FadeIn>

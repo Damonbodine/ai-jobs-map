@@ -11,7 +11,6 @@ import { generateBlueprint } from "@/lib/blueprint"
 import { cn } from "@/lib/utils"
 import { PageTransition } from "@/components/PageTransition"
 import { FadeIn } from "@/components/FadeIn"
-import { supabase } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { computeDisplayedTimeback } from "@/lib/timeback"
 import {
@@ -61,13 +60,6 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
     blueprint.totalMinutesSaved
   )
   const blueprintScale = blueprint.totalMinutesSaved > 0 ? displayedMinutes / blueprint.totalMinutesSaved : 1
-
-  const factoryTier =
-    blueprint.architecture === "single-agent"
-      ? "starter"
-      : blueprint.architecture === "multi-agent"
-        ? "workflow"
-        : "ops"
 
   const recommendedModuleKeys = useMemo(
     () => blueprint.agents.map((agent) => agent.blockName),
@@ -152,38 +144,56 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
       toast.error("Add an email so we know where to send your assistant plan.")
       return
     }
+    if (selectedModules.length === 0) {
+      toast.error("Select at least one module to request a plan.")
+      return
+    }
 
     setSubmitting(true)
     try {
-      const addedModules = selectedModules.filter((m) => !recommendedModuleKeys.includes(m))
-      const removedModules = recommendedModuleKeys.filter((m) => !selectedModules.includes(m))
       const selectedCapabilities = selectedModules.flatMap(
         (moduleKey) => (capabilitiesByModule[moduleKey] ?? []).map((c) => c.capability_key)
       )
 
-      const { error } = await supabase
-        .from("assistant_inquiries")
-        .insert({
-          occupation_id: occupation.id,
-          occupation_title: occupation.title,
-          occupation_slug: slug,
-          recommended_modules: recommendedModuleKeys,
-          selected_modules: selectedModules,
-          added_modules: addedModules,
-          removed_modules: removedModules,
-          selected_capabilities: selectedCapabilities,
-          custom_requests: customRequests,
-          pain_points: [],
-          contact_name: contactName,
-          contact_email: contactEmail,
-          tier: factoryTier,
+      const res = await fetch("/api/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          occupationId: occupation.id,
+          occupationTitle: occupation.title,
+          occupationSlug: slug,
+          selectedModules,
+          selectedCapabilities,
+          selectedTaskIds: [],
+          customRequests,
+          teamSize: TEAM_SIZES[teamSizeIndex]?.label ?? "",
+          tierKey: currentTier.key,
+          displayedMinutes,
+          displayedAnnualValue: annualValue,
+          contactName,
+          contactEmail,
           source: "blueprint",
-        })
+          website: "", // honeypot — real users never see it
+        }),
+      })
 
-      if (error) throw error
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(
+          typeof body?.error === "string"
+            ? body.error
+            : "Could not submit the assistant request. Please try again."
+        )
+      }
+
       setSubmitted(true)
-    } catch {
-      toast.error("Could not submit the assistant request. Please try again.")
+    } catch (err) {
+      console.error("[blueprint] submit failed", err)
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Could not submit the assistant request. Please try again."
+      )
     } finally {
       setSubmitting(false)
     }

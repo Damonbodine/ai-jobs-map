@@ -114,7 +114,7 @@ export async function POST(request: Request) {
     contact_name: input.contactName || null,
     contact_email: input.contactEmail,
     tier: input.tierKey,
-    source: "occupation-inline",
+    source: input.source,
   })
 
   if (dbError) {

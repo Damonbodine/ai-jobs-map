@@ -28,37 +28,43 @@ export function BrowseFilters({ currentCategory, currentSort }: BrowseFiltersPro
   return (
     <div className="flex flex-col gap-3 mb-6">
       {/* Category pills */}
-      <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:overflow-visible scrollbar-hide">
-        <button
-          onClick={() => updateParams({ category: null, page: "1" })}
-          className={cn(
-            "px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors whitespace-nowrap flex-shrink-0",
-            !currentCategory
-              ? "bg-foreground text-background border-foreground"
-              : "border-border hover:bg-secondary"
-          )}
-        >
-          All
-        </button>
-        {CATEGORIES.slice(0, 10).map((cat) => (
+      <div className="relative -mx-4 sm:mx-0">
+        <div className="flex gap-2 overflow-x-auto pb-2 px-4 sm:px-0 sm:flex-wrap sm:overflow-visible scrollbar-hide">
           <button
-            key={cat.slug}
-            onClick={() =>
-              updateParams({
-                category: currentCategory === cat.slug ? null : cat.slug,
-                page: "1",
-              })
-            }
+            onClick={() => updateParams({ category: null, page: "1" })}
             className={cn(
               "px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors whitespace-nowrap flex-shrink-0",
-              currentCategory === cat.slug
+              !currentCategory
                 ? "bg-foreground text-background border-foreground"
                 : "border-border hover:bg-secondary"
             )}
           >
-            {cat.label}
+            All
           </button>
-        ))}
+          {CATEGORIES.slice(0, 10).map((cat) => (
+            <button
+              key={cat.slug}
+              onClick={() =>
+                updateParams({
+                  category: currentCategory === cat.slug ? null : cat.slug,
+                  page: "1",
+                })
+              }
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors whitespace-nowrap flex-shrink-0",
+                currentCategory === cat.slug
+                  ? "bg-foreground text-background border-foreground"
+                  : "border-border hover:bg-secondary"
+              )}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background via-background/80 to-transparent sm:hidden"
+        />
       </div>
 
       {/* Sort dropdown */}

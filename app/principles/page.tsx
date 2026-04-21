@@ -41,11 +41,21 @@ export default function PrinciplesPage() {
         <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-4">
           What AI should and shouldn&apos;t do — how we think about it.
         </h1>
-        <p className="text-lg text-muted-foreground leading-relaxed mb-10">
+        <p className="text-lg text-muted-foreground leading-relaxed mb-3">
           {SITE.name} shows time-back estimates for 800+ occupations. Numbers
           out of context can read the wrong way, so this page is the stance
           behind them — written by {AGENCY.name}, the team that builds the
           systems.
+        </p>
+        <p className="text-sm text-muted-foreground mb-10">
+          See also:{" "}
+          <Link href="/about" className="text-accent hover:underline">
+            how we work
+          </Link>
+          {" · "}
+          <Link href="/security" className="text-accent hover:underline">
+            security &amp; data handling
+          </Link>
         </p>
       </FadeIn>
 

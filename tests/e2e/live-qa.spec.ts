@@ -54,8 +54,8 @@ test("build-a-team: configure roles + submit inquiry", async ({ page }) => {
   const submit = page.getByRole("button", { name: /send|submit|request|build/i }).last()
   await submit.click()
 
-  // Done phase — Calendly embed should appear
-  await expect(page.locator("iframe[src*='calendly']")).toBeVisible({ timeout: 20000 })
+  // Done phase — Google Calendar booking embed should appear
+  await expect(page.locator("iframe[src*='calendar.google.com']")).toBeVisible({ timeout: 20000 })
 })
 
 test("contact form submits", async ({ page }) => {

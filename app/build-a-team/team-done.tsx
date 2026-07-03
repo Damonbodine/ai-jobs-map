@@ -1,7 +1,7 @@
 "use client"
 
 import { CheckCircle2 } from "lucide-react"
-import { CalendlyEmbed } from "@/components/CalendlyEmbed"
+import { BookingEmbed } from "@/components/BookingEmbed"
 import { computeAnnualHours } from "@/lib/pricing"
 
 export function TeamDone({
@@ -27,7 +27,7 @@ export function TeamDone({
           </p>
         </div>
       </div>
-      <CalendlyEmbed prefill={{ email }} />
+      <BookingEmbed />
     </div>
   )
 }

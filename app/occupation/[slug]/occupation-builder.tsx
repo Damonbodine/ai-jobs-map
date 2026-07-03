@@ -11,7 +11,7 @@ import {
   computeDynamicPrice,
   TEAM_SIZES,
 } from "@/lib/pricing"
-import { CalendlyEmbed } from "@/components/CalendlyEmbed"
+import { BookingEmbed } from "@/components/BookingEmbed"
 import { CONTACT } from "@/lib/site"
 import type { ModuleCapability } from "@/types"
 import type { RelatedOccupation } from "@/lib/occupation-data"
@@ -628,12 +628,7 @@ export function OccupationBuilder({
               <h3 className="font-heading text-lg font-semibold mb-3">
                 Book a 30-minute scoping call
               </h3>
-              <CalendlyEmbed
-                prefill={{
-                  email: contactEmail,
-                  name: contactName || undefined,
-                }}
-              />
+              <BookingEmbed />
             </div>
 
             <div className="text-sm text-muted-foreground flex items-center gap-2 pt-2">

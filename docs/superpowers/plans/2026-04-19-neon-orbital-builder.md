@@ -1581,10 +1581,10 @@ function DoneState({
       >
         prefer email?{" "}
         <a
-          href="mailto:hello@placetostand.co"
+          href="mailto:damon@clearroadlabs.com"
           style={{ color: NEON.cyan, textDecoration: "underline", textUnderlineOffset: 4 }}
         >
-          hello@placetostand.co
+          damon@clearroadlabs.com
         </a>
       </div>
     </div>
@@ -1601,7 +1601,7 @@ import { CalendlyEmbed } from "@/components/CalendlyEmbed"
 import { CONTACT } from "@/lib/site"
 ```
 
-In the `DoneState` component written in Step 3, replace the hardcoded `hello@placetostand.co` in both the `href` and the link text with `CONTACT.email`:
+In the `DoneState` component written in Step 3, replace the hardcoded `damon@clearroadlabs.com` in both the `href` and the link text with `CONTACT.email`:
 
 ```tsx
 <a

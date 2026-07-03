@@ -48,7 +48,7 @@ Both are generated server-side via `@react-pdf/renderer`, use the existing Helve
 - Kicker: `AI TIMEBACK · TEAM BLUEPRINT`
 - Headline: `"Your team reclaims X hours every year."` (computed from all roles × headcount)
 - Sub: List of role names with headcount badges
-- Footer: `Prepared by Place To Stand Agency · [date]`
+- Footer: `Prepared by Clear Road Labs · [date]`
 
 #### Page 2 — Team at a Glance
 - 3-stat row: total hours reclaimed/year, total annual value (sum across all roles × headcount × hourly wage), total AI-applicable tasks selected
@@ -88,7 +88,7 @@ Both are generated server-side via `@react-pdf/renderer`, use the existing Helve
 - Black background matching cover
 - `"Book a 30-minute scoping call."`
 - Supporting copy: "We'll walk through this blueprint, answer questions, and give you a fixed-price proposal within 48 hours."
-- Contact block: `damon@placetostandagency.com` + `CONTACT.email` from `lib/site.ts`
+- Contact block: `damon@clearroadlabs.com` + `CONTACT.email` from `lib/site.ts`
 - Agency name + site URL from `lib/site.ts`
 
 ---

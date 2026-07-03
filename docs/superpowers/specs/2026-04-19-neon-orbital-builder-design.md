@@ -1,7 +1,7 @@
 # Neon Orbital Builder — Design Spec
 
 **Date:** 2026-04-19
-**Owner:** Damon / Place To Stand
+**Owner:** Damon / Clear Road Labs
 **Status:** Approved — ready for implementation plan
 
 ## Context

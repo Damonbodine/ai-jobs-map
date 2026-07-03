@@ -9,7 +9,7 @@ export const SITE = {
   name: "AI Timeback",
   tagline: "See exactly how much time AI gives back — role by role.",
   description:
-    "Discover how much time AI gives back in your specific occupation. Task-level analysis grounded in Bureau of Labor Statistics and O*NET data, delivered as a concrete implementation plan by Place To Stand Agency.",
+    "Discover how much time AI gives back in your specific occupation. Task-level analysis grounded in Bureau of Labor Statistics and O*NET data, delivered as a concrete implementation plan by Clear Road Labs.",
   // The fallback is intentional for local dev and preview builds. In production,
   // always set NEXT_PUBLIC_SITE_URL to the real canonical domain — otherwise
   // OpenGraph, canonical URLs, and emails will point at the vercel.app subdomain.
@@ -19,16 +19,16 @@ export const SITE = {
 } as const
 
 export const AGENCY = {
-  name: "Place To Stand Agency",
-  shortName: "Place To Stand",
-  url: "https://placetostandagency.com",
+  name: "Clear Road Labs",
+  shortName: "Clear Road Labs",
+  url: "https://clearroadlabs.com",
   tagline: "We build custom AI systems for knowledge-work teams.",
 } as const
 
 export const CONTACT = {
   // Single email for public-facing address AND internal lead notifications.
-  email: "damon@placetostandagency.com",
-  replyTo: "damon@placetostandagency.com",
+  email: "damon@clearroadlabs.com",
+  replyTo: "damon@clearroadlabs.com",
 } as const
 
 /**

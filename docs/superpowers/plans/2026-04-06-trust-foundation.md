@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship the trust layer of the site — legal pages, About rewrite with Place To Stand Agency framing, Contact page with working Resend-backed form, fixed header/footer, and removal of dead code — so the site no longer reads as a prototype and is safe to drive paid traffic to.
+**Goal:** Ship the trust layer of the site — legal pages, About rewrite with Clear Road Labs framing, Contact page with working Resend-backed form, fixed header/footer, and removal of dead code — so the site no longer reads as a prototype and is safe to drive paid traffic to.
 
 **Architecture:** Static server components for legal/marketing pages (no client JS cost), one client component for the contact form, one Next.js Route Handler (`/api/contact`) that validates with zod and sends notifications via Resend. Single source of truth for site metadata in `lib/site.ts` so every page, footer, and email references the same brand/contact info. This is Plan 1 of 4 — it intentionally does not touch the occupation builder email flow (that's Plan 2: Funnel Realness).
 
@@ -13,12 +13,12 @@
 - Design system: Newsreader (heading) + Manrope (body), warm white + blue accent. Follow existing page patterns in `app/about/page.tsx` for layout.
 - Existing components you'll reuse: `FadeIn`, `Stagger`, `StaggerItem` from `components/FadeIn`.
 - Resend API key is already in `.env.local` as `RESEND_API_KEY`. You'll need to add `RESEND_FROM_EMAIL` and `CONTACT_NOTIFICATION_EMAIL` too.
-- The positioning decision: **Path B — agency funnel.** Every page should read like a small, credible agency (Place To Stand Agency) offering custom AI implementation, with the occupation builder as a discovery tool. Not SaaS self-serve.
+- The positioning decision: **Path B — agency funnel.** Every page should read like a small, credible agency (Clear Road Labs) offering custom AI implementation, with the occupation builder as a discovery tool. Not SaaS self-serve.
 
 **Brand/content constants (pasted verbatim into `lib/site.ts` in Task 1):**
-- Agency: **Place To Stand Agency**
+- Agency: **Clear Road Labs**
 - Site name: **AI Jobs Map**
-- Contact email: **damon@placetostandagency.com** (same address for public-facing + internal lead notifications)
+- Contact email: **damon@clearroadlabs.com** (same address for public-facing + internal lead notifications)
 - Production URL: `https://ai-jobs-map.vercel.app` (placeholder — swap when custom domain ships)
 - Proof point (for About + Footer): *"Built an internal AI assistant for Valise that reclaimed 15 hours/week from their operations team."*
 
@@ -41,7 +41,7 @@
 
 **Modify:**
 - `app/layout.tsx:20-24` — real metadata (title template, description, metadataBase, openGraph)
-- `app/about/page.tsx` — rewrite with Place To Stand framing + Valise proof + founder voice
+- `app/about/page.tsx` — rewrite with Clear Road Labs framing + Valise proof + founder voice
 - `components/layout/Header.tsx:82-87` and `116-122` — replace broken `href="#"` Sign In with `href="/contact"` "Book a Call" (desktop + mobile)
 - `components/layout/Footer.tsx` — replace Legal column with **Trust** column (Terms, Privacy, **Security**), Company column gets About + Contact, add agency attribution line
 
@@ -82,23 +82,23 @@ export const SITE = {
   name: "AI Jobs Map",
   tagline: "Task-level AI analysis for 800+ occupations",
   description:
-    "Discover how AI can save time in your specific occupation. Task-level analysis grounded in Bureau of Labor Statistics and O*NET data, delivered as a concrete implementation plan by Place To Stand Agency.",
+    "Discover how AI can save time in your specific occupation. Task-level analysis grounded in Bureau of Labor Statistics and O*NET data, delivered as a concrete implementation plan by Clear Road Labs.",
   url:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
     "https://ai-jobs-map.vercel.app",
 } as const
 
 export const AGENCY = {
-  name: "Place To Stand Agency",
-  shortName: "Place To Stand",
-  url: "https://placetostandagency.com",
+  name: "Clear Road Labs",
+  shortName: "Clear Road Labs",
+  url: "https://clearroadlabs.com",
   tagline: "We build custom AI systems for knowledge-work teams.",
 } as const
 
 export const CONTACT = {
   // Single email for public-facing address AND internal lead notifications.
-  email: "damon@placetostandagency.com",
-  replyTo: "damon@placetostandagency.com",
+  email: "damon@clearroadlabs.com",
+  replyTo: "damon@clearroadlabs.com",
 } as const
 
 /**
@@ -121,7 +121,7 @@ Check if `.env.local.example` exists. If yes, append:
 ```
 # Resend (transactional email)
 RESEND_API_KEY=
-RESEND_FROM_EMAIL=notifications@placetostandagency.com
+RESEND_FROM_EMAIL=notifications@clearroadlabs.com
 NEXT_PUBLIC_SITE_URL=https://ai-jobs-map.vercel.app
 ```
 
@@ -131,7 +131,7 @@ If no `.env.local.example` exists, create one with the full list of env vars Pla
 
 Remind the human reviewing this plan to ensure `.env.local` contains:
 - `RESEND_API_KEY=re_xxx` (user has already added this)
-- `RESEND_FROM_EMAIL=notifications@placetostandagency.com` — **must be a verified sender in Resend**. If the domain isn't verified yet, use `onboarding@resend.dev` as a temporary fallback for local testing.
+- `RESEND_FROM_EMAIL=notifications@clearroadlabs.com` — **must be a verified sender in Resend**. If the domain isn't verified yet, use `onboarding@resend.dev` as a temporary fallback for local testing.
 - `NEXT_PUBLIC_SITE_URL=http://localhost:3050` (dev) or the real vercel.app URL (prod)
 
 This is a human verification step — no code changes. Do not proceed to Task 2 until confirmed.
@@ -363,7 +363,7 @@ git commit -m "fix(header): replace broken Sign In link with Book a Call CTA"
 
 ---
 
-## Task 5: Rewrite About page with Place To Stand framing
+## Task 5: Rewrite About page with Clear Road Labs framing
 
 **Files:**
 - Modify: `app/about/page.tsx` (full replacement)
@@ -557,7 +557,7 @@ npm run dev
 ```
 
 Visit `http://localhost:3050/about`. Confirm:
-- "A project by Place To Stand Agency" kicker renders above the h1
+- "A project by Clear Road Labs" kicker renders above the h1
 - New h1: "We help teams build AI systems that actually ship."
 - Valise proof-point card renders with accent-colored border
 - "How we work" 4-step section renders below methodology
@@ -567,7 +567,7 @@ Visit `http://localhost:3050/about`. Confirm:
 
 ```bash
 git add app/about/page.tsx
-git commit -m "feat(about): rewrite with Place To Stand agency framing and Valise proof"
+git commit -m "feat(about): rewrite with Clear Road Labs agency framing and Valise proof"
 ```
 
 ---
@@ -1265,7 +1265,7 @@ export async function POST(request: Request) {
     )
   }
 
-  // Notify damon@placetostandagency.com via Resend
+  // Notify damon@clearroadlabs.com via Resend
   try {
     const safeName = escapeHtml(name)
     const safeEmail = escapeHtml(email)
@@ -1375,7 +1375,7 @@ curl -i -X POST http://localhost:3050/api/contact \
 Expected:
 - HTTP 200 with body `{"ok":true}`
 - New row visible in Supabase `contact_messages` table
-- Email arrives at damon@placetostandagency.com within ~10 seconds
+- Email arrives at damon@clearroadlabs.com within ~10 seconds
 
 Now test validation failure:
 
@@ -1700,7 +1700,7 @@ Visit `http://localhost:3050/contact`. Fill out the form with valid data and sub
 - Loading spinner appears during submit
 - Success state renders after ~1s
 - New row in Supabase `contact_messages`
-- Email arrived at damon@placetostandagency.com
+- Email arrived at damon@clearroadlabs.com
 
 Try submitting with invalid data (empty name, bad email, 3-char message). Confirm inline field errors render.
 
@@ -2081,7 +2081,7 @@ Expected: PASS.
 
 - [ ] **Step 3: Visual check**
 
-Visit any page and scroll to the footer. Confirm four columns on desktop (Brand, Explore, Company, Trust), two on mobile. All links route correctly: `/about`, `/contact`, `/security`, `/terms`, `/privacy`, `/browse`, `/products`. The Place To Stand Agency link opens in a new tab.
+Visit any page and scroll to the footer. Confirm four columns on desktop (Brand, Explore, Company, Trust), two on mobile. All links route correctly: `/about`, `/contact`, `/security`, `/terms`, `/privacy`, `/browse`, `/products`. The Clear Road Labs link opens in a new tab.
 
 - [ ] **Step 4: Commit**
 
@@ -2188,7 +2188,7 @@ test.describe("/contact page", () => {
     ).toBeVisible()
 
     await expect(
-      page.getByText(/place to stand agency/i).first()
+      page.getByText(/clear road labs/i).first()
     ).toBeVisible()
 
     await expect(page.getByLabel(/your name/i)).toBeVisible()
@@ -2201,7 +2201,7 @@ test.describe("/contact page", () => {
 
     // Email fallback link
     await expect(
-      page.getByRole("link", { name: /damon@placetostandagency\.com/i })
+      page.getByRole("link", { name: /damon@clearroadlabs\.com/i })
     ).toBeVisible()
   })
 
@@ -2344,8 +2344,8 @@ With `npm run dev` running:
 2. Click Book a Call → lands on `/contact`. Confirm no 404.
 3. Submit the form with real (test) data. Confirm success state.
 4. Check Supabase `contact_messages` for the new row.
-5. Check damon@placetostandagency.com for the notification email.
-6. Navigate to `/about` — confirm Place To Stand framing, Valise card, "How we work" section.
+5. Check damon@clearroadlabs.com for the notification email.
+6. Navigate to `/about` — confirm Clear Road Labs framing, Valise card, "How we work" section.
 7. Scroll to footer — confirm Trust column (Security, Terms, Privacy), agency attribution, mailto link.
 8. Click Security → confirm 4 pillars + LLM/Regulated-data sections render.
 9. Click Terms, then Privacy — confirm both render end-to-end.

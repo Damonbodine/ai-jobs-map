@@ -891,7 +891,7 @@ function CtaPage({ props }: { props: TeamDeckProps }) {
         </Text>
       </View>
       <View style={{ backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 8, padding: 16 }}>
-        <Text style={{ fontSize: 8, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>Place To Stand Agency</Text>
+        <Text style={{ fontSize: 8, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>Clear Road Labs</Text>
         <Text style={{ fontSize: 10, color: C.bg }}>{props.agencyName}</Text>
         <Text style={{ fontSize: 10, color: "#60a5fa", marginTop: 2 }}>{props.siteUrl}/contact</Text>
       </View>
@@ -1264,7 +1264,7 @@ Expected: newest deployment shows READY state
 
 - [ ] **Step 6: Manual spot-check**
 
-Submit the team inquiry form at `https://ai-jobs-map.vercel.app/build-a-team?roles=registered-nurses:2,software-developers:1` with `damon@placetostandagency.com`. Check that the PDF attachment is multi-page and contains role sections and module deep-dives.
+Submit the team inquiry form at `https://ai-jobs-map.vercel.app/build-a-team?roles=registered-nurses:2,software-developers:1` with `damon@clearroadlabs.com`. Check that the PDF attachment is multi-page and contains role sections and module deep-dives.
 
 Submit the one-pager form at `https://ai-jobs-map.vercel.app/occupation/registered-nurses`. Check that the PDF has 2 pages including a module breakdown.
 

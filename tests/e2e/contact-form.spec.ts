@@ -9,7 +9,7 @@ test.describe("/contact page", () => {
     ).toBeVisible()
 
     await expect(
-      page.getByText(/place to stand agency/i).first()
+      page.getByText(/clear road labs/i).first()
     ).toBeVisible()
 
     await expect(page.getByLabel(/your name/i)).toBeVisible()
@@ -22,7 +22,7 @@ test.describe("/contact page", () => {
 
     // Email fallback link
     await expect(
-      page.getByRole("link", { name: /damon@placetostandagency\.com/i }).first()
+      page.getByRole("link", { name: /damon@clearroadlabs\.com/i }).first()
     ).toBeVisible()
   })
 

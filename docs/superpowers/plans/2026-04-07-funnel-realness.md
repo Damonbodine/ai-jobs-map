@@ -2052,7 +2052,7 @@ Start dev server. Submit a valid inquiry with curl. Verify:
 - 200 `{ok:true}` response
 - New row in `assistant_inquiries` with `source = "occupation-inline"`
 - One confirmation email delivered to the test address (PDF attached)
-- One notification email delivered to `damon@placetostandagency.com` (PDF attached)
+- One notification email delivered to `damon@clearroadlabs.com` (PDF attached)
 - PDF opens cleanly in Preview — no font fallback warnings, layout intact
 
 Then repeat with:
@@ -2081,7 +2081,7 @@ Same matrix: valid, invalid, honeypot, malformed. Verify `one_pager_requests` ta
 Open the actual PDF files emailed to the test address. Check:
 - Newsreader + Manrope fonts rendering
 - Blue accent color (#2563eb) on headings and callouts
-- "PLACE TO STAND AGENCY" header present
+- "CLEAR ROAD LABS" header present
 - Stats row shows minutes/day, annual value, task count
 - Footer has generated date + agency attribution
 - Page fits on LETTER without overflow

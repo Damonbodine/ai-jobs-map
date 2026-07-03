@@ -53,7 +53,7 @@ Applied as CSS variables on the page's root div. No Tailwind involvement — the
 4. **847 ways to start** — 4-column occupation grid, neon category labels, hover spark-burst (6 rising coins per card), translateY(-6px) lift.
 5. **Staff a whole function** — interactive team builder (Software Engineers / Customer Success / Marketing), +/– seat buttons, live count-up of reclaimed minutes, FTE + $/year derivations.
 6. **Start reclaiming CTA** — sunrise radial gradient, animated 4-stop gradient-shift on RECLAIMING wordmark, breathing button.
-7. **Footer** — DM Mono, © 2026 · PLACE TO STAND AGENCY · BUILT ON BLS · O*NET.
+7. **Footer** — DM Mono, © 2026 · CLEAR ROAD LABS · BUILT ON BLS · O*NET.
 
 ## What intentionally changes
 

@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server"
 import { buildATeamInquirySchema } from "@/lib/validation/build-a-team-inquiry"
 import { sendEmail } from "@/lib/resend"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { occupations, occupationAutomationProfile, jobMicroTasks, teamInquiryRequests } from "@/lib/db/schema"
+import { eq, inArray } from "drizzle-orm"
 import { renderTeamDeckPdf } from "@/lib/pdf/render"
 import { computeRoleSections, computeTopModules, computePhases, type CartItemWithSelection } from "@/lib/pdf/team-deck-data"
 import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
@@ -44,28 +46,70 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data
-  const supabase = createServerClient()
 
   // Fetch all occupations in the submitted cart server-side.
   const slugs = input.roles.map(r => r.slug)
-  const { data: occupations, error: occError } = await supabase
-    .from("occupations").select("id, slug, title, hourly_wage").in("slug", slugs)
-  if (occError || !occupations?.length) {
+  const occupationsData = await db
+    .select({
+      id: occupations.id,
+      slug: occupations.slug,
+      title: occupations.title,
+      hourly_wage: occupations.hourlyWage,
+    })
+    .from(occupations)
+    .where(inArray(occupations.slug, slugs))
+
+  const occupationsList = occupationsData.map(o => ({
+    ...o,
+    hourly_wage: o.hourly_wage ? parseFloat(o.hourly_wage) : null,
+  }))
+
+  if (!occupationsList.length) {
     return NextResponse.json({ error: "Unknown roles in cart" }, { status: 400 })
   }
 
-  const occupationIds = occupations.map(o => o.id)
-  const [{ data: profiles }, { data: tasks }] = await Promise.all([
-    supabase.from("occupation_automation_profile").select("*").in("occupation_id", occupationIds),
-    supabase.from("job_micro_tasks").select("*").in("occupation_id", occupationIds),
+  const occupationIds = occupationsList.map(o => o.id)
+  const [profiles, tasks] = await Promise.all([
+    db
+      .select({
+        id: occupationAutomationProfile.id,
+        occupation_id: occupationAutomationProfile.occupationId,
+        composite_score: occupationAutomationProfile.compositeScore,
+        work_activity_automation_potential: occupationAutomationProfile.workActivityAutomationPotential,
+        time_range_low: occupationAutomationProfile.timeRangeLow,
+        time_range_high: occupationAutomationProfile.timeRangeHigh,
+        time_range_by_block: occupationAutomationProfile.timeRangeByBlock,
+        block_example_tasks: occupationAutomationProfile.blockExampleTasks,
+        top_automatable_activities: occupationAutomationProfile.topAutomatableActivities,
+        top_blocking_abilities: occupationAutomationProfile.topBlockingAbilities,
+        physical_ability_avg: occupationAutomationProfile.physicalAbilityAvg,
+      })
+      .from(occupationAutomationProfile)
+      .where(inArray(occupationAutomationProfile.occupationId, occupationIds)),
+    db
+      .select({
+        id: jobMicroTasks.id,
+        occupation_id: jobMicroTasks.occupationId,
+        task_name: jobMicroTasks.taskName,
+        task_description: jobMicroTasks.taskDescription,
+        frequency: jobMicroTasks.frequency,
+        ai_applicable: jobMicroTasks.aiApplicable,
+        ai_how_it_helps: jobMicroTasks.aiHowItHelps,
+        ai_impact_level: jobMicroTasks.aiImpactLevel,
+        ai_effort_to_implement: jobMicroTasks.aiEffortToImplement,
+        ai_category: jobMicroTasks.aiCategory,
+        ai_tools: jobMicroTasks.aiTools,
+      })
+      .from(jobMicroTasks)
+      .where(inArray(jobMicroTasks.occupationId, occupationIds)),
   ])
 
   const roleDataBySlug = new Map<string, RoleData>()
-  for (const occ of occupations) {
+  for (const occ of occupationsList) {
     roleDataBySlug.set(occ.slug, {
-      occupation: occ,
-      profile: (profiles ?? []).find(p => p.occupation_id === occ.id) ?? null,
-      tasks: (tasks ?? []).filter(t => t.occupation_id === occ.id),
+      occupation: occ as any,
+      profile: (profiles ?? []).find(p => p.occupation_id === occ.id) as any ?? null,
+      tasks: (tasks ?? []).filter(t => t.occupation_id === occ.id) as any[],
     })
   }
 
@@ -79,32 +123,38 @@ export async function POST(request: Request) {
     count: r.count,
     selectedModules: r.selectedModules,
     selectedTaskIds: r.selectedTaskIds,
-    title: occupations.find(o => o.slug === r.slug)?.title ?? r.slug,
+    title: occupationsList.find(o => o.slug === r.slug)?.title ?? r.slug,
   }))
 
   const tier = PRICING_TIERS.find(t => t.key === input.tierKey) ?? PRICING_TIERS[0]
 
   // Insert lead row FIRST (two-writes-no-silent-failure pattern).
-  const { data: insertedRow, error: dbError } = await supabase
-    .from("team_inquiry_requests")
-    .insert({
-      contact_email: input.contactEmail,
-      contact_name: input.contactName ?? null,
-      roles_json: rolesJson,
-      team_size: input.teamSize || null,
-      tier: tier.key,
-      custom_requests: input.customRequests,
-      total_people: totals.totalPeople,
-      total_minutes_per_day: Math.round(totals.totalMinutesPerDay),
-      total_annual_value: Math.round(totals.totalAnnualValue),
-      fte_equivalents: totals.fteEquivalents,
-      user_agent: userAgent,
-      ip_hash: ipHash,
-    })
-    .select("id").single()
+  let insertedRow: { id: string } | undefined
+  try {
+    const results = await db
+      .insert(teamInquiryRequests)
+      .values({
+        contactEmail: input.contactEmail,
+        contactName: input.contactName ?? null,
+        rolesJson: rolesJson,
+        teamSize: input.teamSize || null,
+        tier: tier.key,
+        customRequests: input.customRequests,
+        totalPeople: totals.totalPeople,
+        totalMinutesPerDay: Math.round(totals.totalMinutesPerDay),
+        totalAnnualValue: Math.round(totals.totalAnnualValue),
+        fteEquivalents: totals.fteEquivalents ? String(totals.fteEquivalents) : null,
+        userAgent: userAgent,
+        ipHash: ipHash,
+      })
+      .returning({ id: teamInquiryRequests.id })
+    insertedRow = results[0]
+  } catch (dbErr) {
+    console.error("[build-a-team/inquiry] db insert failed", dbErr)
+    return NextResponse.json({ error: "We couldn't process your request. Please try again shortly." }, { status: 500 })
+  }
 
-  if (dbError || !insertedRow) {
-    console.error("[build-a-team/inquiry] db insert failed", dbError)
+  if (!insertedRow) {
     return NextResponse.json({ error: "We couldn't process your request. Please try again shortly." }, { status: 500 })
   }
 
@@ -173,9 +223,17 @@ export async function POST(request: Request) {
     console.error("[build-a-team/inquiry] email failed", err)
   }
 
-  await supabase.from("team_inquiry_requests")
-    .update({ pdf_sent_at: emailSent ? new Date().toISOString() : null, pdf_send_error: emailError ?? pdfError })
-    .eq("id", insertedRow.id)
+  try {
+    await db
+      .update(teamInquiryRequests)
+      .set({
+        pdfSentAt: emailSent ? new Date().toISOString() : null,
+        pdfSendError: emailError ?? pdfError,
+      })
+      .where(eq(teamInquiryRequests.id, insertedRow.id))
+  } catch (updateErr) {
+    console.error("[build-a-team/inquiry] update status failed", updateErr)
+  }
 
   return NextResponse.json({ ok: true })
 }

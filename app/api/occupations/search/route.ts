@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { occupations } from "@/lib/db/schema"
+import { ilike, and } from "drizzle-orm"
 
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get("q")?.trim() ?? ""
@@ -9,8 +11,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = createServerClient()
-
     // Split query into words and match each against the title.
     // "Financial Analyst" becomes: title ilike '%financial%' AND title ilike '%analyst%'
     const words = query.split(/\s+/).filter((w) => w.length >= 2)
@@ -18,22 +18,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ results: [] })
     }
 
-    let builder = supabase
-      .from("occupations")
-      .select("id, title, slug, major_category")
+    const conditions = words.map((word) => ilike(occupations.title, `%${word}%`))
 
-    for (const word of words) {
-      builder = builder.ilike("title", `%${word}%`)
-    }
-
-    const { data, error } = await builder.order("title").limit(10)
-
-    if (error) {
-      return NextResponse.json({ results: [] }, { status: 200 })
-    }
+    const data = await db
+      .select({
+        id: occupations.id,
+        title: occupations.title,
+        slug: occupations.slug,
+        major_category: occupations.majorCategory,
+      })
+      .from(occupations)
+      .where(and(...conditions))
+      .orderBy(occupations.title)
+      .limit(10)
 
     return NextResponse.json({ results: data ?? [] })
   } catch {
     return NextResponse.json({ results: [] }, { status: 200 })
   }
 }
+

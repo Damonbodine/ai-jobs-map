@@ -1,11 +1,12 @@
 // app/api/demo/lead/route.ts
 // POST captures an email + the task description that generated the custom demo.
-// Writes to Supabase first (source of truth), then notifies Damon via Resend.
+// Writes to Postgres first (source of truth), then notifies Damon via Resend.
 // If Resend fails we still return success — the lead is saved and followable manually.
 
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { demoLeads } from "@/lib/db/schema"
 import { sendEmail } from "@/lib/resend"
 import { CONTACT, AGENCY, SITE } from "@/lib/site"
 import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
@@ -65,23 +66,22 @@ export async function POST(request: Request) {
 
   const { email, taskDescription, occupationContext } = parsed.data
 
-  const supabase = createServerClient()
-  const { error: dbError } = await supabase.from("demo_leads").insert({
-    email,
-    task_description: taskDescription,
-    occupation_context: occupationContext ?? null,
-    ip_hash: ipHash,
-  })
-
-  if (dbError) {
-    console.error("[demo/lead] supabase insert failed", dbError)
+  try {
+    await db.insert(demoLeads).values({
+      email,
+      taskDescription,
+      occupationContext: occupationContext ?? null,
+      ipHash: ipHash,
+    })
+  } catch (dbError) {
+    console.error("[demo/lead] database insert failed", dbError)
     return NextResponse.json(
       { error: "We couldn't save that. Please try again shortly." },
       { status: 500 }
     )
   }
 
-  // Notify damon@placetostandagency.com via Resend.
+  // Notify CONTACT.email via Resend.
   // DB already succeeded — if Resend fails, the lead is still saved and
   // followable manually. Log loudly so we can fix Resend config.
   try {
@@ -117,7 +117,7 @@ Submitted via ${SITE.name} /demo/try — ${AGENCY.name}`,
     })
   } catch (err) {
     console.error("[demo/lead] resend notification failed", err)
-    // Do NOT fail the request; the lead is saved in Supabase.
+    // Do NOT fail the request; the lead is saved in the database.
   }
 
   return NextResponse.json({ ok: true }, { status: 200 })

@@ -90,7 +90,7 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc list-inside space-y-1 mt-2">
               <li>
-                <strong className="text-foreground">Supabase</strong> — stores
+                <strong className="text-foreground">Neon</strong> — stores
                 form submissions in an encrypted Postgres database.
               </li>
               <li>
@@ -151,7 +151,7 @@ export default function PrivacyPage() {
             </h2>
             <p>
               We use industry-standard encryption in transit (HTTPS) and at
-              rest (Supabase managed Postgres). No system is perfectly secure,
+              rest (Neon managed Postgres). No system is perfectly secure,
               but we take reasonable care to protect your information and will
               notify you promptly if we learn of a breach affecting your data.
             </p>

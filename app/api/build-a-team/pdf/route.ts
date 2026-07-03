@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server"
 import { buildATeamPdfSchema } from "@/lib/validation/build-a-team"
 import { sendEmail } from "@/lib/resend"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { occupations, occupationAutomationProfile, jobMicroTasks, departmentRoiRequests } from "@/lib/db/schema"
+import { eq, inArray } from "drizzle-orm"
 import { renderDepartmentPdf } from "@/lib/pdf/render"
 import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
 import { AGENCY, SITE } from "@/lib/site"
@@ -65,18 +67,27 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data
-  const supabase = createServerClient()
 
-  // Fetch every occupation in the cart from Supabase. We never trust
+  // Fetch every occupation in the cart. We never trust
   // client-sent display values — the PDF numbers are computed from the
   // canonical hourly_wage and the live task list.
   const slugs = input.cart.map((c) => c.slug)
-  const { data: occupations, error: occError } = await supabase
-    .from("occupations")
-    .select("id, slug, title, hourly_wage")
-    .in("slug", slugs)
+  const occupationsData = await db
+    .select({
+      id: occupations.id,
+      slug: occupations.slug,
+      title: occupations.title,
+      hourly_wage: occupations.hourlyWage,
+    })
+    .from(occupations)
+    .where(inArray(occupations.slug, slugs))
 
-  if (occError || !occupations || occupations.length === 0) {
+  const occupationsList = occupationsData.map(o => ({
+    ...o,
+    hourly_wage: o.hourly_wage ? parseFloat(o.hourly_wage) : null,
+  }))
+
+  if (occupationsList.length === 0) {
     return NextResponse.json(
       { error: "Unknown roles in cart" },
       { status: 400 }
@@ -84,49 +95,81 @@ export async function POST(request: Request) {
   }
 
   // Fetch profiles + tasks for every occupation in parallel.
-  const occupationIds = occupations.map((o) => o.id)
-  const [{ data: profiles }, { data: tasks }] = await Promise.all([
-    supabase
-      .from("occupation_automation_profile")
-      .select("*")
-      .in("occupation_id", occupationIds),
-    supabase
-      .from("job_micro_tasks")
-      .select("*")
-      .in("occupation_id", occupationIds),
+  const occupationIds = occupationsList.map((o) => o.id)
+  const [profiles, tasks] = await Promise.all([
+    db
+      .select({
+        id: occupationAutomationProfile.id,
+        occupation_id: occupationAutomationProfile.occupationId,
+        composite_score: occupationAutomationProfile.compositeScore,
+        work_activity_automation_potential: occupationAutomationProfile.workActivityAutomationPotential,
+        time_range_low: occupationAutomationProfile.timeRangeLow,
+        time_range_high: occupationAutomationProfile.timeRangeHigh,
+        time_range_by_block: occupationAutomationProfile.timeRangeByBlock,
+        block_example_tasks: occupationAutomationProfile.blockExampleTasks,
+        top_automatable_activities: occupationAutomationProfile.topAutomatableActivities,
+        top_blocking_abilities: occupationAutomationProfile.topBlockingAbilities,
+        physical_ability_avg: occupationAutomationProfile.physicalAbilityAvg,
+      })
+      .from(occupationAutomationProfile)
+      .where(inArray(occupationAutomationProfile.occupationId, occupationIds)),
+    db
+      .select({
+        id: jobMicroTasks.id,
+        occupation_id: jobMicroTasks.occupationId,
+        task_name: jobMicroTasks.taskName,
+        task_description: jobMicroTasks.taskDescription,
+        frequency: jobMicroTasks.frequency,
+        ai_applicable: jobMicroTasks.aiApplicable,
+        ai_how_it_helps: jobMicroTasks.aiHowItHelps,
+        ai_impact_level: jobMicroTasks.aiImpactLevel,
+        ai_effort_to_implement: jobMicroTasks.aiEffortToImplement,
+        ai_category: jobMicroTasks.aiCategory,
+        ai_tools: jobMicroTasks.aiTools,
+      })
+      .from(jobMicroTasks)
+      .where(inArray(jobMicroTasks.occupationId, occupationIds)),
   ])
 
   // Build the per-slug RoleData map for the compute helper.
   const roleDataBySlug = new Map<string, RoleData>()
-  for (const occ of occupations) {
+  for (const occ of occupationsList) {
     roleDataBySlug.set(occ.slug, {
-      occupation: occ,
-      profile: (profiles ?? []).find((p) => p.occupation_id === occ.id) ?? null,
-      tasks: (tasks ?? []).filter((t) => t.occupation_id === occ.id),
+      occupation: occ as any,
+      profile: (profiles ?? []).find((p) => p.occupation_id === occ.id) as any ?? null,
+      tasks: (tasks ?? []).filter((t) => t.occupation_id === occ.id) as any[],
     })
   }
 
   const totals = computeDepartmentTotals(input.cart, roleDataBySlug)
 
   // Save the lead row FIRST.
-  const { data: insertedRow, error: dbError } = await supabase
-    .from("department_roi_requests")
-    .insert({
-      email: input.email,
-      team_label: input.teamLabel ?? null,
-      cart: input.cart,
-      total_people: totals.totalPeople,
-      total_minutes_per_day: Math.round(totals.totalMinutesPerDay),
-      total_annual_value: Math.round(totals.totalAnnualValue),
-      fte_equivalents: totals.fteEquivalents,
-      user_agent: userAgent,
-      ip_hash: ipHash,
-    })
-    .select("id")
-    .single()
+  let insertedRow: { id: string } | undefined
+  try {
+    const results = await db
+      .insert(departmentRoiRequests)
+      .values({
+        email: input.email,
+        teamLabel: input.teamLabel ?? null,
+        cart: input.cart,
+        totalPeople: totals.totalPeople,
+        totalMinutesPerDay: Math.round(totals.totalMinutesPerDay),
+        totalAnnualValue: Math.round(totals.totalAnnualValue),
+        fteEquivalents: totals.fteEquivalents ? String(totals.fteEquivalents) : null,
+        userAgent: userAgent,
+        ipHash: ipHash,
+      })
+      .returning({ id: departmentRoiRequests.id })
+    insertedRow = results[0]
+  } catch (dbErr) {
+    console.error("[build-a-team] database insert failed", dbErr)
+    return NextResponse.json(
+      { error: "We couldn't process your request. Please try again shortly." },
+      { status: 500 }
+    )
+  }
 
-  if (dbError || !insertedRow) {
-    console.error("[build-a-team] supabase insert failed", dbError)
+  if (!insertedRow) {
     return NextResponse.json(
       { error: "We couldn't process your request. Please try again shortly." },
       { status: 500 }
@@ -202,14 +245,17 @@ If the numbers make sense and you'd like to talk about a real build, book a scop
     console.error("[build-a-team] delivery email failed", err)
   }
 
-  // Persist delivery state for audit.
-  await supabase
-    .from("department_roi_requests")
-    .update({
-      pdf_sent_at: emailSent ? new Date().toISOString() : null,
-      pdf_send_error: emailError ?? pdfError,
-    })
-    .eq("id", insertedRow.id)
+  try {
+    await db
+      .update(departmentRoiRequests)
+      .set({
+        pdfSentAt: emailSent ? new Date().toISOString() : null,
+        pdfSendError: emailError ?? pdfError,
+      })
+      .where(eq(departmentRoiRequests.id, insertedRow.id))
+  } catch (updateErr) {
+    console.error("[build-a-team] update status failed", updateErr)
+  }
 
   return NextResponse.json({ ok: true }, { status: 200 })
 }

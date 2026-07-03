@@ -1,5 +1,7 @@
 // app/api/demo/search/route.ts
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { occupations } from "@/lib/db/schema"
+import { ilike, desc } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
 export async function GET(request: Request) {
@@ -10,13 +12,20 @@ export async function GET(request: Request) {
     return NextResponse.json([])
   }
 
-  const supabase = createServerClient()
-  const { data } = await supabase
-    .from("occupations")
-    .select("slug, title")
-    .ilike("title", `%${q}%`)
-    .order("employment", { ascending: false, nullsFirst: false })
-    .limit(8)
+  try {
+    const data = await db
+      .select({
+        slug: occupations.slug,
+        title: occupations.title,
+      })
+      .from(occupations)
+      .where(ilike(occupations.title, `%${q}%`))
+      .orderBy(desc(occupations.employment))
+      .limit(8)
 
-  return NextResponse.json(data ?? [])
+    return NextResponse.json(data ?? [])
+  } catch {
+    return NextResponse.json([])
+  }
 }
+

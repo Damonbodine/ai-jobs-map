@@ -4,7 +4,9 @@ import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, ChevronRight } from "lucide-react"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { occupations } from "@/lib/db/schema"
+import { desc } from "drizzle-orm"
 import { FadeIn } from "@/components/FadeIn"
 import { PageTransition } from "@/components/PageTransition"
 import { deriveOccupationStory } from "@/lib/occupation-story"
@@ -27,17 +29,19 @@ import { OnePagerButton } from "./one-pager-button"
 import { OccupationDemoSection, OccupationDemoSectionSkeleton } from "@/components/demo/OccupationDemoSection"
 
 export async function generateStaticParams() {
-  // Build-time Supabase fetch is best-effort: if env vars aren't available in
+  // Build-time pg/Drizzle fetch is best-effort: if env vars aren't available in
   // this build scope (e.g. Vercel Preview without DB creds), skip pre-rendering
   // and let all slugs SSR on demand. Production has the creds and pre-renders.
   try {
-    const supabase = createServerClient()
-    const { data } = await supabase
-      .from("occupations")
-      .select("slug, employment")
-      .order("employment", { ascending: false, nullsFirst: false })
+    const data = await db
+      .select({
+        slug: occupations.slug,
+        employment: occupations.employment,
+      })
+      .from(occupations)
+      .orderBy(desc(occupations.employment))
       .limit(20)
-    return (data ?? []).map((o) => ({ slug: o.slug }))
+    return data.map((o) => ({ slug: o.slug }))
   } catch (err) {
     console.warn("[generateStaticParams] skipping pre-render:", (err as Error).message)
     return []

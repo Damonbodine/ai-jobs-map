@@ -1,16 +1,18 @@
+import { describe, it, expect } from "vitest"
 import { impactRetentionFactor, computeRoleSections, computeTopModules, computePhases, type RoleDeckSection, type TaskWithTimes } from "./team-deck-data"
 import type { MicroTask, AutomationProfile } from "@/types"
 
 const mockProfile: AutomationProfile = {
-  id: 1, occupation_id: 1, composite_score: 60,
-  ability_automation_potential: 0.5, work_activity_automation_potential: 0.5,
-  keyword_score: 0.5, knowledge_digital_readiness: 0.5,
-  task_frequency_weight: 0.3, physical_ability_avg: 1.2,
-  cognitive_routine_avg: 3.0, cognitive_creative_avg: 3.0,
-  top_automatable_activities: null, top_blocking_abilities: null,
-  time_range_low: 20, time_range_high: 60,
-  time_range_by_block: null, block_example_tasks: null,
-  created_at: "", updated_at: "",
+  id: 1,
+  occupation_id: 1,
+  composite_score: 60,
+  work_activity_automation_potential: 0.5,
+  physical_ability_avg: 1.2,
+  time_range_low: 20,
+  time_range_high: 60,
+  time_range_by_block: "",
+  top_automatable_activities: "",
+  top_blocking_abilities: "",
 }
 
 const mockTasks: MicroTask[] = [
@@ -23,9 +25,8 @@ const mockTasks: MicroTask[] = [
     ai_how_it_helps: "AI drafts notes from voice input",
     ai_impact_level: 5,
     ai_effort_to_implement: 1,
-    ai_category: "documentation",
+    ai_category: "documentation" as any,
     ai_tools: "GPT-4, DAX Copilot",
-    created_at: "", updated_at: "",
   },
   {
     id: 2, occupation_id: 1,
@@ -36,9 +37,8 @@ const mockTasks: MicroTask[] = [
     ai_how_it_helps: "AI prioritizes queue",
     ai_impact_level: 4,
     ai_effort_to_implement: 2,
-    ai_category: "intake",
+    ai_category: "intake" as any,
     ai_tools: "ChatGPT",
-    created_at: "", updated_at: "",
   },
 ]
 

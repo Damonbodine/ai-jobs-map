@@ -47,3 +47,5 @@ next-env.d.ts
 # Drizzle
 drizzle.config.ts
 .playwright-mcp/
+.env*.local
+backups/

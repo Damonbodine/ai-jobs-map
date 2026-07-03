@@ -1,6 +1,8 @@
 // app/demo/page.tsx
 import { Suspense } from "react"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { occupations } from "@/lib/db/schema"
+import { inArray } from "drizzle-orm"
 import { DemoTeaser } from "@/components/demo/DemoTeaser"
 import { OccupationSearch } from "@/components/demo/OccupationSearch"
 import Link from "next/link"
@@ -21,13 +23,14 @@ const FEATURED_SLUGS = [
 ]
 
 async function FeaturedRoles() {
-  const supabase = createServerClient()
-  const { data } = await supabase
-    .from("occupations")
-    .select("slug, title, major_category")
-    .in("slug", FEATURED_SLUGS)
-
-  const roles = data ?? []
+  const roles = await db
+    .select({
+      slug: occupations.slug,
+      title: occupations.title,
+      major_category: occupations.majorCategory,
+    })
+    .from(occupations)
+    .where(inArray(occupations.slug, FEATURED_SLUGS))
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl mx-auto">

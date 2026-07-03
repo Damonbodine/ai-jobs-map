@@ -3,7 +3,9 @@ export const dynamic = "force-dynamic"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, ChevronRight } from "lucide-react"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { occupations as occupationsTable, occupationAutomationProfile } from "@/lib/db/schema"
+import { eq } from "drizzle-orm"
 import { getCategoryBySlug, CATEGORIES } from "@/lib/categories"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 
@@ -33,16 +35,28 @@ export default async function CategoryPage(props: {
   let occupations: any[] = []
 
   try {
-    const supabase = createServerClient()
-    const { data } = await supabase
-      .from("occupations")
-      .select(
-        "id, title, slug, major_category, employment, occupation_automation_profile(composite_score)"
+    const rows = await db
+      .select({
+        id: occupationsTable.id,
+        title: occupationsTable.title,
+        slug: occupationsTable.slug,
+        major_category: occupationsTable.majorCategory,
+        employment: occupationsTable.employment,
+        occupation_automation_profile: {
+          composite_score: occupationAutomationProfile.compositeScore,
+        }
+      })
+      .from(occupationsTable)
+      .leftJoin(
+        occupationAutomationProfile,
+        eq(occupationsTable.id, occupationAutomationProfile.occupationId)
       )
-      .eq("major_category", cat.dbValue)
-      .order("title")
-    occupations = data ?? []
-  } catch {
+      .where(eq(occupationsTable.majorCategory, cat.dbValue))
+      .orderBy(occupationsTable.title)
+
+    occupations = rows ?? []
+  } catch (err) {
+    console.error("[CategoryPage] fetch error:", err)
     // fall back to empty results if DB unavailable
   }
 

@@ -1,46 +1,62 @@
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { moduleCapabilities, taskCapabilityMappings } from "@/lib/db/schema"
+import { eq, inArray } from "drizzle-orm"
 import type { ModuleCapability } from "@/types"
 
 /**
  * Fetch all capabilities for a given module key.
  */
 export async function getCapabilitiesForModule(moduleKey: string): Promise<ModuleCapability[]> {
-  const supabase = await createServerClient()
-  const { data, error } = await supabase
-    .from("module_capabilities")
-    .select("*")
-    .eq("module_key", moduleKey)
-    .order("capability_name")
+  try {
+    const data = await db
+      .select({
+        id: moduleCapabilities.id,
+        module_key: moduleCapabilities.moduleKey,
+        capability_key: moduleCapabilities.capabilityKey,
+        capability_name: moduleCapabilities.capabilityName,
+        description: moduleCapabilities.description,
+        example_tasks: moduleCapabilities.exampleTasks,
+        likely_systems: moduleCapabilities.likelySystems,
+      })
+      .from(moduleCapabilities)
+      .where(eq(moduleCapabilities.moduleKey, moduleKey))
+      .orderBy(moduleCapabilities.capabilityName)
 
-  if (error) {
+    return data as ModuleCapability[]
+  } catch (error) {
     console.error(`Error fetching capabilities for ${moduleKey}:`, error)
     return []
   }
-  return data as ModuleCapability[]
 }
 
 /**
  * Fetch all capabilities, grouped by module key.
  */
 export async function getAllCapabilities(): Promise<Record<string, ModuleCapability[]>> {
-  const supabase = await createServerClient()
-  const { data, error } = await supabase
-    .from("module_capabilities")
-    .select("*")
-    .order("module_key")
-    .order("capability_name")
+  try {
+    const data = await db
+      .select({
+        id: moduleCapabilities.id,
+        module_key: moduleCapabilities.moduleKey,
+        capability_key: moduleCapabilities.capabilityKey,
+        capability_name: moduleCapabilities.capabilityName,
+        description: moduleCapabilities.description,
+        example_tasks: moduleCapabilities.exampleTasks,
+        likely_systems: moduleCapabilities.likelySystems,
+      })
+      .from(moduleCapabilities)
+      .orderBy(moduleCapabilities.moduleKey, moduleCapabilities.capabilityName)
 
-  if (error) {
+    const grouped: Record<string, ModuleCapability[]> = {}
+    for (const cap of data as ModuleCapability[]) {
+      if (!grouped[cap.module_key]) grouped[cap.module_key] = []
+      grouped[cap.module_key].push(cap)
+    }
+    return grouped
+  } catch (error) {
     console.error("Error fetching capabilities:", error)
     return {}
   }
-
-  const grouped: Record<string, ModuleCapability[]> = {}
-  for (const cap of data as ModuleCapability[]) {
-    if (!grouped[cap.module_key]) grouped[cap.module_key] = []
-    grouped[cap.module_key].push(cap)
-  }
-  return grouped
 }
 
 /**
@@ -52,27 +68,42 @@ export async function getCapabilitiesForTasks(
 ): Promise<Record<string, ModuleCapability[]>> {
   if (taskIds.length === 0) return {}
 
-  const supabase = await createServerClient()
-  const { data: mappings, error: mapError } = await supabase
-    .from("task_capability_mappings")
-    .select("capability_key")
-    .in("micro_task_id", taskIds)
+  try {
+    const mappings = await db
+      .select({
+        capability_key: taskCapabilityMappings.capabilityKey,
+      })
+      .from(taskCapabilityMappings)
+      .where(inArray(taskCapabilityMappings.microTaskId, taskIds))
 
-  if (mapError || !mappings?.length) return {}
+    if (!mappings?.length) return {}
 
-  const capKeys = [...new Set(mappings.map((m: { capability_key: string }) => m.capability_key))]
+    const capKeys = [...new Set(mappings.map((m) => m.capability_key))]
 
-  const { data: caps, error: capError } = await supabase
-    .from("module_capabilities")
-    .select("*")
-    .in("capability_key", capKeys)
+    const caps = await db
+      .select({
+        id: moduleCapabilities.id,
+        module_key: moduleCapabilities.moduleKey,
+        capability_key: moduleCapabilities.capabilityKey,
+        capability_name: moduleCapabilities.capabilityName,
+        description: moduleCapabilities.description,
+        example_tasks: moduleCapabilities.exampleTasks,
+        likely_systems: moduleCapabilities.likelySystems,
+      })
+      .from(moduleCapabilities)
+      .where(inArray(moduleCapabilities.capabilityKey, capKeys))
 
-  if (capError || !caps) return {}
+    if (!caps) return {}
 
-  const grouped: Record<string, ModuleCapability[]> = {}
-  for (const cap of caps as ModuleCapability[]) {
-    if (!grouped[cap.module_key]) grouped[cap.module_key] = []
-    grouped[cap.module_key].push(cap)
+    const grouped: Record<string, ModuleCapability[]> = {}
+    for (const cap of caps as ModuleCapability[]) {
+      if (!grouped[cap.module_key]) grouped[cap.module_key] = []
+      grouped[cap.module_key].push(cap)
+    }
+    return grouped
+  } catch (error) {
+    console.error("Error fetching capabilities for tasks:", error)
+    return {}
   }
-  return grouped
 }
+

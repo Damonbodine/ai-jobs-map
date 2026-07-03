@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server"
 import { inquirySchema } from "@/lib/validation/inquiry"
 import { sendEmail } from "@/lib/resend"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { occupations, occupationAutomationProfile, jobMicroTasks, assistantInquiries } from "@/lib/db/schema"
+import { eq, desc } from "drizzle-orm"
 import { renderBlueprintPdf } from "@/lib/pdf/render"
 import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
 import { AGENCY, CONTACT, SITE } from "@/lib/site"
@@ -11,6 +13,7 @@ import {
   estimateTaskMinutes,
   inferArchetypeMultiplier,
 } from "@/lib/timeback"
+import type { AutomationProfile, MicroTask } from "@/types"
 
 export const runtime = "nodejs"
 
@@ -68,63 +71,97 @@ export async function POST(request: Request) {
   }
 
   const input = parsed.data
-  const supabase = createServerClient()
 
   // Re-fetch occupation truth so the PDF identity (id, title, hourly_wage)
   // is never client-trusted.
-  const { data: occupation, error: occError } = await supabase
-    .from("occupations")
-    .select("id, title, slug, hourly_wage")
-    .eq("slug", input.occupationSlug)
-    .single()
+  const occupationsData = await db
+    .select({
+      id: occupations.id,
+      title: occupations.title,
+      slug: occupations.slug,
+      hourly_wage: occupations.hourlyWage,
+    })
+    .from(occupations)
+    .where(eq(occupations.slug, input.occupationSlug))
+    .limit(1)
 
-  if (occError || !occupation) {
+  if (occupationsData.length === 0) {
     return NextResponse.json({ error: "Unknown occupation" }, { status: 400 })
   }
+
+  const occupation = occupationsData[0]
 
   // Re-fetch the task list AND profile in parallel. Client-sent
   // displayedMinutes / displayedAnnualValue are NOT trusted — we
   // recompute from the subset of tasks the user actually selected.
-  const [{ data: profile }, { data: allTasks }] = await Promise.all([
-    supabase
-      .from("occupation_automation_profile")
-      .select("*")
-      .eq("occupation_id", occupation.id)
-      .single(),
-    supabase
-      .from("job_micro_tasks")
-      .select("*")
-      .eq("occupation_id", occupation.id)
-      .order("ai_impact_level", { ascending: false }),
+  const [profiles, allTasksData] = await Promise.all([
+    db
+      .select({
+        id: occupationAutomationProfile.id,
+        occupation_id: occupationAutomationProfile.occupationId,
+        composite_score: occupationAutomationProfile.compositeScore,
+        work_activity_automation_potential: occupationAutomationProfile.workActivityAutomationPotential,
+        time_range_low: occupationAutomationProfile.timeRangeLow,
+        time_range_high: occupationAutomationProfile.timeRangeHigh,
+        time_range_by_block: occupationAutomationProfile.timeRangeByBlock,
+        block_example_tasks: occupationAutomationProfile.blockExampleTasks,
+        top_automatable_activities: occupationAutomationProfile.topAutomatableActivities,
+        top_blocking_abilities: occupationAutomationProfile.topBlockingAbilities,
+        physical_ability_avg: occupationAutomationProfile.physicalAbilityAvg,
+      })
+      .from(occupationAutomationProfile)
+      .where(eq(occupationAutomationProfile.occupationId, occupation.id))
+      .limit(1),
+    db
+      .select({
+        id: jobMicroTasks.id,
+        occupation_id: jobMicroTasks.occupationId,
+        task_name: jobMicroTasks.taskName,
+        task_description: jobMicroTasks.taskDescription,
+        frequency: jobMicroTasks.frequency,
+        ai_applicable: jobMicroTasks.aiApplicable,
+        ai_how_it_helps: jobMicroTasks.aiHowItHelps,
+        ai_impact_level: jobMicroTasks.aiImpactLevel,
+        ai_effort_to_implement: jobMicroTasks.aiEffortToImplement,
+        ai_category: jobMicroTasks.aiCategory,
+        ai_tools: jobMicroTasks.aiTools,
+      })
+      .from(jobMicroTasks)
+      .where(eq(jobMicroTasks.occupationId, occupation.id))
+      .orderBy(desc(jobMicroTasks.aiImpactLevel)),
   ])
+
+  const profile = profiles.length > 0 ? (profiles[0] as unknown as AutomationProfile) : null
+  const allTasks = allTasksData as unknown as MicroTask[]
 
   // Insert the lead row FIRST — source of truth. If PDF/email fail
   // downstream, the lead is still saved and followable manually.
-  const { error: dbError } = await supabase.from("assistant_inquiries").insert({
-    occupation_id: occupation.id,
-    occupation_title: occupation.title,
-    occupation_slug: occupation.slug,
-    recommended_modules: input.selectedModules,
-    selected_modules: input.selectedModules,
-    added_modules: [],
-    removed_modules: [],
-    selected_capabilities: input.selectedCapabilities,
-    custom_requests: input.customRequests,
-    pain_points: [],
-    contact_name: input.contactName || null,
-    contact_email: input.contactEmail,
-    tier: input.tierKey,
-    source: input.source,
-  })
-
-  if (dbError) {
-    console.error("[inquiries] supabase insert failed", dbError)
+  try {
+    await db.insert(assistantInquiries).values({
+      occupationId: occupation.id,
+      occupationTitle: occupation.title,
+      occupationSlug: occupation.slug,
+      recommendedModules: input.selectedModules,
+      selectedModules: input.selectedModules,
+      addedModules: [],
+      removedModules: [],
+      selectedCapabilities: input.selectedCapabilities,
+      customRequests: input.customRequests,
+      painPoints: [],
+      contactName: input.contactName || null,
+      contactEmail: input.contactEmail,
+      tier: input.tierKey,
+      source: input.source,
+    })
+  } catch (dbError) {
+    console.error("[inquiries] database insert failed", dbError)
     return NextResponse.json(
       { error: "We couldn't save your request. Please try again shortly." },
       { status: 500 }
     )
   }
 
+  const hourlyWageFloat = occupation.hourly_wage ? parseFloat(occupation.hourly_wage) : null
   const tier = PRICING_TIERS.find((t) => t.key === input.tierKey)
   const generatedAt = new Date().toISOString().slice(0, 10)
 
@@ -132,7 +169,7 @@ export async function POST(request: Request) {
   // The client tells us which task IDs the user selected. From there
   // we recompute every number that ends up in the PDF + email so a
   // tampered or stale client cannot produce a misleading blueprint.
-  const archetypeMultiplier = inferArchetypeMultiplier(profile ?? null)
+  const archetypeMultiplier = inferArchetypeMultiplier(profile)
   const aiTasks = (allTasks ?? []).filter((t) => t.ai_applicable)
 
   const selectedIdSet = new Set(input.selectedTaskIds)
@@ -150,13 +187,13 @@ export async function POST(request: Request) {
     0
   )
   const { displayedMinutes: serverMinutes } = computeDisplayedTimeback(
-    profile ?? null,
+    profile,
     tasksForPdf,
     selectedTotalMinutes
   )
   const serverAnnualValue = computeAnnualValue(
     serverMinutes,
-    occupation.hourly_wage
+    hourlyWageFloat
   )
 
   const taskListForPdf = tasksForPdf.slice(0, 12).map((task) => ({

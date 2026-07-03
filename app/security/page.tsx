@@ -19,7 +19,7 @@ const PILLARS = [
   {
     icon: Server,
     title: "Infrastructure you can audit",
-    body: "Our production stack runs on Vercel (SOC 2 Type II) and Supabase (SOC 2 Type II, managed Postgres with encryption at rest and in transit). We document exactly which systems touch your data and can provide sub-processor lists on request.",
+    body: "Our production stack runs on Vercel (SOC 2 Type II) and Neon (SOC 2 Type II, managed Postgres with encryption at rest and in transit). We document exactly which systems touch your data and can provide sub-processor lists on request.",
   },
   {
     icon: Database,
@@ -132,7 +132,7 @@ export default function SecurityPage() {
             </p>
             <ul className="list-disc list-inside space-y-1 mt-2">
               <li>No tracking cookies, no advertising, no third-party analytics (as of the date above).</li>
-              <li>Submitted form data is stored in Supabase (encrypted at rest, RLS-locked).</li>
+              <li>Submitted form data is stored in Neon Postgres (encrypted at rest, accessible only to server-side code).</li>
               <li>Notification email is delivered via Resend; no marketing newsletters.</li>
               <li>You can request full deletion at any time by emailing{" "}
                 <a href={`mailto:${CONTACT.email}`} className="text-accent hover:underline">

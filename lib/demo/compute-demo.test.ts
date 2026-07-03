@@ -4,8 +4,10 @@ import { buildDemoRoleStats } from "./compute-demo"
 import type { DemoAgentStep } from "./types"
 
 // Top-level mocks — must be hoisted before any imports that use these modules
-vi.mock("@/lib/supabase/server", () => ({
-  createServerClient: vi.fn(),
+vi.mock("@/lib/occupation-data", () => ({
+  getOccupationBySlug: vi.fn(),
+  getOccupationProfile: vi.fn(),
+  getOccupationTasks: vi.fn(),
 }))
 
 vi.mock("./resolve-demo-content", () => ({
@@ -26,6 +28,7 @@ const mockTasks = [
 const mockProfile = {
   id: 1, occupation_id: 10, composite_score: 70, work_activity_automation_potential: null,
   time_range_low: 40, time_range_high: 80, physical_ability_avg: 1.0,
+  time_range_by_block: "", top_automatable_activities: "", top_blocking_abilities: "",
 }
 
 const mockPartialAgents: Omit<DemoAgentStep, "beforeMinutes" | "afterMinutes">[] = [
@@ -84,15 +87,18 @@ describe("buildDemoRoleStats", () => {
 describe("computeDemoForSlug", () => {
   // Lazy-import so the module picks up our vi.mock stubs above
   let computeDemoForSlug: (slug: string) => Promise<import("./types").DemoRoleData | null>
-  let createServerClientMock: ReturnType<typeof vi.fn>
+  let getOccupationBySlugMock: ReturnType<typeof vi.fn>
+  let getOccupationProfileMock: ReturnType<typeof vi.fn>
+  let getOccupationTasksMock: ReturnType<typeof vi.fn>
   let resolveAgentContentMock: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
     vi.clearAllMocks()
 
-    // Re-import mocked modules to grab the mock fns
-    const supabaseMod = await import("@/lib/supabase/server")
-    createServerClientMock = vi.mocked(supabaseMod.createServerClient)
+    const occDataMod = await import("@/lib/occupation-data")
+    getOccupationBySlugMock = vi.mocked(occDataMod.getOccupationBySlug)
+    getOccupationProfileMock = vi.mocked(occDataMod.getOccupationProfile)
+    getOccupationTasksMock = vi.mocked(occDataMod.getOccupationTasks)
 
     const resolverMod = await import("./resolve-demo-content")
     resolveAgentContentMock = vi.mocked(resolverMod.resolveAgentContent)
@@ -101,42 +107,18 @@ describe("computeDemoForSlug", () => {
     computeDemoForSlug = computeMod.computeDemoForSlug
   })
 
-  function makeSupabaseMock(
-    occupationData: unknown,
-    tasksData: unknown,
-    profileData: unknown
+  function makeOccupationDataMock(
+    occupationData: any,
+    tasksData: any,
+    profileData: any
   ) {
-    // Each .from() chain returns a chainable builder that resolves at .single() or at the end.
-    // We track which table is being queried so we can return the right data.
-    const makeChain = (resolvedData: unknown, isSingle = false) => {
-      const chain: Record<string, unknown> = {}
-      const terminal = () => Promise.resolve({ data: resolvedData, error: null })
-      chain.select = () => chain
-      chain.eq = () => chain
-      chain.order = () => chain
-      chain.single = terminal
-      // For non-single queries (tasks list), the chain itself is a thenable
-      if (!isSingle) {
-        ;(chain as unknown as Promise<unknown>).then = (resolve: (v: unknown) => unknown) =>
-          terminal().then(resolve)
-      }
-      return chain
-    }
-
-    const supabase = {
-      from: vi.fn((table: string) => {
-        if (table === "occupations") return makeChain(occupationData, true)
-        if (table === "job_micro_tasks") return makeChain(tasksData, false)
-        if (table === "occupation_automation_profile") return makeChain(profileData, true)
-        return makeChain(null, false)
-      }),
-    }
-    createServerClientMock.mockReturnValue(supabase)
-    return supabase
+    getOccupationBySlugMock.mockResolvedValue(occupationData)
+    getOccupationTasksMock.mockResolvedValue(tasksData ?? [])
+    getOccupationProfileMock.mockResolvedValue(profileData)
   }
 
   it("returns null for an unknown slug", async () => {
-    makeSupabaseMock(null, null, null)
+    makeOccupationDataMock(null, null, null)
 
     const result = await computeDemoForSlug("nonexistent-slug")
     expect(result).toBeNull()
@@ -150,13 +132,13 @@ describe("computeDemoForSlug", () => {
       major_category: "Construction",
       sub_category: null,
       employment: null,
-      hourly_wage: 25,
+      hourly_wage: "25", // String payload as in Drizzle
       annual_wage: null,
     }
     const noAiTasks = [
       { id: 1, occupation_id: 42, task_name: "Dig holes", task_description: "", frequency: "daily", ai_applicable: false, ai_impact_level: null, ai_effort_to_implement: null, ai_category: null, ai_how_it_helps: null, ai_tools: null },
     ]
-    makeSupabaseMock(occupation, noAiTasks, null)
+    makeOccupationDataMock(occupation, noAiTasks, null)
 
     const result = await computeDemoForSlug("manual-laborer")
     expect(result).toBeNull()
@@ -170,14 +152,14 @@ describe("computeDemoForSlug", () => {
       major_category: "Business",
       sub_category: null,
       employment: 50000,
-      hourly_wage: 40,
-      annual_wage: 83200,
+      hourly_wage: "40", // String payload as in Drizzle
+      annual_wage: null,
     }
     const tasks = [
       { id: 10, occupation_id: 99, task_name: "Triage data requests", task_description: "", frequency: "daily", ai_applicable: true, ai_impact_level: 5, ai_effort_to_implement: 2, ai_category: "intake", ai_how_it_helps: "automates routing", ai_tools: null },
       { id: 11, occupation_id: 99, task_name: "Build dashboards", task_description: "", frequency: "daily", ai_applicable: true, ai_impact_level: 4, ai_effort_to_implement: 3, ai_category: "analysis", ai_how_it_helps: "generates charts", ai_tools: null },
     ]
-    makeSupabaseMock(occupation, tasks, mockProfile)
+    makeOccupationDataMock(occupation, tasks, mockProfile)
 
     const fakeContent = {
       narrative: "Agent handles this automatically.",
@@ -205,7 +187,7 @@ describe("computeDemoForSlug", () => {
       major_category: "Business",
       sub_category: null,
       employment: 50000,
-      hourly_wage: 40,
+      hourly_wage: "40", // String payload as in Drizzle
       annual_wage: null,
     }
     // Two tasks from different categories → two modules
@@ -213,7 +195,7 @@ describe("computeDemoForSlug", () => {
       { id: 10, occupation_id: 99, task_name: "Triage data requests", task_description: "", frequency: "daily", ai_applicable: true, ai_impact_level: 5, ai_effort_to_implement: 2, ai_category: "intake", ai_how_it_helps: "automates routing", ai_tools: null },
       { id: 11, occupation_id: 99, task_name: "Build dashboards", task_description: "", frequency: "daily", ai_applicable: true, ai_impact_level: 4, ai_effort_to_implement: 3, ai_category: "analysis", ai_how_it_helps: "generates charts", ai_tools: null },
     ]
-    makeSupabaseMock(occupation, tasks, null)
+    makeOccupationDataMock(occupation, tasks, null)
 
     const fakeContent = {
       narrative: "Handled.",

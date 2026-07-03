@@ -2,7 +2,9 @@ export const dynamic = "force-dynamic"
 
 import Link from "next/link"
 import { Clock, Cpu, Users } from "lucide-react"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { occupations, occupationAutomationProfile, jobMicroTasks } from "@/lib/db/schema"
+import { eq, inArray } from "drizzle-orm"
 import { CATEGORIES } from "@/lib/categories"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 import { LandingSearch } from "@/app/landing-search"
@@ -44,31 +46,67 @@ export default async function HomePage() {
   let featuredExample: { title: string; slug: string; minutes: number; topAreas: string[] } | null = null
 
   try {
-    const supabase = createServerClient()
-
     // Fetch category counts
-    const { data } = await supabase.from("occupations").select("major_category")
-    for (const row of data ?? []) {
+    const categoryRows = await db
+      .select({ major_category: occupations.majorCategory })
+      .from(occupations)
+
+    for (const row of categoryRows ?? []) {
       categoryCounts[row.major_category] = (categoryCounts[row.major_category] || 0) + 1
     }
 
     // Fetch popular occupations with live time estimates
-    const { data: popOccs } = await supabase
-      .from("occupations")
-      .select("id, title, slug, major_category")
-      .in("slug", POPULAR_SLUGS)
+    const popOccs = await db
+      .select({
+        id: occupations.id,
+        title: occupations.title,
+        slug: occupations.slug,
+        major_category: occupations.majorCategory,
+      })
+      .from(occupations)
+      .where(inArray(occupations.slug, POPULAR_SLUGS))
 
     if (popOccs && popOccs.length > 0) {
       const popIds = popOccs.map((o) => o.id)
 
-      const [{ data: profiles }, { data: tasks }] = await Promise.all([
-        supabase.from("occupation_automation_profile").select("*").in("occupation_id", popIds),
-        supabase.from("job_micro_tasks").select("*").in("occupation_id", popIds),
+      const [profiles, tasks] = await Promise.all([
+        db
+          .select({
+            id: occupationAutomationProfile.id,
+            occupation_id: occupationAutomationProfile.occupationId,
+            composite_score: occupationAutomationProfile.compositeScore,
+            work_activity_automation_potential: occupationAutomationProfile.workActivityAutomationPotential,
+            time_range_low: occupationAutomationProfile.timeRangeLow,
+            time_range_high: occupationAutomationProfile.timeRangeHigh,
+            time_range_by_block: occupationAutomationProfile.timeRangeByBlock,
+            block_example_tasks: occupationAutomationProfile.blockExampleTasks,
+            top_automatable_activities: occupationAutomationProfile.topAutomatableActivities,
+            top_blocking_abilities: occupationAutomationProfile.topBlockingAbilities,
+            physical_ability_avg: occupationAutomationProfile.physicalAbilityAvg,
+          })
+          .from(occupationAutomationProfile)
+          .where(inArray(occupationAutomationProfile.occupationId, popIds)),
+        db
+          .select({
+            id: jobMicroTasks.id,
+            occupation_id: jobMicroTasks.occupationId,
+            task_name: jobMicroTasks.taskName,
+            task_description: jobMicroTasks.taskDescription,
+            frequency: jobMicroTasks.frequency,
+            ai_applicable: jobMicroTasks.aiApplicable,
+            ai_how_it_helps: jobMicroTasks.aiHowItHelps,
+            ai_impact_level: jobMicroTasks.aiImpactLevel,
+            ai_effort_to_implement: jobMicroTasks.aiEffortToImplement,
+            ai_category: jobMicroTasks.aiCategory,
+            ai_tools: jobMicroTasks.aiTools,
+          })
+          .from(jobMicroTasks)
+          .where(inArray(jobMicroTasks.occupationId, popIds)),
       ])
 
-      const profileMap = new Map((profiles ?? []).map((p: AutomationProfile) => [p.occupation_id, p]))
+      const profileMap = new Map((profiles ?? []).map((p) => [p.occupation_id, p as unknown as AutomationProfile]))
       const taskMap = new Map<number, MicroTask[]>()
-      for (const t of (tasks ?? []) as MicroTask[]) {
+      for (const t of (tasks ?? []) as unknown as MicroTask[]) {
         const existing = taskMap.get(t.occupation_id) ?? []
         existing.push(t)
         taskMap.set(t.occupation_id, existing)
@@ -80,7 +118,7 @@ export default async function HomePage() {
           if (!occ) return null
           const profile = profileMap.get(occ.id) ?? null
           const occTasks = taskMap.get(occ.id) ?? []
-          const blueprint = generateBlueprint(occ as Occupation, occTasks, profile)
+          const blueprint = generateBlueprint(occ as unknown as Occupation, occTasks, profile)
           const { displayedMinutes } = computeDisplayedTimeback(profile, occTasks, blueprint.totalMinutesSaved)
           return { title: occ.title, slug: occ.slug, minutes: displayedMinutes }
         })
@@ -105,20 +143,62 @@ export default async function HomePage() {
       featuredExample = { ...matchedPop, topAreas: pick.areas }
     } else {
       // Fetch separately if not in popular list
-      const { data: occ } = await supabase
-        .from("occupations")
-        .select("id, title, slug, major_category")
-        .eq("slug", pick.slug)
-        .single()
-      if (occ) {
-        const { data: prof } = await supabase.from("occupation_automation_profile").select("*").eq("occupation_id", occ.id).single()
-        const { data: tsk } = await supabase.from("job_micro_tasks").select("*").eq("occupation_id", occ.id)
-        const bp = generateBlueprint(occ as Occupation, (tsk ?? []) as MicroTask[], prof)
-        const { displayedMinutes } = computeDisplayedTimeback(prof, (tsk ?? []) as MicroTask[], bp.totalMinutesSaved)
+      const occs = await db
+        .select({
+          id: occupations.id,
+          title: occupations.title,
+          slug: occupations.slug,
+          major_category: occupations.majorCategory,
+        })
+        .from(occupations)
+        .where(eq(occupations.slug, pick.slug))
+        .limit(1)
+
+      if (occs.length > 0) {
+        const occ = occs[0]
+        const profiles = await db
+          .select({
+            id: occupationAutomationProfile.id,
+            occupation_id: occupationAutomationProfile.occupationId,
+            composite_score: occupationAutomationProfile.compositeScore,
+            work_activity_automation_potential: occupationAutomationProfile.workActivityAutomationPotential,
+            time_range_low: occupationAutomationProfile.timeRangeLow,
+            time_range_high: occupationAutomationProfile.timeRangeHigh,
+            time_range_by_block: occupationAutomationProfile.timeRangeByBlock,
+            block_example_tasks: occupationAutomationProfile.blockExampleTasks,
+            top_automatable_activities: occupationAutomationProfile.topAutomatableActivities,
+            top_blocking_abilities: occupationAutomationProfile.topBlockingAbilities,
+            physical_ability_avg: occupationAutomationProfile.physicalAbilityAvg,
+          })
+          .from(occupationAutomationProfile)
+          .where(eq(occupationAutomationProfile.occupationId, occ.id))
+          .limit(1)
+
+        const tsk = await db
+          .select({
+            id: jobMicroTasks.id,
+            occupation_id: jobMicroTasks.occupationId,
+            task_name: jobMicroTasks.taskName,
+            task_description: jobMicroTasks.taskDescription,
+            frequency: jobMicroTasks.frequency,
+            ai_applicable: jobMicroTasks.aiApplicable,
+            ai_how_it_helps: jobMicroTasks.aiHowItHelps,
+            ai_impact_level: jobMicroTasks.aiImpactLevel,
+            ai_effort_to_implement: jobMicroTasks.aiEffortToImplement,
+            ai_category: jobMicroTasks.aiCategory,
+            ai_tools: jobMicroTasks.aiTools,
+          })
+          .from(jobMicroTasks)
+          .where(eq(jobMicroTasks.occupationId, occ.id))
+
+        const prof = profiles.length > 0 ? (profiles[0] as unknown as AutomationProfile) : null
+        const bp = generateBlueprint(occ as unknown as Occupation, (tsk ?? []) as unknown as MicroTask[], prof)
+        const { displayedMinutes } = computeDisplayedTimeback(prof, (tsk ?? []) as unknown as MicroTask[], bp.totalMinutesSaved)
         featuredExample = { title: occ.title, slug: occ.slug, minutes: displayedMinutes, topAreas: pick.areas }
       }
     }
-  } catch {
+  } catch (err) {
+    console.error("[HomePage] fetch error:", err)
     // silently fall back
   }
 

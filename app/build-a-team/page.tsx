@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { occupations, occupationAutomationProfile, jobMicroTasks } from "@/lib/db/schema"
+import { eq, inArray } from "drizzle-orm"
 import { FadeIn } from "@/components/FadeIn"
 import { decodeCart, encodeCart, type CartRow } from "@/lib/build-a-team/url-state"
 import { findTemplate, TEMPLATES } from "@/lib/build-a-team/templates"
@@ -72,36 +74,69 @@ export default async function BuildATeamPage({
   let capabilitiesByModule: Record<string, import("@/types").ModuleCapability[]> = {}
 
   if (cart.length > 0) {
-    const supabase = createServerClient()
     const slugs = cart.map((r) => r.slug)
-    const { data: occupations } = await supabase
-      .from("occupations")
-      .select("id, slug, title, hourly_wage")
-      .in("slug", slugs)
+    const occupationsData = await db
+      .select({
+        id: occupations.id,
+        slug: occupations.slug,
+        title: occupations.title,
+        hourly_wage: occupations.hourlyWage,
+      })
+      .from(occupations)
+      .where(inArray(occupations.slug, slugs))
 
-    if (occupations && occupations.length > 0) {
-      const occupationIds = occupations.map((o) => o.id)
-      const [{ data: profiles }, { data: tasks }, capabilities] = await Promise.all([
-        supabase
-          .from("occupation_automation_profile")
-          .select("*")
-          .in("occupation_id", occupationIds),
-        supabase
-          .from("job_micro_tasks")
-          .select("*")
-          .in("occupation_id", occupationIds),
+    const occupationsList = occupationsData.map(o => ({
+      ...o,
+      hourly_wage: o.hourly_wage ? parseFloat(o.hourly_wage) : null,
+    }))
+
+    if (occupationsList && occupationsList.length > 0) {
+      const occupationIds = occupationsList.map((o) => o.id)
+      const [profiles, tasks, capabilities] = await Promise.all([
+        db
+          .select({
+            id: occupationAutomationProfile.id,
+            occupation_id: occupationAutomationProfile.occupationId,
+            composite_score: occupationAutomationProfile.compositeScore,
+            work_activity_automation_potential: occupationAutomationProfile.workActivityAutomationPotential,
+            time_range_low: occupationAutomationProfile.timeRangeLow,
+            time_range_high: occupationAutomationProfile.timeRangeHigh,
+            time_range_by_block: occupationAutomationProfile.timeRangeByBlock,
+            block_example_tasks: occupationAutomationProfile.blockExampleTasks,
+            top_automatable_activities: occupationAutomationProfile.topAutomatableActivities,
+            top_blocking_abilities: occupationAutomationProfile.topBlockingAbilities,
+            physical_ability_avg: occupationAutomationProfile.physicalAbilityAvg,
+          })
+          .from(occupationAutomationProfile)
+          .where(inArray(occupationAutomationProfile.occupationId, occupationIds)),
+        db
+          .select({
+            id: jobMicroTasks.id,
+            occupation_id: jobMicroTasks.occupationId,
+            task_name: jobMicroTasks.taskName,
+            task_description: jobMicroTasks.taskDescription,
+            frequency: jobMicroTasks.frequency,
+            ai_applicable: jobMicroTasks.aiApplicable,
+            ai_how_it_helps: jobMicroTasks.aiHowItHelps,
+            ai_impact_level: jobMicroTasks.aiImpactLevel,
+            ai_effort_to_implement: jobMicroTasks.aiEffortToImplement,
+            ai_category: jobMicroTasks.aiCategory,
+            ai_tools: jobMicroTasks.aiTools,
+          })
+          .from(jobMicroTasks)
+          .where(inArray(jobMicroTasks.occupationId, occupationIds)),
         getAllCapabilities(),
       ])
 
       capabilitiesByModule = capabilities
 
       const roleDataBySlug = new Map<string, RoleData>()
-      for (const occ of occupations) {
+      for (const occ of occupationsList) {
         roleDataBySlug.set(occ.slug, {
-          occupation: occ,
+          occupation: occ as any,
           profile:
-            (profiles ?? []).find((p) => p.occupation_id === occ.id) ?? null,
-          tasks: (tasks ?? []).filter((t) => t.occupation_id === occ.id),
+            (profiles ?? []).find((p) => p.occupation_id === occ.id) as any ?? null,
+          tasks: (tasks ?? []).filter((t) => t.occupation_id === occ.id) as any[],
         })
       }
 

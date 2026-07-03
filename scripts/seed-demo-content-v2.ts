@@ -1,7 +1,7 @@
 // Seeds demo_agent_content_v2 with icon-forward short-label content (v2 format)
 
-// Env vars must be passed via command line (dotenvx overrides them)
-import { createClient } from "@supabase/supabase-js"
+import { and, eq, sql } from "drizzle-orm"
+import { db, pool, schema } from "./db"
 import { selectDemoModules } from "../lib/demo/select-demo-modules"
 import { generateDemoContent } from "../lib/demo/generate-demo-content"
 import { computeModuleTimes } from "../lib/demo/compute-demo"
@@ -9,41 +9,51 @@ import { getAgentMetadata } from "../lib/demo/agent-metadata"
 import type { MicroTask, Occupation, AutomationProfile } from "../types"
 import type { ModuleKey } from "../lib/modules"
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 async function fetchTopOccupations(limit?: number): Promise<Occupation[]> {
   // Order by employment desc so high-traffic occupations seed first —
   // partial runs still deliver the most value.
-  let query = supabase
-    .from("occupations")
-    .select("id, title, slug, major_category, sub_category, employment, hourly_wage, annual_wage")
-    .order("employment", { ascending: false, nullsFirst: false })
+  const rows = await db
+    .select({
+      id: schema.occupations.id,
+      title: schema.occupations.title,
+      slug: schema.occupations.slug,
+      major_category: schema.occupations.majorCategory,
+      sub_category: schema.occupations.subCategory,
+      employment: schema.occupations.employment,
+      hourly_wage: schema.occupations.hourlyWage,
+      annual_wage: schema.occupations.annualWage,
+    })
+    .from(schema.occupations)
+    .orderBy(sql`${schema.occupations.employment} desc nulls last`)
+    .limit(typeof limit === "number" ? limit : Number.MAX_SAFE_INTEGER)
 
-  if (typeof limit === "number") query = query.limit(limit)
-
-  const { data, error } = await query
-  if (error) throw error
-  return (data ?? []) as Occupation[]
+  return rows as unknown as Occupation[]
 }
 
 async function fetchTasksForOccupation(occupationId: number): Promise<MicroTask[]> {
-  const { data } = await supabase
-    .from("job_micro_tasks")
-    .select("*")
-    .eq("occupation_id", occupationId)
-  return (data ?? []) as MicroTask[]
+  const rows = await db
+    .select()
+    .from(schema.jobMicroTasks)
+    .where(eq(schema.jobMicroTasks.occupationId, occupationId))
+  return rows as unknown as MicroTask[]
 }
 
 async function fetchProfileForOccupation(occupationId: number): Promise<AutomationProfile | null> {
-  const { data } = await supabase
-    .from("occupation_automation_profile")
-    .select("id, occupation_id, composite_score, work_activity_automation_potential, time_range_low, time_range_high, physical_ability_avg")
-    .eq("occupation_id", occupationId)
-    .maybeSingle()
-  return (data ?? null) as AutomationProfile | null
+  const rows = await db
+    .select({
+      id: schema.occupationAutomationProfile.id,
+      occupation_id: schema.occupationAutomationProfile.occupationId,
+      composite_score: schema.occupationAutomationProfile.compositeScore,
+      work_activity_automation_potential:
+        schema.occupationAutomationProfile.workActivityAutomationPotential,
+      time_range_low: schema.occupationAutomationProfile.timeRangeLow,
+      time_range_high: schema.occupationAutomationProfile.timeRangeHigh,
+      physical_ability_avg: schema.occupationAutomationProfile.physicalAbilityAvg,
+    })
+    .from(schema.occupationAutomationProfile)
+    .where(eq(schema.occupationAutomationProfile.occupationId, occupationId))
+    .limit(1)
+  return (rows[0] ?? null) as unknown as AutomationProfile | null
 }
 
 async function seedOccupation(occupation: Occupation) {
@@ -65,14 +75,18 @@ async function seedOccupation(occupation: Occupation) {
   for (const mod of selectedModules) {
     try {
       // Check if already cached in v2
-      const { data: existing } = await supabase
-        .from("demo_agent_content_v2")
-        .select("id")
-        .eq("occupation_id", occupation.id)
-        .eq("module_key", mod.moduleKey)
-        .maybeSingle()
+      const existing = await db
+        .select({ id: schema.demoAgentContentV2.id })
+        .from(schema.demoAgentContentV2)
+        .where(
+          and(
+            eq(schema.demoAgentContentV2.occupationId, occupation.id),
+            eq(schema.demoAgentContentV2.moduleKey, mod.moduleKey)
+          )
+        )
+        .limit(1)
 
-      if (existing) {
+      if (existing.length > 0) {
         console.log(`  ↩ ${occupation.title} / ${mod.moduleKey} (cached, skipping)`)
         continue
       }
@@ -89,27 +103,27 @@ async function seedOccupation(occupation: Occupation) {
 
       const meta = getAgentMetadata(mod.moduleKey as ModuleKey)
 
-      // Insert into v2
-      const { error: insertError } = await supabase.from("demo_agent_content_v2").upsert(
-        {
-          occupation_id: occupation.id,
-          module_key: mod.moduleKey,
-          agent_name: meta.agentName,
-          label: meta.label,
-          accent_color: meta.accentColor,
-          time_of_day: meta.timeOfDay,
-          narrative: content.narrative,
-          loop_data: content.loop,
-          output_data: content.output,
-        },
-        { onConflict: "occupation_id,module_key" }
-      )
-
-      if (insertError) {
-        console.error(`  ✗ upsert failed:`, insertError)
-      } else {
-        console.log(`  ✓ ${occupation.title} / ${mod.moduleKey}`)
+      // Upsert into v2
+      const values = {
+        occupationId: occupation.id,
+        moduleKey: mod.moduleKey,
+        agentName: meta.agentName,
+        label: meta.label,
+        accentColor: meta.accentColor,
+        timeOfDay: meta.timeOfDay,
+        narrative: content.narrative,
+        loopData: content.loop,
+        outputData: content.output,
       }
+      await db
+        .insert(schema.demoAgentContentV2)
+        .values(values)
+        .onConflictDoUpdate({
+          target: [schema.demoAgentContentV2.occupationId, schema.demoAgentContentV2.moduleKey],
+          set: values,
+        })
+
+      console.log(`  ✓ ${occupation.title} / ${mod.moduleKey}`)
     } catch (err) {
       console.error(`  ✗ ${occupation.title} / ${mod.moduleKey}:`, err)
     }
@@ -137,7 +151,9 @@ async function main() {
   console.log("\nDone seeding demo content v2.")
 }
 
-main().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
+main()
+  .catch((err) => {
+    console.error(err)
+    process.exitCode = 1
+  })
+  .finally(() => pool.end())

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import { contactFormSchema } from "@/lib/validation/contact"
 import { sendEmail } from "@/lib/resend"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { contactMessages } from "@/lib/db/schema"
 import { CONTACT, AGENCY, SITE } from "@/lib/site"
 import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
 
@@ -73,27 +74,25 @@ export async function POST(request: Request) {
 
   const { name, email, company, message } = parsed.data
 
-  // Insert into Supabase using the service-role client.
-  const supabase = createServerClient()
-  const { error: dbError } = await supabase.from("contact_messages").insert({
-    name,
-    email,
-    company: company || null,
-    message,
-    source: "contact-page",
-    user_agent: userAgent,
-    ip_hash: ipHash,
-  })
-
-  if (dbError) {
-    console.error("[contact] supabase insert failed", dbError)
+  try {
+    await db.insert(contactMessages).values({
+      name,
+      email,
+      company: company || null,
+      message,
+      source: "contact-page",
+      userAgent: userAgent,
+      ipHash: ipHash,
+    })
+  } catch (dbError) {
+    console.error("[contact] database insert failed", dbError)
     return NextResponse.json(
       { error: "We couldn't save your message. Please try again shortly." },
       { status: 500 }
     )
   }
 
-  // Notify damon@placetostandagency.com via Resend.
+  // Notify CONTACT.email via Resend.
   // If Resend fails, we still return success because the DB row is the
   // source of truth — the lead is saved and can be followed up manually.
   try {
@@ -133,7 +132,7 @@ Submitted via ${SITE.name} — ${AGENCY.name}`,
     // Log loudly so we can follow up manually and fix Resend config.
     console.error("[contact] resend notification failed", err)
     // Do NOT fail the request; the user's message was saved. We'll see it
-    // in Supabase even if the email didn't go.
+    // in the database even if the email didn’t go.
   }
 
   return NextResponse.json({ ok: true }, { status: 200 })

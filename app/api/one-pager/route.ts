@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server"
 import { onePagerSchema } from "@/lib/validation/one-pager"
 import { sendEmail } from "@/lib/resend"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { occupations, occupationAutomationProfile, jobMicroTasks, onePagerRequests } from "@/lib/db/schema"
+import { eq, desc } from "drizzle-orm"
 import { renderBlueprintPdf } from "@/lib/pdf/render"
 import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
 import { AGENCY, SITE } from "@/lib/site"
@@ -14,6 +16,7 @@ import { computeAnnualValue } from "@/lib/pricing"
 import { getBlockForTask } from "@/lib/blueprint"
 import { MODULE_REGISTRY } from "@/lib/modules"
 import { PDF_MODULE_ACCENTS } from "@/lib/pdf/styles"
+import type { AutomationProfile, MicroTask } from "@/types"
 
 export const runtime = "nodejs"
 
@@ -71,45 +74,77 @@ export async function POST(request: Request) {
   }
 
   const { email, occupationSlug } = parsed.data
-  const supabase = createServerClient()
 
   // Fetch real occupation + tasks + profile server-side so the PDF
   // numbers are derived from truth, not from the client.
-  const { data: occupation, error: occError } = await supabase
-    .from("occupations")
-    .select("id, title, slug, hourly_wage")
-    .eq("slug", occupationSlug)
-    .single()
+  const occupationsData = await db
+    .select({
+      id: occupations.id,
+      title: occupations.title,
+      slug: occupations.slug,
+      hourly_wage: occupations.hourlyWage,
+    })
+    .from(occupations)
+    .where(eq(occupations.slug, occupationSlug))
+    .limit(1)
 
-  if (occError || !occupation) {
+  if (occupationsData.length === 0) {
     return NextResponse.json({ error: "Unknown occupation" }, { status: 400 })
   }
 
-  const [{ data: profile }, { data: tasks }] = await Promise.all([
-    supabase
-      .from("occupation_automation_profile")
-      .select("*")
-      .eq("occupation_id", occupation.id)
-      .single(),
-    supabase
-      .from("job_micro_tasks")
-      .select("*")
-      .eq("occupation_id", occupation.id)
-      .order("ai_impact_level", { ascending: false }),
+  const occupation = occupationsData[0]
+
+  const [profiles, tasks] = await Promise.all([
+    db
+      .select({
+        id: occupationAutomationProfile.id,
+        occupation_id: occupationAutomationProfile.occupationId,
+        composite_score: occupationAutomationProfile.compositeScore,
+        work_activity_automation_potential: occupationAutomationProfile.workActivityAutomationPotential,
+        time_range_low: occupationAutomationProfile.timeRangeLow,
+        time_range_high: occupationAutomationProfile.timeRangeHigh,
+        time_range_by_block: occupationAutomationProfile.timeRangeByBlock,
+        block_example_tasks: occupationAutomationProfile.blockExampleTasks,
+        top_automatable_activities: occupationAutomationProfile.topAutomatableActivities,
+        top_blocking_abilities: occupationAutomationProfile.topBlockingAbilities,
+        physical_ability_avg: occupationAutomationProfile.physicalAbilityAvg,
+      })
+      .from(occupationAutomationProfile)
+      .where(eq(occupationAutomationProfile.occupationId, occupation.id))
+      .limit(1),
+    db
+      .select({
+        id: jobMicroTasks.id,
+        occupation_id: jobMicroTasks.occupationId,
+        task_name: jobMicroTasks.taskName,
+        task_description: jobMicroTasks.taskDescription,
+        frequency: jobMicroTasks.frequency,
+        ai_applicable: jobMicroTasks.aiApplicable,
+        ai_how_it_helps: jobMicroTasks.aiHowItHelps,
+        ai_impact_level: jobMicroTasks.aiImpactLevel,
+        ai_effort_to_implement: jobMicroTasks.aiEffortToImplement,
+        ai_category: jobMicroTasks.aiCategory,
+        ai_tools: jobMicroTasks.aiTools,
+      })
+      .from(jobMicroTasks)
+      .where(eq(jobMicroTasks.occupationId, occupation.id))
+      .orderBy(desc(jobMicroTasks.aiImpactLevel)),
   ])
 
-  const aiTasks = (tasks ?? []).filter((t) => t.ai_applicable)
-  const archetypeMultiplier = inferArchetypeMultiplier(profile ?? null)
+  const profile = profiles.length > 0 ? (profiles[0] as unknown as AutomationProfile) : null
+  const aiTasks = ((tasks ?? []) as unknown as MicroTask[]).filter((t) => t.ai_applicable)
+  const archetypeMultiplier = inferArchetypeMultiplier(profile)
   const totalBlueprintMinutes = aiTasks.reduce(
     (sum, task) => sum + estimateTaskMinutes(task) * archetypeMultiplier,
     0
   )
   const { displayedMinutes } = computeDisplayedTimeback(
-    profile ?? null,
-    tasks ?? [],
+    profile,
+    (tasks ?? []) as unknown as MicroTask[],
     totalBlueprintMinutes
   )
-  const annualValue = computeAnnualValue(displayedMinutes, occupation.hourly_wage)
+  const hourlyWageFloat = occupation.hourly_wage ? parseFloat(occupation.hourly_wage) : null
+  const annualValue = computeAnnualValue(displayedMinutes, hourlyWageFloat)
 
   // Compute module breakdown for one-pager page 2
   const moduleMap = new Map<string, { rawMinutes: number; taskNames: string[] }>()
@@ -144,20 +179,28 @@ export async function POST(request: Request) {
   // Save the capture first — the row is the source of truth. Capture
   // the inserted id so we can update pdf_sent_at / pdf_send_error after
   // the email attempt.
-  const { data: insertedRow, error: dbError } = await supabase
-    .from("one_pager_requests")
-    .insert({
-      email,
-      occupation_slug: occupation.slug,
-      occupation_title: occupation.title,
-      user_agent: userAgent,
-      ip_hash: ipHash,
-    })
-    .select("id")
-    .single()
+  let insertedRow: { id: string } | undefined
+  try {
+    const results = await db
+      .insert(onePagerRequests)
+      .values({
+        email,
+        occupationSlug: occupation.slug,
+        occupationTitle: occupation.title,
+        userAgent: userAgent,
+        ipHash: ipHash,
+      })
+      .returning({ id: onePagerRequests.id })
+    insertedRow = results[0]
+  } catch (dbErr) {
+    console.error("[one-pager] database insert failed", dbErr)
+    return NextResponse.json(
+      { error: "We couldn't process your request. Please try again shortly." },
+      { status: 500 }
+    )
+  }
 
-  if (dbError || !insertedRow) {
-    console.error("[one-pager] supabase insert failed", dbError)
+  if (!insertedRow) {
     return NextResponse.json(
       { error: "We couldn't process your request. Please try again shortly." },
       { status: 500 }
@@ -226,14 +269,17 @@ If the numbers make sense and you'd like to talk about a real build, book a scop
     console.error("[one-pager] delivery email failed", err)
   }
 
-  // Persist delivery state on the row so we can audit failures later.
-  await supabase
-    .from("one_pager_requests")
-    .update({
-      pdf_sent_at: emailSent ? new Date().toISOString() : null,
-      pdf_send_error: emailError ?? pdfError,
-    })
-    .eq("id", insertedRow.id)
+  try {
+    await db
+      .update(onePagerRequests)
+      .set({
+        pdfSentAt: emailSent ? new Date().toISOString() : null,
+        pdfSendError: emailError ?? pdfError,
+      })
+      .where(eq(onePagerRequests.id, insertedRow.id))
+  } catch (updateErr) {
+    console.error("[one-pager] update status failed", updateErr)
+  }
 
   return NextResponse.json({ ok: true }, { status: 200 })
 }

@@ -147,33 +147,3 @@ export function generateBlueprint(
     humanCheckpoints,
   }
 }
-
-/**
- * Enriches a blueprint with capability data from the database.
- * Call this server-side after generateBlueprint() to add capabilities to each agent.
- */
-export async function enrichBlueprintWithCapabilities(
-  blueprint: AgentBlueprint,
-  taskIds: number[]
-): Promise<AgentBlueprint> {
-  const { getAllCapabilities } = await import("@/lib/capabilities")
-  const { getCapabilitiesForTasks } = await import("@/lib/capabilities")
-
-  // Get capabilities that are mapped to this occupation's tasks
-  const taskCapabilities = await getCapabilitiesForTasks(taskIds)
-
-  // Fall back to all capabilities per module if no task mappings exist yet
-  const allCapabilities = Object.keys(taskCapabilities).length > 0
-    ? taskCapabilities
-    : await getAllCapabilities()
-
-  const enrichedAgents = blueprint.agents.map((agent) => ({
-    ...agent,
-    capabilities: allCapabilities[agent.blockName] || [],
-  }))
-
-  return {
-    ...blueprint,
-    agents: enrichedAgents,
-  }
-}

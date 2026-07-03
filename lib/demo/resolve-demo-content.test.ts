@@ -1,29 +1,34 @@
 // lib/demo/resolve-demo-content.test.ts
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import type { SupabaseClient } from "@supabase/supabase-js"
+import { db } from "@/lib/db/client"
 
 // Mock dependencies before importing the module
 vi.mock("./generate-demo-content", () => ({
   generateDemoContent: vi.fn(),
 }))
-vi.mock("@/lib/supabase/server", () => ({
-  createServerClient: vi.fn(),
-}))
+
+vi.mock("@/lib/db/client", () => {
+  return {
+    db: {
+      select: vi.fn(),
+      insert: vi.fn(),
+    }
+  }
+})
 
 import { resolveAgentContent } from "./resolve-demo-content"
 import { generateDemoContent } from "./generate-demo-content"
-import { createServerClient } from "@/lib/supabase/server"
 import type { MicroTask } from "@/types"
 
 const CACHED_ROW = {
   narrative: "Cached narrative.",
-  loop_data: {
+  loopData: {
     inputs: ["a", "b", "c"],
     actions: ["x", "y", "z"],
     outputs: ["1", "2", "3"],
     humanAction: "Reviews and approves.",
   },
-  output_data: { format: "prose", label: "REPORT", content: "Cached output." },
+  outputData: { format: "prose", label: "REPORT", content: "Cached output." },
 }
 
 const GENERATED = {
@@ -37,20 +42,32 @@ const GENERATED = {
   output: { format: "prose" as const, label: "REPORT", content: "Generated output." },
 }
 
-function mockSupabase(cacheHit: boolean) {
-  const selectChain = {
-    eq: vi.fn().mockReturnThis(),
-    single: vi.fn().mockResolvedValue({
-      data: cacheHit ? CACHED_ROW : null,
-      error: null,
-    }),
+function mockDb(cacheHitV2: boolean, cacheHitV1: boolean = false) {
+  const limitMock = vi.fn()
+  if (cacheHitV2) {
+    limitMock.mockResolvedValueOnce([CACHED_ROW])
+  } else if (cacheHitV1) {
+    limitMock.mockResolvedValueOnce([]).mockResolvedValueOnce([CACHED_ROW])
+  } else {
+    limitMock.mockResolvedValueOnce([]).mockResolvedValueOnce([])
   }
-  const fromImpl = vi.fn().mockReturnValue({
-    select: vi.fn().mockReturnValue(selectChain),
-    upsert: vi.fn().mockResolvedValue({ error: null }),
-  })
-  vi.mocked(createServerClient).mockReturnValue({ from: fromImpl } as unknown as SupabaseClient)
-  return { from: fromImpl }
+
+  const whereMock = vi.fn().mockReturnValue({ limit: limitMock })
+  const fromMock = vi.fn().mockReturnValue({ where: whereMock })
+  const selectMock = vi.fn().mockReturnValue({ from: fromMock })
+
+  const onConflictDoUpdateMock = vi.fn().mockResolvedValue({ error: null })
+  const valuesMock = vi.fn().mockReturnValue({ onConflictDoUpdate: onConflictDoUpdateMock })
+  const insertMock = vi.fn().mockReturnValue({ values: valuesMock })
+
+  db.select = selectMock as any
+  db.insert = insertMock as any
+
+  return {
+    select: selectMock,
+    insert: insertMock,
+    onConflictDoUpdate: onConflictDoUpdateMock,
+  }
 }
 
 const TASKS: MicroTask[] = [
@@ -66,8 +83,20 @@ const TASKS: MicroTask[] = [
 describe("resolveAgentContent", () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it("returns cached content when DB row exists", async () => {
-    mockSupabase(true)
+  it("returns cached content when DB row exists in V2", async () => {
+    mockDb(true)
+    const result = await resolveAgentContent({
+      occupationId: 10,
+      occupationTitle: "Nurse",
+      moduleKey: "intake",
+      tasks: TASKS,
+    })
+    expect(result.narrative).toBe("Cached narrative.")
+    expect(generateDemoContent).not.toHaveBeenCalled()
+  })
+
+  it("returns cached content when DB row exists in V1", async () => {
+    mockDb(false, true)
     const result = await resolveAgentContent({
       occupationId: 10,
       occupationTitle: "Nurse",
@@ -79,7 +108,7 @@ describe("resolveAgentContent", () => {
   })
 
   it("generates and upserts when no cache row exists", async () => {
-    const { from } = mockSupabase(false)
+    const { insert } = mockDb(false, false)
     vi.mocked(generateDemoContent).mockResolvedValue(GENERATED)
 
     const result = await resolveAgentContent({
@@ -91,6 +120,6 @@ describe("resolveAgentContent", () => {
 
     expect(result.narrative).toBe("Generated narrative.")
     expect(generateDemoContent).toHaveBeenCalledOnce()
-    expect(from).toHaveBeenCalledTimes(2) // once for select, once for upsert
+    expect(insert).toHaveBeenCalledOnce()
   })
 })

@@ -2,7 +2,9 @@ export const dynamic = "force-dynamic"
 
 import Link from "next/link"
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
-import { createServerClient } from "@/lib/supabase/server"
+import { db } from "@/lib/db/client"
+import { occupations, occupationAutomationProfile, jobMicroTasks } from "@/lib/db/schema"
+import { eq, inArray, sql } from "drizzle-orm"
 import { CATEGORIES } from "@/lib/categories"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 import { BrowseFilters } from "./filters"
@@ -29,72 +31,77 @@ export default async function BrowsePage(props: {
   let tasksByOccupation = new Map<number, MicroTask[]>()
 
   try {
-    const supabase = createServerClient()
     const from = (page - 1) * PAGE_SIZE
 
-    async function runQuery(selectShape: string) {
-      let query = supabase
-        .from("occupations")
-        .select(selectShape, { count: "exact" })
+    // Count query
+    const countQuery = db
+      .select({ count: sql<number>`count(*)` })
+      .from(occupations)
 
-      if (category) {
-        query = query.eq("major_category", category)
-      }
+    const countResult = category
+      ? await countQuery.where(eq(occupations.majorCategory, category))
+      : await countQuery
 
-      query = query.order("title").range(from, from + PAGE_SIZE - 1)
-      return query
-    }
+    totalCount = Number(countResult[0]?.count || 0)
 
-    const primary = await runQuery(
-      "id, title, slug, major_category, occupation_automation_profile(composite_score,time_range_high)"
-    )
-
-    if (primary.error) {
-      const fallback = await runQuery(
-        "id, title, slug, major_category, occupation_automation_profile(composite_score)"
-      )
-      if (fallback.error) {
-        let plainQuery = supabase
-          .from("occupations")
-          .select("id, title, slug, major_category", { count: "exact" })
-
-        if (category) {
-          plainQuery = plainQuery.eq("major_category", category)
+    // Results query
+    let queryResults = db
+      .select({
+        id: occupations.id,
+        title: occupations.title,
+        slug: occupations.slug,
+        major_category: occupations.majorCategory,
+        occupation_automation_profile: {
+          composite_score: occupationAutomationProfile.compositeScore,
+          time_range_high: occupationAutomationProfile.timeRangeHigh,
         }
+      })
+      .from(occupations)
+      .leftJoin(
+        occupationAutomationProfile,
+        eq(occupations.id, occupationAutomationProfile.occupationId)
+      )
 
-        plainQuery = plainQuery.order("title").range(from, from + PAGE_SIZE - 1)
-        const plain = await plainQuery
-        results = plain.data ?? []
-        totalCount = plain.count ?? 0
-      } else {
-        results = fallback.data ?? []
-        totalCount = fallback.count ?? 0
-      }
-    } else {
-      results = primary.data ?? []
-      totalCount = primary.count ?? 0
-    }
+    const finalQuery = category
+      ? queryResults.where(eq(occupations.majorCategory, category))
+      : queryResults
+
+    results = await finalQuery
+      .orderBy(occupations.title)
+      .limit(PAGE_SIZE)
+      .offset(from)
 
     const occupationIds = results
       .map((occupation) => occupation.id)
       .filter((id): id is number => typeof id === "number")
 
     if (occupationIds.length > 0) {
-      const { data: taskRows } = await supabase
-        .from("job_micro_tasks")
-        .select(
-          "id, occupation_id, task_name, task_description, frequency, ai_applicable, ai_how_it_helps, ai_impact_level, ai_effort_to_implement, ai_category, ai_tools"
-        )
-        .in("occupation_id", occupationIds)
+      const taskRows = await db
+        .select({
+          id: jobMicroTasks.id,
+          occupation_id: jobMicroTasks.occupationId,
+          task_name: jobMicroTasks.taskName,
+          task_description: jobMicroTasks.taskDescription,
+          frequency: jobMicroTasks.frequency,
+          ai_applicable: jobMicroTasks.aiApplicable,
+          ai_how_it_helps: jobMicroTasks.aiHowItHelps,
+          ai_impact_level: jobMicroTasks.aiImpactLevel,
+          ai_effort_to_implement: jobMicroTasks.aiEffortToImplement,
+          ai_category: jobMicroTasks.aiCategory,
+          ai_tools: jobMicroTasks.aiTools,
+        })
+        .from(jobMicroTasks)
+        .where(inArray(jobMicroTasks.occupationId, occupationIds))
 
       tasksByOccupation = new Map<number, MicroTask[]>()
-      for (const task of taskRows ?? []) {
+      for (const task of (taskRows ?? []) as unknown as MicroTask[]) {
         const existing = tasksByOccupation.get(task.occupation_id) ?? []
         existing.push(task)
         tasksByOccupation.set(task.occupation_id, existing)
       }
     }
-  } catch {
+  } catch (err) {
+    console.error("[BrowsePage] fetch error:", err)
     // silently fall back to empty results if DB unavailable
   }
 

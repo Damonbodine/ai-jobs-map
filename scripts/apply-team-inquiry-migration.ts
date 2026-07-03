@@ -11,11 +11,10 @@
 import fs from 'fs';
 import path from 'path';
 import pg from 'pg';
-import dotenv from 'dotenv';
 
 // Load .env.local explicitly so this script works the same way `next dev`
 // resolves env vars (DATABASE_URL, SUPABASE_*, etc).
-dotenv.config({ path: path.join(process.cwd(), '.env.local') });
+process.loadEnvFile(path.join(process.cwd(), '.env.local'));
 
 const { Client } = pg;
 

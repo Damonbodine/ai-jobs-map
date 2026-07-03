@@ -1,45 +1,36 @@
-export const dynamic = "force-dynamic"
-
-import { createServerClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import { BlueprintView } from "./blueprint-view"
 import { getAllCapabilities } from "@/lib/capabilities"
+import {
+  getOccupationBySlug,
+  getOccupationProfile,
+  getOccupationTasks,
+} from "@/lib/occupation-data"
+
+export const dynamic = "force-dynamic"
 
 export default async function BlueprintPage(props: {
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await props.params
-  const supabase = await createServerClient()
 
-  const { data: occupation } = await supabase
-    .from("occupations")
-    .select("*")
-    .eq("slug", slug)
-    .single()
-
+  const occupation = await getOccupationBySlug(slug)
   if (!occupation) notFound()
 
-  const [{ data: profile }, { data: tasks }, capabilitiesByModule] = await Promise.all([
-    supabase
-      .from("occupation_automation_profile")
-      .select("*")
-      .eq("occupation_id", occupation.id)
-      .single(),
-    supabase
-      .from("job_micro_tasks")
-      .select("*")
-      .eq("occupation_id", occupation.id)
-      .order("ai_impact_level", { ascending: false }),
+  const [profile, tasks, capabilitiesByModule] = await Promise.all([
+    getOccupationProfile(occupation.id),
+    getOccupationTasks(occupation.id),
     getAllCapabilities(),
   ])
 
   return (
     <BlueprintView
-      occupation={occupation}
-      profile={profile}
-      tasks={tasks ?? []}
+      occupation={occupation as any}
+      profile={profile as any}
+      tasks={tasks as any[]}
       slug={slug}
       capabilitiesByModule={capabilitiesByModule}
     />
   )
 }
+

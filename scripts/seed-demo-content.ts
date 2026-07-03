@@ -1,33 +1,38 @@
-// Env vars must be passed via command line (dotenvx overrides them)
-import { createClient } from "@supabase/supabase-js"
+// Seeds demo_agent_content (v1 format) for the top 20 occupations by id.
+
+import { and, asc, eq } from "drizzle-orm"
+import { db, pool, schema } from "./db"
 import { selectDemoModules } from "../lib/demo/select-demo-modules"
 import { generateDemoContent } from "../lib/demo/generate-demo-content"
 import { getAgentMetadata } from "../lib/demo/agent-metadata"
 import type { MicroTask, Occupation } from "../types"
 import type { ModuleKey } from "../lib/modules"
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 async function fetchTopOccupations(limit = 20): Promise<Occupation[]> {
-  const { data, error } = await supabase
-    .from("occupations")
-    .select("id, title, slug, major_category, sub_category, employment, hourly_wage, annual_wage")
-    .order("id", { ascending: true })
+  const rows = await db
+    .select({
+      id: schema.occupations.id,
+      title: schema.occupations.title,
+      slug: schema.occupations.slug,
+      major_category: schema.occupations.majorCategory,
+      sub_category: schema.occupations.subCategory,
+      employment: schema.occupations.employment,
+      hourly_wage: schema.occupations.hourlyWage,
+      annual_wage: schema.occupations.annualWage,
+    })
+    .from(schema.occupations)
+    .orderBy(asc(schema.occupations.id))
     .limit(limit)
 
-  if (error) throw error
-  return (data ?? []) as Occupation[]
+  return rows as unknown as Occupation[]
 }
 
 async function fetchTasksForOccupation(occupationId: number): Promise<MicroTask[]> {
-  const { data } = await supabase
-    .from("job_micro_tasks")
-    .select("*")
-    .eq("occupation_id", occupationId)
-  return (data ?? []) as MicroTask[]
+  const rows = await db
+    .select()
+    .from(schema.jobMicroTasks)
+    .where(eq(schema.jobMicroTasks.occupationId, occupationId))
+  return rows as unknown as MicroTask[]
 }
 
 async function seedOccupation(occupation: Occupation) {
@@ -42,14 +47,18 @@ async function seedOccupation(occupation: Occupation) {
   for (const mod of selectedModules) {
     try {
       // Check if already cached
-      const { data: existing } = await supabase
-        .from("demo_agent_content")
-        .select("id")
-        .eq("occupation_id", occupation.id)
-        .eq("module_key", mod.moduleKey)
-        .maybeSingle()
+      const existing = await db
+        .select({ id: schema.demoAgentContent.id })
+        .from(schema.demoAgentContent)
+        .where(
+          and(
+            eq(schema.demoAgentContent.occupationId, occupation.id),
+            eq(schema.demoAgentContent.moduleKey, mod.moduleKey)
+          )
+        )
+        .limit(1)
 
-      if (existing) {
+      if (existing.length > 0) {
         console.log(`  ↩ ${occupation.title} / ${mod.moduleKey} (cached, skipping)`)
         continue
       }
@@ -63,27 +72,26 @@ async function seedOccupation(occupation: Occupation) {
 
       const meta = getAgentMetadata(mod.moduleKey as ModuleKey)
 
-      // Insert
-      const { error: insertError } = await supabase.from("demo_agent_content").upsert(
-        {
-          occupation_id: occupation.id,
-          module_key: mod.moduleKey,
-          agent_name: meta.agentName,
-          label: meta.label,
-          accent_color: meta.accentColor,
-          time_of_day: meta.timeOfDay,
-          narrative: content.narrative,
-          loop_data: content.loop,
-          output_data: content.output,
-        },
-        { onConflict: "occupation_id,module_key" }
-      )
-
-      if (insertError) {
-        console.error(`  ✗ upsert failed:`, insertError)
-      } else {
-        console.log(`  ✓ ${occupation.title} / ${mod.moduleKey}`)
+      const values = {
+        occupationId: occupation.id,
+        moduleKey: mod.moduleKey,
+        agentName: meta.agentName,
+        label: meta.label,
+        accentColor: meta.accentColor,
+        timeOfDay: meta.timeOfDay,
+        narrative: content.narrative,
+        loopData: content.loop,
+        outputData: content.output,
       }
+      await db
+        .insert(schema.demoAgentContent)
+        .values(values)
+        .onConflictDoUpdate({
+          target: [schema.demoAgentContent.occupationId, schema.demoAgentContent.moduleKey],
+          set: values,
+        })
+
+      console.log(`  ✓ ${occupation.title} / ${mod.moduleKey}`)
     } catch (err) {
       console.error(`  ✗ ${occupation.title} / ${mod.moduleKey}:`, err)
     }
@@ -105,7 +113,9 @@ async function main() {
   console.log("\nDone seeding demo content.")
 }
 
-main().catch((err) => {
-  console.error(err)
-  process.exit(1)
-})
+main()
+  .catch((err) => {
+    console.error(err)
+    process.exitCode = 1
+  })
+  .finally(() => pool.end())

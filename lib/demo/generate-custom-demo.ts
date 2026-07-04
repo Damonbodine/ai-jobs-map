@@ -4,6 +4,7 @@
 
 import { getAgentMetadata } from "./agent-metadata"
 import { MODULE_KEYS } from "@/lib/modules"
+import { SITE } from "@/lib/site"
 import { computeAnnualValue } from "@/lib/pricing"
 import type { ModuleKey } from "@/lib/modules"
 import type { AgentLoopContent, AgentOutput, DemoAgentStep, DemoRoleData } from "./types"
@@ -100,7 +101,7 @@ async function callOpenRouter(prompt: string): Promise<string> {
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": "https://ai-jobs-map.vercel.app",
+      "HTTP-Referer": SITE.url,
     },
     body: JSON.stringify({
       // models-array-only is OpenRouter's fallback-routing form; adding a

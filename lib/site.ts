@@ -15,7 +15,7 @@ export const SITE = {
   // OpenGraph, canonical URLs, and emails will point at the vercel.app subdomain.
   url:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    "https://ai-jobs-map.vercel.app",
+    "https://timeback.clearroadlabs.com",
 } as const
 
 export const AGENCY = {

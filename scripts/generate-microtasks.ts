@@ -95,7 +95,7 @@ async function generateMicroTasks(occupationTitle: string, category: string): Pr
         headers: {
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://ai-jobs-map.vercel.app',
+          'HTTP-Referer': 'https://timeback.clearroadlabs.com',
           'X-Title': 'AI Jobs Map',
         },
         body: JSON.stringify({

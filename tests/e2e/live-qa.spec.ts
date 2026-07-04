@@ -5,7 +5,7 @@
 
 import { test, expect } from "@playwright/test"
 
-const BASE = "https://ai-jobs-map.vercel.app"
+const BASE = "https://timeback.clearroadlabs.com"
 const TEST_EMAIL = "damon@clearroadlabs.com"
 const TEST_NAME = "QA Test"
 

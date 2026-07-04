@@ -51,8 +51,8 @@ export function EmailCaptureCard({ taskDescription, occupationContext }: Props) 
 
   if (status === "success") {
     const contactHref = occupationContext
-      ? `/contact?source=demo-try&role=${encodeURIComponent(occupationContext)}`
-      : "/contact?source=demo-try"
+      ? `/contact?source=demo-try&role=${encodeURIComponent(occupationContext)}#book`
+      : "/contact?source=demo-try#book"
 
     return (
       <div className="space-y-3">

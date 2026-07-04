@@ -162,7 +162,7 @@ export default async function OccupationPage(props: {
             </div>
             <div className="mt-6 flex justify-center">
               <Link
-                href="/contact"
+                href="/contact#book"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
               >
                 Book a scoping call

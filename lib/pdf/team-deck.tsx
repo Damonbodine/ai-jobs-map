@@ -319,7 +319,7 @@ function CtaPage({ props }: { props: TeamDeckProps }) {
         <Text style={{ fontSize: 8, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>Prepared by</Text>
         <Text style={{ fontSize: 10, color: C.bg }}>{props.agencyName}</Text>
         <Text style={{ fontSize: 10, color: "#60a5fa", marginTop: 2 }}>{props.contactEmail}</Text>
-        <Text style={{ fontSize: 10, color: "#60a5fa" }}>{props.siteUrl}/contact</Text>
+        <Text style={{ fontSize: 10, color: "#60a5fa" }}>{props.siteUrl}/contact#book</Text>
       </View>
     </Page>
   )

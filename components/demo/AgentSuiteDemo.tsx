@@ -178,7 +178,7 @@ export function AgentSuiteDemo({ roles, occupationTitle }: Props) {
         </div>
         <div className="flex items-center gap-3">
           <Link
-            href="/contact"
+            href="/contact#book"
             className="text-xs text-muted-foreground border border-border rounded-full px-4 py-2 hover:bg-muted transition-colors"
           >
             Book a scoping call

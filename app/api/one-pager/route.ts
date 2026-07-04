@@ -244,14 +244,14 @@ export async function POST(request: Request) {
 <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px; color:#221f1c;">
   <h2 style="font-size: 20px; margin: 0 0 12px;">Your one-pager is attached.</h2>
   <p>Thanks for your interest in the ${escapeHtml(SITE.name)} analysis for <strong>${safeOccupation}</strong>. The attached PDF summarizes the top automation opportunities and the time-back potential for this role &mdash; share it with your team.</p>
-  <p>If the numbers make sense and you'd like to talk about a real build, book a scoping call at <a href="${SITE.url}/contact" style="color:#2563eb;">${SITE.url}/contact</a>.</p>
+  <p>If the numbers make sense and you'd like to talk about a real build, book a scoping call at <a href="${SITE.url}/contact#book" style="color:#2563eb;">${SITE.url}/contact#book</a>.</p>
   <p style="margin-top:24px;">&mdash; ${escapeHtml(AGENCY.name)}</p>
 </div>`.trim(),
       text: `Your one-pager is attached.
 
 Thanks for your interest in the ${SITE.name} analysis for ${occupation.title}. The attached PDF summarizes the top automation opportunities and the time-back potential for this role — share it with your team.
 
-If the numbers make sense and you'd like to talk about a real build, book a scoping call at ${SITE.url}/contact.
+If the numbers make sense and you'd like to talk about a real build, book a scoping call at ${SITE.url}/contact#book.
 
 — ${AGENCY.name}`,
       attachments: pdfBuffer

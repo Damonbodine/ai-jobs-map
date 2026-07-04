@@ -16,8 +16,8 @@ type Props = {
 
 export function CustomDemoResult({ role, taskDescription, occupationContext, onReset }: Props) {
   const contactHref = occupationContext
-    ? `/contact?source=demo-try&role=${encodeURIComponent(occupationContext)}`
-    : "/contact?source=demo-try"
+    ? `/contact?source=demo-try&role=${encodeURIComponent(occupationContext)}#book`
+    : "/contact?source=demo-try#book"
 
   return (
     <DemoFadeIn>

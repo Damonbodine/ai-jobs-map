@@ -256,8 +256,8 @@ export function DepartmentPdf(props: DepartmentPdfProps) {
           <View style={styles.bullet}>
             <Text style={styles.bulletDot}>3.</Text>
             <Text style={styles.bulletBody}>
-              Book a 30-minute scoping call at {props.siteUrl}/contact when
-              you&apos;re ready to talk about a real implementation.
+              Book a 30-minute scoping call at {props.siteUrl}/contact#book
+              when you&apos;re ready to talk about a real implementation.
             </Text>
           </View>
         </View>

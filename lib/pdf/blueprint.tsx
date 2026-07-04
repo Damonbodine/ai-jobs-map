@@ -329,7 +329,7 @@ export function BlueprintPdf(props: BlueprintPdfProps) {
                 ? "We'll follow up within one business day to schedule a scoping call."
                 : "When you're ready to talk about a real build, book a scoping call at " +
                   props.siteUrl +
-                  "/contact."}
+                  "/contact#book."}
             </Text>
           </View>
           <View style={styles.bullet}>

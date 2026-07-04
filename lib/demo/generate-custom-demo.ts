@@ -80,6 +80,17 @@ Respond ONLY with valid JSON, no markdown fences, in this exact shape:
 }`
 }
 
+// Free-tier models only (":free" variants cost $0). Ordered by capability;
+// OpenRouter's `models` fallback routing tries each in turn when the free
+// pool for one is saturated. Caveat: free variants share an account-level
+// daily request cap (50/day, or 1000/day once the account has bought $10 of
+// credits) — fine at current traffic with the 5/day/IP route limit.
+const FREE_MODELS = [
+  "openai/gpt-oss-120b:free",
+  "qwen/qwen3-next-80b-a3b-instruct:free",
+  "meta-llama/llama-3.3-70b-instruct:free",
+]
+
 async function callOpenRouter(prompt: string): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY
   if (!apiKey) throw new Error("OPENROUTER_API_KEY not set")
@@ -92,7 +103,8 @@ async function callOpenRouter(prompt: string): Promise<string> {
       "HTTP-Referer": "https://ai-jobs-map.vercel.app",
     },
     body: JSON.stringify({
-      model: "anthropic/claude-haiku-4-5",
+      model: FREE_MODELS[0],
+      models: FREE_MODELS,
       messages: [{ role: "user", content: prompt }],
       max_tokens: 1500,
       temperature: 0.7,

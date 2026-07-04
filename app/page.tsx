@@ -220,20 +220,20 @@ export default async function HomePage() {
       <section className="container mx-auto px-4 pt-20 pb-16 text-center">
         <FadeIn delay={0}>
           <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-secondary text-muted-foreground border border-border mb-6">
-            800+ Occupations Analyzed
+            Grounded in BLS &amp; O*NET task data
           </span>
         </FadeIn>
 
         <FadeIn delay={0.1}>
           <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground max-w-3xl mx-auto leading-tight">
-            Where, concretely, is the time?
+            Your team is losing an hour a day to work AI can already do.
           </h1>
         </FadeIn>
 
         <FadeIn delay={0.2}>
           <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto">
-            800+ occupations mapped task-by-task to the work AI can genuinely handle.
-            See the honest time-back estimate for your role in under a minute — and if the numbers fit, we build the system with you.
+            Timeback maps 800+ occupations task by task to show exactly where.
+            See the numbers for your roles in under a minute — and if they hold up, we build the system that gets that time back.
           </p>
         </FadeIn>
 
@@ -259,10 +259,16 @@ export default async function HomePage() {
 
         <FadeIn delay={0.3} className="mt-8">
           <LandingSearch />
-          <div className="flex justify-center">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 mt-3">
+            <Link
+              href="/demo/try"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Describe a task — watch an agent handle it live →
+            </Link>
             <Link
               href="/build-a-team"
-              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mt-3"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Or build a whole team →
             </Link>

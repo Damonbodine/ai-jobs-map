@@ -103,7 +103,9 @@ async function callOpenRouter(prompt: string): Promise<string> {
       "HTTP-Referer": "https://ai-jobs-map.vercel.app",
     },
     body: JSON.stringify({
-      model: FREE_MODELS[0],
+      // models-array-only is OpenRouter's fallback-routing form; adding a
+      // `model` field alongside it pins the request to that model and a
+      // transient 429 kills the whole call instead of falling back.
       models: FREE_MODELS,
       messages: [{ role: "user", content: prompt }],
       max_tokens: 1500,
@@ -113,7 +115,11 @@ async function callOpenRouter(prompt: string): Promise<string> {
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}))
-    throw new Error(`OpenRouter API error ${response.status}: ${JSON.stringify(body)}`)
+    const err = new Error(
+      `OpenRouter API error ${response.status}: ${JSON.stringify(body)}`
+    ) as Error & { status?: number }
+    err.status = response.status
+    throw err
   }
 
   const data = await response.json()
@@ -184,7 +190,11 @@ export async function generateCustomDemo(input: GenerateCustomInput): Promise<De
       break
     } catch (err) {
       lastError = err
-      if (err instanceof Error && err.message.startsWith("OpenRouter API error")) {
+      // Auth/config errors won't fix themselves — fail fast. Transient
+      // upstream errors (429 free-pool congestion, 5xx) get the second
+      // attempt, same as malformed-JSON responses.
+      const status = (err as Error & { status?: number }).status
+      if (status === 401 || status === 403 || status === 402) {
         throw err
       }
     }

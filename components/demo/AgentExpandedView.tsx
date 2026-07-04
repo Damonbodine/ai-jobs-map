@@ -65,14 +65,14 @@ export function AgentExpandedView({ agent }: Props) {
             </div>
             <div className="text-[9px] text-red-500/70 mt-0.5">manual work</div>
           </div>
-          <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-3 border border-emerald-100 dark:border-emerald-900/30">
-            <div className="text-[8px] font-bold tracking-wider text-emerald-600 dark:text-emerald-400 mb-2 uppercase">
+          <div className="bg-success/10 dark:bg-success/20 rounded-lg p-3 border border-success/20 dark:border-success/30">
+            <div className="text-[8px] font-bold tracking-wider text-success dark:text-success mb-2 uppercase">
               After
             </div>
-            <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+            <div className="text-2xl font-black text-success dark:text-success">
               {agent.afterMinutes} min
             </div>
-            <div className="text-[9px] text-emerald-500/70 mt-0.5">to review &amp; approve</div>
+            <div className="text-[9px] text-success/70 mt-0.5">to review &amp; approve</div>
           </div>
         </div>
       </motion.div>

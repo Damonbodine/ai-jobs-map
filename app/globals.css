@@ -33,6 +33,15 @@
     --input: 33 18% 85%;
     --ring: 217 91% 60%;
     --radius: 0.625rem;
+    /* Semantic success states (form confirmations, agent "live" indicators).
+       45% lightness is the compromise between emerald-600-on-light and
+       emerald-400-on-terminal usages this token replaced. */
+    --success: 156 62% 45%;
+    --success-foreground: 0 0% 100%;
+    /* Dark "agent console" panels inside light pages — a deliberate device,
+       not a theme leak. */
+    --terminal: 40 4% 6%;
+    --terminal-foreground: 40 6% 93%;
   }
 
   .dark {
@@ -55,6 +64,10 @@
     --border: 30 8% 18%;
     --input: 30 8% 18%;
     --ring: 217 91% 65%;
+    --success: 152 55% 45%;
+    --success-foreground: 0 0% 100%;
+    --terminal: 40 4% 6%;
+    --terminal-foreground: 40 6% 93%;
   }
 }
 

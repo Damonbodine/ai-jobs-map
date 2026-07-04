@@ -55,7 +55,7 @@ export function AgentOutputPanel({ output, agentName }: Props) {
   }
 
   return (
-    <div className="rounded-xl overflow-hidden bg-[#0f0f0e] border border-white/8">
+    <div className="rounded-xl overflow-hidden bg-terminal border border-white/8">
       {/* Header bar */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8">
         <div className="flex items-center gap-2">
@@ -78,7 +78,7 @@ export function AgentOutputPanel({ output, agentName }: Props) {
             </button>
           )}
           {isDone && (
-            <span className="text-[9px] text-emerald-500/70">{agentName} · complete</span>
+            <span className="text-[9px] text-success/70">{agentName} · complete</span>
           )}
         </div>
       </div>

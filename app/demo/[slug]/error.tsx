@@ -14,20 +14,20 @@ export default function DemoSlugError({
   }, [error])
 
   return (
-    <main className="min-h-screen bg-[#fafaf7] flex items-center justify-center">
+    <main className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center max-w-md px-4">
         <p className="text-sm font-semibold text-red-500 uppercase tracking-widest mb-2">
           Demo Unavailable
         </p>
-        <h1 className="text-2xl font-bold text-[#1a1a1a] mb-3">
+        <h1 className="text-2xl font-bold text-foreground mb-3">
           We couldn&apos;t load this demo
         </h1>
-        <p className="text-[#666] mb-6">
+        <p className="text-muted-foreground mb-6">
           This occupation&apos;s demo is still being generated. Try again in a moment.
         </p>
         <button
           onClick={reset}
-          className="px-5 py-2.5 bg-[#1a1a1a] text-white rounded-lg text-sm font-medium hover:bg-[#333] transition-colors"
+          className="px-5 py-2.5 bg-foreground text-background rounded-lg text-sm font-medium hover:bg-foreground/80 transition-colors"
         >
           Try again
         </button>

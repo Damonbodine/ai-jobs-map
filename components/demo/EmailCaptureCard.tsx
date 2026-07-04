@@ -60,15 +60,15 @@ export function EmailCaptureCard({ taskDescription, occupationContext, generatio
 
     return (
       <div className="space-y-3">
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+        <div className="rounded-xl border border-success/30 bg-success/10 px-5 py-4 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-success flex items-center justify-center shrink-0">
             <Check className="h-4 w-4 text-white" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-emerald-900">
+            <p className="text-sm font-semibold text-success">
               Sent — check {email}.
             </p>
-            <p className="text-xs text-emerald-800 mt-0.5">
+            <p className="text-xs text-success/90 mt-0.5">
               Your agent demo summary is on its way, and we&apos;ll follow up
               personally within a day.
             </p>

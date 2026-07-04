@@ -81,7 +81,7 @@ export function DemoTimeline({
                   {agent.label}
                 </div>
                 {isActive && (
-                  <div className="text-[9px] mt-1 pl-3.5 font-semibold text-emerald-400">
+                  <div className="text-[9px] mt-1 pl-3.5 font-semibold text-success">
                     {agent.beforeMinutes} min → {agent.afterMinutes} min
                   </div>
                 )}
@@ -104,14 +104,14 @@ export function DemoTimeline({
 
       {/* Summary footer */}
       <div className="p-3 border-t border-border">
-        <div className="bg-blue-50 dark:bg-blue-950/40 rounded-lg p-3 border border-blue-100 dark:border-blue-900/50">
-          <div className="text-[8px] font-bold tracking-wider text-blue-600 dark:text-blue-400 mb-1 uppercase">
+        <div className="bg-accent/10 dark:bg-accent/20 rounded-lg p-3 border border-accent/20 dark:border-accent/30">
+          <div className="text-[8px] font-bold tracking-wider text-accent dark:text-accent/80 mb-1 uppercase">
             Total reclaimed
           </div>
-          <div className="text-xl font-black text-blue-700 dark:text-blue-300">
+          <div className="text-xl font-black text-accent dark:text-accent/70">
             {activeRole.totalBeforeMinutes - activeRole.totalAfterMinutes} min
           </div>
-          <div className="text-[9px] text-blue-500 dark:text-blue-400">every single day</div>
+          <div className="text-[9px] text-accent dark:text-accent/80">every single day</div>
         </div>
       </div>
     </div>

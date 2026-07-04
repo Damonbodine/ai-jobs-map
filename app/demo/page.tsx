@@ -38,12 +38,12 @@ async function FeaturedRoles() {
         <Link
           key={role.slug}
           href={`/demo/${role.slug}`}
-          className="group bg-white border border-gray-200 rounded-xl px-4 py-3 text-left hover:border-cyan-300 hover:shadow-sm transition-all"
+          className="group bg-white border border-border rounded-xl px-4 py-3 text-left hover:border-accent/40 hover:shadow-sm transition-all"
         >
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1">
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-1">
             {role.major_category}
           </p>
-          <p className="text-sm font-semibold text-gray-800 group-hover:text-cyan-700 transition-colors leading-snug">
+          <p className="text-sm font-semibold text-foreground group-hover:text-accent transition-colors leading-snug">
             {role.title}
           </p>
         </Link>
@@ -54,16 +54,16 @@ async function FeaturedRoles() {
 
 export default async function DemoPage() {
   return (
-    <main className="min-h-screen bg-[#fafaf7]">
+    <main className="min-h-screen bg-background">
       {/* Hero + Search */}
       <section className="max-w-3xl mx-auto px-4 pt-16 pb-12 text-center">
-        <p className="text-sm font-semibold text-cyan-600 uppercase tracking-widest mb-3">
+        <p className="text-sm font-semibold text-accent uppercase tracking-widest mb-3">
           AI Agent Suite
         </p>
-        <h1 className="text-4xl font-bold text-[#1a1a1a] font-display mb-4">
+        <h1 className="text-4xl font-bold text-foreground font-display mb-4">
           See your workday, transformed
         </h1>
-        <p className="text-lg text-[#555] mb-8">
+        <p className="text-lg text-muted-foreground mb-8">
           Search any job title. We&apos;ll show you exactly which agents handle which tasks — and how many hours they give back.
         </p>
         <OccupationSearch />
@@ -73,12 +73,12 @@ export default async function DemoPage() {
       <section className="max-w-2xl mx-auto px-4 pb-10">
         <Link
           href="/demo/try"
-          className="group block rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-50 to-white px-5 py-4 text-center hover:border-cyan-400 hover:shadow-sm transition-all"
+          className="group block rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/5 to-white px-5 py-4 text-center hover:border-accent/50 hover:shadow-sm transition-all"
         >
-          <p className="text-xs font-semibold text-cyan-700 uppercase tracking-widest mb-1">
+          <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-1">
             ✨ New — live custom demo
           </p>
-          <p className="text-sm font-semibold text-gray-800 group-hover:text-cyan-700 transition-colors">
+          <p className="text-sm font-semibold text-foreground group-hover:text-accent transition-colors">
             Don&apos;t see your role? Describe your task and we&apos;ll build the demo live →
           </p>
         </Link>
@@ -86,13 +86,13 @@ export default async function DemoPage() {
 
       {/* Featured roles */}
       <section className="max-w-4xl mx-auto px-4 pb-16">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest text-center mb-5">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest text-center mb-5">
           Featured roles
         </p>
         <Suspense fallback={
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl mx-auto">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+              <div key={i} className="h-16 bg-muted rounded-xl animate-pulse" />
             ))}
           </div>
         }>
@@ -101,12 +101,12 @@ export default async function DemoPage() {
       </section>
 
       {/* Existing scripted demo */}
-      <section className="border-t border-gray-200 bg-white">
+      <section className="border-t border-border bg-white">
         <div className="max-w-5xl mx-auto px-4 py-16">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest text-center mb-2">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest text-center mb-2">
             Full walkthrough
           </p>
-          <h2 className="text-2xl font-bold text-[#1a1a1a] font-display text-center mb-10">
+          <h2 className="text-2xl font-bold text-foreground font-display text-center mb-10">
             Watch the agents in action
           </h2>
           <DemoTeaser />

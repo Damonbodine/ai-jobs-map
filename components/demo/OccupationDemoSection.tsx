@@ -80,13 +80,13 @@ export function OccupationDemoSectionSkeleton() {
               <div className="h-3 w-2/3 bg-muted/50 rounded" />
             </div>
             {/* Loop diagram placeholder */}
-            <div className="rounded-xl bg-[#0f0f0e] border border-white/8 h-40" />
+            <div className="rounded-xl bg-terminal border border-white/8 h-40" />
             {/* Output panel */}
             <div className="rounded-xl border border-border h-24 bg-muted/10" />
             {/* Before/After */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg h-16 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/20" />
-              <div className="rounded-lg h-16 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/20" />
+              <div className="rounded-lg h-16 bg-success/10 dark:bg-success/10 border border-success/20 dark:border-success/20" />
             </div>
           </div>
         </div>

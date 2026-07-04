@@ -65,7 +65,7 @@ export async function DemoTeaser() {
                   <span className="text-[10px] text-muted-foreground ml-1.5">{agent.label}</span>
                 </div>
               </div>
-              <div className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+              <div className="text-[10px] font-semibold text-success dark:text-success">
                 {agent.beforeMinutes} min → {agent.afterMinutes} min
               </div>
             </div>
@@ -75,18 +75,18 @@ export async function DemoTeaser() {
 
       {/* Summary stat + CTA */}
       <div className="px-4 pb-4">
-        <div className="flex items-center justify-between bg-blue-50 dark:bg-blue-950/30 rounded-xl p-3 border border-blue-100 dark:border-blue-900/30">
+        <div className="flex items-center justify-between bg-accent/10 dark:bg-accent/20 rounded-xl p-3 border border-accent/20 dark:border-accent/20">
           <div>
-            <div className="text-lg font-black text-blue-700 dark:text-blue-300">
+            <div className="text-lg font-black text-accent dark:text-accent/70">
               {minutesSaved} min/day
             </div>
-            <div className="text-[9px] text-blue-500 dark:text-blue-400">
+            <div className="text-[9px] text-accent dark:text-accent/80">
               ${defaultRole.annualValueDollars.toLocaleString()}/yr per person
             </div>
           </div>
           <Link
             href="/demo"
-            className="flex items-center gap-1.5 text-xs font-bold bg-blue-600 text-white rounded-full px-4 py-2 hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-1.5 text-xs font-bold bg-accent text-white rounded-full px-4 py-2 hover:bg-accent/90 transition-colors"
           >
             See full demo <ArrowRight className="w-3 h-3" />
           </Link>

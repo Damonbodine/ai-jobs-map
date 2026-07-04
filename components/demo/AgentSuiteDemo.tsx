@@ -111,7 +111,7 @@ export function AgentSuiteDemo({ roles, occupationTitle }: Props) {
       {/* Demo header bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-muted/30">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
           <span className="text-xs font-semibold text-foreground">
             {activeRole.displayName} · Full AI Agent Suite
           </span>

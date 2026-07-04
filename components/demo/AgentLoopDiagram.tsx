@@ -60,7 +60,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
     PHASES.indexOf(phase) >= PHASES.indexOf(p) || phase === "pause"
 
   return (
-    <div className="relative rounded-xl overflow-hidden bg-[#0f0f0e] border border-white/8">
+    <div className="relative rounded-xl overflow-hidden bg-terminal border border-white/8">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
         <span className="text-xs font-medium text-white/50">
@@ -158,7 +158,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
               className="flex items-start gap-1.5 py-0.5"
             >
               {isActive("outputs") && (
-                <Check className="w-2.5 h-2.5 text-emerald-400 shrink-0 mt-0.5" />
+                <Check className="w-2.5 h-2.5 text-success shrink-0 mt-0.5" />
               )}
               <span className="text-[10px] text-white/60 leading-snug">{item}</span>
             </motion.div>
@@ -197,7 +197,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ delay: 0.5 }}
-                className="mt-2 inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded-full"
+                className="mt-2 inline-flex items-center gap-1 bg-success/20 text-success text-[9px] font-bold px-2 py-0.5 rounded-full"
               >
                 <Check className="w-2 h-2" /> Done
               </motion.div>

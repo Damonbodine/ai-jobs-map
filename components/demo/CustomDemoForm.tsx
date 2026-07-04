@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { ArrowRight, Sparkles } from "lucide-react"
 import type { DemoRoleData } from "@/lib/demo/types"
 import { CustomDemoResult } from "./CustomDemoResult"
+import { track } from "@/lib/analytics"
 
 type Stage = "idle" | "generating" | "ready" | "error"
 
@@ -80,6 +81,9 @@ export function CustomDemoForm() {
           typeof payload?.generationId === "string" ? payload.generationId : null
         )
         setStage("ready")
+        track("demo_generated", {
+          has_role_context: Boolean(occupationContext.trim()),
+        })
       } catch (err) {
         clearProgressTimers()
         const message =

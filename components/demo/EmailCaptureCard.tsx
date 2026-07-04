@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { Mail, Check, ArrowRight } from "lucide-react"
+import { track } from "@/lib/analytics"
 
 type Props = {
   taskDescription: string
@@ -44,6 +45,7 @@ export function EmailCaptureCard({ taskDescription, occupationContext, generatio
       }
 
       setStatus("success")
+      track("demo_lead_captured", { source: "demo_try" })
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unexpected error."
       setErrorMessage(message)

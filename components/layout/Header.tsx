@@ -6,6 +6,7 @@ import { Menu, X, Sun, Moon, ChevronDown } from "lucide-react"
 import { useState } from "react"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
+import { track } from "@/lib/analytics"
 import { DARK_MODE_ENABLED } from "@/lib/features"
 import {
   DropdownMenu,
@@ -92,6 +93,7 @@ export function Header() {
           ) : null}
           <Link
             href="/contact#book"
+            onClick={() => track("book_call_clicked", { location: "header" })}
             className="text-sm font-semibold bg-foreground text-background px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
           >
             Book a Call
@@ -126,7 +128,10 @@ export function Header() {
           <div className="pt-2 mt-1 border-t border-border flex items-center gap-2">
             <Link
               href="/contact#book"
-              onClick={() => setMobileOpen(false)}
+              onClick={() => {
+                track("book_call_clicked", { location: "mobile" })
+                setMobileOpen(false)
+              }}
               className="flex-1 text-center py-2.5 text-sm font-semibold bg-foreground text-background rounded-lg active:opacity-80 transition-opacity"
             >
               Book a Call

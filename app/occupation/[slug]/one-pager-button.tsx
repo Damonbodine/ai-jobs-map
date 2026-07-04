@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Download, Loader2, CheckCircle2, X } from "lucide-react"
 import { onePagerSchema } from "@/lib/validation/one-pager"
+import { track } from "@/lib/analytics"
 
 type Status = "idle" | "submitting" | "success" | "error"
 
@@ -89,6 +90,7 @@ export function OnePagerButton({
         return
       }
       setStatus("success")
+      track("one_pager_requested", { occupation_slug: occupationSlug })
     } catch {
       setErrorMessage("Network error. Please try again.")
       setStatus("error")

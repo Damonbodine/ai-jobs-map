@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { Newsreader, Manrope } from "next/font/google"
+import { GoogleAnalytics } from "@next/third-parties/google"
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import { Header } from "@/components/layout/Header"
 import { Footer } from "@/components/layout/Footer"
@@ -57,6 +58,9 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
         </ThemeProvider>
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
       </body>
     </html>
   )

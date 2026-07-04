@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { Loader2, CheckCircle2, X } from "lucide-react"
 import { buildATeamPdfSchema } from "@/lib/validation/build-a-team"
 import type { CartRow } from "@/lib/build-a-team/url-state"
+import { track } from "@/lib/analytics"
 
 type Status = "idle" | "submitting" | "success" | "error"
 
@@ -82,6 +83,7 @@ export function PdfModal({
         return
       }
       setStatus("success")
+      track("team_pdf_requested")
     } catch {
       setErrorMessage("Network error. Please try again.")
       setStatus("error")

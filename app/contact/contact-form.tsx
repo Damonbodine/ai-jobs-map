@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { Loader2, CheckCircle2 } from "lucide-react"
 import { contactFormSchema } from "@/lib/validation/contact"
+import { track } from "@/lib/analytics"
 
 type Status = "idle" | "submitting" | "success" | "error"
 
@@ -96,6 +97,7 @@ export function ContactForm() {
       }
 
       setStatus("success")
+      track("contact_submitted")
     } catch {
       setErrorMessage(
         "Network error. Please check your connection and try again."

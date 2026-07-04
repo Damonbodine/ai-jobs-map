@@ -15,6 +15,7 @@ import { PdfModal } from "./pdf-modal"
 import { RoleBuilder, type TaskItem } from "./role-builder"
 import { TeamContactForm } from "./team-contact-form"
 import { TeamDone } from "./team-done"
+import { track } from "@/lib/analytics"
 
 type RoleTaskData = {
   slug: string
@@ -189,6 +190,7 @@ export function Cart({
     setDoneTotalPeople(totalPeople)
     setDoneMinutesPerDay(totalMinutesPerDay)
     setPhase("done")
+    track("team_inquiry_submitted", { role_count: cart.length })
   }
 
   // ── Done phase ──

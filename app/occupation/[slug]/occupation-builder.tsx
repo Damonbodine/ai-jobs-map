@@ -16,6 +16,7 @@ import { CONTACT } from "@/lib/site"
 import type { ModuleCapability } from "@/types"
 import type { RelatedOccupation } from "@/lib/occupation-data"
 import Link from "next/link"
+import { track } from "@/lib/analytics"
 
 interface TaskItem {
   id: number
@@ -244,6 +245,7 @@ export function OccupationBuilder({
       }
 
       setPhase("done")
+      track("inquiry_submitted", { source: "builder" })
     } catch (err) {
       console.error("[builder] submit failed", err)
       toast.error(

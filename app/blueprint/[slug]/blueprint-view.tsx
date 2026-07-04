@@ -29,6 +29,7 @@ import type {
 
 import { MODULE_LABELS as BLOCK_LABELS, MODULE_DESCRIPTIONS as REGISTRY_DESCRIPTIONS, MODULE_COLORS } from "@/lib/modules"
 import { TimeDonut } from "@/components/TimeDonut"
+import { track } from "@/lib/analytics"
 
 const MODULE_DESCRIPTIONS = REGISTRY_DESCRIPTIONS
 
@@ -187,6 +188,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
       }
 
       setSubmitted(true)
+      track("inquiry_submitted", { source: "blueprint" })
     } catch (err) {
       console.error("[blueprint] submit failed", err)
       toast.error(

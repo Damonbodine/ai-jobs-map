@@ -1,6 +1,9 @@
 "use client"
 
+import { useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { BOOKING } from "@/lib/booking"
+import { track } from "@/lib/analytics"
 
 /**
  * Inline Google Calendar appointment-schedule widget, wrapped in the site's
@@ -23,6 +26,13 @@ export function BookingEmbed({
   const embedSrc = url
     ? `${url}${url.includes("?") ? "&" : "?"}gv=true`
     : BOOKING.embedUrl
+  const pathname = usePathname()
+
+  useEffect(() => {
+    track("booking_embed_viewed", { page: pathname })
+    // Fire once per mount — pathname changes remount the page anyway.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div

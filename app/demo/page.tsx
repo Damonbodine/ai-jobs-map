@@ -9,7 +9,7 @@ import Link from "next/link"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "AI Agent Suite Demo | AI Jobs Map",
+  title: "AI Agent Suite Demo",
   description: "See how AI agents transform a full workday for any job role.",
 }
 

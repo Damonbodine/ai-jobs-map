@@ -1,6 +1,6 @@
-# AI Jobs Map
+# Timeback
 
-Discover how AI can transform any career. Search 800+ occupations to find AI-powered opportunities and skill recommendations.
+See exactly how much time AI gives back — role by role. 800+ occupations mapped task-by-task, by Clear Road Labs. Lives at timeback.clearroadlabs.com.
 
 ## Tech Stack
 

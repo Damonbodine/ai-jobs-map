@@ -74,7 +74,7 @@ function CoverPage({ props }: { props: TeamDeckProps }) {
   return (
     <Page size="LETTER" style={s.darkPage}>
       <View style={{ flex: 1, justifyContent: "center" }}>
-        <Text style={s.darkKicker}>AI Timeback · Team Blueprint</Text>
+        <Text style={s.darkKicker}>Timeback · Team Blueprint</Text>
         <Text style={[s.h1, { color: C.bg, marginBottom: 6 }]}>
           Your team reclaims{"\n"}
           <Text style={{ color: "#60a5fa" }}>{hoursPerYear.toLocaleString()} hours</Text>

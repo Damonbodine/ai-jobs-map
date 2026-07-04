@@ -24,7 +24,7 @@ export function Header() {
     { href: "/browse", label: "Browse" },
     { href: "/demo", label: "Demo" },
     { href: "/build-a-team", label: "Build a Team" },
-    { href: "/products", label: "Pricing" },
+    { href: "/products", label: "What We Build" },
   ]
 
   return (
@@ -33,7 +33,7 @@ export function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-1.5 group">
             <span className="font-heading text-lg font-semibold tracking-tight">
-              AI Timeback
+              Timeback
             </span>
             <ChevronDown className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-foreground" />
           </DropdownMenuTrigger>
@@ -51,7 +51,7 @@ export function Header() {
               Build a Team
             </DropdownMenuItem>
             <DropdownMenuItem render={<Link href="/products" />}>
-              Pricing
+              What We Build
             </DropdownMenuItem>
             <DropdownMenuItem render={<Link href="/about" />}>
               About
@@ -91,7 +91,7 @@ export function Header() {
             </button>
           ) : null}
           <Link
-            href="/contact"
+            href="/contact#book"
             className="text-sm font-semibold bg-foreground text-background px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
           >
             Book a Call
@@ -125,7 +125,7 @@ export function Header() {
           ))}
           <div className="pt-2 mt-1 border-t border-border flex items-center gap-2">
             <Link
-              href="/contact"
+              href="/contact#book"
               onClick={() => setMobileOpen(false)}
               className="flex-1 text-center py-2.5 text-sm font-semibold bg-foreground text-background rounded-lg active:opacity-80 transition-opacity"
             >

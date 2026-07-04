@@ -12,9 +12,9 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const role = await computeDemoForSlug(slug)
-  if (!role) return { title: "Demo | AI Jobs Map" }
+  if (!role) return { title: "Demo" }
   return {
-    title: `${role.displayName} AI Demo | AI Jobs Map`,
+    title: `${role.displayName} AI Demo`,
     description: role.tagline,
   }
 }

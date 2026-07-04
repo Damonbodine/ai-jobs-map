@@ -6,7 +6,7 @@
  */
 
 export const SITE = {
-  name: "AI Timeback",
+  name: "Timeback",
   tagline: "See exactly how much time AI gives back — role by role.",
   description:
     "Discover how much time AI gives back in your specific occupation. Task-level analysis grounded in Bureau of Labor Statistics and O*NET data, delivered as a concrete implementation plan by Clear Road Labs.",

@@ -11,8 +11,8 @@ const TEST_NAME = "QA Test"
 
 test("homepage branding + nav", async ({ page }) => {
   await page.goto(BASE, { waitUntil: "domcontentloaded" })
-  await expect(page).toHaveTitle(/AI Timeback/)
-  await expect(page.locator("header")).toContainText("AI Timeback")
+  await expect(page).toHaveTitle(/Timeback/)
+  await expect(page.locator("header")).toContainText("Timeback")
   await expect(page.locator("header")).toContainText("Build a Team")
 })
 

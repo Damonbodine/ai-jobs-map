@@ -57,7 +57,7 @@ export function Footer() {
                 href="/products"
                 className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Pricing
+                What We Build
               </Link>
             </div>
           </div>

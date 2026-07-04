@@ -6,7 +6,7 @@ import { PageTransition } from "@/components/PageTransition"
 import { CustomDemoForm } from "@/components/demo/CustomDemoForm"
 
 export const metadata: Metadata = {
-  title: "Try a Custom AI Agent Demo | AI Jobs Map",
+  title: "Try a Custom AI Agent Demo",
   description: "Describe a task you spend too much time on. We'll generate a custom AI agent demo for it in seconds.",
 }
 

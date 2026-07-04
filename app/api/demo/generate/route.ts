@@ -4,6 +4,8 @@
 
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { db } from "@/lib/db/client"
+import { demoGenerations } from "@/lib/db/schema"
 import { generateCustomDemo } from "@/lib/demo/generate-custom-demo"
 import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
 
@@ -52,11 +54,46 @@ export async function POST(request: Request) {
     )
   }
 
+  const input = parsed.data
+
+  // Log every generation attempt (success or failure). This must never fail
+  // the response — the route worked without any DB dependency before, and a
+  // DB blip shouldn't take the demo down with it.
+  async function logGeneration(outcome: {
+    generatedRole: unknown
+    success: boolean
+    error?: string
+  }): Promise<string | null> {
+    try {
+      const rows = await db
+        .insert(demoGenerations)
+        .values({
+          taskDescription: input.taskDescription,
+          occupationContext: input.occupationContext || null,
+          generatedRole: outcome.generatedRole ?? null,
+          success: outcome.success,
+          error: outcome.error ?? null,
+          ipHash,
+        })
+        .returning({ id: demoGenerations.id })
+      return rows[0]?.id ?? null
+    } catch (dbErr) {
+      console.error("[demo/generate] failed to log generation", dbErr)
+      return null
+    }
+  }
+
   try {
-    const role = await generateCustomDemo(parsed.data)
-    return NextResponse.json({ role }, { status: 200 })
+    const role = await generateCustomDemo(input)
+    const generationId = await logGeneration({ generatedRole: role, success: true })
+    return NextResponse.json({ role, generationId }, { status: 200 })
   } catch (err) {
     console.error("[demo/generate] generation failed", err)
+    await logGeneration({
+      generatedRole: null,
+      success: false,
+      error: err instanceof Error ? err.message : String(err),
+    })
     return NextResponse.json(
       { error: "We couldn't generate a demo for that description. Try rephrasing or adding more detail." },
       { status: 500 }

@@ -5,11 +5,13 @@
 
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { eq } from "drizzle-orm"
 import { db } from "@/lib/db/client"
-import { demoLeads } from "@/lib/db/schema"
+import { demoLeads, demoGenerations } from "@/lib/db/schema"
 import { sendEmail } from "@/lib/resend"
 import { CONTACT, AGENCY, SITE } from "@/lib/site"
 import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
+import type { DemoRoleData } from "@/lib/demo/types"
 
 function escapeHtml(value: string): string {
   return value
@@ -26,6 +28,7 @@ const requestSchema = z.object({
   email: z.string().trim().email().max(200),
   taskDescription: z.string().trim().min(1).max(800),
   occupationContext: z.string().trim().max(120).optional(),
+  generationId: z.string().uuid().optional(),
 })
 
 export async function POST(request: Request) {
@@ -64,7 +67,7 @@ export async function POST(request: Request) {
     )
   }
 
-  const { email, taskDescription, occupationContext } = parsed.data
+  const { email, taskDescription, occupationContext, generationId } = parsed.data
 
   try {
     await db.insert(demoLeads).values({
@@ -72,6 +75,7 @@ export async function POST(request: Request) {
       taskDescription,
       occupationContext: occupationContext ?? null,
       ipHash: ipHash,
+      generationId: generationId ?? null,
     })
   } catch (dbError) {
     console.error("[demo/lead] database insert failed", dbError)
@@ -118,6 +122,96 @@ Submitted via ${SITE.name} /demo/try — ${AGENCY.name}`,
   } catch (err) {
     console.error("[demo/lead] resend notification failed", err)
     // Do NOT fail the request; the lead is saved in the database.
+  }
+
+  // Send the prospect their demo summary. The role content is loaded
+  // server-side from demo_generations (never trusted from the client). If the
+  // lookup fails we still send an acknowledgment so the success copy in the
+  // UI stays honest.
+  try {
+    let role: DemoRoleData | null = null
+    if (generationId) {
+      try {
+        const rows = await db
+          .select({ generatedRole: demoGenerations.generatedRole })
+          .from(demoGenerations)
+          .where(eq(demoGenerations.id, generationId))
+          .limit(1)
+        role = (rows[0]?.generatedRole as DemoRoleData | null) ?? null
+      } catch (lookupErr) {
+        console.error("[demo/lead] generation lookup failed", lookupErr)
+      }
+    }
+
+    const safeTask = escapeHtml(taskDescription).replace(/\n/g, "<br/>")
+    const minutesSaved = role
+      ? role.totalBeforeMinutes - role.totalAfterMinutes
+      : null
+
+    const agentHtml =
+      role && role.agents.length > 0
+        ? role.agents
+            .map(
+              (a) => `
+  <div style="padding: 12px; background: #f7f5f0; border-radius: 8px; margin: 0 0 8px;">
+    <p style="margin: 0; font-weight: 600;">${escapeHtml(a.agentName)} — ${escapeHtml(a.label)}</p>
+    <p style="margin: 4px 0 0; font-size: 14px; color: #444;">${escapeHtml(a.narrative)}</p>
+    <p style="margin: 6px 0 0; font-size: 13px; color: #2563eb;">${a.beforeMinutes} min → ${a.afterMinutes} min</p>
+  </div>`
+            )
+            .join("")
+        : ""
+
+    const agentText =
+      role && role.agents.length > 0
+        ? role.agents
+            .map(
+              (a) =>
+                `${a.agentName} — ${a.label}\n${a.narrative}\n${a.beforeMinutes} min → ${a.afterMinutes} min`
+            )
+            .join("\n\n")
+        : ""
+
+    await sendEmail({
+      to: email,
+      replyTo: CONTACT.replyTo,
+      subject: `Your custom AI agent demo — ${SITE.name}`,
+      html: `
+<div style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px;">
+  <h2 style="font-size: 18px; margin: 0 0 12px;">Here's the agent we sketched for your task</h2>
+  <p style="margin: 0 0 8px;"><strong>You described:</strong></p>
+  <div style="padding: 12px; background: #f7f5f0; border-radius: 8px; border-left: 3px solid #2563eb; margin: 0 0 16px;">
+    ${safeTask}
+  </div>
+  ${agentHtml}
+  ${
+    minutesSaved && minutesSaved > 0
+      ? `<p style="margin: 16px 0 8px;"><strong>Estimated time back: ~${minutesSaved} minutes a day.</strong> These numbers are estimates — we refine them during scoping.</p>`
+      : ""
+  }
+  <p style="margin: 16px 0 8px;">We'll follow up personally within a day. If you'd like to move faster, book a 30-minute scoping call — we'll walk through what a real build of this looks like, no pitch:</p>
+  <p style="margin: 0 0 16px;"><a href="${SITE.url}/contact#book" style="color:#2563eb;">${SITE.url}/contact#book</a></p>
+  <p style="margin: 24px 0 0; font-size: 12px; color: #777;">
+    ${SITE.name} — a project by ${AGENCY.name}
+  </p>
+</div>
+      `.trim(),
+      text: `Here's the agent we sketched for your task
+
+You described:
+${taskDescription}
+${agentText ? `\n${agentText}\n` : ""}${
+        minutesSaved && minutesSaved > 0
+          ? `\nEstimated time back: ~${minutesSaved} minutes a day. These numbers are estimates — we refine them during scoping.\n`
+          : ""
+      }
+We'll follow up personally within a day. To move faster, book a 30-minute scoping call: ${SITE.url}/contact#book
+
+${SITE.name} — a project by ${AGENCY.name}`,
+    })
+  } catch (err) {
+    console.error("[demo/lead] prospect email failed", err)
+    // Do NOT fail the request; the lead is saved and the owner was notified.
   }
 
   return NextResponse.json({ ok: true }, { status: 200 })

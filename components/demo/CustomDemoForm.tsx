@@ -21,6 +21,7 @@ export function CustomDemoForm() {
   const [progressLabel, setProgressLabel] = useState(PROGRESS_STAGES[0].label)
   const [errorMessage, setErrorMessage] = useState("")
   const [role, setRole] = useState<DemoRoleData | null>(null)
+  const [generationId, setGenerationId] = useState<string | null>(null)
 
   const progressTimers = useRef<ReturnType<typeof setTimeout>[]>([])
 
@@ -75,6 +76,9 @@ export function CustomDemoForm() {
 
         clearProgressTimers()
         setRole(generatedRole)
+        setGenerationId(
+          typeof payload?.generationId === "string" ? payload.generationId : null
+        )
         setStage("ready")
       } catch (err) {
         clearProgressTimers()
@@ -89,6 +93,7 @@ export function CustomDemoForm() {
 
   const handleReset = useCallback(() => {
     setRole(null)
+    setGenerationId(null)
     setStage("idle")
     setErrorMessage("")
   }, [])
@@ -99,6 +104,7 @@ export function CustomDemoForm() {
         role={role}
         taskDescription={taskDescription.trim()}
         occupationContext={occupationContext.trim() || undefined}
+        generationId={generationId ?? undefined}
         onReset={handleReset}
       />
     )

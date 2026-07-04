@@ -549,6 +549,22 @@ export const demoLeads = pgTable("demo_leads", {
 	taskDescription: text("task_description").notNull(),
 	occupationContext: text("occupation_context"),
 	ipHash: text("ip_hash"),
+	generationId: uuid("generation_id"),
 }, (table) => [
 	index("idx_demo_leads_created_at").using("btree", table.createdAt.desc().nullsFirst().op("timestamptz_ops")),
+]);
+
+// Every /demo/try generation, captured whether or not the visitor leaves an
+// email — the raw task descriptions are market intel on their own.
+export const demoGenerations = pgTable("demo_generations", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	taskDescription: text("task_description").notNull(),
+	occupationContext: text("occupation_context"),
+	generatedRole: jsonb("generated_role"),
+	success: boolean().notNull(),
+	error: text(),
+	ipHash: text("ip_hash"),
+}, (table) => [
+	index("idx_demo_generations_created_at").using("btree", table.createdAt.desc().nullsFirst().op("timestamptz_ops")),
 ]);

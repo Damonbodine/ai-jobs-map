@@ -11,10 +11,11 @@ type Props = {
   role: DemoRoleData
   taskDescription: string
   occupationContext?: string
+  generationId?: string
   onReset: () => void
 }
 
-export function CustomDemoResult({ role, taskDescription, occupationContext, onReset }: Props) {
+export function CustomDemoResult({ role, taskDescription, occupationContext, generationId, onReset }: Props) {
   const contactHref = occupationContext
     ? `/contact?source=demo-try&role=${encodeURIComponent(occupationContext)}#book`
     : "/contact?source=demo-try#book"
@@ -41,6 +42,7 @@ export function CustomDemoResult({ role, taskDescription, occupationContext, onR
         <EmailCaptureCard
           taskDescription={taskDescription}
           occupationContext={occupationContext}
+          generationId={generationId}
         />
 
         <p className="text-center text-xs text-muted-foreground">

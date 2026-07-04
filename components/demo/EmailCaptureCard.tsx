@@ -7,11 +7,12 @@ import { Mail, Check, ArrowRight } from "lucide-react"
 type Props = {
   taskDescription: string
   occupationContext?: string
+  generationId?: string
 }
 
 type Status = "idle" | "submitting" | "success" | "error"
 
-export function EmailCaptureCard({ taskDescription, occupationContext }: Props) {
+export function EmailCaptureCard({ taskDescription, occupationContext, generationId }: Props) {
   const [email, setEmail] = useState("")
   const [status, setStatus] = useState<Status>("idle")
   const [errorMessage, setErrorMessage] = useState("")
@@ -32,6 +33,7 @@ export function EmailCaptureCard({ taskDescription, occupationContext }: Props) 
           email: trimmed,
           taskDescription,
           occupationContext,
+          generationId,
         }),
       })
 
@@ -62,10 +64,11 @@ export function EmailCaptureCard({ taskDescription, occupationContext }: Props) 
           </div>
           <div>
             <p className="text-sm font-semibold text-emerald-900">
-              Got it — we&apos;ll be in touch.
+              Sent — check {email}.
             </p>
             <p className="text-xs text-emerald-800 mt-0.5">
-              Check {email} within a day for a one-pager tailored to this task.
+              Your agent demo summary is on its way, and we&apos;ll follow up
+              personally within a day.
             </p>
           </div>
         </div>
@@ -103,10 +106,11 @@ export function EmailCaptureCard({ taskDescription, occupationContext }: Props) 
         </div>
         <div>
           <p className="text-sm font-semibold text-foreground">
-            Want a custom PDF report for this task?
+            Want this in your inbox?
           </p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Drop your email — we&apos;ll send a one-pager sized for your workflow. No spam.
+            We&apos;ll send a summary of this agent — what it does, the minutes
+            it saves, and how we&apos;d build it. No spam.
           </p>
         </div>
       </div>

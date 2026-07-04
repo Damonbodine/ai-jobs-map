@@ -2,12 +2,20 @@ export const dynamic = "force-dynamic"
 
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import { unstable_cache } from "next/cache"
 import { ArrowRight, ChevronRight } from "lucide-react"
 import { db } from "@/lib/db/client"
-import { occupations as occupationsTable, occupationAutomationProfile } from "@/lib/db/schema"
-import { eq } from "drizzle-orm"
+import {
+  occupations as occupationsTable,
+  occupationAutomationProfile,
+  jobMicroTasks,
+} from "@/lib/db/schema"
+import { eq, inArray } from "drizzle-orm"
 import { getCategoryBySlug, CATEGORIES } from "@/lib/categories"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
+import { computeDisplayedTimeback } from "@/lib/timeback"
+import { generateBlueprint } from "@/lib/blueprint"
+import type { AutomationProfile, MicroTask, Occupation } from "@/types"
 
 export async function generateStaticParams() {
   return CATEGORIES.map((c) => ({ category: c.slug }))
@@ -25,16 +33,18 @@ export async function generateMetadata(props: {
   }
 }
 
-export default async function CategoryPage(props: {
-  params: Promise<{ category: string }>
-}) {
-  const { category: categorySlug } = await props.params
-  const cat = getCategoryBySlug(categorySlug)
-  if (!cat) notFound()
+type CategoryOccupation = {
+  id: number
+  title: string
+  slug: string
+  employment: number | null
+  minutes: number | null
+}
 
-  let occupations: any[] = []
-
-  try {
+// Computing displayedMinutes needs every occupation's tasks + full profile —
+// heavy for large categories (Production has 104), so cache per category.
+const getCategoryOccupations = unstable_cache(
+  async (dbValue: string): Promise<CategoryOccupation[]> => {
     const rows = await db
       .select({
         id: occupationsTable.id,
@@ -42,19 +52,95 @@ export default async function CategoryPage(props: {
         slug: occupationsTable.slug,
         major_category: occupationsTable.majorCategory,
         employment: occupationsTable.employment,
-        occupation_automation_profile: {
-          composite_score: occupationAutomationProfile.compositeScore,
-        }
       })
       .from(occupationsTable)
-      .leftJoin(
-        occupationAutomationProfile,
-        eq(occupationsTable.id, occupationAutomationProfile.occupationId)
-      )
-      .where(eq(occupationsTable.majorCategory, cat.dbValue))
+      .where(eq(occupationsTable.majorCategory, dbValue))
       .orderBy(occupationsTable.title)
 
-    occupations = rows ?? []
+    const ids = rows.map((r) => r.id)
+    if (ids.length === 0) return []
+
+    const [profiles, taskRows] = await Promise.all([
+      db
+        .select({
+          id: occupationAutomationProfile.id,
+          occupation_id: occupationAutomationProfile.occupationId,
+          composite_score: occupationAutomationProfile.compositeScore,
+          work_activity_automation_potential:
+            occupationAutomationProfile.workActivityAutomationPotential,
+          time_range_low: occupationAutomationProfile.timeRangeLow,
+          time_range_high: occupationAutomationProfile.timeRangeHigh,
+          time_range_by_block: occupationAutomationProfile.timeRangeByBlock,
+          block_example_tasks: occupationAutomationProfile.blockExampleTasks,
+          top_automatable_activities:
+            occupationAutomationProfile.topAutomatableActivities,
+          top_blocking_abilities:
+            occupationAutomationProfile.topBlockingAbilities,
+          physical_ability_avg: occupationAutomationProfile.physicalAbilityAvg,
+        })
+        .from(occupationAutomationProfile)
+        .where(inArray(occupationAutomationProfile.occupationId, ids)),
+      db
+        .select({
+          id: jobMicroTasks.id,
+          occupation_id: jobMicroTasks.occupationId,
+          task_name: jobMicroTasks.taskName,
+          task_description: jobMicroTasks.taskDescription,
+          frequency: jobMicroTasks.frequency,
+          ai_applicable: jobMicroTasks.aiApplicable,
+          ai_how_it_helps: jobMicroTasks.aiHowItHelps,
+          ai_impact_level: jobMicroTasks.aiImpactLevel,
+          ai_effort_to_implement: jobMicroTasks.aiEffortToImplement,
+          ai_category: jobMicroTasks.aiCategory,
+          ai_tools: jobMicroTasks.aiTools,
+        })
+        .from(jobMicroTasks)
+        .where(inArray(jobMicroTasks.occupationId, ids)),
+    ])
+
+    const profileMap = new Map(
+      (profiles ?? []).map((p) => [p.occupation_id, p as unknown as AutomationProfile])
+    )
+    const taskMap = new Map<number, MicroTask[]>()
+    for (const t of (taskRows ?? []) as unknown as MicroTask[]) {
+      const existing = taskMap.get(t.occupation_id) ?? []
+      existing.push(t)
+      taskMap.set(t.occupation_id, existing)
+    }
+
+    return rows.map((occ) => {
+      const profile = profileMap.get(occ.id) ?? null
+      const tasks = taskMap.get(occ.id) ?? []
+      const blueprint = generateBlueprint(occ as unknown as Occupation, tasks, profile)
+      const { displayedMinutes } = computeDisplayedTimeback(
+        profile,
+        tasks,
+        blueprint.totalMinutesSaved
+      )
+      return {
+        id: occ.id,
+        title: occ.title,
+        slug: occ.slug,
+        employment: occ.employment,
+        minutes: displayedMinutes > 0 ? displayedMinutes : null,
+      }
+    })
+  },
+  ["category-occupation-minutes"],
+  { revalidate: 3600 }
+)
+
+export default async function CategoryPage(props: {
+  params: Promise<{ category: string }>
+}) {
+  const { category: categorySlug } = await props.params
+  const cat = getCategoryBySlug(categorySlug)
+  if (!cat) notFound()
+
+  let occupations: CategoryOccupation[] = []
+
+  try {
+    occupations = await getCategoryOccupations(cat.dbValue)
   } catch (err) {
     console.error("[CategoryPage] fetch error:", err)
     // fall back to empty results if DB unavailable
@@ -114,48 +200,39 @@ export default async function CategoryPage(props: {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
           staggerDelay={0.04}
         >
-          {occupations.map((occ) => {
-            const profileRaw = occ.occupation_automation_profile
-            const profile = Array.isArray(profileRaw) ? profileRaw[0] : profileRaw
-            const score =
-              profile?.composite_score
-                ? Math.round(profile.composite_score)
-                : null
-
-            return (
-              <StaggerItem key={occ.id}>
-                <Link
-                  href={`/occupation/${occ.slug}`}
-                  className="group flex items-center justify-between rounded-xl border border-border bg-card p-4 hover:shadow-md hover:border-ring/40 transition-all"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div
-                      title={occ.title}
-                      className="text-sm font-semibold line-clamp-2 leading-snug group-hover:text-foreground/80 transition-colors"
-                    >
-                      {occ.title}
+          {occupations.map((occ) => (
+            <StaggerItem key={occ.id}>
+              <Link
+                href={`/occupation/${occ.slug}`}
+                className="group flex items-center justify-between rounded-xl border border-border bg-card p-4 hover:shadow-md hover:border-ring/40 transition-all"
+              >
+                <div className="min-w-0 flex-1">
+                  <div
+                    title={occ.title}
+                    className="text-sm font-semibold line-clamp-2 leading-snug group-hover:text-foreground/80 transition-colors"
+                  >
+                    {occ.title}
+                  </div>
+                  {occ.employment && (
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {occ.employment.toLocaleString()} employed
                     </div>
-                    {occ.employment && (
-                      <div className="text-xs text-muted-foreground mt-0.5">
-                        {occ.employment.toLocaleString()} employed
+                  )}
+                </div>
+                <div className="flex items-center gap-3 ml-3 shrink-0">
+                  {occ.minutes !== null && (
+                    <div className="text-right">
+                      <div className="font-heading text-lg font-bold text-[hsl(var(--accent))]">
+                        {occ.minutes}
                       </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3 ml-3 shrink-0">
-                    {score !== null && (
-                      <div className="text-right">
-                        <div className="font-heading text-lg font-bold text-[hsl(var(--accent))]">
-                          {score}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground">readiness</div>
-                      </div>
-                    )}
-                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                </Link>
-              </StaggerItem>
-            )
-          })}
+                      <div className="text-[10px] text-muted-foreground">min/day</div>
+                    </div>
+                  )}
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </Link>
+            </StaggerItem>
+          ))}
         </Stagger>
       )}
     </main>

@@ -51,9 +51,21 @@ export default async function BrowsePage(props: {
         title: occupations.title,
         slug: occupations.slug,
         major_category: occupations.majorCategory,
+        // Full profile column set — must match the homepage/category selects so
+        // computeDisplayedTimeback yields the same figure on every surface.
         occupation_automation_profile: {
           composite_score: occupationAutomationProfile.compositeScore,
+          work_activity_automation_potential:
+            occupationAutomationProfile.workActivityAutomationPotential,
+          time_range_low: occupationAutomationProfile.timeRangeLow,
           time_range_high: occupationAutomationProfile.timeRangeHigh,
+          time_range_by_block: occupationAutomationProfile.timeRangeByBlock,
+          block_example_tasks: occupationAutomationProfile.blockExampleTasks,
+          top_automatable_activities:
+            occupationAutomationProfile.topAutomatableActivities,
+          top_blocking_abilities:
+            occupationAutomationProfile.topBlockingAbilities,
+          physical_ability_avg: occupationAutomationProfile.physicalAbilityAvg,
         }
       })
       .from(occupations)
@@ -182,7 +194,7 @@ export default async function BrowsePage(props: {
           staggerDelay={0.04}
         >
           {results.map((occ) => {
-            const upperBoundMinutes = browseEstimates.get(occ.id) ?? null
+            const estimatedMinutes = browseEstimates.get(occ.id) ?? null
 
             return (
               <StaggerItem key={occ.id}>
@@ -202,10 +214,10 @@ export default async function BrowsePage(props: {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 ml-3 shrink-0">
-                    {upperBoundMinutes !== null && (
+                    {estimatedMinutes !== null && (
                       <div className="text-right">
                         <div className="font-heading text-lg font-bold text-[hsl(var(--accent))]">
-                          {upperBoundMinutes}
+                          {estimatedMinutes}
                         </div>
                         <div className="text-[10px] text-muted-foreground">min/day</div>
                       </div>

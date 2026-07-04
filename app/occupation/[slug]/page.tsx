@@ -73,9 +73,10 @@ export default async function OccupationPage(props: {
     blueprint?.totalMinutesSaved ?? 0
   )
   const archetypeMultiplier = inferArchetypeMultiplier(profile)
-  // Use displayedHigh (optimistic end of BLS range) as the headline claim so
-  // the hero "Reclaim X minutes" matches what the agent demo footer shows.
-  const claimedMinutes = displayedHigh > 0 ? displayedHigh : displayedMinutes
+  // Headline claim is the central estimate — the same figure the homepage
+  // cards, browse, demo footer, and PDFs show. The low–high range lives in
+  // the EstimateInfo tooltip.
+  const claimedMinutes = displayedMinutes
   const annualValue = computeAnnualValue(claimedMinutes, occupation.hourly_wage)
 
   // Compute per-task display minutes scaled to displayed total
@@ -158,7 +159,7 @@ export default async function OccupationPage(props: {
                 <span className="text-foreground font-bold">{claimedMinutes} minutes</span>{" "}
                 a day
               </p>
-              <EstimateInfo />
+              <EstimateInfo low={displayedLow} high={displayedHigh} />
             </div>
             <div className="mt-6 flex justify-center">
               <Link
@@ -169,6 +170,10 @@ export default async function OccupationPage(props: {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Run a team of {occupation.title.toLowerCase()}? We scope and
+              build these systems for you — 30 minutes, no pitch.
+            </p>
           </div>
         </FadeIn>
 

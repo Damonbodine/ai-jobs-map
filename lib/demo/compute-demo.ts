@@ -37,12 +37,12 @@ export function computeModuleTimes(
   const { profile, tasks, blueprintMinutes } = input
   const aiTasks = tasks.filter((t) => t.ai_applicable)
   const archetypeMultiplier = inferArchetypeMultiplier(profile)
-  const { displayedHigh } = computeDisplayedTimeback(profile, tasks, blueprintMinutes)
+  const { displayedMinutes } = computeDisplayedTimeback(profile, tasks, blueprintMinutes)
   const totalRawMinutes = aiTasks.reduce(
     (sum, t) => sum + estimateTaskMinutes(t) * archetypeMultiplier,
     0
   )
-  const scaleFactor = displayedHigh / Math.max(totalRawMinutes, 1)
+  const scaleFactor = displayedMinutes / Math.max(totalRawMinutes, 1)
 
   // Group tasks by module
   const moduleTaskMap = new Map<string, MicroTask[]>()
@@ -71,13 +71,15 @@ export function computeModuleTimes(
     rawTimes.set(moduleKey, { before, after })
   }
 
-  // Apply correction so total savings = displayedHigh
+  // Apply correction so total savings = displayedMinutes
   const rawTotalSaved = Array.from(rawTimes.values()).reduce(
     (s, t) => s + (t.before - t.after),
     0
   )
   const correction =
-    rawTotalSaved > 0 && displayedHigh > 0 ? displayedHigh / rawTotalSaved : 1
+    rawTotalSaved > 0 && displayedMinutes > 0
+      ? displayedMinutes / rawTotalSaved
+      : 1
 
   const result = new Map<string, { beforeMinutes: number; afterMinutes: number }>()
   for (const [key, t] of rawTimes) {
@@ -97,13 +99,13 @@ export function buildDemoRoleStats(
   const aiTasks = tasks.filter((t) => t.ai_applicable)
   const archetypeMultiplier = inferArchetypeMultiplier(profile)
 
-  const { displayedMinutes, displayedHigh } = computeDisplayedTimeback(profile, tasks, blueprintMinutes)
+  const { displayedMinutes } = computeDisplayedTimeback(profile, tasks, blueprintMinutes)
   const totalRawMinutes = aiTasks.reduce(
     (sum, t) => sum + estimateTaskMinutes(t) * archetypeMultiplier,
     0
   )
-  // Use the high end of the range for demo display — aspirational but defensible
-  const displayedScaleFactor = displayedHigh / Math.max(totalRawMinutes, 1)
+  // Scale to the central estimate — the same figure every other surface shows
+  const displayedScaleFactor = displayedMinutes / Math.max(totalRawMinutes, 1)
 
   // Group tasks by module key
   const moduleTaskMap = new Map<string, MicroTask[]>()
@@ -134,11 +136,12 @@ export function buildDemoRoleStats(
     return { ...script, beforeMinutes, afterMinutes }
   })
 
-  // Scale agent savings so total matches displayedHigh — the demo shows a subset
-  // of all tasks, so raw savings will always be less than the full occuption claim.
+  // Scale agent savings so total matches displayedMinutes — the demo shows a
+  // subset of all tasks, so raw savings will always be less than the full
+  // occupation claim.
   const rawSaved = agents.reduce((s, a) => s + (a.beforeMinutes - a.afterMinutes), 0)
-  if (rawSaved > 0 && displayedHigh > rawSaved) {
-    const correction = displayedHigh / rawSaved
+  if (rawSaved > 0 && displayedMinutes > rawSaved) {
+    const correction = displayedMinutes / rawSaved
     for (const a of agents) {
       a.beforeMinutes = Math.round(a.beforeMinutes * correction)
       a.afterMinutes = Math.max(1, Math.round(a.afterMinutes * correction))

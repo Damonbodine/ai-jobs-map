@@ -4,7 +4,13 @@ import { useEffect, useRef, useState } from "react"
 import { Info } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-export function EstimateInfo() {
+export function EstimateInfo({
+  low,
+  high,
+}: {
+  low?: number
+  high?: number
+}) {
   const [open, setOpen] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
 
@@ -54,7 +60,9 @@ export function EstimateInfo() {
           We estimate how much daily time in this role sits in repeatable work AI can assist or automate.
         </div>
         <div className="mt-2 text-background/80">
-          The range reflects conservative and optimistic assumptions, and your selected tasks below change the custom build estimate.
+          {low && high && high > low
+            ? `Typically ${low}–${high} minutes depending on your stack — the range reflects conservative and optimistic assumptions, and your selected tasks below change the custom build estimate.`
+            : "The range reflects conservative and optimistic assumptions, and your selected tasks below change the custom build estimate."}
         </div>
         <div className="mt-2 text-background/70">
           This is an estimate, not a guarantee.

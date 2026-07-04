@@ -72,7 +72,7 @@ export function EmailCaptureCard({ taskDescription, occupationContext }: Props) 
 
         <div className="rounded-xl border border-border bg-card px-5 py-4">
           <p className="text-sm font-semibold text-foreground mb-2">
-            Don&apos;t want to wait?
+            Rolling this out for a team?
           </p>
           <div className="flex flex-col sm:flex-row gap-2">
             <Link

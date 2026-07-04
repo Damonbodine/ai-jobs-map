@@ -27,8 +27,12 @@ const POPULAR_SLUGS = [
   "civil-engineers",
 ]
 
-const STATS = [
-  { icon: Clock, value: "58", label: "Avg min saved / day" },
+// Fallback for the average when the DB is unavailable; otherwise it's derived
+// from the popular-occupation estimates fetched below.
+const FALLBACK_AVG_MINUTES = 58
+
+const buildStats = (avgMinutes: number) => [
+  { icon: Clock, value: String(avgMinutes), label: "Avg min saved / day" },
   { icon: Cpu, value: "12K+", label: "Tasks mapped" },
   { icon: Users, value: "847", label: "Occupations" },
 ]
@@ -202,6 +206,14 @@ export default async function HomePage() {
     // silently fall back
   }
 
+  const avgMinutes = popularOccupations.length
+    ? Math.round(
+        popularOccupations.reduce((sum, o) => sum + o.minutes, 0) /
+          popularOccupations.length
+      )
+    : FALLBACK_AVG_MINUTES
+  const stats = buildStats(avgMinutes)
+
   return (
     <main className="min-h-screen">
       {/* Hero */}
@@ -287,7 +299,7 @@ export default async function HomePage() {
       <section className="border-y border-border bg-card py-10">
         <div className="container mx-auto px-4">
           <Stagger className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-            {STATS.map((stat) => (
+            {stats.map((stat) => (
               <StaggerItem key={stat.label}>
                 <div className="flex flex-col items-center gap-2">
                   <stat.icon className="h-5 w-5 text-[hsl(var(--accent))]" />

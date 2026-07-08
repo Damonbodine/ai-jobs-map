@@ -43,13 +43,13 @@ test.describe("/contact page", () => {
 })
 
 test.describe("header navigation", () => {
-  test("Book a Call CTA routes to /contact", async ({ page }) => {
+  test("audit CTA hands off to clearroadlabs.com/enquire", async ({
+    page,
+  }) => {
     await page.goto("/")
-    await page
-      .getByRole("link", { name: /^book a call$/i })
-      .first()
-      .click()
-    await expect(page).toHaveURL(/\/contact$/)
+    await expect(
+      page.getByRole("link", { name: /^start with an audit$/i }).first()
+    ).toHaveAttribute("href", "https://clearroadlabs.com/enquire")
   })
 })
 

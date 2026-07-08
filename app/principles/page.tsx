@@ -101,19 +101,19 @@ export default function PrinciplesPage() {
 
       <FadeIn delay={0.5}>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            href="/about"
+          <a
+            href={AGENCY.auditUrl}
             className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
           >
-            How we work
-          </Link>
-          <Link
-            href="/contact"
+            How the audit works
+          </a>
+          <a
+            href={AGENCY.enquireUrl}
             className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity"
           >
-            Book a scoping call
+            Start with an audit
             <ArrowRight className="h-4 w-4" />
-          </Link>
+          </a>
         </div>
       </FadeIn>
     </div>

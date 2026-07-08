@@ -2,6 +2,7 @@
 import React from "react"
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer"
 import { PDF_COLORS as C } from "./styles"
+import { AGENCY } from "@/lib/site"
 import type { RoleDeckSection, ModuleBreakdown, PhasedRoadmap } from "./team-deck-data"
 import type { DepartmentTotals } from "@/lib/build-a-team/compute"
 
@@ -309,17 +310,17 @@ function CtaPage({ props }: { props: TeamDeckProps }) {
       <View style={{ flex: 1, justifyContent: "center" }}>
         <Text style={s.darkKicker}>Next step</Text>
         <Text style={[s.h1, { color: C.bg, marginBottom: 16 }]}>
-          Book a 30-minute{"\n"}scoping call.
+          Start with{"\n"}an audit.
         </Text>
         <Text style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, maxWidth: 400 }}>
-          We'll walk through this blueprint together, answer questions, and give you a fixed-price implementation proposal within 48 hours.
+          These numbers are estimates. The audit proves them on your workflow — two weeks, a ranked build plan. Engagements run through {AGENCY.name}.
         </Text>
       </View>
       <View style={{ backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 8, padding: 16 }}>
         <Text style={{ fontSize: 8, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>Prepared by</Text>
         <Text style={{ fontSize: 10, color: C.bg }}>{props.agencyName}</Text>
         <Text style={{ fontSize: 10, color: "#60a5fa", marginTop: 2 }}>{props.contactEmail}</Text>
-        <Text style={{ fontSize: 10, color: "#60a5fa" }}>{props.siteUrl}/contact#book</Text>
+        <Text style={{ fontSize: 10, color: "#60a5fa" }}>{AGENCY.enquireUrl}</Text>
       </View>
     </Page>
   )

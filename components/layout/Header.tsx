@@ -102,13 +102,13 @@ export function Header() {
               )}
             </button>
           ) : null}
-          <Link
-            href="/contact#book"
+          <a
+            href={AGENCY.enquireUrl}
             onClick={() => track("book_call_clicked", { location: "header" })}
             className="text-sm font-semibold bg-foreground text-background px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
           >
-            Book a Call
-          </Link>
+            Start with an audit
+          </a>
         </nav>
 
         <button
@@ -137,16 +137,16 @@ export function Header() {
             </Link>
           ))}
           <div className="pt-2 mt-1 border-t border-border flex items-center gap-2">
-            <Link
-              href="/contact#book"
+            <a
+              href={AGENCY.enquireUrl}
               onClick={() => {
                 track("book_call_clicked", { location: "mobile" })
                 setMobileOpen(false)
               }}
               className="flex-1 text-center py-2.5 text-sm font-semibold bg-foreground text-background rounded-lg active:opacity-80 transition-opacity"
             >
-              Book a Call
-            </Link>
+              Start with an audit
+            </a>
             {DARK_MODE_ENABLED ? (
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

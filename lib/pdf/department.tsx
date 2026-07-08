@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer"
 import { PDF_COLORS as COLORS } from "./styles"
+import { AGENCY } from "@/lib/site"
 
 // Same Helvetica fallback rationale as blueprint.tsx — see that
 // file's header for the full explanation. TODO in a future plan to
@@ -256,8 +257,8 @@ export function DepartmentPdf(props: DepartmentPdfProps) {
           <View style={styles.bullet}>
             <Text style={styles.bulletDot}>3.</Text>
             <Text style={styles.bulletBody}>
-              Book a 30-minute scoping call at {props.siteUrl}/contact#book
-              when you&apos;re ready to talk about a real implementation.
+              Start with an audit at {AGENCY.enquireUrl} when you&apos;re
+              ready to talk about a real implementation.
             </Text>
           </View>
         </View>

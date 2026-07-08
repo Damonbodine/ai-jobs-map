@@ -136,7 +136,7 @@ Submitted via ${SITE.name} — ${AGENCY.name}`,
   }
 
   // Auto-reply to the prospect so they know the message landed, with a
-  // shortcut to the booking calendar. Never fails the request.
+  // shortcut to the Clear Road Labs audit intake. Never fails the request.
   try {
     await sendEmail({
       to: email,
@@ -145,14 +145,14 @@ Submitted via ${SITE.name} — ${AGENCY.name}`,
       html: `
 <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px;">
   <p style="margin: 0 0 12px;">Thanks — I read every message personally and reply within one business day, usually much faster.</p>
-  <p style="margin: 0 0 12px;">Want to skip ahead? Grab 30 minutes directly and we'll scope the workflow together:</p>
-  <p style="margin: 0 0 16px;"><a href="${SITE.url}/contact#book" style="color:#2563eb;">${SITE.url}/contact#book</a></p>
+  <p style="margin: 0 0 12px;">Want to skip ahead? Start with an audit — we'll prove the numbers on your actual workflow:</p>
+  <p style="margin: 0 0 16px;"><a href="${AGENCY.enquireUrl}" style="color:#2563eb;">${AGENCY.enquireUrl}</a></p>
   <p style="margin: 24px 0 0;">— Damon<br/><span style="font-size: 12px; color: #777;">${AGENCY.name}</span></p>
 </div>
       `.trim(),
       text: `Thanks — I read every message personally and reply within one business day, usually much faster.
 
-Want to skip ahead? Grab 30 minutes directly and we'll scope the workflow together: ${SITE.url}/contact#book
+Want to skip ahead? Start with an audit — we'll prove the numbers on your actual workflow: ${AGENCY.enquireUrl}
 
 — Damon
 ${AGENCY.name}`,

@@ -11,8 +11,7 @@ import {
   computeDynamicPrice,
   TEAM_SIZES,
 } from "@/lib/pricing"
-import { BookingEmbed } from "@/components/BookingEmbed"
-import { CONTACT } from "@/lib/site"
+import { AGENCY, CONTACT } from "@/lib/site"
 import type { ModuleCapability } from "@/types"
 import type { RelatedOccupation } from "@/lib/occupation-data"
 import Link from "next/link"
@@ -619,18 +618,29 @@ export function OccupationBuilder({
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     We just emailed a PDF of your custom AI assistant blueprint to{" "}
                     <strong className="text-foreground">{contactEmail}</strong>.
-                    Share it with your team, push back on the numbers, and book a
-                    scoping call below whenever you&apos;re ready to talk specifics.
+                    Share it with your team, push back on the numbers, and start
+                    an audit whenever you&apos;re ready to talk specifics.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div>
-              <h3 className="font-heading text-lg font-semibold mb-3">
-                Book a 30-minute scoping call
+            <div className="rounded-2xl border border-border bg-card p-6">
+              <h3 className="font-heading text-lg font-semibold mb-2">
+                Ready to prove the numbers?
               </h3>
-              <BookingEmbed />
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                These numbers are estimates. The audit proves them on your
+                workflow — two weeks, a ranked build plan. Engagements run
+                through {AGENCY.name}.
+              </p>
+              <a
+                href={AGENCY.enquireUrl}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
+              >
+                Start with an audit
+                <ArrowRight className="h-4 w-4" />
+              </a>
             </div>
 
             <div className="text-sm text-muted-foreground flex items-center gap-2 pt-2">

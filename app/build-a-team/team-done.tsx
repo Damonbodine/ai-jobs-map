@@ -1,7 +1,7 @@
 "use client"
 
-import { CheckCircle2 } from "lucide-react"
-import { BookingEmbed } from "@/components/BookingEmbed"
+import { ArrowRight, CheckCircle2 } from "lucide-react"
+import { AGENCY } from "@/lib/site"
 import { computeAnnualHours } from "@/lib/pricing"
 
 export function TeamDone({
@@ -23,11 +23,24 @@ export function TeamDone({
           <p className="text-sm text-muted-foreground leading-relaxed">
             We sent a PDF to <strong>{email}</strong> covering your {totalPeople}-person team
             ({hoursPerYear > 0 ? `~${hoursPerYear.toLocaleString()} hours reclaimed per year` : "full time-back breakdown"}).
-            Book a scoping call below and we&apos;ll walk through the build together.
+            Start with an audit and we&apos;ll walk through the build together.
           </p>
         </div>
       </div>
-      <BookingEmbed />
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <h3 className="font-heading text-lg font-semibold mb-2">Ready to prove the numbers?</h3>
+        <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+          These numbers are estimates. The audit proves them on your workflow —
+          two weeks, a ranked build plan. Engagements run through {AGENCY.name}.
+        </p>
+        <a
+          href={AGENCY.enquireUrl}
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
+        >
+          Start with an audit
+          <ArrowRight className="h-4 w-4" />
+        </a>
+      </div>
     </div>
   )
 }

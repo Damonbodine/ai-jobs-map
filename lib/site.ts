@@ -22,6 +22,10 @@ export const AGENCY = {
   name: "Clear Road Labs",
   shortName: "Clear Road Labs",
   url: "https://clearroadlabs.com",
+  /** Apply-intent handoff — start an audit with Clear Road Labs. */
+  enquireUrl: "https://clearroadlabs.com/enquire",
+  /** Learn-intent handoff — how the audit works. */
+  auditUrl: "https://clearroadlabs.com/services#audit",
   tagline: "We build custom AI systems for knowledge-work teams.",
 } as const
 

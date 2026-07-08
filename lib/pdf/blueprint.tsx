@@ -21,6 +21,7 @@ import {
 // in the PDF without depending on a third-party CDN at runtime.
 
 import { PDF_COLORS as COLORS } from "./styles"
+import { AGENCY } from "@/lib/site"
 
 const styles = StyleSheet.create({
   page: {
@@ -326,10 +327,10 @@ export function BlueprintPdf(props: BlueprintPdfProps) {
             <Text style={styles.bulletDot}>2.</Text>
             <Text style={styles.bulletBody}>
               {props.variant === "builder"
-                ? "We'll follow up within one business day to schedule a scoping call."
-                : "When you're ready to talk about a real build, book a scoping call at " +
-                  props.siteUrl +
-                  "/contact#book."}
+                ? "We'll follow up within one business day to talk through the build."
+                : "When you're ready to talk about a real build, start with an audit at " +
+                  AGENCY.enquireUrl +
+                  "."}
             </Text>
           </View>
           <View style={styles.bullet}>

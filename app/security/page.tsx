@@ -214,7 +214,7 @@ export default function SecurityPage() {
             href="/contact"
             className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
           >
-            Book a scoping call
+            Start a conversation
           </Link>
         </div>
       </FadeIn>

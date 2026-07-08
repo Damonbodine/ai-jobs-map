@@ -1,13 +1,12 @@
 import { Suspense } from "react"
-import { Mail } from "lucide-react"
+import { ArrowRight, Mail } from "lucide-react"
 import { FadeIn } from "@/components/FadeIn"
-import { BookingEmbed } from "@/components/BookingEmbed"
 import { ContactForm } from "./contact-form"
 import { AGENCY, CONTACT } from "@/lib/site"
 
 export const metadata = {
-  title: "Book a Call",
-  description: `Book a 30-minute scoping call with ${AGENCY.name}, or send a note about the workflow you'd like to automate.`,
+  title: "Contact",
+  description: `Engagements run through ${AGENCY.name}. Start with an audit, or send a note about the workflow you'd like to automate.`,
 }
 
 export default function ContactPage() {
@@ -21,27 +20,47 @@ export default function ContactPage() {
           Let&apos;s talk.
         </h1>
         <p className="text-lg text-muted-foreground leading-relaxed mb-10 max-w-2xl">
-          Grab 30 minutes — we&apos;ll scope the workflow you want to automate,
-          no pitch. You&apos;ll leave with an honest take on whether this is
-          something we can help with.
+          Timeback is the free diagnostic. When you&apos;re ready to prove the
+          numbers on your own workflow, the next step runs through{" "}
+          {AGENCY.name}.
         </p>
       </FadeIn>
 
       <FadeIn delay={0.15}>
-        <section id="book" className="scroll-mt-20">
-          <BookingEmbed />
+        <section className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+          <h2 className="font-heading text-xl font-semibold tracking-tight mb-2">
+            Engagements run through {AGENCY.name}
+          </h2>
+          <p className="text-muted-foreground leading-relaxed mb-6 max-w-2xl">
+            The numbers here are estimates by design. The audit proves them on
+            your actual workflow — two weeks, a ranked build plan.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href={AGENCY.auditUrl}
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
+            >
+              How the audit works
+            </a>
+            <a
+              href={AGENCY.enquireUrl}
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              Start with an audit
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
         </section>
       </FadeIn>
 
       <FadeIn delay={0.25}>
         <div className="mt-14 pt-10 border-t border-border max-w-2xl">
           <h2 className="font-heading text-xl font-semibold tracking-tight mb-2">
-            Not ready to book?
+            Prefer to send a note?
           </h2>
           <p className="text-muted-foreground leading-relaxed mb-8">
             Tell us about your team and the workflow you&apos;d like to
-            automate instead. We reply within one business day — usually much
-            faster.
+            automate. We reply within one business day — usually much faster.
           </p>
           <Suspense fallback={<div className="h-96" />}>
             <ContactForm />

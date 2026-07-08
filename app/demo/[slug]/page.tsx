@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { computeDemoForSlug } from "@/lib/demo/compute-demo"
+import { AGENCY } from "@/lib/site"
 import { AgentSuiteDemo } from "@/components/demo/AgentSuiteDemo"
 import type { Metadata } from "next"
 
@@ -46,7 +47,7 @@ export default async function DemoSlugPage({ params }: Props) {
                 Want this running for your team?
               </h2>
               <p className="text-muted-foreground">
-                We build these agent suites custom — scoped in a single call, delivered in 1–4 weeks.
+                We build these agent suites custom — scoped through a Clear Road Labs audit, delivered in 1–4 weeks.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 shrink-0 w-full sm:w-auto">
@@ -56,12 +57,12 @@ export default async function DemoSlugPage({ params }: Props) {
               >
                 Add to my team
               </Link>
-              <Link
-                href={`/contact?source=demo-slug&role=${encodeURIComponent(role.displayName)}`}
+              <a
+                href={AGENCY.enquireUrl}
                 className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
               >
-                Book a scoping call
-              </Link>
+                Start with an audit
+              </a>
             </div>
           </div>
         </section>

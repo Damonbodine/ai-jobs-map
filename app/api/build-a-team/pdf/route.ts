@@ -220,14 +220,14 @@ export async function POST(request: Request) {
 <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px; color:#221f1c;">
   <h2 style="font-size: 20px; margin: 0 0 12px;">Your department blueprint is attached.</h2>
   <p>Thanks for using the ${escapeHtml(SITE.name)} team builder. The attached PDF summarizes the compounded time-back and annual value for <strong>${safeLabel}</strong> &mdash; share it with your team or your CFO.</p>
-  <p>If the numbers make sense and you&apos;d like to talk about a real build, book a scoping call at <a href="${SITE.url}/contact#book" style="color:#2563eb;">${SITE.url}/contact#book</a>.</p>
+  <p>If the numbers make sense and you&apos;d like to talk about a real build, start with an audit at <a href="${AGENCY.enquireUrl}" style="color:#2563eb;">${AGENCY.enquireUrl}</a>.</p>
   <p style="margin-top:24px;">&mdash; ${escapeHtml(AGENCY.name)}</p>
 </div>`.trim(),
       text: `Your department blueprint is attached.
 
 Thanks for using the ${SITE.name} team builder. The attached PDF summarizes the compounded time-back and annual value for ${input.teamLabel ?? "your team"} — share it with your team or your CFO.
 
-If the numbers make sense and you'd like to talk about a real build, book a scoping call at ${SITE.url}/contact#book.
+If the numbers make sense and you'd like to talk about a real build, start with an audit at ${AGENCY.enquireUrl}.
 
 — ${AGENCY.name}`,
       attachments: pdfBuffer

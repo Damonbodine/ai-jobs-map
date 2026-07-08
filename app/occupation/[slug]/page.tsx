@@ -14,6 +14,7 @@ import { computeDisplayedTimeback, estimateTaskMinutes, inferArchetypeMultiplier
 import { getBlockForTask } from "@/lib/blueprint"
 import { computeAnnualValue } from "@/lib/pricing"
 import { getAllCapabilities } from "@/lib/capabilities"
+import { AGENCY } from "@/lib/site"
 import {
   getOccupationBySlug,
   getOccupationProfile,
@@ -162,17 +163,17 @@ export default async function OccupationPage(props: {
               <EstimateInfo low={displayedLow} high={displayedHigh} />
             </div>
             <div className="mt-6 flex justify-center">
-              <Link
-                href="/contact#book"
+              <a
+                href={AGENCY.enquireUrl}
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
               >
-                Book a scoping call
+                Start with an audit
                 <ArrowRight className="h-4 w-4" />
-              </Link>
+              </a>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              Run a team of {occupation.title.toLowerCase()}? We scope and
-              build these systems for you — 30 minutes, no pitch.
+              These numbers are estimates. The audit proves them on your
+              workflow — two weeks, a ranked build plan.
             </p>
           </div>
         </FadeIn>

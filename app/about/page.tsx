@@ -175,13 +175,13 @@ export default function AboutPage() {
           >
             Explore Occupations
           </Link>
-          <Link
-            href="/contact"
+          <a
+            href={AGENCY.enquireUrl}
             className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity"
           >
-            Book a scoping call
+            Start with an audit
             <ArrowRight className="h-4 w-4" />
-          </Link>
+          </a>
         </div>
       </FadeIn>
     </div>

@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     })
   ) {
     return NextResponse.json(
-      { error: "Daily demo limit reached from this network. Try again tomorrow, or book a call to see more." },
+      { error: "Daily demo limit reached from this network. Try again tomorrow." },
       { status: 429 }
     )
   }

@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { Mail, Check, ArrowRight } from "lucide-react"
+import { AGENCY } from "@/lib/site"
 import { track } from "@/lib/analytics"
 
 type Props = {
@@ -54,10 +55,6 @@ export function EmailCaptureCard({ taskDescription, occupationContext, generatio
   }
 
   if (status === "success") {
-    const contactHref = occupationContext
-      ? `/contact?source=demo-try&role=${encodeURIComponent(occupationContext)}#book`
-      : "/contact?source=demo-try#book"
-
     return (
       <div className="space-y-3">
         <div className="rounded-xl border border-success/30 bg-success/10 px-5 py-4 flex items-center gap-3">
@@ -87,13 +84,13 @@ export function EmailCaptureCard({ taskDescription, occupationContext, generatio
               Plan my whole team
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
-            <Link
-              href={contactHref}
+            <a
+              href={AGENCY.enquireUrl}
               className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-foreground px-4 py-2 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
             >
-              Book a scoping call
+              Start with an audit
               <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+            </a>
           </div>
         </div>
       </div>

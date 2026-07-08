@@ -203,10 +203,10 @@ export async function POST(request: Request) {
 <div style="font-family:-apple-system,system-ui,sans-serif;max-width:560px;color:#221f1c;">
   <h2 style="font-size:20px;margin:0 0 12px;">Your team blueprint is attached.</h2>
   <p>Thanks for using the team builder, ${safeName}. The PDF summarises the compounded AI value for your ${totals.totalPeople}-person team — ${totals.fteEquivalents} FTE-equivalents of time reclaimed per day.</p>
-  <p>We'll be in touch shortly to talk through the build. If you'd like to move faster, book a scoping call at <a href="${SITE.url}/contact#book" style="color:#2563eb;">${SITE.url}/contact#book</a>.</p>
+  <p>We'll be in touch shortly to talk through the build. If you'd like to move faster, start with an audit at <a href="${AGENCY.enquireUrl}" style="color:#2563eb;">${AGENCY.enquireUrl}</a>.</p>
   <p style="margin-top:24px;">&mdash; ${escapeHtml(AGENCY.name)}</p>
 </div>`.trim(),
-      text: `Your team blueprint is attached.\n\nThanks ${input.contactName ?? input.contactEmail}. The PDF covers your ${totals.totalPeople}-person team (${totals.fteEquivalents} FTEs reclaimed/day).\n\nBook a call: ${SITE.url}/contact#book\n\n— ${AGENCY.name}`,
+      text: `Your team blueprint is attached.\n\nThanks ${input.contactName ?? input.contactEmail}. The PDF covers your ${totals.totalPeople}-person team (${totals.fteEquivalents} FTEs reclaimed/day).\n\nStart with an audit: ${AGENCY.enquireUrl}\n\n— ${AGENCY.name}`,
       attachments: pdfBuffer ? [{ filename: "ai-team-blueprint.pdf", content: pdfBuffer }] : undefined,
     })
     emailSent = true

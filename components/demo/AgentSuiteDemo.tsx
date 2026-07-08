@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import { AGENCY } from "@/lib/site"
 import { DemoTimeline } from "./DemoTimeline"
 import { AgentExpandedView } from "./AgentExpandedView"
 import type { DemoRoleData } from "@/lib/demo/types"
@@ -177,12 +178,12 @@ export function AgentSuiteDemo({ roles, occupationTitle }: Props) {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Link
-            href="/contact#book"
+          <a
+            href={AGENCY.enquireUrl}
             className="text-xs text-muted-foreground border border-border rounded-full px-4 py-2 hover:bg-muted transition-colors"
           >
-            Book a scoping call
-          </Link>
+            Start with an audit
+          </a>
           <Link
             href="/build-a-team"
             className="flex items-center gap-1.5 text-xs font-semibold bg-foreground text-background rounded-full px-4 py-2 hover:opacity-90 transition-opacity"

@@ -189,8 +189,8 @@ Submitted via ${SITE.name} /demo/try — ${AGENCY.name}`,
       ? `<p style="margin: 16px 0 8px;"><strong>Estimated time back: ~${minutesSaved} minutes a day.</strong> These numbers are estimates — we refine them during scoping.</p>`
       : ""
   }
-  <p style="margin: 16px 0 8px;">We'll follow up personally within a day. If you'd like to move faster, book a 30-minute scoping call — we'll walk through what a real build of this looks like, no pitch:</p>
-  <p style="margin: 0 0 16px;"><a href="${SITE.url}/contact#book" style="color:#2563eb;">${SITE.url}/contact#book</a></p>
+  <p style="margin: 16px 0 8px;">We'll follow up personally within a day. If you'd like to move faster, start with an audit — ${AGENCY.name} proves these numbers on your actual workflow:</p>
+  <p style="margin: 0 0 16px;"><a href="${AGENCY.enquireUrl}" style="color:#2563eb;">${AGENCY.enquireUrl}</a></p>
   <p style="margin: 24px 0 0; font-size: 12px; color: #777;">
     ${SITE.name} — a project by ${AGENCY.name}
   </p>
@@ -205,7 +205,7 @@ ${agentText ? `\n${agentText}\n` : ""}${
           ? `\nEstimated time back: ~${minutesSaved} minutes a day. These numbers are estimates — we refine them during scoping.\n`
           : ""
       }
-We'll follow up personally within a day. To move faster, book a 30-minute scoping call: ${SITE.url}/contact#book
+We'll follow up personally within a day. To move faster, start with an audit: ${AGENCY.enquireUrl}
 
 ${SITE.name} — a project by ${AGENCY.name}`,
     })

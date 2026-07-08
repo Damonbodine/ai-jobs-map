@@ -6,6 +6,7 @@ import { Menu, X, Sun, Moon, ChevronDown } from "lucide-react"
 import { useState } from "react"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
+import { AGENCY } from "@/lib/site"
 import { track } from "@/lib/analytics"
 import { DARK_MODE_ENABLED } from "@/lib/features"
 import {
@@ -31,37 +32,47 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
       <div className="container mx-auto px-4 h-14 flex items-center justify-between">
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-1.5 group">
-            <span className="font-heading text-lg font-semibold tracking-tight">
-              Timeback
-            </span>
-            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-foreground" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem render={<Link href="/" />}>
-              Home
-            </DropdownMenuItem>
-            <DropdownMenuItem render={<Link href="/browse" />}>
-              Browse
-            </DropdownMenuItem>
-            <DropdownMenuItem render={<Link href="/demo" />}>
-              Demo
-            </DropdownMenuItem>
-            <DropdownMenuItem render={<Link href="/build-a-team" />}>
-              Build a Team
-            </DropdownMenuItem>
-            <DropdownMenuItem render={<Link href="/products" />}>
-              What We Build
-            </DropdownMenuItem>
-            <DropdownMenuItem render={<Link href="/about" />}>
-              About
-            </DropdownMenuItem>
-            <DropdownMenuItem render={<Link href="/principles" />}>
-              Principles
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-baseline gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1.5 group">
+              <span className="font-heading text-lg font-semibold tracking-tight">
+                Timeback
+              </span>
+              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-foreground" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem render={<Link href="/" />}>
+                Home
+              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href="/browse" />}>
+                Browse
+              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href="/demo" />}>
+                Demo
+              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href="/build-a-team" />}>
+                Build a Team
+              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href="/products" />}>
+                What We Build
+              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href="/about" />}>
+                About
+              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href="/principles" />}>
+                Principles
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <a
+            href={AGENCY.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline text-[11px] text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
+          >
+            by Clear Road Labs
+          </a>
+        </div>
 
         <nav className="hidden sm:flex items-center gap-6">
           {links.map((link) => (

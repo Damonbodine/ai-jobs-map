@@ -113,8 +113,17 @@ export function Footer() {
 
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row justify-between gap-3 text-xs text-muted-foreground">
           <p>
-            © {year} {AGENCY.name}. Built from public occupation data and our
-            own task-level analysis.
+            © {year}{" "}
+            <a
+              href={AGENCY.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors"
+            >
+              {AGENCY.name}
+            </a>
+            . Built from public occupation data and our own task-level
+            analysis.
           </p>
           <p>
             Data sources: U.S. Bureau of Labor Statistics &middot; O*NET

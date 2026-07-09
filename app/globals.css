@@ -1,83 +1,74 @@
 @import "tailwindcss";
 
 /*
- * Tailwind v4 does NOT auto-load v3-style tailwind.config.js. Without this
- * @config directive, the custom color utilities defined there (bg-foreground,
- * text-accent, bg-card, border-border, etc.) silently fall back to default
- * Tailwind and the entire design system breaks — elements that should be
- * blue-accented render in the default foreground color. This one line
- * restores the v3 config while we consider a longer-term migration to v4
- * @theme blocks.
+ * Blueprint Light — the Clear Road Labs design system on a light surface.
+ * CRL is ice-on-ink; Timeback is ink-on-ice. Canonical reference:
+ * docs/brand-contract.md (mirrored in the ClearRoadLabs repo).
+ *
+ * lib/brand.ts mirrors these values for the surfaces that cannot read CSS
+ * (PDF templates, email HTML, opengraph-image). tests/unit/brand-lockstep
+ * fails if the two drift. Change colors HERE first, then brand.ts.
  */
-@config "../tailwind.config.js";
+@theme {
+  /* surfaces */
+  --color-background: #f2f6f9;
+  --color-card: #ffffff;
+  --color-card-foreground: #0a1420;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0a1420;
+  --color-secondary: #e3ecf4;
+  --color-secondary-foreground: #0a1420;
+  --color-muted: #e3ecf4;
+  --color-muted-foreground: #47586b;
 
-@layer base {
-  :root {
-    --background: 40 33% 98%;
-    --foreground: 30 10% 12%;
-    --card: 0 0% 100%;
-    --card-foreground: 30 10% 12%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 30 10% 12%;
-    --primary: 30 10% 12%;
-    --primary-foreground: 40 33% 98%;
-    --secondary: 36 20% 93%;
-    --secondary-foreground: 30 10% 12%;
-    --muted: 36 20% 93%;
-    --muted-foreground: 30 8% 42%;
-    --accent: 217 91% 60%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 33 18% 88%;
-    --input: 33 18% 85%;
-    --ring: 217 91% 60%;
-    --radius: 0.625rem;
-    /* Semantic success states (form confirmations, agent "live" indicators).
-       45% lightness is the compromise between emerald-600-on-light and
-       emerald-400-on-terminal usages this token replaced. */
-    --success: 156 62% 45%;
-    --success-foreground: 0 0% 100%;
-    /* Dark "agent console" panels inside light pages — a deliberate device,
-       not a theme leak. */
-    --terminal: 40 4% 6%;
-    --terminal-foreground: 40 6% 93%;
-  }
+  /* ink */
+  --color-foreground: #0a1420;
+  --color-primary: #0a1420;
+  --color-primary-foreground: #f2f6f9;
 
-  .dark {
-    --background: 30 10% 8%;
-    --foreground: 36 20% 90%;
-    --card: 30 8% 11%;
-    --card-foreground: 36 20% 90%;
-    --popover: 30 8% 11%;
-    --popover-foreground: 36 20% 90%;
-    --primary: 36 20% 90%;
-    --primary-foreground: 30 10% 8%;
-    --secondary: 30 8% 15%;
-    --secondary-foreground: 36 20% 90%;
-    --muted: 30 8% 15%;
-    --muted-foreground: 30 10% 55%;
-    --accent: 217 91% 65%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 40%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 30 8% 18%;
-    --input: 30 8% 18%;
-    --ring: 217 91% 65%;
-    --success: 152 55% 45%;
-    --success-foreground: 0 0% 100%;
-    --terminal: 40 4% 6%;
-    --terminal-foreground: 40 6% 93%;
-  }
+  /* brand accents: deep cyan for interactive text/links (AA on light),
+     raw cyan for fills/buttons/meters (pairs with ink text) */
+  --color-accent: #0f7fa8;
+  --color-accent-foreground: #ffffff;
+  --color-cyan: #6fd4ec;
+  --color-ring: #0f7fa8;
+
+  /* status */
+  --color-destructive: #b23b35;
+  --color-destructive-foreground: #ffffff;
+  --color-success: #0f7a53;
+  --color-success-foreground: #ffffff;
+
+  /* CRL-dark islands: the agent-console panels are literal mothership theme */
+  --color-terminal: #0a1420;
+  --color-terminal-foreground: #e3ecf4;
+
+  /* hairlines — ink at 14%, mirroring CRL's ice-at-14% */
+  --color-border: rgb(10 20 32 / 0.14);
+  --color-input: rgb(10 20 32 / 0.18);
+
+  /* radius 0 — the engineering-drawing edge (2px exceptions must be logged
+     in docs/brand-contract.md) */
+  --radius-lg: 0rem;
+  --radius-md: 0rem;
+  --radius-sm: 0rem;
+}
+
+/* Font utilities resolve to the next/font variables injected on <body>
+   (app/layout.tsx). `inline` is required for var() indirection. */
+@theme inline {
+  --font-heading: var(--font-geist-sans);
+  --font-body: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    border-color: var(--color-border);
   }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    background-color: var(--color-background);
+    color: var(--color-foreground);
   }
 }
 

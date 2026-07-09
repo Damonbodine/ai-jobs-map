@@ -69,6 +69,12 @@ function reconcileSavingsToTarget(items: BeforeAfter[], targetSavedMinutes: numb
       drift += adjust
     }
   }
+  // If afterMinutes hit its floor before the drift was absorbed (e.g. a
+  // single agent whose savings are capped at before - 1), grow beforeMinutes
+  // on the largest saver instead.
+  if (drift < 0 && bySavings.length > 0) {
+    bySavings[0].beforeMinutes += -drift
+  }
 }
 
 export function computeModuleTimes(

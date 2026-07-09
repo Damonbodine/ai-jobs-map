@@ -79,6 +79,23 @@ describe("buildDemoRoleStats", () => {
     expect(result.totalBeforeMinutes - result.totalAfterMinutes).toBe(displayedMinutes)
   })
 
+  it("reconciles exactly even when one agent covers a fraction of the tasks", async () => {
+    // A single covering agent caps savings at beforeMinutes - 1 during the
+    // after-pass; the reconciler must grow beforeMinutes to hit the target.
+    const tasks = [
+      { id: 1, occupation_id: 10, task_name: "Send emails", task_description: "", frequency: "daily" as const, ai_applicable: true, ai_impact_level: 4, ai_effort_to_implement: 2, ai_category: null, ai_how_it_helps: null, ai_tools: null },
+      { id: 2, occupation_id: 10, task_name: "Write reports", task_description: "", frequency: "daily" as const, ai_applicable: true, ai_impact_level: 3, ai_effort_to_implement: 3, ai_category: null, ai_how_it_helps: null, ai_tools: null },
+      { id: 3, occupation_id: 10, task_name: "Log records", task_description: "", frequency: "daily" as const, ai_applicable: true, ai_impact_level: 5, ai_effort_to_implement: 1, ai_category: null, ai_how_it_helps: null, ai_tools: null },
+    ]
+    const result = buildDemoRoleStats(
+      { occupation: { id: 10, title: "Test Role", slug: "test-role", major_category: "Test", sub_category: null, employment: null, hourly_wage: 60, annual_wage: null }, profile: mockProfile, tasks },
+      [{ ...mockPartialAgents[0], moduleKey: "communication" }]
+    )
+    const { computeDisplayedTimeback } = await import("@/lib/timeback")
+    const { displayedMinutes } = computeDisplayedTimeback(mockProfile, tasks)
+    expect(result.totalBeforeMinutes - result.totalAfterMinutes).toBe(displayedMinutes)
+  })
+
   it("annualValueDollars is positive when hourly_wage is set", () => {
     const result = buildDemoRoleStats(
       { occupation: { id: 10, title: "Test Role", slug: "test-role", major_category: "Test", sub_category: null, employment: null, hourly_wage: 60, annual_wage: null }, profile: mockProfile, tasks: mockTasks },

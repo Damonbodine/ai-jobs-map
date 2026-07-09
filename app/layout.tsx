@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Newsreader, Manrope } from "next/font/google"
+import { Geist, Geist_Mono } from "next/font/google"
 import { GoogleAnalytics } from "@next/third-parties/google"
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import { Header } from "@/components/layout/Header"
@@ -7,15 +7,15 @@ import { Footer } from "@/components/layout/Footer"
 import { SITE, AGENCY } from "@/lib/site"
 import "./globals.css"
 
-const newsreader = Newsreader({
+const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-heading",
+  variable: "--font-geist-sans",
   display: "swap",
 })
 
-const manrope = Manrope({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
-  variable: "--font-body",
+  variable: "--font-geist-mono",
   display: "swap",
 })
 
@@ -51,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${newsreader.variable} ${manrope.variable} font-body min-h-screen flex flex-col`}
+        className={`${geist.variable} ${geistMono.variable} font-body min-h-screen flex flex-col`}
       >
         <ThemeProvider>
           <Header />

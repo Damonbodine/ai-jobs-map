@@ -60,7 +60,7 @@ export default async function DemoPage() {
         <p className="text-sm font-semibold text-accent uppercase tracking-widest mb-3">
           AI Agent Suite
         </p>
-        <h1 className="text-4xl font-bold text-foreground font-display mb-4">
+        <h1 className="text-4xl font-bold text-foreground font-heading mb-4">
           See your workday, transformed
         </h1>
         <p className="text-lg text-muted-foreground mb-8">
@@ -106,7 +106,7 @@ export default async function DemoPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest text-center mb-2">
             Full walkthrough
           </p>
-          <h2 className="text-2xl font-bold text-foreground font-display text-center mb-10">
+          <h2 className="text-2xl font-bold text-foreground font-heading text-center mb-10">
             Watch the agents in action
           </h2>
           <DemoTeaser />

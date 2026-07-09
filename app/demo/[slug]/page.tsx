@@ -33,7 +33,7 @@ export default async function DemoSlugPage({ params }: Props) {
           <p className="text-sm font-semibold text-accent uppercase tracking-widest mb-1">
             AI Agent Suite Demo
           </p>
-          <h1 className="text-3xl font-bold text-foreground font-display mb-2">
+          <h1 className="text-3xl font-bold text-foreground font-heading mb-2">
             {role.displayName}
           </h1>
           <p className="text-lg text-muted-foreground">{role.tagline}</p>
@@ -43,7 +43,7 @@ export default async function DemoSlugPage({ params }: Props) {
         <section className="mt-12 rounded-3xl border border-border bg-white p-8 sm:p-10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 justify-between">
             <div className="max-w-md">
-              <h2 className="text-2xl font-bold text-foreground font-display mb-2">
+              <h2 className="text-2xl font-bold text-foreground font-heading mb-2">
                 Want this running for your team?
               </h2>
               <p className="text-muted-foreground">

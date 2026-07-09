@@ -68,9 +68,10 @@ export function computeDisplayedTimeback(
               optimisticProfileMinutes * 0.2 +
               scaledTaskMinutes * 0.35 +
               optimisticBlueprintMinutes * 0.15
-          : scaledTaskMinutes * 0.55 +
-              optimisticBlueprintMinutes * 0.25 +
-              (profile?.composite_score ?? 50) * 0.2,
+          : // No profile range: blend task model and blueprint only. The
+            // composite score is unitless (0–100) and must never be added
+            // as minutes — it already differentiates via scoreMultiplier.
+            scaledTaskMinutes * 0.6875 + optimisticBlueprintMinutes * 0.3125,
         scaledTaskMinutes,
         optimisticProfileMinutes,
         optimisticBlueprintMinutes

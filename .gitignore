@@ -49,3 +49,4 @@ drizzle.config.ts
 .playwright-mcp/
 .env*.local
 backups/
+__pycache__/

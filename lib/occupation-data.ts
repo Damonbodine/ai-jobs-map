@@ -1,3 +1,5 @@
+// Fetchers deliberately do NOT catch database errors: an outage must surface
+// to the route's error boundary, never masquerade as not-found/empty content.
 import { cache } from "react"
 import { db } from "@/lib/db/client"
 import { occupations, occupationAutomationProfile, jobMicroTasks } from "@/lib/db/schema"
@@ -5,8 +7,7 @@ import { eq, ne, and, desc } from "drizzle-orm"
 import type { Occupation, AutomationProfile, MicroTask } from "@/types"
 
 export const getOccupationBySlug = cache(async (slug: string): Promise<Occupation | null> => {
-  try {
-    const data = await db
+  const data = await db
       .select({
         id: occupations.id,
         title: occupations.title,
@@ -21,22 +22,17 @@ export const getOccupationBySlug = cache(async (slug: string): Promise<Occupatio
       .where(eq(occupations.slug, slug))
       .limit(1)
 
-    if (data.length === 0) return null
-    const o = data[0]
-    return {
-      ...o,
-      hourly_wage: o.hourly_wage ? parseFloat(o.hourly_wage) : null,
-      annual_wage: o.annual_wage ? parseFloat(o.annual_wage) : null,
-    } as Occupation
-  } catch (err) {
-    console.error("[getOccupationBySlug] error:", err)
-    return null
-  }
+  if (data.length === 0) return null
+  const o = data[0]
+  return {
+    ...o,
+    hourly_wage: o.hourly_wage ? parseFloat(o.hourly_wage) : null,
+    annual_wage: o.annual_wage ? parseFloat(o.annual_wage) : null,
+  } as Occupation
 })
 
 export const getOccupationProfile = cache(async (occupationId: number): Promise<AutomationProfile | null> => {
-  try {
-    const data = await db
+  const data = await db
       .select({
         id: occupationAutomationProfile.id,
         occupation_id: occupationAutomationProfile.occupationId,
@@ -54,17 +50,12 @@ export const getOccupationProfile = cache(async (occupationId: number): Promise<
       .where(eq(occupationAutomationProfile.occupationId, occupationId))
       .limit(1)
 
-    if (data.length === 0) return null
-    return data[0] as AutomationProfile
-  } catch (err) {
-    console.error("[getOccupationProfile] error:", err)
-    return null
-  }
+  if (data.length === 0) return null
+  return data[0] as AutomationProfile
 })
 
 export const getOccupationTasks = cache(async (occupationId: number): Promise<MicroTask[]> => {
-  try {
-    const data = await db
+  const data = await db
       .select({
         id: jobMicroTasks.id,
         occupation_id: jobMicroTasks.occupationId,
@@ -82,11 +73,7 @@ export const getOccupationTasks = cache(async (occupationId: number): Promise<Mi
       .where(eq(jobMicroTasks.occupationId, occupationId))
       .orderBy(desc(jobMicroTasks.aiImpactLevel))
 
-    return data as MicroTask[]
-  } catch (err) {
-    console.error("[getOccupationTasks] error:", err)
-    return []
-  }
+  return data as MicroTask[]
 })
 
 export type RelatedOccupation = Pick<Occupation, "id" | "title" | "slug" | "major_category">
@@ -96,8 +83,7 @@ export const getRelatedOccupations = cache(async (
   majorCategory: string,
   limit = 4,
 ): Promise<RelatedOccupation[]> => {
-  try {
-    const data = await db
+  const data = await db
       .select({
         id: occupations.id,
         title: occupations.title,
@@ -114,10 +100,6 @@ export const getRelatedOccupations = cache(async (
       .orderBy(desc(occupations.employment))
       .limit(limit)
 
-    return data as RelatedOccupation[]
-  } catch (err) {
-    console.error("[getRelatedOccupations] error:", err)
-    return []
-  }
+  return data as RelatedOccupation[]
 })
 

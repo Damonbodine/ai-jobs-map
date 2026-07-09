@@ -91,18 +91,15 @@ export default async function BrowsePage(props: {
     ? CATEGORIES.find((c) => c.slug === categorySlug)?.dbValue ?? null
     : null
 
-  let results: BrowseOccupation[] = []
-  let totalCount = 0
-
-  try {
-    const list = await getBrowseList()
-    const paged = filterSortPage(list, { sort, category, page, pageSize: PAGE_SIZE })
-    results = paged.rows
-    totalCount = paged.totalCount
-  } catch (err) {
-    console.error("[BrowsePage] fetch error:", err)
-    // silently fall back to empty results if DB unavailable
-  }
+  // A DB failure here throws to error.tsx — an outage must never render as
+  // "No occupations found".
+  const list = await getBrowseList()
+  const { rows: results, totalCount } = filterSortPage(list, {
+    sort,
+    category,
+    page,
+    pageSize: PAGE_SIZE,
+  })
 
   const browseEstimates = new Map<number, number>()
   for (const occupation of results) {

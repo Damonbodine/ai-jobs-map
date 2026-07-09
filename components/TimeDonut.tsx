@@ -65,7 +65,7 @@ export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprin
   })
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 mb-8">
+    <div className="border border-border bg-card p-5 sm:p-6 mb-8">
       <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6 items-start">
         {/* Donut Chart */}
         <div className="flex flex-col items-center">
@@ -91,19 +91,36 @@ export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprin
                   onClick={() => setActiveSlice(activeSlice === arc.blockName ? null : arc.blockName)}
                 />
               ))}
+              {arcs.map((arc) => {
+                const angle = ((arc.rotation + 90) / 180) * Math.PI
+                const inner = radius - strokeWidth / 2 - 4
+                const outer = radius + strokeWidth / 2 + 4
+                return (
+                  <line
+                    key={`sep-${arc.blockName}`}
+                    x1={center + inner * Math.sin(angle)}
+                    y1={center - inner * Math.cos(angle)}
+                    x2={center + outer * Math.sin(angle)}
+                    y2={center - outer * Math.cos(angle)}
+                    stroke="var(--color-card)"
+                    strokeWidth={2}
+                    pointerEvents="none"
+                  />
+                )
+              })}
             </svg>
             {/* Center label */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               {activeData ? (
                 <>
-                  <div className="font-heading text-2xl font-bold" style={{ color: activeData.color }}>
+                  <div className="font-mono text-2xl font-bold tabular-nums text-foreground">
                     {activeData.minutes}
                   </div>
                   <div className="text-[10px] text-muted-foreground">min/day</div>
                 </>
               ) : (
                 <>
-                  <div className="font-heading text-2xl font-bold text-accent">
+                  <div className="font-mono text-2xl font-bold tabular-nums text-foreground">
                     {totalMinutes}
                   </div>
                   <div className="text-[10px] text-muted-foreground">min/day total</div>
@@ -119,7 +136,7 @@ export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprin
                 key={slice.blockName}
                 type="button"
                 className={cn(
-                  "flex items-center gap-2 w-full text-left px-2 py-1 rounded-md transition-colors text-xs",
+                  "flex items-center gap-2 w-full text-left px-2 py-1 transition-colors text-xs",
                   activeSlice === slice.blockName ? "bg-secondary" : "hover:bg-secondary/50"
                 )}
                 onMouseEnter={() => setActiveSlice(slice.blockName)}
@@ -127,11 +144,11 @@ export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprin
                 onClick={() => setActiveSlice(activeSlice === slice.blockName ? null : slice.blockName)}
               >
                 <div
-                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                  className="w-2.5 h-2.5 border border-border flex-shrink-0"
                   style={{ backgroundColor: slice.color }}
                 />
                 <span className="truncate flex-1">{slice.label}</span>
-                <span className="text-muted-foreground tabular-nums">{slice.minutes}m</span>
+                <span className="font-mono text-muted-foreground tabular-nums">{slice.minutes}m</span>
               </button>
             ))}
           </div>
@@ -142,7 +159,11 @@ export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprin
           {activeData ? (
             <div className="space-y-4">
               <div>
-                <h3 className="font-heading text-lg font-semibold" style={{ color: activeData.color }}>
+                <h3 className="flex items-center gap-2 font-heading text-lg font-semibold text-foreground">
+                  <span
+                    className="inline-block h-3 w-3 shrink-0 border border-border"
+                    style={{ backgroundColor: activeData.color }}
+                  />
                   {activeData.label} Agent
                 </h3>
                 <div className="text-sm text-muted-foreground mt-0.5">
@@ -153,12 +174,12 @@ export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprin
               {/* Capabilities */}
               {activeData.capabilities.length > 0 && (
                 <div>
-                  <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">
+                  <div className="eyebrow mb-2">
                     Capabilities included
                   </div>
                   <div className="space-y-2">
                     {activeData.capabilities.map((cap) => (
-                      <div key={cap.capability_key} className="rounded-lg border border-border bg-secondary/30 px-3 py-2">
+                      <div key={cap.capability_key} className="border border-border bg-secondary/30 px-3 py-2">
                         <div className="text-sm font-medium">{cap.capability_name}</div>
                         <div className="text-xs text-muted-foreground mt-0.5">{cap.description}</div>
                       </div>
@@ -170,7 +191,7 @@ export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprin
               {/* Top Tasks */}
               {activeData.tasks.length > 0 && (
                 <div>
-                  <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">
+                  <div className="eyebrow mb-2">
                     Tasks handled ({activeData.tasks.length})
                   </div>
                   <div className="space-y-1">
@@ -179,7 +200,7 @@ export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprin
                         <span className="truncate flex-1 mr-2">{task.name}</span>
                         <span className={cn(
                           "text-[10px] font-medium px-1.5 py-0.5 rounded flex-shrink-0",
-                          task.tier === "automated" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                          task.tier === "automated" ? "bg-success/10 text-success" : "bg-accent/10 text-accent"
                         )}>
                           {task.tier}
                         </span>
@@ -197,12 +218,12 @@ export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprin
               {/* Tools */}
               {activeData.tools.length > 0 && (
                 <div>
-                  <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1.5">
+                  <div className="eyebrow mb-1.5">
                     Tools
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {activeData.tools.map((tool) => (
-                      <span key={tool} className="text-[10px] bg-secondary px-2 py-0.5 rounded">
+                      <span key={tool} className="text-[10px] bg-secondary px-2 py-0.5">
                         {tool}
                       </span>
                     ))}

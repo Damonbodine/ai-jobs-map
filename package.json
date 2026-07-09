@@ -6,6 +6,7 @@
     "dev": "next dev --port 3050",
     "build": "next build",
     "start": "next start -p 3050",
+    "test": "vitest run",
     "test:e2e": "playwright test",
     "preview:fresh": "zsh scripts/preview-fresh.sh 3050",
     "lint": "next lint",

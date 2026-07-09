@@ -2,34 +2,8 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
+import { MODULE_ACCENTS, MODULE_LABELS } from "@/lib/modules"
 import type { ModuleCapability } from "@/types"
-
-// Module colors for the chart — solid fill colors that work in both themes
-const DONUT_COLORS: Record<string, string> = {
-  intake: "#06b6d4",        // cyan-500
-  analysis: "#6366f1",      // indigo-500
-  documentation: "#8b5cf6", // violet-500
-  coordination: "#10b981",  // emerald-500
-  exceptions: "#f59e0b",    // amber-500
-  learning: "#f43f5e",      // rose-500
-  research: "#14b8a6",      // teal-500
-  compliance: "#ef4444",    // red-500
-  communication: "#f97316", // orange-500
-  data_reporting: "#0ea5e9",// sky-500
-}
-
-const MODULE_LABELS: Record<string, string> = {
-  intake: "Intake & Triage",
-  analysis: "Analysis",
-  documentation: "Documentation",
-  coordination: "Coordination & Scheduling",
-  exceptions: "Exceptions & Escalations",
-  learning: "Learning & Updates",
-  research: "Research",
-  compliance: "Compliance & Policy",
-  communication: "Communication",
-  data_reporting: "Data & Reporting",
-}
 
 interface DonutSlice {
   blockName: string
@@ -65,7 +39,7 @@ export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprin
       label: MODULE_LABELS[agent.blockName] || agent.blockName,
       minutes: scaledMinutes,
       percentage: totalMinutes > 0 ? (scaledMinutes / totalMinutes) * 100 : 0,
-      color: DONUT_COLORS[agent.blockName] || "#6b7280",
+      color: MODULE_ACCENTS[agent.blockName as keyof typeof MODULE_ACCENTS] ?? "#47586b",
       tasks: agent.tasks.filter((t) => t.tier !== "human-only"),
       capabilities: capabilitiesByModule[agent.blockName] || [],
       tools: agent.toolAccess,

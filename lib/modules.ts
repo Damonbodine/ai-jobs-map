@@ -3,6 +3,7 @@ import {
   MessageSquare, Shield, BookOpen, Database, AlertTriangle,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { DATA_SERIES } from "@/lib/brand"
 
 export interface ModuleDefinition {
   key: string
@@ -30,6 +31,26 @@ export const MODULE_KEYS = [
 export type ModuleKey = (typeof MODULE_KEYS)[number]
 
 /**
+ * Fixed module→color assignment on the 6-value DATA_SERIES ramp
+ * (docs/brand-contract.md). 10 modules on 6 colors means four documented
+ * repeats — identity is never color-alone (icon + label always render
+ * beside the swatch). Do not reorder: the same module keeps the same
+ * color everywhere, forever.
+ */
+export const MODULE_ACCENTS: Record<ModuleKey, string> = {
+  intake: DATA_SERIES[0],
+  analysis: DATA_SERIES[3],
+  documentation: DATA_SERIES[1],
+  coordination: DATA_SERIES[2],
+  exceptions: DATA_SERIES[4],
+  learning: DATA_SERIES[5],
+  research: DATA_SERIES[0],
+  compliance: DATA_SERIES[3],
+  communication: DATA_SERIES[1],
+  data_reporting: DATA_SERIES[2],
+}
+
+/**
  * Single source of truth for all module definitions.
  * Every surface in the app should import from here.
  */
@@ -40,7 +61,7 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
     description: "Sort incoming requests and prep the next step.",
     role: "Processes incoming requests, emails, and data inputs",
     tools: ["Email AI", "Form Parser", "Ticket Router"],
-    color: "bg-cyan-50/50 text-cyan-900 border-cyan-200/70 dark:bg-cyan-950/40 dark:text-cyan-300 dark:border-cyan-800",
+    color: "border-border bg-secondary/60 text-foreground",
     icon: Mail,
   },
   analysis: {
@@ -49,7 +70,7 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
     description: "Review inputs and surface patterns or decisions.",
     role: "Analyzes data, identifies patterns, generates insights",
     tools: ["Data Analyzer", "Trend Detector", "Pattern Scanner"],
-    color: "bg-indigo-50/50 text-indigo-900 border-indigo-200/70 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800",
+    color: "border-border bg-secondary/60 text-foreground",
     icon: BarChart3,
   },
   documentation: {
@@ -58,7 +79,7 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
     description: "Draft recurring records, notes, and summaries.",
     role: "Writes reports, notes, summaries, and documentation",
     tools: ["Report Writer", "Summary Generator", "Template Engine"],
-    color: "bg-violet-50/50 text-violet-900 border-violet-200/70 dark:bg-violet-950/40 dark:text-violet-300 dark:border-violet-800",
+    color: "border-border bg-secondary/60 text-foreground",
     icon: FileText,
   },
   coordination: {
@@ -67,7 +88,7 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
     description: "Keep schedules, handoffs, and follow-through moving.",
     role: "Manages scheduling, delegation, and workflow tracking",
     tools: ["Calendar AI", "Task Tracker", "Status Updater"],
-    color: "bg-emerald-50/50 text-emerald-900 border-emerald-200/70 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800",
+    color: "border-border bg-secondary/60 text-foreground",
     icon: Users,
   },
   exceptions: {
@@ -76,7 +97,7 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
     description: "Flag disruptions, edge cases, and escalations early.",
     role: "Handles edge cases, escalations, and unusual situations",
     tools: ["Escalation Router", "Exception Handler", "Alert Manager"],
-    color: "bg-amber-50/50 text-amber-900 border-amber-200/70 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800",
+    color: "border-border bg-secondary/60 text-foreground",
     icon: AlertTriangle,
   },
   learning: {
@@ -85,7 +106,7 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
     description: "Track updates, standards, and best practices.",
     role: "Monitors best practices and emerging methods",
     tools: ["Knowledge Base", "Skill Recommender", "News Monitor"],
-    color: "bg-rose-50/50 text-rose-900 border-rose-200/70 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800",
+    color: "border-border bg-secondary/60 text-foreground",
     icon: BookOpen,
   },
   research: {
@@ -94,7 +115,7 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
     description: "Pull supporting context and compare options quickly.",
     role: "Finds information, compares options, stays current",
     tools: ["Web Researcher", "Document Scanner", "Comparison Engine"],
-    color: "bg-teal-50/50 text-teal-900 border-teal-200/70 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-800",
+    color: "border-border bg-secondary/60 text-foreground",
     icon: Search,
   },
   compliance: {
@@ -103,7 +124,7 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
     description: "Check policy, process, and regulatory requirements.",
     role: "Checks regulations, validates processes",
     tools: ["Regulation Checker", "Audit Assistant", "Policy Validator"],
-    color: "bg-red-50/50 text-red-900 border-red-200/70 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800",
+    color: "border-border bg-secondary/60 text-foreground",
     icon: Shield,
   },
   communication: {
@@ -112,7 +133,7 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
     description: "Prepare updates, messages, and stakeholder follow-through.",
     role: "Drafts messages, prepares presentations",
     tools: ["Message Drafter", "Tone Adjuster", "Slide Builder"],
-    color: "bg-orange-50/50 text-orange-900 border-orange-200/70 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800",
+    color: "border-border bg-secondary/60 text-foreground",
     icon: MessageSquare,
   },
   data_reporting: {
@@ -121,7 +142,7 @@ export const MODULE_REGISTRY: Record<ModuleKey, ModuleDefinition> = {
     description: "Keep metrics, reports, and status views current.",
     role: "Collects, organizes, and visualizes data",
     tools: ["Dashboard Builder", "Report Scheduler", "Data Visualizer"],
-    color: "bg-sky-50/50 text-sky-900 border-sky-200/70 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800",
+    color: "border-border bg-secondary/60 text-foreground",
     icon: Database,
   },
 }

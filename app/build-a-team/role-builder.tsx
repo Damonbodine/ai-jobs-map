@@ -2,21 +2,8 @@
 
 import { useState } from "react"
 import { Check } from "lucide-react"
-import { MODULE_REGISTRY } from "@/lib/modules"
+import { MODULE_REGISTRY, MODULE_ACCENTS } from "@/lib/modules"
 import { cn } from "@/lib/utils"
-
-const MODULE_ACCENTS: Record<string, string> = {
-  intake: "#06b6d4",
-  analysis: "#6366f1",
-  documentation: "#8b5cf6",
-  coordination: "#10b981",
-  exceptions: "#f59e0b",
-  learning: "#f43f5e",
-  research: "#14b8a6",
-  compliance: "#ef4444",
-  communication: "#f97316",
-  data_reporting: "#0ea5e9",
-}
 
 export type TaskItem = {
   id: number
@@ -82,7 +69,7 @@ export function RoleBuilder({
       {groups.map(({ moduleKey, tasks: groupTasks, groupMinutes, selectedCount }) => {
         const allSelected = selectedCount === groupTasks.length
         const someSelected = selectedCount > 0
-        const accent = MODULE_ACCENTS[moduleKey] ?? "#6b7280"
+        const accent = MODULE_ACCENTS[moduleKey as keyof typeof MODULE_ACCENTS] ?? "#47586b"
         const definition = MODULE_REGISTRY[moduleKey as keyof typeof MODULE_REGISTRY]
         const Icon = definition?.icon
         const isExpanded = expandedModules.has(moduleKey)

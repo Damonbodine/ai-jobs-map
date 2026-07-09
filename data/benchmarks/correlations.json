@@ -1,0 +1,774 @@
+{
+  "generated": "2026-07-09",
+  "our_occupations_with_soc": 752,
+  "aei_task_join": {
+    "matched_tasks": 3364,
+    "unmatched_tasks": 1
+  },
+  "correlations": {
+    "felten_aioe": {
+      "overlap_n": 654,
+      "spearman_composite": 0.364,
+      "spearman_displayed_minutes": 0.513
+    },
+    "openai_human_beta": {
+      "overlap_n": 752,
+      "spearman_composite": 0.289,
+      "spearman_displayed_minutes": 0.455
+    },
+    "openai_model_beta": {
+      "overlap_n": 752,
+      "spearman_composite": 0.355,
+      "spearman_displayed_minutes": 0.471
+    },
+    "anthropic_economic_index_usage": {
+      "overlap_n": 493,
+      "spearman_composite": 0.255,
+      "spearman_displayed_minutes": 0.31
+    }
+  },
+  "divergences": {
+    "felten_aioe": [
+      {
+        "soc": "47-3014",
+        "title": "Helpers painters paperhangers plasterers and stucco masons",
+        "our_percentile": 99.8,
+        "index_percentile": 0.5,
+        "rank_gap_pct_points": 99.4,
+        "our_value": 73.8,
+        "index_value": -2.0448
+      },
+      {
+        "soc": "13-1141",
+        "title": "Compensation benefits and job analysis specialists",
+        "our_percentile": 1.1,
+        "index_percentile": 98.3,
+        "rank_gap_pct_points": 97.2,
+        "our_value": 44.8,
+        "index_value": 1.441
+      },
+      {
+        "soc": "51-6021",
+        "title": "Pressers textile garment and related materials",
+        "our_percentile": 95.0,
+        "index_percentile": 0.8,
+        "rank_gap_pct_points": 94.3,
+        "our_value": 63.6,
+        "index_value": -1.9501
+      },
+      {
+        "soc": "47-3015",
+        "title": "Helpers pipelayers plumbers pipefitters and steamfitters",
+        "our_percentile": 98.2,
+        "index_percentile": 4.3,
+        "rank_gap_pct_points": 93.9,
+        "our_value": 68.0,
+        "index_value": -1.6789
+      },
+      {
+        "soc": "47-2131",
+        "title": "Insulation workers floor ceiling and wall",
+        "our_percentile": 97.4,
+        "index_percentile": 4.9,
+        "rank_gap_pct_points": 92.5,
+        "our_value": 66.3,
+        "index_value": -1.6188
+      },
+      {
+        "soc": "47-2141",
+        "title": " Painters construction and maintenance",
+        "our_percentile": 96.6,
+        "index_percentile": 5.4,
+        "rank_gap_pct_points": 91.3,
+        "our_value": 65.1,
+        "index_value": -1.588
+      },
+      {
+        "soc": "53-7121",
+        "title": "Tank car truck and ship loaders",
+        "our_percentile": 95.7,
+        "index_percentile": 8.6,
+        "rank_gap_pct_points": 87.2,
+        "our_value": 64.1,
+        "index_value": -1.3878
+      },
+      {
+        "soc": "47-3012",
+        "title": "Helpers carpenters",
+        "our_percentile": 94.3,
+        "index_percentile": 7.2,
+        "rank_gap_pct_points": 87.1,
+        "our_value": 62.2,
+        "index_value": -1.4253
+      },
+      {
+        "soc": "47-5071",
+        "title": "Roustabouts oil and gas",
+        "our_percentile": 92.0,
+        "index_percentile": 6.3,
+        "rank_gap_pct_points": 85.7,
+        "our_value": 59.7,
+        "index_value": -1.519
+      },
+      {
+        "soc": "47-5051",
+        "title": "Rock splitters quarry",
+        "our_percentile": 87.5,
+        "index_percentile": 2.6,
+        "rank_gap_pct_points": 84.9,
+        "our_value": 56.4,
+        "index_value": -1.7635
+      },
+      {
+        "soc": "47-5081",
+        "title": "Helpers extraction workers",
+        "our_percentile": 90.7,
+        "index_percentile": 6.0,
+        "rank_gap_pct_points": 84.7,
+        "our_value": 58.6,
+        "index_value": -1.5432
+      },
+      {
+        "soc": "45-2041",
+        "title": "Graders and sorters agricultural products",
+        "our_percentile": 93.3,
+        "index_percentile": 8.9,
+        "rank_gap_pct_points": 84.4,
+        "our_value": 61.1,
+        "index_value": -1.371
+      },
+      {
+        "soc": "51-4121",
+        "title": "Welders cutters solderers and brazers",
+        "our_percentile": 96.5,
+        "index_percentile": 12.8,
+        "rank_gap_pct_points": 83.6,
+        "our_value": 64.8,
+        "index_value": -1.1976
+      },
+      {
+        "soc": "51-6064",
+        "title": "Textile winding twisting and drawing out machine setters operators and tenders",
+        "our_percentile": 91.7,
+        "index_percentile": 8.3,
+        "rank_gap_pct_points": 83.4,
+        "our_value": 59.1,
+        "index_value": -1.3929
+      },
+      {
+        "soc": "43-5053",
+        "title": "Postal service mail sorters processors and processing machine operators",
+        "our_percentile": 95.3,
+        "index_percentile": 13.0,
+        "rank_gap_pct_points": 82.3,
+        "our_value": 63.7,
+        "index_value": -1.185
+      },
+      {
+        "soc": "51-4072",
+        "title": "Molding coremaking and casting machine setters operators and tenders metal and plastic",
+        "our_percentile": 96.2,
+        "index_percentile": 14.8,
+        "rank_gap_pct_points": 81.3,
+        "our_value": 64.3,
+        "index_value": -1.1461
+      },
+      {
+        "soc": "51-9021",
+        "title": "Crushing grinding and polishing machine setters operators and tenders",
+        "our_percentile": 100.0,
+        "index_percentile": 18.7,
+        "rank_gap_pct_points": 81.3,
+        "our_value": 74.1,
+        "index_value": -1.0435
+      },
+      {
+        "soc": "51-9041",
+        "title": "Extruding forming pressing and compacting machine setters operators and tenders",
+        "our_percentile": 99.5,
+        "index_percentile": 18.8,
+        "rank_gap_pct_points": 80.7,
+        "our_value": 70.6,
+        "index_value": -1.0422
+      },
+      {
+        "soc": "51-9195",
+        "title": "Molders shapers and casters except metal and plastic",
+        "our_percentile": 93.7,
+        "index_percentile": 13.3,
+        "rank_gap_pct_points": 80.4,
+        "our_value": 61.8,
+        "index_value": -1.1834
+      },
+      {
+        "soc": "51-3022",
+        "title": "Meat poultry and fish cutters and trimmers",
+        "our_percentile": 95.6,
+        "index_percentile": 16.2,
+        "rank_gap_pct_points": 79.4,
+        "our_value": 64.0,
+        "index_value": -1.1056
+      }
+    ],
+    "openai_human_beta": [
+      {
+        "soc": "47-3014",
+        "title": "Helpers painters paperhangers plasterers and stucco masons",
+        "our_percentile": 99.9,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 96.1,
+        "our_value": 73.8,
+        "index_value": 0.0
+      },
+      {
+        "soc": "51-4194",
+        "title": "Tool grinders filers and sharpeners",
+        "our_percentile": 99.7,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 96.0,
+        "our_value": 71.4,
+        "index_value": 0.0
+      },
+      {
+        "soc": "47-3015",
+        "title": "Helpers pipelayers plumbers pipefitters and steamfitters",
+        "our_percentile": 98.4,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 94.7,
+        "our_value": 68.0,
+        "index_value": 0.0
+      },
+      {
+        "soc": "35-2015",
+        "title": "Cooks short order",
+        "our_percentile": 97.7,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 94.0,
+        "our_value": 66.6,
+        "index_value": 0.0
+      },
+      {
+        "soc": "51-3022",
+        "title": "Meat poultry and fish cutters and trimmers",
+        "our_percentile": 96.0,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 92.3,
+        "our_value": 64.0,
+        "index_value": 0.0
+      },
+      {
+        "soc": "47-3012",
+        "title": "Helpers carpenters",
+        "our_percentile": 94.5,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 90.8,
+        "our_value": 62.2,
+        "index_value": 0.0
+      },
+      {
+        "soc": "47-5043",
+        "title": "Roof bolters mining",
+        "our_percentile": 94.1,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 90.4,
+        "our_value": 62.0,
+        "index_value": 0.0
+      },
+      {
+        "soc": "35-2011",
+        "title": "Cooks fast food",
+        "our_percentile": 99.5,
+        "index_percentile": 9.8,
+        "rank_gap_pct_points": 89.6,
+        "our_value": 70.0,
+        "index_value": 0.0263
+      },
+      {
+        "soc": "51-4052",
+        "title": "Pourers and casters metal",
+        "our_percentile": 92.4,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 88.6,
+        "our_value": 60.5,
+        "index_value": 0.0
+      },
+      {
+        "soc": "47-5071",
+        "title": "Roustabouts oil and gas",
+        "our_percentile": 91.6,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 87.8,
+        "our_value": 59.7,
+        "index_value": 0.0
+      },
+      {
+        "soc": "51-9124",
+        "title": "Coating painting and spraying machine setters operators and tenders",
+        "our_percentile": 95.3,
+        "index_percentile": 7.6,
+        "rank_gap_pct_points": 87.7,
+        "our_value": 63.5,
+        "index_value": 0.0109
+      },
+      {
+        "soc": "51-6021",
+        "title": "Pressers textile garment and related materials",
+        "our_percentile": 95.5,
+        "index_percentile": 8.3,
+        "rank_gap_pct_points": 87.2,
+        "our_value": 63.6,
+        "index_value": 0.0208
+      },
+      {
+        "soc": "47-2141",
+        "title": " Painters construction and maintenance",
+        "our_percentile": 96.9,
+        "index_percentile": 10.4,
+        "rank_gap_pct_points": 86.6,
+        "our_value": 65.1,
+        "index_value": 0.0286
+      },
+      {
+        "soc": "51-4031",
+        "title": "Cutting punching and press machine setters operators and tenders metal and plastic",
+        "our_percentile": 92.9,
+        "index_percentile": 8.1,
+        "rank_gap_pct_points": 84.8,
+        "our_value": 60.8,
+        "index_value": 0.02
+      },
+      {
+        "soc": "51-4072",
+        "title": "Molding coremaking and casting machine setters operators and tenders metal and plastic",
+        "our_percentile": 96.5,
+        "index_percentile": 11.7,
+        "rank_gap_pct_points": 84.8,
+        "our_value": 64.3,
+        "index_value": 0.0349
+      },
+      {
+        "soc": "51-4121",
+        "title": "Welders cutters solderers and brazers",
+        "our_percentile": 96.8,
+        "index_percentile": 12.8,
+        "rank_gap_pct_points": 84.0,
+        "our_value": 64.8,
+        "index_value": 0.0392
+      },
+      {
+        "soc": "27-3023",
+        "title": "News analysts reporters and journalists",
+        "our_percentile": 11.9,
+        "index_percentile": 95.7,
+        "rank_gap_pct_points": 83.8,
+        "our_value": 48.7,
+        "index_value": 0.6333
+      },
+      {
+        "soc": "51-9051",
+        "title": "Furnace kiln oven drier and kettle operators and tenders",
+        "our_percentile": 95.5,
+        "index_percentile": 13.4,
+        "rank_gap_pct_points": 82.2,
+        "our_value": 63.6,
+        "index_value": 0.04
+      },
+      {
+        "soc": "51-4122",
+        "title": "Welding soldering and brazing machine setters operators and tenders",
+        "our_percentile": 98.0,
+        "index_percentile": 17.3,
+        "rank_gap_pct_points": 80.7,
+        "our_value": 66.8,
+        "index_value": 0.0568
+      },
+      {
+        "soc": "47-3013",
+        "title": "Helpers electricians",
+        "our_percentile": 84.3,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 80.6,
+        "our_value": 55.8,
+        "index_value": 0.0
+      }
+    ],
+    "openai_model_beta": [
+      {
+        "soc": "47-3014",
+        "title": "Helpers painters paperhangers plasterers and stucco masons",
+        "our_percentile": 99.9,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 96.7,
+        "our_value": 73.8,
+        "index_value": 0.0
+      },
+      {
+        "soc": "35-2011",
+        "title": "Cooks fast food",
+        "our_percentile": 99.5,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 96.3,
+        "our_value": 70.0,
+        "index_value": 0.0
+      },
+      {
+        "soc": "47-3015",
+        "title": "Helpers pipelayers plumbers pipefitters and steamfitters",
+        "our_percentile": 98.4,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 95.3,
+        "our_value": 68.0,
+        "index_value": 0.0
+      },
+      {
+        "soc": "35-2015",
+        "title": "Cooks short order",
+        "our_percentile": 97.7,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 94.6,
+        "our_value": 66.6,
+        "index_value": 0.0
+      },
+      {
+        "soc": "51-3022",
+        "title": "Meat poultry and fish cutters and trimmers",
+        "our_percentile": 96.0,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 92.9,
+        "our_value": 64.0,
+        "index_value": 0.0
+      },
+      {
+        "soc": "47-3012",
+        "title": "Helpers carpenters",
+        "our_percentile": 94.5,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 91.4,
+        "our_value": 62.2,
+        "index_value": 0.0
+      },
+      {
+        "soc": "47-5043",
+        "title": "Roof bolters mining",
+        "our_percentile": 94.1,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 91.0,
+        "our_value": 62.0,
+        "index_value": 0.0
+      },
+      {
+        "soc": "51-4194",
+        "title": "Tool grinders filers and sharpeners",
+        "our_percentile": 99.7,
+        "index_percentile": 9.4,
+        "rank_gap_pct_points": 90.4,
+        "our_value": 71.4,
+        "index_value": 0.0333
+      },
+      {
+        "soc": "51-4052",
+        "title": "Pourers and casters metal",
+        "our_percentile": 92.4,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 89.2,
+        "our_value": 60.5,
+        "index_value": 0.0
+      },
+      {
+        "soc": "51-6021",
+        "title": "Pressers textile garment and related materials",
+        "our_percentile": 95.5,
+        "index_percentile": 6.4,
+        "rank_gap_pct_points": 89.2,
+        "our_value": 63.6,
+        "index_value": 0.0104
+      },
+      {
+        "soc": "47-5071",
+        "title": "Roustabouts oil and gas",
+        "our_percentile": 91.6,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 88.4,
+        "our_value": 59.7,
+        "index_value": 0.0
+      },
+      {
+        "soc": "47-5081",
+        "title": "Helpers extraction workers",
+        "our_percentile": 90.2,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 87.0,
+        "our_value": 58.6,
+        "index_value": 0.0
+      },
+      {
+        "soc": "51-4031",
+        "title": "Cutting punching and press machine setters operators and tenders metal and plastic",
+        "our_percentile": 92.9,
+        "index_percentile": 6.2,
+        "rank_gap_pct_points": 86.6,
+        "our_value": 60.8,
+        "index_value": 0.01
+      },
+      {
+        "soc": "47-2131",
+        "title": "Insulation workers floor ceiling and wall",
+        "our_percentile": 97.6,
+        "index_percentile": 12.6,
+        "rank_gap_pct_points": 85.0,
+        "our_value": 66.3,
+        "index_value": 0.05
+      },
+      {
+        "soc": "51-4033",
+        "title": "Grinding lapping polishing and buffing machine tool setters operators and tenders metal and plastic",
+        "our_percentile": 99.2,
+        "index_percentile": 14.7,
+        "rank_gap_pct_points": 84.5,
+        "our_value": 68.9,
+        "index_value": 0.0645
+      },
+      {
+        "soc": "47-2141",
+        "title": " Painters construction and maintenance",
+        "our_percentile": 96.9,
+        "index_percentile": 13.4,
+        "rank_gap_pct_points": 83.5,
+        "our_value": 65.1,
+        "index_value": 0.0571
+      },
+      {
+        "soc": "39-3093",
+        "title": "Locker room coatroom and dressing room attendants",
+        "our_percentile": 98.1,
+        "index_percentile": 14.7,
+        "rank_gap_pct_points": 83.4,
+        "our_value": 67.0,
+        "index_value": 0.0645
+      },
+      {
+        "soc": "51-9124",
+        "title": "Coating painting and spraying machine setters operators and tenders",
+        "our_percentile": 95.3,
+        "index_percentile": 12.0,
+        "rank_gap_pct_points": 83.3,
+        "our_value": 63.5,
+        "index_value": 0.0435
+      },
+      {
+        "soc": "51-9041",
+        "title": "Extruding forming pressing and compacting machine setters operators and tenders",
+        "our_percentile": 99.6,
+        "index_percentile": 16.8,
+        "rank_gap_pct_points": 82.8,
+        "our_value": 70.6,
+        "index_value": 0.075
+      },
+      {
+        "soc": "51-4122",
+        "title": "Welding soldering and brazing machine setters operators and tenders",
+        "our_percentile": 98.0,
+        "index_percentile": 15.8,
+        "rank_gap_pct_points": 82.2,
+        "our_value": 66.8,
+        "index_value": 0.0682
+      }
+    ],
+    "anthropic_economic_index_usage": [
+      {
+        "soc": "53-2011",
+        "title": "Airline pilots copilots and flight engineers",
+        "our_percentile": 96.5,
+        "index_percentile": 0.3,
+        "rank_gap_pct_points": 96.1,
+        "our_value": 64.2,
+        "index_value": 0.0015
+      },
+      {
+        "soc": "21-1012",
+        "title": "Educational guidance and career counselors and advisors",
+        "our_percentile": 0.4,
+        "index_percentile": 95.7,
+        "rank_gap_pct_points": 95.3,
+        "our_value": 42.6,
+        "index_value": 0.4411
+      },
+      {
+        "soc": "51-9021",
+        "title": "Crushing grinding and polishing machine setters operators and tenders",
+        "our_percentile": 100.0,
+        "index_percentile": 7.3,
+        "rank_gap_pct_points": 92.7,
+        "our_value": 74.1,
+        "index_value": 0.0022
+      },
+      {
+        "soc": "13-1141",
+        "title": "Compensation benefits and job analysis specialists",
+        "our_percentile": 0.8,
+        "index_percentile": 92.1,
+        "rank_gap_pct_points": 91.3,
+        "our_value": 44.8,
+        "index_value": 0.2952
+      },
+      {
+        "soc": "51-4192",
+        "title": "Layout workers metal and plastic",
+        "our_percentile": 96.1,
+        "index_percentile": 4.9,
+        "rank_gap_pct_points": 91.3,
+        "our_value": 63.9,
+        "index_value": 0.002
+      },
+      {
+        "soc": "51-4121",
+        "title": "Welders cutters solderers and brazers",
+        "our_percentile": 97.0,
+        "index_percentile": 6.1,
+        "rank_gap_pct_points": 90.9,
+        "our_value": 64.8,
+        "index_value": 0.0021
+      },
+      {
+        "soc": "27-2011",
+        "title": "Actors",
+        "our_percentile": 9.8,
+        "index_percentile": 99.0,
+        "rank_gap_pct_points": 89.1,
+        "our_value": 48.8,
+        "index_value": 1.043
+      },
+      {
+        "soc": "43-5032",
+        "title": "Dispatchers except police fire and ambulance",
+        "our_percentile": 98.8,
+        "index_percentile": 11.1,
+        "rank_gap_pct_points": 87.7,
+        "our_value": 68.3,
+        "index_value": 0.003
+      },
+      {
+        "soc": "51-7031",
+        "title": "Model makers wood",
+        "our_percentile": 99.1,
+        "index_percentile": 11.5,
+        "rank_gap_pct_points": 87.6,
+        "our_value": 68.4,
+        "index_value": 0.0031
+      },
+      {
+        "soc": "33-9092",
+        "title": "Lifeguards ski patrol and other recreational protective service workers",
+        "our_percentile": 92.8,
+        "index_percentile": 6.1,
+        "rank_gap_pct_points": 86.7,
+        "our_value": 58.8,
+        "index_value": 0.0021
+      },
+      {
+        "soc": "45-2093",
+        "title": "Farmworkers farm ranch and aquacultural animals",
+        "our_percentile": 91.1,
+        "index_percentile": 4.9,
+        "rank_gap_pct_points": 86.2,
+        "our_value": 57.5,
+        "index_value": 0.002
+      },
+      {
+        "soc": "27-4031",
+        "title": "Camera operators television video and film",
+        "our_percentile": 98.6,
+        "index_percentile": 12.6,
+        "rank_gap_pct_points": 86.0,
+        "our_value": 68.2,
+        "index_value": 0.0036
+      },
+      {
+        "soc": "33-3012",
+        "title": "Correctional officers and jailers",
+        "our_percentile": 8.0,
+        "index_percentile": 93.3,
+        "rank_gap_pct_points": 85.3,
+        "our_value": 48.4,
+        "index_value": 0.3359
+      },
+      {
+        "soc": "49-9098",
+        "title": "Helpers installation maintenance and repair workers",
+        "our_percentile": 87.2,
+        "index_percentile": 1.9,
+        "rank_gap_pct_points": 85.3,
+        "our_value": 55.8,
+        "index_value": 0.0016
+      },
+      {
+        "soc": "51-2011",
+        "title": "Aircraft structure surfaces rigging and systems assemblers",
+        "our_percentile": 91.4,
+        "index_percentile": 6.1,
+        "rank_gap_pct_points": 85.3,
+        "our_value": 57.6,
+        "index_value": 0.0021
+      },
+      {
+        "soc": "51-9192",
+        "title": "Cleaning washing and metal pickling equipment operators and tenders",
+        "our_percentile": 94.3,
+        "index_percentile": 9.6,
+        "rank_gap_pct_points": 84.7,
+        "our_value": 60.5,
+        "index_value": 0.0025
+      },
+      {
+        "soc": "35-2012",
+        "title": "Cooks institution and cafeteria",
+        "our_percentile": 95.7,
+        "index_percentile": 13.2,
+        "rank_gap_pct_points": 82.6,
+        "our_value": 62.8,
+        "index_value": 0.0037
+      },
+      {
+        "soc": "47-2141",
+        "title": " Painters construction and maintenance",
+        "our_percentile": 97.2,
+        "index_percentile": 14.8,
+        "rank_gap_pct_points": 82.4,
+        "our_value": 65.1,
+        "index_value": 0.0042
+      },
+      {
+        "soc": "35-2015",
+        "title": "Cooks short order",
+        "our_percentile": 98.0,
+        "index_percentile": 16.0,
+        "rank_gap_pct_points": 81.9,
+        "our_value": 66.6,
+        "index_value": 0.0047
+      },
+      {
+        "soc": "35-2013",
+        "title": "Cooks private household",
+        "our_percentile": 97.8,
+        "index_percentile": 20.3,
+        "rank_gap_pct_points": 77.5,
+        "our_value": 65.7,
+        "index_value": 0.0063
+      }
+    ]
+  },
+  "cross_index_context": {
+    "aioe_vs_openai_human": {
+      "overlap_n": 683,
+      "spearman": 0.859
+    },
+    "aioe_vs_aei_usage": {
+      "overlap_n": 587,
+      "spearman": 0.568
+    },
+    "openai_human_vs_aei_usage": {
+      "overlap_n": 519,
+      "spearman": 0.577
+    }
+  }
+}

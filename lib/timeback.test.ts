@@ -60,11 +60,10 @@ describe("inferArchetypeMultiplier", () => {
 })
 
 describe("computeDisplayedTimeback", () => {
-  it("returns 0 when there are no AI-applicable tasks, no profile, and no blueprint", () => {
+  it("returns 0 when there are no AI-applicable tasks and no profile", () => {
     const { displayedMinutes, displayedLow, displayedHigh } = computeDisplayedTimeback(
       null,
-      [makeTask({ ai_applicable: false })],
-      0
+      [makeTask({ ai_applicable: false })]
     )
     expect(displayedMinutes).toBe(0)
     expect(displayedLow).toBe(0)
@@ -81,8 +80,19 @@ describe("computeDisplayedTimeback", () => {
     })
     const { displayedMinutes } = computeDisplayedTimeback(
       profile,
+      [makeTask({ ai_applicable: false })]
+    )
+    expect(displayedMinutes).toBe(0)
+  })
+
+  it("ignores fabricated blueprint minutes when no AI-applicable work exists", () => {
+    // Blueprint totals historically included human-only tasks and injected
+    // quick-win tasks; they must not be able to set the hero number.
+    const { displayedMinutes } = computeDisplayedTimeback(
+      null,
       [makeTask({ ai_applicable: false })],
-      0
+      // @ts-expect-error legacy third argument — removed from the signature
+      50
     )
     expect(displayedMinutes).toBe(0)
   })
@@ -92,15 +102,15 @@ describe("computeDisplayedTimeback", () => {
       makeTask({ id: i, ai_impact_level: 5, ai_effort_to_implement: 1 })
     )
     const profile = makeProfile({ time_range_low: 500, time_range_high: 900 })
-    const { displayedMinutes } = computeDisplayedTimeback(profile, tasks, 400)
+    const { displayedMinutes } = computeDisplayedTimeback(profile, tasks)
     expect(displayedMinutes).toBeLessThanOrEqual(180)
   })
 
   it("keeps low <= displayed <= high whenever an estimate is shown", () => {
     const cases = [
-      computeDisplayedTimeback(makeProfile(), [makeTask()], 20),
-      computeDisplayedTimeback(null, [makeTask()], 20),
-      computeDisplayedTimeback(makeProfile({ time_range_low: 10, time_range_high: 80 }), [makeTask(), makeTask({ id: 2, frequency: "weekly" })], 0),
+      computeDisplayedTimeback(makeProfile(), [makeTask()]),
+      computeDisplayedTimeback(null, [makeTask()]),
+      computeDisplayedTimeback(makeProfile({ time_range_low: 10, time_range_high: 80 }), [makeTask(), makeTask({ id: 2, frequency: "weekly" })]),
     ]
     for (const c of cases) {
       expect(c.displayedMinutes).toBeGreaterThan(0)
@@ -111,7 +121,7 @@ describe("computeDisplayedTimeback", () => {
 
   it("never shows less than the profile's optimistic bound (current product behavior)", () => {
     const profile = makeProfile({ time_range_low: 20, time_range_high: 75 })
-    const { displayedMinutes } = computeDisplayedTimeback(profile, [makeTask()], 10)
+    const { displayedMinutes } = computeDisplayedTimeback(profile, [makeTask()])
     expect(displayedMinutes).toBeGreaterThanOrEqual(75)
   })
 })

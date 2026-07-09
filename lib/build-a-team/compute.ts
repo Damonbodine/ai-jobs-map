@@ -4,11 +4,7 @@ import type {
   MicroTask,
   Occupation,
 } from "@/types"
-import {
-  computeDisplayedTimeback,
-  estimateTaskMinutes,
-  inferArchetypeMultiplier,
-} from "@/lib/timeback"
+import { computeDisplayedTimeback } from "@/lib/timeback"
 import { computeAnnualValue } from "@/lib/pricing"
 
 export type RoleData = {
@@ -58,16 +54,9 @@ export function computeDepartmentTotals(
     const data = roleDataBySlug.get(cartRow.slug)
     if (!data) continue
 
-    const archetypeMultiplier = inferArchetypeMultiplier(data.profile ?? null)
-    const aiTasks = data.tasks.filter((t) => t.ai_applicable)
-    const totalBlueprintMinutes = aiTasks.reduce(
-      (sum, task) => sum + estimateTaskMinutes(task) * archetypeMultiplier,
-      0
-    )
     const { displayedMinutes } = computeDisplayedTimeback(
       data.profile ?? null,
-      data.tasks,
-      totalBlueprintMinutes
+      data.tasks
     )
     const annualValuePerPerson = computeAnnualValue(
       displayedMinutes,

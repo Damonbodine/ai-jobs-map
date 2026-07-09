@@ -11,7 +11,7 @@ import {
   computeDisplayedTimeback,
 } from "@/lib/timeback"
 import { impactRetentionFactor } from "@/lib/pdf/team-deck-data"
-import { getBlockForTask, generateBlueprint } from "@/lib/blueprint"
+import { getBlockForTask } from "@/lib/blueprint"
 import { computeAnnualValue } from "@/lib/pricing"
 import { DEMO_ROLE_SCRIPTS } from "./demo-scripts"
 import { selectDemoModules } from "./select-demo-modules"
@@ -25,19 +25,60 @@ type RoleInput = {
   occupation: Occupation
   profile: AutomationProfile | null
   tasks: MicroTask[]
-  blueprintMinutes: number
 }
 
 type PartialAgentScript = Omit<DemoAgentStep, "beforeMinutes" | "afterMinutes">
+
+type BeforeAfter = { beforeMinutes: number; afterMinutes: number }
+
+// Scale each item's savings so the total equals `targetSavedMinutes` exactly,
+// in both directions, then absorb per-item rounding drift so the demo's total
+// always matches the hero number instead of being one or two minutes off.
+function reconcileSavingsToTarget(items: BeforeAfter[], targetSavedMinutes: number) {
+  const rawSaved = items.reduce((s, t) => s + (t.beforeMinutes - t.afterMinutes), 0)
+  if (rawSaved <= 0 || targetSavedMinutes <= 0) return
+
+  const correction = targetSavedMinutes / rawSaved
+  for (const t of items) {
+    t.beforeMinutes = Math.round(t.beforeMinutes * correction)
+    t.afterMinutes = Math.max(1, Math.round(t.afterMinutes * correction))
+    if (t.afterMinutes >= t.beforeMinutes) {
+      t.afterMinutes = Math.max(1, t.beforeMinutes - 1)
+      if (t.beforeMinutes <= 1) t.beforeMinutes = Math.max(1, t.afterMinutes + 1)
+    }
+  }
+
+  // Absorb rounding drift, largest savers first, keeping 1 <= after < before.
+  let drift =
+    items.reduce((s, t) => s + (t.beforeMinutes - t.afterMinutes), 0) -
+    targetSavedMinutes
+  const bySavings = [...items].sort(
+    (a, b) => (b.beforeMinutes - b.afterMinutes) - (a.beforeMinutes - a.afterMinutes)
+  )
+  for (const t of bySavings) {
+    if (drift === 0) break
+    if (drift > 0) {
+      const room = t.beforeMinutes - 1 - t.afterMinutes
+      const adjust = Math.min(drift, room)
+      t.afterMinutes += adjust
+      drift -= adjust
+    } else {
+      const room = t.afterMinutes - 1
+      const adjust = Math.min(-drift, room)
+      t.afterMinutes -= adjust
+      drift += adjust
+    }
+  }
+}
 
 export function computeModuleTimes(
   input: RoleInput,
   selectedModuleKeys: string[]
 ): Map<string, { beforeMinutes: number; afterMinutes: number }> {
-  const { profile, tasks, blueprintMinutes } = input
+  const { profile, tasks } = input
   const aiTasks = tasks.filter((t) => t.ai_applicable)
   const archetypeMultiplier = inferArchetypeMultiplier(profile)
-  const { displayedMinutes } = computeDisplayedTimeback(profile, tasks, blueprintMinutes)
+  const { displayedMinutes } = computeDisplayedTimeback(profile, tasks)
   const totalRawMinutes = aiTasks.reduce(
     (sum, t) => sum + estimateTaskMinutes(t) * archetypeMultiplier,
     0
@@ -71,23 +112,15 @@ export function computeModuleTimes(
     rawTimes.set(moduleKey, { before, after })
   }
 
-  // Apply correction so total savings = displayedMinutes
-  const rawTotalSaved = Array.from(rawTimes.values()).reduce(
-    (s, t) => s + (t.before - t.after),
-    0
-  )
-  const correction =
-    rawTotalSaved > 0 && displayedMinutes > 0
-      ? displayedMinutes / rawTotalSaved
-      : 1
+  // Scale so total savings = displayedMinutes exactly
+  const entries = Array.from(rawTimes.entries()).map(([key, t]) => ({
+    key,
+    times: { beforeMinutes: t.before, afterMinutes: t.after },
+  }))
+  reconcileSavingsToTarget(entries.map((e) => e.times), displayedMinutes)
 
   const result = new Map<string, { beforeMinutes: number; afterMinutes: number }>()
-  for (const [key, t] of rawTimes) {
-    const before = Math.round(t.before * correction)
-    let after = Math.max(1, Math.round(t.after * correction))
-    if (after >= before) after = Math.max(1, before - 1)
-    result.set(key, { beforeMinutes: before, afterMinutes: after })
-  }
+  for (const e of entries) result.set(e.key, e.times)
   return result
 }
 
@@ -95,11 +128,11 @@ export function buildDemoRoleStats(
   input: RoleInput,
   scriptAgents: PartialAgentScript[]
 ): DemoRoleData {
-  const { occupation, profile, tasks, blueprintMinutes } = input
+  const { occupation, profile, tasks } = input
   const aiTasks = tasks.filter((t) => t.ai_applicable)
   const archetypeMultiplier = inferArchetypeMultiplier(profile)
 
-  const { displayedMinutes } = computeDisplayedTimeback(profile, tasks, blueprintMinutes)
+  const { displayedMinutes } = computeDisplayedTimeback(profile, tasks)
   const totalRawMinutes = aiTasks.reduce(
     (sum, t) => sum + estimateTaskMinutes(t) * archetypeMultiplier,
     0
@@ -136,20 +169,10 @@ export function buildDemoRoleStats(
     return { ...script, beforeMinutes, afterMinutes }
   })
 
-  // Scale agent savings so total matches displayedMinutes — the demo shows a
-  // subset of all tasks, so raw savings will always be less than the full
-  // occupation claim.
-  const rawSaved = agents.reduce((s, a) => s + (a.beforeMinutes - a.afterMinutes), 0)
-  if (rawSaved > 0 && displayedMinutes > rawSaved) {
-    const correction = displayedMinutes / rawSaved
-    for (const a of agents) {
-      a.beforeMinutes = Math.round(a.beforeMinutes * correction)
-      a.afterMinutes = Math.max(1, Math.round(a.afterMinutes * correction))
-      if (a.afterMinutes >= a.beforeMinutes) {
-        a.afterMinutes = Math.max(1, a.beforeMinutes - 1)
-      }
-    }
-  }
+  // Scale agent savings so the demo's total matches displayedMinutes exactly,
+  // in both directions — the demo must never show more (or less) than the
+  // hero number above it.
+  reconcileSavingsToTarget(agents, displayedMinutes)
 
   const totalBeforeMinutes = agents.reduce((s, a) => s + a.beforeMinutes, 0)
   const totalAfterMinutes = agents.reduce((s, a) => s + a.afterMinutes, 0)
@@ -178,14 +201,7 @@ async function fetchRoleData(slug: string): Promise<RoleInput | null> {
     getOccupationProfile(occupation.id),
   ])
 
-  const blueprint = generateBlueprint(occupation, tasks, profile)
-
-  return {
-    occupation,
-    profile,
-    tasks,
-    blueprintMinutes: blueprint.totalMinutesSaved,
-  }
+  return { occupation, profile, tasks }
 }
 
 export const computeDemoRoles: () => Promise<DemoRoleData[]> = unstable_cache(

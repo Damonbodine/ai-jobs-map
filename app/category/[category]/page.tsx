@@ -14,7 +14,6 @@ import { eq, inArray } from "drizzle-orm"
 import { getCategoryBySlug, CATEGORIES } from "@/lib/categories"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 import { computeDisplayedTimeback } from "@/lib/timeback"
-import { generateBlueprint } from "@/lib/blueprint"
 import type { AutomationProfile, MicroTask, Occupation } from "@/types"
 
 export async function generateStaticParams() {
@@ -111,12 +110,7 @@ const getCategoryOccupations = unstable_cache(
     return rows.map((occ) => {
       const profile = profileMap.get(occ.id) ?? null
       const tasks = taskMap.get(occ.id) ?? []
-      const blueprint = generateBlueprint(occ as unknown as Occupation, tasks, profile)
-      const { displayedMinutes } = computeDisplayedTimeback(
-        profile,
-        tasks,
-        blueprint.totalMinutesSaved
-      )
+      const { displayedMinutes } = computeDisplayedTimeback(profile, tasks)
       return {
         id: occ.id,
         title: occ.title,

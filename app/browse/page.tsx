@@ -9,8 +9,7 @@ import { CATEGORIES } from "@/lib/categories"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 import { BrowseFilters } from "./filters"
 import { computeDisplayedTimeback } from "@/lib/timeback"
-import { generateBlueprint } from "@/lib/blueprint"
-import type { AutomationProfile, MicroTask, Occupation } from "@/types"
+import type { AutomationProfile, MicroTask } from "@/types"
 
 const PAGE_SIZE = 24
 
@@ -124,17 +123,13 @@ export default async function BrowsePage(props: {
       ? profileRaw[0]
       : profileRaw) as AutomationProfile | null
     const tasks = tasksByOccupation.get(occupation.id) ?? []
-    const blueprint = generateBlueprint(occupation as Occupation, tasks, profile)
-    const { displayedMinutes } = computeDisplayedTimeback(
-      profile,
-      tasks,
-      blueprint.totalMinutesSaved
-    )
+    const { displayedMinutes } = computeDisplayedTimeback(profile, tasks)
 
-    browseEstimates.set(
-      occupation.id,
-      displayedMinutes || Math.round(profile?.time_range_high ?? profile?.composite_score ?? 0)
-    )
+    // Occupations with no estimate show no number (composite_score is a
+    // unitless index, never a minutes fallback).
+    if (displayedMinutes > 0) {
+      browseEstimates.set(occupation.id, displayedMinutes)
+    }
   }
 
   // Client-side sort by time saved when requested

@@ -181,16 +181,25 @@ export async function POST(request: Request) {
   const tasksForPdf =
     selectedTasksFromDb.length > 0 ? selectedTasksFromDb : aiTasks
 
-  // Sum the selected minutes from the same source the occupation page uses.
-  const selectedTotalMinutes = tasksForPdf.reduce(
+  // The selection's minutes are its proportional share of the full role's
+  // displayed estimate — the same scaling the occupation page applies to
+  // per-task rows. Deselecting tasks therefore honestly lowers the number;
+  // the profile's optimistic bound never floors a partial selection.
+  const { displayedMinutes: fullRoleMinutes } = computeDisplayedTimeback(
+    profile,
+    allTasks ?? []
+  )
+  const rawAllMinutes = aiTasks.reduce(
     (sum, task) => sum + estimateTaskMinutes(task) * archetypeMultiplier,
     0
   )
-  const { displayedMinutes: serverMinutes } = computeDisplayedTimeback(
-    profile,
-    tasksForPdf,
-    selectedTotalMinutes
+  const rawSelectedMinutes = tasksForPdf.reduce(
+    (sum, task) => sum + estimateTaskMinutes(task) * archetypeMultiplier,
+    0
   )
+  const displayScale =
+    rawAllMinutes > 0 ? fullRoleMinutes / rawAllMinutes : 0
+  const serverMinutes = Math.round(rawSelectedMinutes * displayScale)
   const serverAnnualValue = computeAnnualValue(
     serverMinutes,
     hourlyWageFloat
@@ -200,7 +209,7 @@ export async function POST(request: Request) {
     name: task.task_name,
     minutesPerDay: Math.max(
       1,
-      Math.round(estimateTaskMinutes(task) * archetypeMultiplier)
+      Math.round(estimateTaskMinutes(task) * archetypeMultiplier * displayScale)
     ),
   }))
   const truncatedCount = Math.max(0, tasksForPdf.length - taskListForPdf.length)

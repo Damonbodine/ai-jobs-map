@@ -9,6 +9,7 @@ import type {
   ArchitectureType,
 } from "@/types"
 import { MODULE_ROLES, MODULE_TOOLS, CATEGORY_TO_MODULE } from "@/lib/modules"
+import { estimateTaskMinutes, inferArchetypeMultiplier } from "@/lib/timeback"
 
 function classifyTier(task: MicroTask): AutomationTier {
   if (!task.ai_applicable) return "human-only"
@@ -60,17 +61,20 @@ export function getBlockForTask(task: MicroTask): string {
   return "intake"
 }
 
-function estimateMinutesSaved(task: MicroTask): number {
-  const base = task.ai_impact_level ?? 2
-  const freq = task.frequency === "daily" ? 1.0 : task.frequency === "weekly" ? 0.2 : 0.05
-  return Math.round(base * 3 * freq * 10) / 10
+// Per-task minutes come from the same model every other surface uses
+// (lib/timeback.ts) so the blueprint's block totals stay proportional to the
+// displayed estimate. Human-only tasks save 0 minutes by definition.
+function estimateMinutesSaved(task: MicroTask, archetypeMultiplier: number): number {
+  return Math.round(estimateTaskMinutes(task) * archetypeMultiplier * 10) / 10
 }
 
 export function generateBlueprint(
   occupation: Occupation,
   tasks: MicroTask[],
-  _profile: AutomationProfile | null
+  profile: AutomationProfile | null
 ): AgentBlueprint {
+  const archetypeMultiplier = inferArchetypeMultiplier(profile)
+
   // Group tasks by block
   const blockMap: Record<string, TaskSpec[]> = {}
 
@@ -82,23 +86,9 @@ export function generateBlueprint(
       name: task.task_name,
       description: task.task_description,
       tier: classifyTier(task),
-      minutesSaved: estimateMinutesSaved(task),
+      minutesSaved: estimateMinutesSaved(task, archetypeMultiplier),
       frequency: task.frequency,
     })
-  }
-
-  // Add universal quick-wins if less than 3 AI-applicable tasks
-  const aiTasks = tasks.filter((t) => t.ai_applicable)
-  if (aiTasks.length < 3) {
-    const quickWins: TaskSpec[] = [
-      { name: "Email Drafting", description: "Draft and edit email responses", tier: "automated", minutesSaved: 5, frequency: "daily" },
-      { name: "Meeting Notes", description: "Summarize meeting notes and action items", tier: "automated", minutesSaved: 4, frequency: "daily" },
-      { name: "Document Search", description: "Find relevant documents and information", tier: "assisted", minutesSaved: 3, frequency: "daily" },
-    ]
-    if (!blockMap["communication"]) blockMap["communication"] = []
-    if (!blockMap["documentation"]) blockMap["documentation"] = []
-    blockMap["communication"].push(quickWins[0])
-    blockMap["documentation"].push(quickWins[1], quickWins[2])
   }
 
   // Build agents

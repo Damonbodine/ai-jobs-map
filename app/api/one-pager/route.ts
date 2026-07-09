@@ -140,8 +140,7 @@ export async function POST(request: Request) {
   )
   const { displayedMinutes } = computeDisplayedTimeback(
     profile,
-    (tasks ?? []) as unknown as MicroTask[],
-    totalBlueprintMinutes
+    (tasks ?? []) as unknown as MicroTask[]
   )
   const hourlyWageFloat = occupation.hourly_wage ? parseFloat(occupation.hourly_wage) : null
   const annualValue = computeAnnualValue(displayedMinutes, hourlyWageFloat)

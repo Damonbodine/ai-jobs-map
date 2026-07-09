@@ -376,13 +376,13 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                               : "border-border bg-card hover:border-accent/20"
                           )}
                           style={isSelected ? {
-                            backgroundColor: "hsl(var(--foreground))",
-                            color: "hsl(var(--background))",
+                            backgroundColor: "var(--color-foreground)",
+                            color: "var(--color-background)",
                           } : undefined}
                         >
                           <div>
-                            <div className="text-sm font-medium" style={isSelected ? { color: "hsl(var(--background))" } : undefined}>{BLOCK_LABELS[moduleKey] ?? moduleKey}</div>
-                            <div className="text-xs text-muted-foreground" style={isSelected ? { color: "hsl(var(--background) / 0.7)" } : undefined}>
+                            <div className="text-sm font-medium" style={isSelected ? { color: "var(--color-background)" } : undefined}>{BLOCK_LABELS[moduleKey] ?? moduleKey}</div>
+                            <div className="text-xs text-muted-foreground" style={isSelected ? { color: "color-mix(in srgb, var(--color-background) 70%, transparent)" } : undefined}>
                               {scaledMin ? `${scaledMin}m saved` : "Time saved"}
                             </div>
                           </div>

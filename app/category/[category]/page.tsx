@@ -222,7 +222,7 @@ export default async function CategoryPage(props: {
                 <div className="flex items-center gap-3 ml-3 shrink-0">
                   {occ.minutes !== null && (
                     <div className="text-right">
-                      <div className="font-heading text-lg font-bold text-[hsl(var(--accent))]">
+                      <div className="font-heading text-lg font-bold text-accent">
                         {occ.minutes}
                       </div>
                       <div className="text-[10px] text-muted-foreground">min/day</div>

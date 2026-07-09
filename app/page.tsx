@@ -247,7 +247,7 @@ export default async function HomePage() {
               <span className="font-medium text-foreground group-hover:text-foreground/80">
                 {featuredExample.title}
               </span>
-              <span className="font-semibold text-[hsl(var(--accent))]">
+              <span className="font-semibold text-accent">
                 Reclaim {featuredExample.minutes} minutes daily
               </span>
               <span className="text-muted-foreground hidden sm:inline">
@@ -292,7 +292,7 @@ export default async function HomePage() {
                 <span className="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors">
                   {occ.title}
                 </span>
-                <span className="text-sm font-semibold text-[hsl(var(--accent))] ml-4 shrink-0">
+                <span className="text-sm font-semibold text-accent ml-4 shrink-0">
                   Reclaim {occ.minutes} min/day
                 </span>
               </Link>
@@ -308,7 +308,7 @@ export default async function HomePage() {
             {stats.map((stat) => (
               <StaggerItem key={stat.label}>
                 <div className="flex flex-col items-center gap-2">
-                  <stat.icon className="h-5 w-5 text-[hsl(var(--accent))]" />
+                  <stat.icon className="h-5 w-5 text-accent" />
                   <span className="font-heading text-4xl font-bold text-foreground">{stat.value}</span>
                   <span className="text-sm text-muted-foreground">{stat.label}</span>
                 </div>
@@ -391,7 +391,7 @@ export default async function HomePage() {
               </Link>
               <Link
                 href="/build-a-team"
-                className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-[hsl(var(--accent))] text-white text-sm font-medium hover:opacity-90 transition-opacity"
+                className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:opacity-90 transition-opacity"
               >
                 Plan my team
               </Link>

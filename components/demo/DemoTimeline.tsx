@@ -59,7 +59,7 @@ export function DemoTimeline({
                 key={agent.moduleKey}
                 onClick={() => onAgentSelect(i)}
                 initial={false}
-                animate={isActive ? { backgroundColor: "hsl(var(--foreground))" } : { backgroundColor: "transparent" }}
+                animate={isActive ? { backgroundColor: "var(--color-foreground)" } : { backgroundColor: "transparent" }}
                 className={cn(
                   "relative w-full text-left rounded-lg px-3 py-2.5 transition-colors overflow-hidden",
                   isActive ? "text-background" : "hover:bg-muted/50"

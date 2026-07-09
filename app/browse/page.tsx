@@ -216,7 +216,7 @@ export default async function BrowsePage(props: {
                   <div className="flex items-center gap-3 ml-3 shrink-0">
                     {estimatedMinutes !== null && (
                       <div className="text-right">
-                        <div className="font-heading text-lg font-bold text-[hsl(var(--accent))]">
+                        <div className="font-heading text-lg font-bold text-accent">
                           {estimatedMinutes}
                         </div>
                         <div className="text-[10px] text-muted-foreground">min/day</div>

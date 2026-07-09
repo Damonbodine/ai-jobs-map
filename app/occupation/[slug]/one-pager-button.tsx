@@ -109,7 +109,7 @@ export function OnePagerButton({
           setErrorMessage(null)
           setFieldError(null)
         }}
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
+        className="inline-flex items-center gap-2 px-5 py-2.5 border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
       >
         <Download className="h-4 w-4" />
         Download One-Pager
@@ -125,12 +125,12 @@ export function OnePagerButton({
             if (e.target === e.currentTarget) setOpen(false)
           }}
         >
-          <div className="bg-card rounded-2xl border border-border max-w-md w-full p-6 relative">
+          <div className="bg-card border border-border max-w-md w-full p-6 relative">
             <button
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Close"
-              className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-secondary transition-colors"
+              className="absolute top-3 right-3 p-1.5 hover:bg-secondary transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -186,7 +186,7 @@ export function OnePagerButton({
                       aria-describedby={
                         fieldError ? "one-pager-email-error" : undefined
                       }
-                      className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors aria-invalid:border-destructive aria-invalid:focus:ring-destructive/30"
+                      className="w-full border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors aria-invalid:border-destructive aria-invalid:focus:ring-destructive/30"
                     />
                     {fieldError ? (
                       <p
@@ -207,7 +207,7 @@ export function OnePagerButton({
                   <button
                     type="submit"
                     disabled={status === "submitting"}
-                    className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
+                    className="inline-flex w-full items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80 disabled:opacity-60"
                   >
                     {status === "submitting" ? (
                       <>

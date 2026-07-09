@@ -258,7 +258,7 @@ export function OccupationBuilder({
 
   return (
     <div>
-      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+      <div className="border border-border bg-card overflow-hidden">
         {assistantGroups.map((group) => {
           const { moduleKey, definition, tasks: groupTasks, groupMinutes, selectedCount } = group
           const isExpanded = expandedModules.has(moduleKey)
@@ -282,7 +282,7 @@ export function OccupationBuilder({
               className={cn(
                 "border-b border-border last:border-b-0 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-inset",
                 allSelected
-                  ? "bg-white text-black"
+                  ? "bg-card text-foreground"
                   : someSelected
                     ? "bg-secondary/10"
                     : "bg-card"
@@ -291,7 +291,7 @@ export function OccupationBuilder({
               <div
                 className={cn(
                   "border-l-4 px-4 py-4 sm:px-5",
-                  allSelected ? "bg-white" : someSelected ? "bg-secondary/10" : "bg-card"
+                  allSelected ? "bg-card" : someSelected ? "bg-secondary/10" : "bg-card"
                 )}
                 style={{ borderLeftColor: accent }}
               >
@@ -310,20 +310,20 @@ export function OccupationBuilder({
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                           <h3 className={cn(
                             "font-heading text-lg font-semibold tracking-tight",
-                            allSelected ? "text-black" : "text-foreground"
+                            allSelected ? "text-foreground" : "text-foreground"
                           )}>
                             {definition?.label ?? moduleKey}
                           </h3>
                           <div className={cn(
                             "text-sm font-medium tabular-nums",
-                            allSelected ? "text-black/80" : "text-foreground/80"
+                            allSelected ? "text-foreground/80" : "text-foreground/80"
                           )}>
                             {groupMinutes} min/day
                           </div>
                         </div>
                         <p className={cn(
                           "mt-1 text-sm",
-                          allSelected ? "text-black/75" : "text-muted-foreground"
+                          allSelected ? "text-muted-foreground" : "text-muted-foreground"
                         )}>
                           {definition?.description ?? "Bundle related work into one assistant scope."}
                         </p>
@@ -337,7 +337,7 @@ export function OccupationBuilder({
                           className={cn(
                             "mt-2 text-sm font-medium underline-offset-4 hover:underline transition-colors",
                             allSelected
-                              ? "text-black/70 hover:text-black"
+                              ? "text-foreground/70 hover:text-foreground"
                               : "text-muted-foreground hover:text-foreground"
                           )}
                         >
@@ -355,9 +355,9 @@ export function OccupationBuilder({
                         toggleModule(moduleKey)
                       }}
                       className={cn(
-                        "inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors min-w-[150px]",
+                        "inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-colors min-w-[150px]",
                         allSelected
-                          ? "bg-black text-white hover:opacity-90"
+                          ? "bg-primary text-primary-foreground hover:opacity-90"
                           : someSelected
                             ? "bg-secondary text-foreground hover:bg-secondary/80"
                             : "bg-accent text-white hover:opacity-90"
@@ -373,13 +373,13 @@ export function OccupationBuilder({
               {isExpanded && (
                 <div className="border-t border-border bg-background/40">
                   <div className="hidden sm:grid grid-cols-[1fr_auto_auto] gap-3 px-5 py-3 sm:px-6 border-b border-border bg-secondary/20">
-                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    <div className="eyebrow">
                       Task
                     </div>
-                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide text-right min-w-[80px]">
+                    <div className="eyebrow text-right min-w-[80px]">
                       Avg per day
                     </div>
-                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide text-right min-w-[140px]">
+                    <div className="eyebrow text-right min-w-[140px]">
                       Scope
                     </div>
                   </div>
@@ -395,20 +395,20 @@ export function OccupationBuilder({
                         className={cn(
                           "flex flex-col sm:grid sm:grid-cols-[1fr_auto_auto] gap-2 sm:gap-3 px-5 py-3.5 sm:px-6 w-full text-left border-b border-border last:border-b-0 transition-all",
                           isSelected
-                            ? "bg-white text-black"
+                            ? "bg-card text-foreground"
                             : "bg-transparent hover:bg-secondary/30"
                         )}
                       >
                         <div className={cn(
                           "text-sm font-medium leading-snug",
-                          isSelected ? "text-black" : "text-foreground/85"
+                          isSelected ? "text-foreground" : "text-foreground/85"
                         )}>
                           {task.task_name}
                         </div>
                         <div className="flex items-center justify-between gap-3 sm:contents">
                           <div className={cn(
                             "text-xs sm:text-sm tabular-nums sm:text-right sm:min-w-[80px]",
-                            isSelected ? "text-black/70 sm:text-black/80" : "text-muted-foreground"
+                            isSelected ? "text-foreground/70 sm:text-foreground/80" : "text-muted-foreground"
                           )}>
                             <span className="sm:hidden uppercase tracking-wide mr-1 font-semibold">
                               Avg/day:
@@ -418,9 +418,9 @@ export function OccupationBuilder({
                           <div className="flex items-center justify-end gap-2 sm:min-w-[140px]">
                             <div
                               className={cn(
-                                "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                                "flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium transition-colors",
                                 isSelected
-                                  ? "bg-black text-white shadow-sm"
+                                  ? "bg-primary text-primary-foreground"
                                   : "bg-secondary text-muted-foreground"
                               )}
                             >
@@ -442,7 +442,7 @@ export function OccupationBuilder({
       {phase === "build" && (
         <div
           ref={builderRef}
-          className="mt-6 rounded-2xl border border-border bg-card p-5 sm:p-6"
+          className="mt-6 border border-border bg-card p-5 sm:p-6"
         >
           <h3 className="font-heading text-xl font-semibold tracking-tight mb-1">
             Request your custom AI assistant plan
@@ -452,7 +452,7 @@ export function OccupationBuilder({
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr_1fr] gap-3 mb-6">
-            <div className="rounded-xl border border-border bg-card p-4">
+            <div className="border border-border bg-card p-4">
               <div className="text-xs text-muted-foreground mb-1">Team size</div>
               <div className="relative">
                 <select
@@ -469,22 +469,22 @@ export function OccupationBuilder({
                 <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
               </div>
             </div>
-            <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
+            <div className="border border-accent/30 bg-accent/5 p-4">
               <div className="text-xs text-muted-foreground mb-1">Hours reclaimed / yr</div>
-              <div className="font-heading text-2xl font-bold text-accent">
+              <div className="font-mono text-2xl font-bold tabular-nums text-accent">
                 {scaledHoursPerYear.toLocaleString()}
               </div>
             </div>
-            <div className="rounded-xl border border-border bg-card p-4">
+            <div className="border border-border bg-card p-4">
               <div className="text-xs text-muted-foreground mb-1">Selected time back</div>
-              <div className="font-heading text-2xl font-bold">
+              <div className="font-mono text-2xl font-bold tabular-nums">
                 {selectedMinutes} min/day
               </div>
             </div>
           </div>
 
           <div className="mb-6">
-            <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">
+            <div className="eyebrow mb-2">
               Custom requests
             </div>
             <div className="flex gap-2">
@@ -498,7 +498,7 @@ export function OccupationBuilder({
                   }
                 }}
                 placeholder="Add a task, workflow, or requirement..."
-                className="flex-1 h-10 px-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                className="flex-1 h-10 px-4 border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
               />
               <button
                 type="button"
@@ -513,7 +513,7 @@ export function OccupationBuilder({
                 {customRequests.map((request, index) => (
                   <span
                     key={`${request}-${index}`}
-                    className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs"
+                    className="inline-flex items-center gap-1 bg-secondary px-3 py-1 text-xs"
                   >
                     {request}
                     <button
@@ -531,23 +531,23 @@ export function OccupationBuilder({
           </div>
 
           <div className="mb-6">
-            <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-3">
+            <div className="eyebrow mb-3">
               Contact
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                <label className="eyebrow">
                   Name
                 </label>
                 <input
                   value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
                   placeholder="Your name"
-                  className="w-full h-10 mt-1 px-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                  className="w-full h-10 mt-1 px-4 border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
                 />
               </div>
               <div>
-                <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                <label className="eyebrow">
                   Email
                 </label>
                 <input
@@ -557,7 +557,7 @@ export function OccupationBuilder({
                   type="email"
                   inputMode="email"
                   autoComplete="email"
-                  className="w-full h-10 mt-1 px-4 rounded-lg border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                  className="w-full h-10 mt-1 px-4 border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
                 />
               </div>
             </div>
@@ -577,7 +577,7 @@ export function OccupationBuilder({
             disabled={submitting || !contactEmail.trim() || selectedModules.length === 0}
             aria-label="Request Your Custom AI Assistant Plan Form"
             data-testid="occupation-builder-submit-form"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity disabled:opacity-50 w-full sm:w-auto"
+            className="inline-flex w-full items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80 disabled:opacity-50 sm:w-auto"
           >
             {submitting ? "Submitting..." : "Request Your Custom AI Assistant Plan"}
             {!submitting && <ArrowRight className="h-4 w-4" />}
@@ -594,7 +594,7 @@ export function OccupationBuilder({
             <div
               role="status"
               aria-live="polite"
-              className="rounded-2xl border border-accent/30 bg-accent/5 p-6 sm:p-8"
+              className="border border-accent/30 bg-accent/5 p-6 sm:p-8"
             >
               <div className="flex items-start gap-3 mb-3">
                 <CheckCircle2 className="h-6 w-6 text-accent flex-shrink-0" />
@@ -612,7 +612,7 @@ export function OccupationBuilder({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="border border-border bg-card p-6">
               <h3 className="font-heading text-lg font-semibold mb-2">
                 Ready to prove the numbers?
               </h3>
@@ -623,7 +623,7 @@ export function OccupationBuilder({
               </p>
               <a
                 href={AGENCY.enquireUrl}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
+                className="inline-flex items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
               >
                 Start with an audit
                 <ArrowRight className="h-4 w-4" />
@@ -656,7 +656,7 @@ export function OccupationBuilder({
                     <Link
                       key={role.id}
                       href={`/occupation/${role.slug}`}
-                      className="group flex items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 hover:border-accent/50 hover:bg-accent/5 transition-colors"
+                      className="group flex items-center justify-between gap-3 border border-border bg-card px-4 py-3 hover:border-accent/50 hover:bg-accent/5 transition-colors"
                     >
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-foreground truncate">
@@ -686,23 +686,23 @@ export function OccupationBuilder({
 
       {phase !== "done" && (
         <div className="sticky bottom-0 z-40 mt-6 px-2 sm:px-0 py-4">
-          <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-background shadow-[0_-10px_30px_rgba(0,0,0,0.18)]">
+          <div className="mx-auto max-w-4xl border border-border bg-background shadow-[0_-10px_30px_rgba(0,0,0,0.18)]">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-4 sm:px-5">
             {phase === "select" ? (
               <>
                 <div className="text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">{selectedModules.length}</span> assistant types selected
+                  <span className="font-mono tabular-nums font-semibold text-foreground">{selectedModules.length}</span> assistant types selected
                   {" "}&middot;{" "}
-                  <span className="font-semibold text-foreground">{selectedMinutes} min/day</span>
+                  <span className="font-mono tabular-nums font-semibold text-foreground">{selectedMinutes} min/day</span>
                   {" "}&middot;{" "}
-                  <span className="font-semibold text-accent">
+                  <span className="font-mono tabular-nums font-semibold text-accent">
                     ~{selectedHoursPerYear.toLocaleString()} hrs/yr reclaimed
                   </span>
                 </div>
                 <button
                   onClick={handlePrimaryAction}
                   disabled={selected.size === 0}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity disabled:opacity-40 w-full sm:w-auto"
+                  className="inline-flex w-full items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80 disabled:opacity-50 sm:w-auto"
                 >
                   Request Your Custom AI Assistant Plan
                   <ArrowRight className="h-4 w-4" />
@@ -711,9 +711,9 @@ export function OccupationBuilder({
             ) : (
               <>
                 <div className="text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">{selectedModules.length}</span> modules
+                  <span className="font-mono tabular-nums font-semibold text-foreground">{selectedModules.length}</span> modules
                   {" "}&middot;{" "}
-                  <span className="font-semibold text-foreground">{selectedMinutes} min/day</span>
+                  <span className="font-mono tabular-nums font-semibold text-foreground">{selectedMinutes} min/day</span>
                   {" "}&middot;{" "}
                   <span className="font-semibold text-accent">{currentTier.label}</span>
                 </div>
@@ -722,7 +722,7 @@ export function OccupationBuilder({
                   disabled={submitting || !contactEmail.trim() || selectedModules.length === 0}
                   aria-label="Request Your Custom AI Assistant Plan Sticky Bar"
                   data-testid="occupation-builder-submit-sticky"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-50 w-full sm:w-auto"
+                  className="inline-flex w-full items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80 disabled:opacity-50 sm:w-auto"
                 >
                   {submitting ? "Submitting..." : "Request Your Custom AI Assistant Plan"}
                   {!submitting && <ArrowRight className="h-4 w-4" />}

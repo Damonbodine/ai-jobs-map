@@ -148,7 +148,7 @@ export default async function OccupationPage(props: {
         {/* Hero — compact so the demo lands in the first viewport */}
         <FadeIn>
           <div className="mb-8 text-center max-w-3xl mx-auto">
-            <div className="inline-block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 border border-border rounded-full px-3 py-1">
+            <div className="eyebrow inline-block border border-border bg-card px-3 py-1 mb-3">
               Occupation
             </div>
             <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight text-balance">
@@ -165,7 +165,7 @@ export default async function OccupationPage(props: {
             <div className="mt-6 flex justify-center">
               <a
                 href={AGENCY.enquireUrl}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
+                className="inline-flex items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
               >
                 Start with an audit
                 <ArrowRight className="h-4 w-4" />
@@ -208,7 +208,7 @@ export default async function OccupationPage(props: {
               />
               <Link
                 href={`/build-a-team?roles=${occupation.slug}:1`}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
               >
                 Add to Team
               </Link>

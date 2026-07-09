@@ -41,7 +41,7 @@ export function EstimateInfo({
     >
       <button
         type="button"
-        className="inline-flex rounded-full border border-border/70 p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+        className="inline-flex border border-border/70 p-1 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
         aria-label="How this estimate is calculated"
         aria-expanded={open}
         onClick={() => setOpen((prev) => !prev)}
@@ -52,7 +52,7 @@ export function EstimateInfo({
       <div
         role="tooltip"
         className={cn(
-          "absolute left-0 top-full z-50 mt-3 w-80 max-w-[calc(100vw-2rem)] rounded-md bg-foreground px-3 py-2 text-left text-xs leading-relaxed text-background shadow-xl transition-opacity duration-150 sm:left-full sm:top-0 sm:ml-3 sm:mt-0",
+          "absolute left-0 top-full z-50 mt-3 w-80 max-w-[calc(100vw-2rem)] bg-foreground px-3 py-2 text-left text-xs leading-relaxed text-background shadow-lg transition-opacity duration-150 sm:left-full sm:top-0 sm:ml-3 sm:mt-0",
           open ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
       >

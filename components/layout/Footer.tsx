@@ -33,7 +33,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold mb-3">Explore</h4>
+            <h4 className="eyebrow mb-3">Explore</h4>
             <div className="space-y-2">
               <Link
                 href="/browse"
@@ -63,7 +63,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold mb-3">Company</h4>
+            <h4 className="eyebrow mb-3">Company</h4>
             <div className="space-y-2">
               <Link
                 href="/about"
@@ -87,7 +87,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold mb-3">Trust</h4>
+            <h4 className="eyebrow mb-3">Trust</h4>
             <div className="space-y-2">
               <Link
                 href="/security"
@@ -111,7 +111,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row justify-between gap-3 text-xs text-muted-foreground">
+        <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row justify-between gap-3 font-mono text-[11px] text-muted-foreground">
           <p>
             © {year}{" "}
             <a

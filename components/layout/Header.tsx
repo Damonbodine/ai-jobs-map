@@ -77,7 +77,7 @@ export function Header() {
               key={link.href}
               href={link.href}
               className={cn(
-                "text-sm font-medium transition-colors hover:text-foreground",
+                "font-mono text-[11px] font-medium uppercase tracking-[0.16em] transition-colors hover:text-foreground",
                 pathname === link.href
                   ? "text-foreground"
                   : "text-muted-foreground"
@@ -89,7 +89,7 @@ export function Header() {
           <a
             href={AGENCY.enquireUrl}
             onClick={() => track("book_call_clicked", { location: "header" })}
-            className="text-sm font-semibold bg-foreground text-background px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
+            className="bg-cyan px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
           >
             Start with an audit
           </a>
@@ -111,7 +111,7 @@ export function Header() {
               href={link.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                "block py-3 px-3 -mx-1 rounded-lg text-sm font-medium transition-colors active:bg-secondary",
+                "block py-3 px-3 -mx-1 font-mono text-xs font-medium uppercase tracking-[0.16em] transition-colors active:bg-secondary",
                 pathname === link.href
                   ? "text-foreground bg-secondary/50"
                   : "text-muted-foreground"
@@ -127,7 +127,7 @@ export function Header() {
                 track("book_call_clicked", { location: "mobile" })
                 setMobileOpen(false)
               }}
-              className="flex-1 text-center py-2.5 text-sm font-semibold bg-foreground text-background rounded-lg active:opacity-80 transition-opacity"
+              className="flex-1 bg-cyan py-2.5 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground transition-colors active:bg-cyan/80"
             >
               Start with an audit
             </a>

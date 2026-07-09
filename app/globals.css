@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 /*
+ * The site is permanently light. Class-gate the `dark:` variant so the ~36
+ * leftover dark: utilities stay inert (nothing ever applies .dark) — without
+ * this line, Tailwind v4 defaults dark: to prefers-color-scheme and OS-dark
+ * visitors get broken dark fragments. SP2 strips the dark: classes entirely.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
  * Blueprint Light — the Clear Road Labs design system on a light surface.
  * CRL is ice-on-ink; Timeback is ink-on-ice. Canonical reference:
  * docs/brand-contract.md (mirrored in the ClearRoadLabs repo).

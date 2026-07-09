@@ -33,4 +33,8 @@ describe("brand lockstep — lib/brand.ts mirrors app/globals.css @theme", () =>
   it("radius tokens are zero (engineering edge)", () => {
     expect(css).toMatch(/--radius-lg:\s*0rem/)
   })
+
+  it("dark: variant stays class-gated (site is permanently light)", () => {
+    expect(css).toMatch(/@custom-variant dark/)
+  })
 })

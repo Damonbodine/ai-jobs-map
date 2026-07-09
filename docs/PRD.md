@@ -600,7 +600,6 @@ Each stage is recorded in `pipeline_runs` table (status: running/completed/faile
 | `generate-skill-recommendations.ts` | Generate `skill_recommendations` (AI-generated) |
 | `fetch-smart-workflows.ts` | Fetch external workflow templates into `smart_workflows` |
 | `seed-occupation-images.ts` | Seed Pexels images for occupation cards |
-| `refresh-browse-metrics.ts` | Refresh materialized browse metrics for fast pagination |
 
 #### O*NET Import & Scoring (Python)
 | Script | Purpose |

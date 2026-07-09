@@ -2,13 +2,11 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, Sun, Moon, ChevronDown } from "lucide-react"
+import { Menu, X, ChevronDown } from "lucide-react"
 import { useState } from "react"
-import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 import { AGENCY } from "@/lib/site"
 import { track } from "@/lib/analytics"
-import { DARK_MODE_ENABLED } from "@/lib/features"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +17,6 @@ import {
 export function Header() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { theme, setTheme } = useTheme()
 
   const links = [
     { href: "/about", label: "About" },
@@ -89,19 +86,6 @@ export function Header() {
               {link.label}
             </Link>
           ))}
-          {DARK_MODE_ENABLED ? (
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 rounded-lg hover:bg-secondary transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-            </button>
-          ) : null}
           <a
             href={AGENCY.enquireUrl}
             onClick={() => track("book_call_clicked", { location: "header" })}
@@ -147,15 +131,6 @@ export function Header() {
             >
               Start with an audit
             </a>
-            {DARK_MODE_ENABLED ? (
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="h-10 w-10 flex items-center justify-center rounded-lg border border-border active:bg-secondary transition-colors"
-                aria-label="Toggle theme"
-              >
-                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </button>
-            ) : null}
           </div>
         </div>
       )}

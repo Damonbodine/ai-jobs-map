@@ -16,7 +16,7 @@ export function TemplatePicker({ templates }: { templates: readonly Template[] }
           <Link
             key={tpl.key}
             href={`/build-a-team?template=${tpl.key}`}
-            className="block rounded-2xl border border-border bg-card p-5 hover:border-accent/40 hover:bg-accent/5 transition-colors"
+            className="block border border-border bg-card p-5 hover:border-accent/40 hover:bg-accent/5 transition-colors"
           >
             <h3 className="font-heading text-base font-semibold mb-1">
               {tpl.name}

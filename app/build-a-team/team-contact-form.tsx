@@ -58,7 +58,7 @@ export function TeamContactForm({
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
+    <div className="border border-border bg-card p-6 space-y-5">
       <div>
         <h2 className="font-heading text-lg font-semibold">Request your team assistant plan</h2>
         <p className="text-sm text-muted-foreground mt-1">
@@ -78,7 +78,7 @@ export function TeamContactForm({
                 key={size.label}
                 type="button"
                 onClick={() => setTeamSizeIndex(i)}
-                className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 border text-sm font-medium transition-colors ${
                   i === teamSizeIndex
                     ? "border-foreground bg-foreground text-background"
                     : "border-border bg-background text-foreground hover:bg-secondary"
@@ -102,7 +102,7 @@ export function TeamContactForm({
             value={contactName}
             onChange={e => setContactName(e.target.value)}
             placeholder="Your name"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+            className="w-full border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
           />
         </div>
 
@@ -121,7 +121,7 @@ export function TeamContactForm({
             aria-invalid={emailError ? true : undefined}
             aria-describedby={emailError ? "team-email-error" : undefined}
             placeholder="you@company.com"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors aria-invalid:border-destructive aria-invalid:focus:ring-destructive/30"
+            className="w-full border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors aria-invalid:border-destructive aria-invalid:focus:ring-destructive/30"
           />
           {emailError && (
             <p id="team-email-error" className="text-xs text-destructive">{emailError}</p>
@@ -140,16 +140,16 @@ export function TeamContactForm({
               onChange={e => setNewRequest(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addRequest() } }}
               placeholder="e.g. HIPAA compliance needed"
-              className="flex-1 rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+              className="flex-1 border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
             />
-            <button type="button" onClick={addRequest} className="px-3 py-2.5 rounded-lg border border-border hover:bg-secondary transition-colors">
+            <button type="button" onClick={addRequest} className="px-3 py-2.5 border border-border hover:bg-secondary transition-colors">
               <Plus className="h-4 w-4" />
             </button>
           </div>
           {customRequests.length > 0 && (
             <ul className="space-y-1.5 mt-2">
               {customRequests.map((req, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm bg-secondary/30 rounded-lg px-3 py-1.5">
+                <li key={i} className="flex items-center gap-2 text-sm bg-secondary/30 px-3 py-1.5">
                   <span className="flex-1">{req}</span>
                   <button type="button" onClick={() => setCustomRequests(p => p.filter((_, j) => j !== i))}>
                     <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
@@ -164,14 +164,14 @@ export function TeamContactForm({
           <button
             type="button"
             onClick={onBack}
-            className="px-4 py-2.5 rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-secondary transition-colors"
+            className="px-4 py-2.5 border border-border text-sm font-semibold text-foreground hover:bg-secondary transition-colors"
           >
             ← Back
           </button>
           <button
             type="submit"
             disabled={submitting}
-            className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
+            className="flex-1 inline-flex items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80 disabled:opacity-60"
           >
             {submitting ? <><Loader2 className="h-4 w-4 animate-spin" />Sending…</> : "Send me the team blueprint →"}
           </button>

@@ -100,12 +100,12 @@ export function PdfModal({
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="bg-card rounded-2xl border border-border max-w-md w-full p-6 relative">
+      <div className="bg-card border border-border max-w-md w-full p-6 relative">
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-secondary transition-colors"
+          className="absolute top-3 right-3 p-1.5 hover:bg-secondary transition-colors"
         >
           <X className="h-4 w-4" />
         </button>
@@ -157,7 +157,7 @@ export function PdfModal({
                   aria-describedby={
                     fieldError ? "pdf-modal-email-error" : undefined
                   }
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors aria-invalid:border-destructive aria-invalid:focus:ring-destructive/30"
+                  className="w-full border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors aria-invalid:border-destructive aria-invalid:focus:ring-destructive/30"
                 />
                 {fieldError ? (
                   <p
@@ -183,7 +183,7 @@ export function PdfModal({
                   value={teamLabel}
                   onChange={(e) => setTeamLabel(e.target.value)}
                   placeholder='e.g. "Acme Health ops team"'
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+                  className="w-full border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
                 />
               </div>
 
@@ -196,7 +196,7 @@ export function PdfModal({
               <button
                 type="submit"
                 disabled={status === "submitting"}
-                className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80 disabled:opacity-60"
               >
                 {status === "submitting" ? (
                   <>

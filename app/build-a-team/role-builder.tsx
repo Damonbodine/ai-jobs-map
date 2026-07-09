@@ -65,7 +65,7 @@ export function RoleBuilder({
   )
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden mt-3">
+    <div className="border border-border bg-card overflow-hidden mt-3">
       {groups.map(({ moduleKey, tasks: groupTasks, groupMinutes, selectedCount }) => {
         const allSelected = selectedCount === groupTasks.length
         const someSelected = selectedCount > 0
@@ -79,23 +79,23 @@ export function RoleBuilder({
             <div
               className={cn(
                 "border-l-4 px-4 py-3 flex items-center justify-between gap-3",
-                allSelected ? "bg-white" : someSelected ? "bg-secondary/10" : "bg-card"
+                allSelected ? "bg-card" : someSelected ? "bg-secondary/10" : "bg-card"
               )}
               style={{ borderLeftColor: accent }}
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 {Icon && (
                   <div
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border bg-background"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center border bg-background"
                     style={{ borderColor: `${accent}40`, color: accent }}
                   >
                     <Icon className="h-3.5 w-3.5" />
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className={cn("text-sm font-semibold", allSelected ? "text-black" : "text-foreground")}>
+                  <p className={cn("text-sm font-semibold", allSelected ? "text-foreground" : "text-foreground")}>
                     {definition?.label ?? moduleKey}
-                    <span className="ml-2 text-xs font-normal text-muted-foreground tabular-nums">
+                    <span className="ml-2 font-mono text-xs font-normal text-muted-foreground tabular-nums">
                       {groupMinutes} min/day
                     </span>
                   </p>
@@ -112,9 +112,9 @@ export function RoleBuilder({
                 type="button"
                 onClick={() => onToggleModule(moduleKey, groupTasks.map(t => t.id))}
                 className={cn(
-                  "shrink-0 inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+                  "shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors",
                   allSelected
-                    ? "bg-black text-white hover:opacity-90"
+                    ? "bg-primary text-primary-foreground hover:opacity-90"
                     : someSelected
                     ? "bg-secondary text-foreground hover:bg-secondary/80"
                     : "bg-accent text-white hover:opacity-90"
@@ -134,10 +134,10 @@ export function RoleBuilder({
                     onClick={() => onToggleTask(task.id)}
                   >
                     <div className={cn(
-                      "mt-0.5 h-4 w-4 shrink-0 rounded border transition-colors flex items-center justify-center",
-                      selected.has(task.id) ? "bg-black border-black" : "border-border bg-background"
+                      "mt-0.5 h-4 w-4 shrink-0 border transition-colors flex items-center justify-center",
+                      selected.has(task.id) ? "bg-primary border-primary" : "border-border bg-background"
                     )}>
-                      {selected.has(task.id) && <Check className="h-2.5 w-2.5 text-white" />}
+                      {selected.has(task.id) && <Check className="h-2.5 w-2.5 text-primary-foreground" />}
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm text-foreground leading-snug">{task.task_name}</p>
@@ -145,7 +145,7 @@ export function RoleBuilder({
                         <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{task.ai_how_it_helps}</p>
                       )}
                     </div>
-                    <span className="ml-auto shrink-0 text-xs text-muted-foreground tabular-nums pt-0.5">
+                    <span className="ml-auto shrink-0 font-mono text-xs text-muted-foreground tabular-nums pt-0.5">
                       {Math.round((task.displayLow + task.displayHigh) / 2)} min
                     </span>
                   </li>

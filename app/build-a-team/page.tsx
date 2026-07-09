@@ -186,7 +186,7 @@ export default async function BuildATeamPage({
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <FadeIn>
-        <p className="text-xs uppercase tracking-[0.18em] text-accent font-semibold mb-3">
+        <p className="eyebrow mb-3">
           BUILD A TEAM
         </p>
         <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-4">

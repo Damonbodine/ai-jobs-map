@@ -4,7 +4,7 @@ import { computeAnnualHours } from "@/lib/pricing"
 export function Results({ totals }: { totals: DepartmentTotals }) {
   const totalHoursPerYear = computeAnnualHours(totals.totalMinutesPerDay)
   return (
-    <div className="mt-8 rounded-2xl border border-accent/30 bg-accent/5 p-6 sm:p-8">
+    <div className="mt-8 border border-accent/30 bg-accent/5 p-6 sm:p-8">
       <h2 className="font-heading text-xl font-semibold mb-5">
         What AI gives this team back
       </h2>
@@ -26,10 +26,10 @@ export function Results({ totals }: { totals: DepartmentTotals }) {
         />
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-4 overflow-x-auto">
+      <div className="border border-border bg-card p-4 overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-xs uppercase tracking-wider text-muted-foreground">
+            <tr className="eyebrow">
               <th className="text-left font-semibold py-2">Role</th>
               <th className="text-center font-semibold py-2">People</th>
               <th className="text-right font-semibold py-2">Min/day each</th>
@@ -40,20 +40,20 @@ export function Results({ totals }: { totals: DepartmentTotals }) {
             {totals.rows.map((row) => (
               <tr key={row.slug} className="border-t border-border">
                 <td className="py-2 text-foreground">{row.title}</td>
-                <td className="py-2 text-center">{row.count}</td>
-                <td className="py-2 text-right">{row.minutesPerPerson}</td>
-                <td className="py-2 text-right">
+                <td className="py-2 text-center font-mono tabular-nums">{row.count}</td>
+                <td className="py-2 text-right font-mono tabular-nums">{row.minutesPerPerson}</td>
+                <td className="py-2 text-right font-mono tabular-nums">
                   {computeAnnualHours(row.totalMinutesPerDay).toLocaleString()}
                 </td>
               </tr>
             ))}
             <tr className="border-t-2 border-foreground font-semibold">
               <td className="py-2">Department total</td>
-              <td className="py-2 text-center">{totals.totalPeople}</td>
-              <td className="py-2 text-right">
+              <td className="py-2 text-center font-mono tabular-nums">{totals.totalPeople}</td>
+              <td className="py-2 text-right font-mono tabular-nums">
                 {Math.round(totals.totalMinutesPerDay).toLocaleString()}
               </td>
-              <td className="py-2 text-right">
+              <td className="py-2 text-right font-mono tabular-nums">
                 {totalHoursPerYear.toLocaleString()}
               </td>
             </tr>
@@ -75,10 +75,10 @@ function Stat({
 }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+      <p className="eyebrow mb-1">
         {label}
       </p>
-      <p className="font-heading text-2xl font-semibold text-foreground">
+      <p className="font-mono text-2xl font-semibold tabular-nums text-foreground">
         {value}
         {unit ? (
           <span className="text-base text-muted-foreground ml-1">{unit}</span>

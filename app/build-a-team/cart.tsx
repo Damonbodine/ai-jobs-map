@@ -218,7 +218,7 @@ export function Cart({
   // ── Configure phase ──
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-border bg-card p-6">
+      <div className="border border-border bg-card p-6">
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-heading text-lg font-semibold">Your team</h2>
           <span className="text-sm text-muted-foreground">
@@ -240,7 +240,7 @@ export function Cart({
               const totalCount = rd?.tasks.length ?? 0
 
               return (
-                <li key={row.slug} className="rounded-xl border border-border overflow-hidden">
+                <li key={row.slug} className="border border-border overflow-hidden">
                   <div className="flex items-center gap-3 px-3 py-2.5">
                     <span className="flex-1 text-sm text-foreground font-medium">{prettySlug(row.slug)}</span>
 
@@ -249,7 +249,7 @@ export function Cart({
                       <button
                         type="button"
                         onClick={() => toggleRoleExpand(row.slug)}
-                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-secondary"
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 hover:bg-secondary"
                       >
                         {selectedCount}/{totalCount} tasks
                         {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -262,7 +262,7 @@ export function Cart({
                         onClick={() => handleSetCount(row.slug, Math.max(1, row.count - 1))}
                         disabled={pending || row.count <= 1}
                         aria-label={`Decrease ${row.slug} count`}
-                        className="p-1.5 rounded-md border border-border hover:bg-secondary transition-colors disabled:opacity-40"
+                        className="p-1.5 border border-border hover:bg-secondary transition-colors disabled:opacity-40"
                       >
                         <Minus className="h-3.5 w-3.5" />
                       </button>
@@ -273,14 +273,14 @@ export function Cart({
                         value={row.count}
                         onChange={e => handleSetCount(row.slug, Number.parseInt(e.target.value || "1", 10))}
                         aria-label={`${row.slug} count`}
-                        className="w-14 text-center text-sm rounded-md border border-border bg-background py-1"
+                        className="w-14 text-center text-sm border border-border bg-background py-1"
                       />
                       <button
                         type="button"
                         onClick={() => handleSetCount(row.slug, row.count + 1)}
                         disabled={pending || row.count >= 999}
                         aria-label={`Increase ${row.slug} count`}
-                        className="p-1.5 rounded-md border border-border hover:bg-secondary transition-colors disabled:opacity-40"
+                        className="p-1.5 border border-border hover:bg-secondary transition-colors disabled:opacity-40"
                       >
                         <Plus className="h-3.5 w-3.5" />
                       </button>
@@ -290,7 +290,7 @@ export function Cart({
                       type="button"
                       onClick={() => handleRemove(row.slug)}
                       aria-label={`Remove ${row.slug}`}
-                      className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                      className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -328,14 +328,14 @@ export function Cart({
           <button
             type="button"
             onClick={handleCopyShare}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
           >
             {copied ? <><Check className="h-4 w-4 text-accent" />Copied</> : <><Link2 className="h-4 w-4" />Copy share link</>}
           </button>
           <button
             type="button"
             onClick={() => setPdfOpen(true)}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
           >
             <Mail className="h-4 w-4" />
             Email me a PDF
@@ -343,7 +343,7 @@ export function Cart({
           <button
             type="button"
             onClick={() => setPhase("contact")}
-            className="sm:ml-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity"
+            className="sm:ml-auto inline-flex items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
           >
             Build Team Assistant
             <ArrowRight className="h-4 w-4" />

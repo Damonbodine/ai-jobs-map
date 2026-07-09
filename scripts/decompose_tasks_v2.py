@@ -153,12 +153,16 @@ def save_skills(cur, conn, task_id, skills):
                 ON CONFLICT (skill_code) DO UPDATE SET skill_name = %s
                 RETURNING id
             """, (code, name, cat, f"Task skill", prof, "intermediate", int(ai_dep * 5), name))
-            skill_id = cur.fetchone()[0] if cur.fetchone() else None
-            
+            # RETURNING always yields one row here (insert or conflict-update),
+            # and fetchone() consumes it — call it exactly once.
+            returned = cur.fetchone()
+            skill_id = returned[0] if returned else None
+
             # Re-fetch if needed
             if not skill_id:
                 cur.execute("SELECT id FROM micro_skills WHERE skill_code = %s", (code,))
-                skill_id = cur.fetchone()[0]
+                row = cur.fetchone()
+                skill_id = row[0] if row else None
         
         if skill_id:
             cur.execute("""

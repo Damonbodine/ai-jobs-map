@@ -56,10 +56,15 @@
   --color-input: rgb(10 20 32 / 0.18);
 
   /* radius 0 — the engineering-drawing edge (2px exceptions must be logged
-     in docs/brand-contract.md) */
+     in docs/brand-contract.md). xl–4xl are zeroed too so the ~150 legacy
+     rounded-xl/2xl call sites render square without editing each one. */
   --radius-lg: 0rem;
   --radius-md: 0rem;
   --radius-sm: 0rem;
+  --radius-xl: 0rem;
+  --radius-2xl: 0rem;
+  --radius-3xl: 0rem;
+  --radius-4xl: 0rem;
 }
 
 /* Font utilities resolve to the next/font variables injected on <body>
@@ -87,5 +92,20 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+  /* Faint engineering-grid motif (CRL uses ice-on-ink; here ink-on-ice). */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgb(10 20 32 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(10 20 32 / 0.05) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  /* Mono uppercase section label — the CRL eyebrow. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-muted-foreground);
   }
 }

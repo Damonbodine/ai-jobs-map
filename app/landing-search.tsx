@@ -76,10 +76,10 @@ export function LandingSearch() {
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder='Try "Software Developer" or "Nurse"'
           className={cn(
-            "w-full pl-11 pr-4 py-3 rounded-xl border border-border bg-card shadow-sm",
+            "w-full pl-11 pr-4 py-3 border border-border bg-card",
             "text-sm text-foreground placeholder:text-muted-foreground",
-            "focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent",
-            "transition-shadow"
+            "focus:outline-none focus-within:border-ring",
+            "transition-colors"
           )}
         />
         {loading && (
@@ -88,14 +88,14 @@ export function LandingSearch() {
       </div>
 
       {open && results.length > 0 && (
-        <div className="absolute z-50 w-full mt-2 rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+        <div className="absolute z-50 w-full mt-2 border border-border bg-card overflow-hidden">
           <ul>
             {results.map((item) => (
               <li key={item.id}>
                 <button
                   type="button"
                   onClick={() => handleSelect(item.slug)}
-                  className="w-full text-left px-4 py-3 hover:bg-secondary transition-colors flex flex-col gap-0.5"
+                  className="w-full text-left px-4 py-3 hover:bg-secondary/40 transition-colors flex flex-col gap-0.5"
                 >
                   <span className="text-sm font-medium text-foreground">{item.title}</span>
                   <span className="text-xs text-muted-foreground">{item.major_category}</span>
@@ -107,7 +107,7 @@ export function LandingSearch() {
       )}
 
       {open && query.length >= 2 && !loading && results.length === 0 && (
-        <div className="absolute z-50 w-full mt-2 rounded-xl border border-border bg-card shadow-sm px-4 py-3">
+        <div className="absolute z-50 w-full mt-2 border border-border bg-card px-4 py-3">
           <span className="text-sm text-muted-foreground">No occupations found for "{query}"</span>
         </div>
       )}

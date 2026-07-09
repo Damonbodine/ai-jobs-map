@@ -217,9 +217,10 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen">
       {/* Hero */}
-      <section className="container mx-auto px-4 pt-20 pb-16 text-center">
+      <section className="bg-grid border-b border-border">
+      <div className="container mx-auto px-4 pt-20 pb-16 text-center">
         <FadeIn delay={0}>
-          <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-secondary text-muted-foreground border border-border mb-6">
+          <span className="eyebrow inline-block border border-border bg-card px-3 py-1.5 mb-6">
             Grounded in BLS &amp; O*NET task data
           </span>
         </FadeIn>
@@ -242,7 +243,7 @@ export default async function HomePage() {
           <FadeIn delay={0.25}>
             <Link
               href={`/occupation/${featuredExample.slug}`}
-              className="mt-6 inline-flex items-center gap-3 rounded-xl border border-border bg-card px-5 py-3 text-sm hover:border-ring/40 hover:shadow-md transition-all group"
+              className="mt-6 inline-flex items-center gap-3 border border-border bg-card px-5 py-3 text-sm hover:border-foreground/30 transition-all group"
             >
               <span className="font-medium text-foreground group-hover:text-foreground/80">
                 {featuredExample.title}
@@ -274,11 +275,13 @@ export default async function HomePage() {
             </Link>
           </div>
         </FadeIn>
+      </div>
       </section>
 
       {/* Popular Occupations */}
       <section className="container mx-auto px-4 pb-16">
         <FadeIn delay={0.1}>
+          <div className="eyebrow mb-2">SEC 01 · Popular occupations</div>
           <h2 className="font-heading text-xl font-semibold text-foreground mb-6">Popular occupations</h2>
         </FadeIn>
 
@@ -287,12 +290,12 @@ export default async function HomePage() {
             <StaggerItem key={occ.slug}>
               <Link
                 href={`/occupation/${occ.slug}`}
-                className="flex items-center justify-between px-4 py-3 rounded-xl border border-border bg-card shadow-sm hover:shadow-md hover:border-ring/40 transition-all group"
+                className="flex items-center justify-between px-4 py-3 border border-border bg-card hover:border-foreground/30 transition-all group"
               >
                 <span className="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors">
                   {occ.title}
                 </span>
-                <span className="text-sm font-semibold text-accent ml-4 shrink-0">
+                <span className="font-mono tabular-nums text-sm font-semibold text-accent ml-4 shrink-0">
                   Reclaim {occ.minutes} min/day
                 </span>
               </Link>
@@ -309,7 +312,7 @@ export default async function HomePage() {
               <StaggerItem key={stat.label}>
                 <div className="flex flex-col items-center gap-2">
                   <stat.icon className="h-5 w-5 text-accent" />
-                  <span className="font-heading text-4xl font-bold text-foreground">{stat.value}</span>
+                  <span className="font-mono text-4xl font-bold tabular-nums text-foreground">{stat.value}</span>
                   <span className="text-sm text-muted-foreground">{stat.label}</span>
                 </div>
               </StaggerItem>
@@ -341,7 +344,7 @@ export default async function HomePage() {
 
       {/* ── Demo teaser ─────────────────────────────────────── */}
       <section className="mt-12 mb-10">
-        <Suspense fallback={<div className="h-64 rounded-2xl bg-muted/10 border border-border animate-pulse" />}>
+        <Suspense fallback={<div className="h-64 bg-muted/10 border border-border animate-pulse" />}>
           <DemoTeaser />
         </Suspense>
       </section>
@@ -349,6 +352,7 @@ export default async function HomePage() {
       {/* Browse by Category */}
       <section className="container mx-auto px-4 py-16">
         <FadeIn delay={0.05}>
+          <div className="eyebrow mb-2">SEC 02 · Browse</div>
           <h2 className="font-heading text-xl font-semibold text-foreground mb-6">Browse by category</h2>
         </FadeIn>
 
@@ -359,7 +363,7 @@ export default async function HomePage() {
               <StaggerItem key={cat.slug}>
                 <Link
                   href={`/category/${cat.slug}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border border-border bg-card hover:bg-secondary hover:border-ring/40 transition-all text-foreground"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-border bg-card hover:bg-secondary hover:border-foreground/30 transition-all text-foreground"
                 >
                   {cat.label}
                   {count !== undefined && (
@@ -375,7 +379,8 @@ export default async function HomePage() {
       {/* CTA */}
       <section className="container mx-auto px-4 pb-20">
         <FadeIn>
-          <div className="rounded-2xl border border-border bg-card p-10 text-center shadow-sm">
+          <div className="border border-border bg-card p-10 text-center">
+            <div className="eyebrow mb-3">SEC 03 · Next step</div>
             <h2 className="font-heading text-2xl sm:text-3xl font-bold text-foreground mb-3">
               Ready to reclaim your time?
             </h2>
@@ -385,13 +390,13 @@ export default async function HomePage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/browse"
-                className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg border border-border bg-secondary text-foreground text-sm font-medium hover:bg-muted transition-colors"
+                className="inline-flex items-center justify-center border border-border bg-transparent px-6 py-2.5 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-secondary"
               >
                 Browse all occupations
               </Link>
               <Link
                 href="/build-a-team"
-                className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:opacity-90 transition-opacity"
+                className="inline-flex items-center justify-center bg-cyan px-6 py-2.5 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
               >
                 Plan my team
               </Link>

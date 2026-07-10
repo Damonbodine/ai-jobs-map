@@ -1,0 +1,766 @@
+{
+  "generated": "2026-07-10",
+  "rubric_version": "v2.0-0bc6e57d39a2",
+  "occupation_score": "unweighted mean of task-level AI score v2",
+  "our_occupations_with_soc": 752,
+  "aei_task_join": {
+    "matched_tasks": 3364,
+    "unmatched_tasks": 1
+  },
+  "correlations": {
+    "felten_aioe": {
+      "overlap_n": 654,
+      "spearman_task_score_v2": 0.833,
+      "spearman_composite_score_v2": 0.847,
+      "spearman_recoverable_share_v2": 0.806
+    },
+    "openai_human_beta": {
+      "overlap_n": 752,
+      "spearman_task_score_v2": 0.867,
+      "spearman_composite_score_v2": 0.846,
+      "spearman_recoverable_share_v2": 0.842
+    },
+    "openai_model_beta": {
+      "overlap_n": 752,
+      "spearman_task_score_v2": 0.902,
+      "spearman_composite_score_v2": 0.881,
+      "spearman_recoverable_share_v2": 0.885
+    },
+    "anthropic_economic_index_usage": {
+      "overlap_n": 493,
+      "spearman_task_score_v2": 0.538,
+      "spearman_composite_score_v2": 0.527,
+      "spearman_recoverable_share_v2": 0.522
+    }
+  },
+  "divergences": {
+    "felten_aioe": [
+      {
+        "soc": "27-2021",
+        "title": "Athletes and sports competitors",
+        "our_percentile": 61.5,
+        "index_percentile": 1.8,
+        "rank_gap_pct_points": 59.6,
+        "our_value": 51.1,
+        "index_value": -1.8143
+      },
+      {
+        "soc": "27-2031",
+        "title": "Dancers",
+        "our_percentile": 53.2,
+        "index_percentile": 0.2,
+        "rank_gap_pct_points": 53.1,
+        "our_value": 44.12,
+        "index_value": -2.6698
+      },
+      {
+        "soc": "41-9012",
+        "title": "Models",
+        "our_percentile": 68.2,
+        "index_percentile": 15.6,
+        "rank_gap_pct_points": 52.6,
+        "our_value": 54.77,
+        "index_value": -1.122
+      },
+      {
+        "soc": "51-9081",
+        "title": "Dental laboratory technicians",
+        "our_percentile": 2.4,
+        "index_percentile": 53.4,
+        "rank_gap_pct_points": 50.9,
+        "our_value": 13.2,
+        "index_value": 0.0013
+      },
+      {
+        "soc": "27-1012",
+        "title": "Craft artists",
+        "our_percentile": 74.5,
+        "index_percentile": 23.9,
+        "rank_gap_pct_points": 50.6,
+        "our_value": 57.5,
+        "index_value": -0.9295
+      },
+      {
+        "soc": "27-2032",
+        "title": "Choreographers",
+        "our_percentile": 55.5,
+        "index_percentile": 5.5,
+        "rank_gap_pct_points": 50.0,
+        "our_value": 45.57,
+        "index_value": -1.5758
+      },
+      {
+        "soc": "43-5071",
+        "title": "Shipping receiving and inventory clerks",
+        "our_percentile": 80.7,
+        "index_percentile": 31.5,
+        "rank_gap_pct_points": 49.2,
+        "our_value": 61.43,
+        "index_value": -0.7463
+      },
+      {
+        "soc": "45-2041",
+        "title": "Graders and sorters agricultural products",
+        "our_percentile": 57.0,
+        "index_percentile": 8.9,
+        "rank_gap_pct_points": 48.2,
+        "our_value": 46.22,
+        "index_value": -1.371
+      },
+      {
+        "soc": "49-9061",
+        "title": "Camera and photographic equipment repairers",
+        "our_percentile": 7.5,
+        "index_percentile": 54.6,
+        "rank_gap_pct_points": 47.1,
+        "our_value": 16.86,
+        "index_value": 0.0546
+      },
+      {
+        "soc": "43-5041",
+        "title": "Meter readers utilities",
+        "our_percentile": 67.0,
+        "index_percentile": 21.6,
+        "rank_gap_pct_points": 45.4,
+        "our_value": 53.96,
+        "index_value": -0.9724
+      },
+      {
+        "soc": "23-1023",
+        "title": "Judges magistrate judges and magistrates",
+        "our_percentile": 54.3,
+        "index_percentile": 99.4,
+        "rank_gap_pct_points": 45.1,
+        "our_value": 44.91,
+        "index_value": 1.4965
+      },
+      {
+        "soc": "31-9011",
+        "title": "Massage therapists",
+        "our_percentile": 49.7,
+        "index_percentile": 7.8,
+        "rank_gap_pct_points": 41.9,
+        "our_value": 41.81,
+        "index_value": -1.4102
+      },
+      {
+        "soc": "49-9064",
+        "title": "Watch and clock repairers",
+        "our_percentile": 8.4,
+        "index_percentile": 47.9,
+        "rank_gap_pct_points": 39.4,
+        "our_value": 17.81,
+        "index_value": -0.2124
+      },
+      {
+        "soc": "43-9031",
+        "title": "Desktop publishers",
+        "our_percentile": 99.8,
+        "index_percentile": 60.6,
+        "rank_gap_pct_points": 39.3,
+        "our_value": 85.33,
+        "index_value": 0.3438
+      },
+      {
+        "soc": "53-3031",
+        "title": "Driver/sales workers",
+        "our_percentile": 71.8,
+        "index_percentile": 32.6,
+        "rank_gap_pct_points": 39.2,
+        "our_value": 56.0,
+        "index_value": -0.7293
+      },
+      {
+        "soc": "43-5052",
+        "title": "Postal service mail carriers",
+        "our_percentile": 56.3,
+        "index_percentile": 17.9,
+        "rank_gap_pct_points": 38.4,
+        "our_value": 46.0,
+        "index_value": -1.0647
+      },
+      {
+        "soc": "25-2022",
+        "title": "Middle school teachers except special and career/technical education",
+        "our_percentile": 48.0,
+        "index_percentile": 86.2,
+        "rank_gap_pct_points": 38.2,
+        "our_value": 40.69,
+        "index_value": 1.2864
+      },
+      {
+        "soc": "31-9097",
+        "title": "Phlebotomists",
+        "our_percentile": 7.8,
+        "index_percentile": 45.7,
+        "rank_gap_pct_points": 37.9,
+        "our_value": 17.12,
+        "index_value": -0.2778
+      },
+      {
+        "soc": "43-9021",
+        "title": "Data entry keyers",
+        "our_percentile": 97.9,
+        "index_percentile": 60.2,
+        "rank_gap_pct_points": 37.6,
+        "our_value": 79.57,
+        "index_value": 0.3108
+      },
+      {
+        "soc": "39-9031",
+        "title": "Exercise trainers and group fitness instructors",
+        "our_percentile": 37.6,
+        "index_percentile": 0.3,
+        "rank_gap_pct_points": 37.3,
+        "our_value": 33.09,
+        "index_value": -2.1119
+      }
+    ],
+    "openai_human_beta": [
+      {
+        "soc": "53-1041",
+        "title": "Aircraft cargo handling supervisors",
+        "our_percentile": 79.5,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 75.8,
+        "our_value": 60.83,
+        "index_value": 0.0
+      },
+      {
+        "soc": "13-1074",
+        "title": "Farm labor contractors",
+        "our_percentile": 63.2,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 59.4,
+        "our_value": 52.67,
+        "index_value": 0.0
+      },
+      {
+        "soc": "27-2021",
+        "title": "Athletes and sports competitors",
+        "our_percentile": 60.9,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 57.2,
+        "our_value": 51.1,
+        "index_value": 0.0
+      },
+      {
+        "soc": "31-9094",
+        "title": "Medical transcriptionists",
+        "our_percentile": 99.6,
+        "index_percentile": 44.9,
+        "rank_gap_pct_points": 54.7,
+        "our_value": 84.61,
+        "index_value": 0.2321
+      },
+      {
+        "soc": "31-1122",
+        "title": "Home health and personal care aides",
+        "our_percentile": 7.2,
+        "index_percentile": 57.1,
+        "rank_gap_pct_points": 49.9,
+        "our_value": 16.87,
+        "index_value": 0.3333
+      },
+      {
+        "soc": "39-9011",
+        "title": "Childcare workers",
+        "our_percentile": 13.2,
+        "index_percentile": 58.4,
+        "rank_gap_pct_points": 45.2,
+        "our_value": 20.53,
+        "index_value": 0.3404
+      },
+      {
+        "soc": "43-3031",
+        "title": "Bookkeeping accounting and auditing clerks",
+        "our_percentile": 98.3,
+        "index_percentile": 54.8,
+        "rank_gap_pct_points": 43.5,
+        "our_value": 80.9,
+        "index_value": 0.314
+      },
+      {
+        "soc": "29-1071",
+        "title": "Physician assistants",
+        "our_percentile": 69.1,
+        "index_percentile": 28.6,
+        "rank_gap_pct_points": 40.6,
+        "our_value": 55.2,
+        "index_value": 0.1101
+      },
+      {
+        "soc": "29-1041",
+        "title": "Optometrists",
+        "our_percentile": 56.0,
+        "index_percentile": 16.2,
+        "rank_gap_pct_points": 39.8,
+        "our_value": 46.91,
+        "index_value": 0.05
+      },
+      {
+        "soc": "45-2041",
+        "title": "Graders and sorters agricultural products",
+        "our_percentile": 55.3,
+        "index_percentile": 16.2,
+        "rank_gap_pct_points": 39.2,
+        "our_value": 46.22,
+        "index_value": 0.05
+      },
+      {
+        "soc": "11-1031",
+        "title": "Legislators",
+        "our_percentile": 44.7,
+        "index_percentile": 83.6,
+        "rank_gap_pct_points": 39.0,
+        "our_value": 39.6,
+        "index_value": 0.5167
+      },
+      {
+        "soc": "47-5011",
+        "title": "Derrick operators oil and gas",
+        "our_percentile": 42.4,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 38.7,
+        "our_value": 37.63,
+        "index_value": 0.0
+      },
+      {
+        "soc": "53-7031",
+        "title": "Dredge operators",
+        "our_percentile": 41.6,
+        "index_percentile": 3.7,
+        "rank_gap_pct_points": 37.9,
+        "our_value": 37.28,
+        "index_value": 0.0
+      },
+      {
+        "soc": "53-3031",
+        "title": "Driver/sales workers",
+        "our_percentile": 71.1,
+        "index_percentile": 33.3,
+        "rank_gap_pct_points": 37.8,
+        "our_value": 56.0,
+        "index_value": 0.1389
+      },
+      {
+        "soc": "27-2031",
+        "title": "Dancers",
+        "our_percentile": 51.3,
+        "index_percentile": 14.2,
+        "rank_gap_pct_points": 37.1,
+        "our_value": 44.12,
+        "index_value": 0.0417
+      },
+      {
+        "soc": "39-6012",
+        "title": "Concierges",
+        "our_percentile": 61.2,
+        "index_percentile": 98.3,
+        "rank_gap_pct_points": 37.1,
+        "our_value": 51.27,
+        "index_value": 0.7
+      },
+      {
+        "soc": "45-4022",
+        "title": "Logging equipment operators",
+        "our_percentile": 55.5,
+        "index_percentile": 18.5,
+        "rank_gap_pct_points": 37.0,
+        "our_value": 46.59,
+        "index_value": 0.0625
+      },
+      {
+        "soc": "53-3011",
+        "title": "Ambulance drivers and attendants except emergency medical technicians",
+        "our_percentile": 51.6,
+        "index_percentile": 15.4,
+        "rank_gap_pct_points": 36.2,
+        "our_value": 44.38,
+        "index_value": 0.0455
+      },
+      {
+        "soc": "19-1013",
+        "title": "Soil and plant scientists",
+        "our_percentile": 59.8,
+        "index_percentile": 95.3,
+        "rank_gap_pct_points": 35.5,
+        "our_value": 50.05,
+        "index_value": 0.6304
+      },
+      {
+        "soc": "29-2092",
+        "title": "Hearing aid specialists",
+        "our_percentile": 50.4,
+        "index_percentile": 16.2,
+        "rank_gap_pct_points": 34.2,
+        "our_value": 43.74,
+        "index_value": 0.05
+      }
+    ],
+    "openai_model_beta": [
+      {
+        "soc": "27-2021",
+        "title": "Athletes and sports competitors",
+        "our_percentile": 60.9,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 57.8,
+        "our_value": 51.1,
+        "index_value": 0.0
+      },
+      {
+        "soc": "43-9071",
+        "title": "Office machine operators except computer",
+        "our_percentile": 8.4,
+        "index_percentile": 59.0,
+        "rank_gap_pct_points": 50.7,
+        "our_value": 17.9,
+        "index_value": 0.3971
+      },
+      {
+        "soc": "33-3011",
+        "title": "Bailiffs",
+        "our_percentile": 55.2,
+        "index_percentile": 9.7,
+        "rank_gap_pct_points": 45.5,
+        "our_value": 46.21,
+        "index_value": 0.0357
+      },
+      {
+        "soc": "27-2031",
+        "title": "Dancers",
+        "our_percentile": 51.3,
+        "index_percentile": 7.2,
+        "rank_gap_pct_points": 44.1,
+        "our_value": 44.12,
+        "index_value": 0.0208
+      },
+      {
+        "soc": "47-5011",
+        "title": "Derrick operators oil and gas",
+        "our_percentile": 42.4,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 39.3,
+        "our_value": 37.63,
+        "index_value": 0.0
+      },
+      {
+        "soc": "53-7031",
+        "title": "Dredge operators",
+        "our_percentile": 41.6,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 38.5,
+        "our_value": 37.28,
+        "index_value": 0.0
+      },
+      {
+        "soc": "21-1013",
+        "title": "Marriage and family therapists",
+        "our_percentile": 62.0,
+        "index_percentile": 23.9,
+        "rank_gap_pct_points": 38.0,
+        "our_value": 52.03,
+        "index_value": 0.1111
+      },
+      {
+        "soc": "47-5081",
+        "title": "Helpers extraction workers",
+        "our_percentile": 40.2,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 37.0,
+        "our_value": 36.19,
+        "index_value": 0.0
+      },
+      {
+        "soc": "13-1074",
+        "title": "Farm labor contractors",
+        "our_percentile": 63.2,
+        "index_percentile": 27.9,
+        "rank_gap_pct_points": 35.3,
+        "our_value": 52.67,
+        "index_value": 0.1429
+      },
+      {
+        "soc": "45-2041",
+        "title": "Graders and sorters agricultural products",
+        "our_percentile": 55.3,
+        "index_percentile": 21.5,
+        "rank_gap_pct_points": 33.8,
+        "our_value": 46.22,
+        "index_value": 0.1
+      },
+      {
+        "soc": "51-9061",
+        "title": "Inspectors testers sorters samplers and weighers",
+        "our_percentile": 28.6,
+        "index_percentile": 61.9,
+        "rank_gap_pct_points": 33.3,
+        "our_value": 29.33,
+        "index_value": 0.4167
+      },
+      {
+        "soc": "53-5022",
+        "title": "Motorboat operators",
+        "our_percentile": 35.8,
+        "index_percentile": 3.1,
+        "rank_gap_pct_points": 32.6,
+        "our_value": 33.11,
+        "index_value": 0.0
+      },
+      {
+        "soc": "49-9061",
+        "title": "Camera and photographic equipment repairers",
+        "our_percentile": 7.0,
+        "index_percentile": 39.4,
+        "rank_gap_pct_points": 32.4,
+        "our_value": 16.86,
+        "index_value": 0.24
+      },
+      {
+        "soc": "27-1012",
+        "title": "Craft artists",
+        "our_percentile": 74.1,
+        "index_percentile": 41.8,
+        "rank_gap_pct_points": 32.3,
+        "our_value": 57.5,
+        "index_value": 0.2586
+      },
+      {
+        "soc": "29-1022",
+        "title": "Oral and maxillofacial surgeons",
+        "our_percentile": 42.7,
+        "index_percentile": 10.5,
+        "rank_gap_pct_points": 32.2,
+        "our_value": 37.74,
+        "index_value": 0.04
+      },
+      {
+        "soc": "53-1041",
+        "title": "Aircraft cargo handling supervisors",
+        "our_percentile": 79.5,
+        "index_percentile": 47.7,
+        "rank_gap_pct_points": 31.8,
+        "our_value": 60.83,
+        "index_value": 0.3
+      },
+      {
+        "soc": "27-4012",
+        "title": "Broadcast technicians",
+        "our_percentile": 50.0,
+        "index_percentile": 81.6,
+        "rank_gap_pct_points": 31.6,
+        "our_value": 42.98,
+        "index_value": 0.5238
+      },
+      {
+        "soc": "31-9011",
+        "title": "Massage therapists",
+        "our_percentile": 48.1,
+        "index_percentile": 16.6,
+        "rank_gap_pct_points": 31.5,
+        "our_value": 41.81,
+        "index_value": 0.0741
+      },
+      {
+        "soc": "41-9011",
+        "title": "Demonstrators and product promoters",
+        "our_percentile": 56.5,
+        "index_percentile": 25.1,
+        "rank_gap_pct_points": 31.4,
+        "our_value": 47.09,
+        "index_value": 0.1282
+      },
+      {
+        "soc": "53-3011",
+        "title": "Ambulance drivers and attendants except emergency medical technicians",
+        "our_percentile": 51.6,
+        "index_percentile": 20.2,
+        "rank_gap_pct_points": 31.4,
+        "our_value": 44.38,
+        "index_value": 0.0909
+      }
+    ],
+    "anthropic_economic_index_usage": [
+      {
+        "soc": "43-4141",
+        "title": "New accounts clerks",
+        "our_percentile": 95.1,
+        "index_percentile": 1.9,
+        "rank_gap_pct_points": 93.2,
+        "our_value": 76.32,
+        "index_value": 0.0016
+      },
+      {
+        "soc": "43-5032",
+        "title": "Dispatchers except police fire and ambulance",
+        "our_percentile": 93.1,
+        "index_percentile": 11.1,
+        "rank_gap_pct_points": 82.0,
+        "our_value": 73.67,
+        "index_value": 0.003
+      },
+      {
+        "soc": "33-3012",
+        "title": "Correctional officers and jailers",
+        "our_percentile": 14.7,
+        "index_percentile": 93.3,
+        "rank_gap_pct_points": 78.6,
+        "our_value": 25.62,
+        "index_value": 0.3359
+      },
+      {
+        "soc": "43-4011",
+        "title": "Brokerage clerks",
+        "our_percentile": 98.8,
+        "index_percentile": 25.5,
+        "rank_gap_pct_points": 73.3,
+        "our_value": 82.77,
+        "index_value": 0.0087
+      },
+      {
+        "soc": "35-2014",
+        "title": "Cooks restaurant",
+        "our_percentile": 2.4,
+        "index_percentile": 74.2,
+        "rank_gap_pct_points": 71.8,
+        "our_value": 15.12,
+        "index_value": 0.0846
+      },
+      {
+        "soc": "43-2021",
+        "title": "Telephone operators",
+        "our_percentile": 90.1,
+        "index_percentile": 19.5,
+        "rank_gap_pct_points": 70.6,
+        "our_value": 71.58,
+        "index_value": 0.0056
+      },
+      {
+        "soc": "35-9031",
+        "title": "Hosts and hostesses restaurant lounge and coffee shop",
+        "our_percentile": 20.9,
+        "index_percentile": 91.1,
+        "rank_gap_pct_points": 70.2,
+        "our_value": 30.25,
+        "index_value": 0.2691
+      },
+      {
+        "soc": "43-3061",
+        "title": "Procurement clerks",
+        "our_percentile": 95.5,
+        "index_percentile": 25.5,
+        "rank_gap_pct_points": 70.1,
+        "our_value": 76.48,
+        "index_value": 0.0087
+      },
+      {
+        "soc": "43-9021",
+        "title": "Data entry keyers",
+        "our_percentile": 97.2,
+        "index_percentile": 28.6,
+        "rank_gap_pct_points": 68.6,
+        "our_value": 79.57,
+        "index_value": 0.0105
+      },
+      {
+        "soc": "13-2041",
+        "title": "Credit analysts",
+        "our_percentile": 94.1,
+        "index_percentile": 26.0,
+        "rank_gap_pct_points": 68.2,
+        "our_value": 75.73,
+        "index_value": 0.0088
+      },
+      {
+        "soc": "13-1032",
+        "title": "Insurance appraisers auto damage",
+        "our_percentile": 91.3,
+        "index_percentile": 23.7,
+        "rank_gap_pct_points": 67.5,
+        "our_value": 72.57,
+        "index_value": 0.0075
+      },
+      {
+        "soc": "17-3013",
+        "title": "Mechanical drafters",
+        "our_percentile": 89.5,
+        "index_percentile": 22.6,
+        "rank_gap_pct_points": 66.8,
+        "our_value": 70.57,
+        "index_value": 0.0071
+      },
+      {
+        "soc": "51-9061",
+        "title": "Inspectors testers sorters samplers and weighers",
+        "our_percentile": 19.5,
+        "index_percentile": 85.6,
+        "rank_gap_pct_points": 66.1,
+        "our_value": 29.33,
+        "index_value": 0.1671
+      },
+      {
+        "soc": "17-3031",
+        "title": "Surveying and mapping technicians",
+        "our_percentile": 73.6,
+        "index_percentile": 10.3,
+        "rank_gap_pct_points": 63.3,
+        "our_value": 60.58,
+        "index_value": 0.0028
+      },
+      {
+        "soc": "51-7032",
+        "title": "Patternmakers wood",
+        "our_percentile": 26.8,
+        "index_percentile": 90.1,
+        "rank_gap_pct_points": 63.3,
+        "our_value": 34.03,
+        "index_value": 0.242
+      },
+      {
+        "soc": "43-3051",
+        "title": "Payroll and timekeeping clerks",
+        "our_percentile": 99.2,
+        "index_percentile": 36.5,
+        "rank_gap_pct_points": 62.7,
+        "our_value": 84.36,
+        "index_value": 0.0167
+      },
+      {
+        "soc": "21-2011",
+        "title": "Clergy",
+        "our_percentile": 36.5,
+        "index_percentile": 98.8,
+        "rank_gap_pct_points": 62.3,
+        "our_value": 41.18,
+        "index_value": 0.9706
+      },
+      {
+        "soc": "29-1141",
+        "title": "Registered nurses",
+        "our_percentile": 31.8,
+        "index_percentile": 94.1,
+        "rank_gap_pct_points": 62.3,
+        "our_value": 37.49,
+        "index_value": 0.3614
+      },
+      {
+        "soc": "27-2011",
+        "title": "Actors",
+        "our_percentile": 36.9,
+        "index_percentile": 99.0,
+        "rank_gap_pct_points": 62.1,
+        "our_value": 41.5,
+        "index_value": 1.043
+      },
+      {
+        "soc": "43-4151",
+        "title": "Order clerks",
+        "our_percentile": 93.9,
+        "index_percentile": 31.8,
+        "rank_gap_pct_points": 62.1,
+        "our_value": 75.45,
+        "index_value": 0.0124
+      }
+    ]
+  }
+}

@@ -1,10 +1,27 @@
 # DG1 — Benchmark validation against published AI-exposure indices
 
-**Date:** 2026-07-09 · **Status: GATE FIRED — do not publish these numbers; DG3 re-scoring is a prerequisite for marketing the composite.**
+**Date:** 2026-07-10 · **Status: DG3 V2 GATE PASSED. Production still reads v1 until the planned DG7 cutover.**
 
-Reproduce: `npx tsx scripts/benchmarks/export-our-scores.ts && python3 scripts/benchmarks/compute_correlations.py`. Sources and citations: `data/benchmarks/raw/SOURCES.md`. Machine-readable results: `data/benchmarks/correlations.json`.
+Reproduce v1: `npx tsx scripts/benchmarks/export-our-scores.ts && python3 scripts/benchmarks/compute_correlations.py`. Reproduce v2 after merging scores: `python3 scripts/rescore/build_occupation_scores.py && python3 scripts/rescore/benchmark_v2.py`. Sources and citations: `data/benchmarks/raw/SOURCES.md`. Machine-readable results: `data/benchmarks/correlations.json` (v1) and `data/benchmarks/correlations_v2.json` (v2).
 
-## Results
+## DG3 v2 results — gate passed
+
+The parallel v2 composite replaces the 20% keyword dimension with the mean validated task-level v2 score; all other dimensions and weights remain unchanged. No production data was overwritten.
+
+| Index | Overlap (n) | ρ vs task score v2 | ρ vs composite v2 | ρ vs recoverable share v2 |
+|---|---:|---:|---:|---:|
+| Felten/Raj/Seamans AIOE (2021) | 654 | 0.833 | **0.847** | 0.806 |
+| OpenAI "GPTs are GPTs" — human ratings (β) | 752 | 0.867 | **0.846** | 0.842 |
+| OpenAI "GPTs are GPTs" — model ratings (β) | 752 | 0.902 | **0.881** | 0.885 |
+| Anthropic Economic Index — usage share | 493 | 0.538 | 0.527 | 0.522 |
+
+The acceptance target was ρ ≥ 0.70 against AIOE and OpenAI human β. Composite v2 clears both targets by more than 0.14.
+
+The 200-task pilot was independently re-scored during the full run. Test-retest consistency was ρ=0.987, mean absolute score difference 2.54 points, 97.5% within 10 points, and 90% exact blocker agreement. Reproduce with `python3 scripts/rescore/compare_pilot.py`; machine-readable results are in `data/scoring/pilot_consistency.json`.
+
+Across 826 occupations, composite v2 has mean 46.33 and median 46.52 versus v1 mean 53.31 and median 52.10. The largest decreases are manual occupations previously inflated by keywords (tool grinders, food-preparation workers, textile and crushing-machine operators); the largest increases include data scientists and computer occupations. The full mover list is reproducible with `python3 scripts/rescore/compare_v1_v2.py` and stored in `data/scoring/comparison_v1_v2.json`.
+
+## DG1 v1 baseline — gate fired
 
 Spearman rank correlation of our scores against three published indices, on the SOC-code overlap:
 
@@ -32,7 +49,7 @@ Spearman rank correlation of our scores against three published indices, on the 
 
 ## Actions
 
-- **Do not publish** current composite scores as "validated" or cite these correlations in marketing. The methodology-page benchmark section waits for post-DG3 numbers.
-- **DG3 rubric requirement (new):** the strong-model re-score must explicitly rate physical embodiment as a blocker, and the composite must drop the keyword dimension (this analysis is the evidence for why).
-- **DG3 acceptance target:** post-re-score composite reaches ρ ≥ 0.7 vs AIOE and OpenAI human β; the physical-occupation divergence list shrinks to near-empty. Re-run this script (it is deterministic) and update this document.
+- **Do not publish the current production v1 composite as validated.** The validated v2 signal remains parallel until DG7 performs the explicit cutover and changelog.
+- **DG3 acceptance target: passed.** Composite v2 reaches ρ=0.847 vs AIOE and ρ=0.846 vs OpenAI human β.
+- **Next validation gate:** DG4 human labeling and agreement statistics. Published-index agreement does not replace task-level human review.
 - **DG5 note:** archetype multipliers proved directionally right (they carry the displayed model from 0.29→0.46+); grounding them properly should come from the re-scored task blockers rather than the physical_ability_avg threshold.

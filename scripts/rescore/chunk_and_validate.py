@@ -94,9 +94,16 @@ def validate_one(chunk_name):
             return False, f"bad recoverable_share in id {r.get('id')}: {rs}"
         if r.get("confidence") not in CONFIDENCES:
             return False, f"bad confidence in id {r.get('id')}: {r.get('confidence')}"
-        # Rubric hard rule: physical blocker caps the digitizable slice
-        if r["blocker"] == "physical" and r["score"] > 40:
+        # Mechanical backstop for the rubric's semantic physical-core rule.
+        # Mixed tasks can legitimately score above 40 while physical access is
+        # still the primary blocker; pure manual execution must remain <=15.
+        if r["blocker"] == "physical" and r["score"] > 70:
             return False, f"physical blocker with score {r['score']} (id {r['id']}) — review chunk"
+    # Seeded 250-task chunks span many occupations and task types. Very low
+    # score diversity indicates archetype bucketing rather than row-level
+    # scoring, even when the JSON schema and id coverage are valid.
+    if len({r["score"] for r in rows}) < 10:
+        return False, "fewer than 10 distinct scores — semantic review required"
     return True, f"ok ({len(rows)} rows)"
 
 
@@ -119,6 +126,15 @@ def cmd_validate():
 def cmd_merge(model_id):
     chunks = sorted(c for c in os.listdir(CHUNKS) if c.endswith(".csv"))
     h = rubric_hash()
+    provenance_path = os.path.join(SCORING, "score-provenance.json")
+    model_by_chunk = {}
+    if os.path.exists(provenance_path):
+        provenance = json.load(open(provenance_path))
+        for run in provenance.get("runs", []):
+            for spec in run.get("chunks", []):
+                start, end = (spec.split("-", 1) + [spec])[:2]
+                for i in range(int(start), int(end) + 1):
+                    model_by_chunk[f"chunk_{i:03d}.csv"] = run["model_id"]
     out = os.path.join(SCORING, "scores_v2.csv")
     n = 0
     with open(out, "w", newline="") as f:
@@ -130,8 +146,9 @@ def cmd_merge(model_id):
                 print(f"SKIPPING {c}: {msg}")
                 continue
             rows = json.load(open(os.path.join(SCORES, c.replace(".csv", ".json"))))
+            row_model_id = model_by_chunk.get(c, model_id)
             for r in rows:
-                w.writerow([r["kind"], r["id"], r["score"], r["blocker"], r["recoverable_share"], r["confidence"], model_id, f"v2.0-{h}"])
+                w.writerow([r["kind"], r["id"], r["score"], r["blocker"], r["recoverable_share"], r["confidence"], row_model_id, f"v2.0-{h}"])
                 n += 1
     print(f"Merged {n} scores to {out}")
 

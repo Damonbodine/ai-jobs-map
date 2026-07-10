@@ -1,0 +1,20 @@
+{
+  "rubric_version": "v2.0-0bc6e57d39a2",
+  "runs": [
+    {
+      "model_id": "claude-fable-5",
+      "date": "2026-07-09",
+      "chunks": ["000-027", "030-032"]
+    },
+    {
+      "model_id": "codex-gpt-5",
+      "date": "2026-07-10",
+      "chunks": ["028-029", "033-100"]
+    }
+  ],
+  "semantic_qa": {
+    "diversity_guard_min_distinct_scores": 10,
+    "quarantined_and_fully_rescored_chunks": ["055", "080", "089"],
+    "physical_core_rule": "Pure manual or embodied task execution scores 15 or below."
+  }
+}

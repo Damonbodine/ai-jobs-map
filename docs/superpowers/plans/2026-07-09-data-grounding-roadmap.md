@@ -68,6 +68,8 @@
 
 ## DG3 — Task re-scoring with one strong model
 
+**Scoring phase completed 2026-07-10:** all 25,122 tasks validated and merged under rubric `v2.0-0bc6e57d39a2`. The parallel composite passes the DG1 gate (ρ=0.847 vs AIOE; ρ=0.846 vs OpenAI human β), and the 200-task test-retest check reaches ρ=0.987. Database parallel-column ingestion remains a separate follow-on; production still reads v1.
+
 **Why:** The headline number is keyword-regex all the way down (`import-onet-tasks.py`: base 75, ±30/±20/+15 adjustments, substring matches like "log" in "geological"), and micro-task impact/effort ratings come from rotating free 1.2B–9B models with no validation. This is the load-bearing fix.
 
 **Design decisions to put to Damon before kickoff:**

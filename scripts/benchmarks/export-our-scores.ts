@@ -23,7 +23,9 @@ async function main() {
   const occs = (await db.execute(sql`
     SELECT o.id, o.slug, o.title,
            p.composite_score, p.time_range_low, p.time_range_high,
-           p.physical_ability_avg
+           p.physical_ability_avg, p.ability_automation_potential,
+           p.work_activity_automation_potential,
+           p.knowledge_digital_readiness, p.task_frequency_weight
     FROM occupations o
     LEFT JOIN occupation_automation_profile p ON p.occupation_id = o.id
     ORDER BY o.id
@@ -35,6 +37,10 @@ async function main() {
     time_range_low: number | null
     time_range_high: number | null
     physical_ability_avg: number | null
+    ability_automation_potential: number | null
+    work_activity_automation_potential: number | null
+    knowledge_digital_readiness: number | null
+    task_frequency_weight: number | null
   }>
 
   const socRows = (await db.execute(sql`
@@ -74,7 +80,7 @@ async function main() {
   }
 
   const lines = [
-    "occupation_id,slug,title,soc_code,soc_confidence,composite_score,displayed_minutes,time_range_low,time_range_high",
+    "occupation_id,slug,title,soc_code,soc_confidence,composite_score,displayed_minutes,time_range_low,time_range_high,ability_automation_potential,work_activity_automation_potential,knowledge_digital_readiness,task_frequency_weight",
   ]
   let withSoc = 0
   for (const o of occs) {
@@ -110,6 +116,10 @@ async function main() {
         displayedMinutes,
         o.time_range_low ?? "",
         o.time_range_high ?? "",
+        o.ability_automation_potential ?? "",
+        o.work_activity_automation_potential ?? "",
+        o.knowledge_digital_readiness ?? "",
+        o.task_frequency_weight ?? "",
       ].join(",")
     )
   }

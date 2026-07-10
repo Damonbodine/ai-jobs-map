@@ -79,7 +79,7 @@ export function RoleBuilder({
             <div
               className={cn(
                 "border-l-4 px-4 py-3 flex items-center justify-between gap-3",
-                allSelected ? "bg-card" : someSelected ? "bg-secondary/10" : "bg-card"
+                someSelected && !allSelected ? "bg-secondary/10" : "bg-card"
               )}
               style={{ borderLeftColor: accent }}
             >
@@ -93,7 +93,7 @@ export function RoleBuilder({
                   </div>
                 )}
                 <div className="min-w-0">
-                  <p className={cn("text-sm font-semibold", allSelected ? "text-foreground" : "text-foreground")}>
+                  <p className="text-sm font-semibold text-foreground">
                     {definition?.label ?? moduleKey}
                     <span className="ml-2 font-mono text-xs font-normal text-muted-foreground tabular-nums">
                       {groupMinutes} min/day
@@ -117,7 +117,7 @@ export function RoleBuilder({
                     ? "bg-primary text-primary-foreground hover:opacity-90"
                     : someSelected
                     ? "bg-secondary text-foreground hover:bg-secondary/80"
-                    : "bg-accent text-white hover:opacity-90"
+                    : "bg-accent text-accent-foreground hover:opacity-90"
                 )}
               >
                 <Check className="h-3 w-3" />

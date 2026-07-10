@@ -291,7 +291,7 @@ export function OccupationBuilder({
               <div
                 className={cn(
                   "border-l-4 px-4 py-4 sm:px-5",
-                  allSelected ? "bg-card" : someSelected ? "bg-secondary/10" : "bg-card"
+                  someSelected && !allSelected ? "bg-secondary/10" : "bg-card"
                 )}
                 style={{ borderLeftColor: accent }}
               >
@@ -308,23 +308,14 @@ export function OccupationBuilder({
                       ) : null}
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                          <h3 className={cn(
-                            "font-heading text-lg font-semibold tracking-tight",
-                            allSelected ? "text-foreground" : "text-foreground"
-                          )}>
+                          <h3 className="font-heading text-lg font-semibold tracking-tight text-foreground">
                             {definition?.label ?? moduleKey}
                           </h3>
-                          <div className={cn(
-                            "text-sm font-medium tabular-nums",
-                            allSelected ? "text-foreground/80" : "text-foreground/80"
-                          )}>
+                          <div className="font-mono text-sm font-medium tabular-nums text-foreground/80">
                             {groupMinutes} min/day
                           </div>
                         </div>
-                        <p className={cn(
-                          "mt-1 text-sm",
-                          allSelected ? "text-muted-foreground" : "text-muted-foreground"
-                        )}>
+                        <p className="mt-1 text-sm text-muted-foreground">
                           {definition?.description ?? "Bundle related work into one assistant scope."}
                         </p>
                         <button
@@ -360,7 +351,7 @@ export function OccupationBuilder({
                           ? "bg-primary text-primary-foreground hover:opacity-90"
                           : someSelected
                             ? "bg-secondary text-foreground hover:bg-secondary/80"
-                            : "bg-accent text-white hover:opacity-90"
+                            : "bg-accent text-accent-foreground hover:opacity-90"
                       )}
                     >
                       <Check className="h-4 w-4" />

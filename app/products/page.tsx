@@ -124,7 +124,7 @@ export default async function ProductsPage() {
           <div className="border border-accent bg-accent/[0.03] p-5 h-full flex flex-col">
             <div className="eyebrow mb-2" style={{ color: "var(--color-accent)" }}>Most common</div>
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-accent text-foreground flex items-center justify-center">
+              <div className="w-9 h-9 rounded-lg bg-accent text-accent-foreground flex items-center justify-center">
                 <Workflow className="h-4 w-4" />
               </div>
               <div>

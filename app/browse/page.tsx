@@ -200,7 +200,7 @@ export default async function BrowsePage(props: {
               <StaggerItem key={occ.id}>
                 <Link
                   href={`/occupation/${occ.slug}`}
-                  className="group flex items-center justify-between rounded-xl border border-border bg-card p-4 hover:shadow-md hover:border-ring/40 transition-all"
+                  className="group flex items-center justify-between border border-border bg-card p-4 hover:border-foreground/30 transition-all"
                 >
                   <div className="min-w-0 flex-1">
                     <div
@@ -216,7 +216,7 @@ export default async function BrowsePage(props: {
                   <div className="flex items-center gap-3 ml-3 shrink-0">
                     {estimatedMinutes !== null && (
                       <div className="text-right">
-                        <div className="font-heading text-lg font-bold text-accent">
+                        <div className="font-mono text-lg font-bold tabular-nums text-accent">
                           {estimatedMinutes}
                         </div>
                         <div className="text-[10px] text-muted-foreground">min/day</div>

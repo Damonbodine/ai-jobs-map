@@ -33,7 +33,7 @@ export function BrowseFilters({ currentCategory, currentSort }: BrowseFiltersPro
           <button
             onClick={() => updateParams({ category: null, page: "1" })}
             className={cn(
-              "px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors whitespace-nowrap flex-shrink-0",
+              "px-3 py-1.5 text-xs font-medium border transition-colors whitespace-nowrap flex-shrink-0",
               !currentCategory
                 ? "bg-foreground text-background border-foreground"
                 : "border-border hover:bg-secondary"
@@ -51,7 +51,7 @@ export function BrowseFilters({ currentCategory, currentSort }: BrowseFiltersPro
                 })
               }
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors whitespace-nowrap flex-shrink-0",
+                "px-3 py-1.5 text-xs font-medium border transition-colors whitespace-nowrap flex-shrink-0",
                 currentCategory === cat.slug
                   ? "bg-foreground text-background border-foreground"
                   : "border-border hover:bg-secondary"
@@ -63,7 +63,7 @@ export function BrowseFilters({ currentCategory, currentSort }: BrowseFiltersPro
         </div>
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background via-background/80 to-transparent sm:hidden"
+          className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-background sm:hidden"
         />
       </div>
 
@@ -71,7 +71,7 @@ export function BrowseFilters({ currentCategory, currentSort }: BrowseFiltersPro
       <select
         value={currentSort}
         onChange={(e) => updateParams({ sort: e.target.value, page: "1" })}
-        className="h-9 px-3 rounded-lg border border-input bg-card text-xs w-full sm:w-auto sm:self-end"
+        className="h-9 px-3 border border-input bg-card text-xs w-full sm:w-auto sm:self-end"
       >
         <option value="title">Sort: A-Z</option>
         <option value="time_back">Sort: Time Saved</option>

@@ -178,7 +178,7 @@ export default async function CategoryPage(props: {
             <Link
               key={c.slug}
               href={`/category/${c.slug}`}
-              className="px-3 py-1.5 rounded-lg border border-border text-xs font-medium hover:bg-secondary transition-colors whitespace-nowrap flex-shrink-0"
+              className="px-3 py-1.5 border border-border text-xs font-medium hover:bg-secondary transition-colors whitespace-nowrap flex-shrink-0"
             >
               {c.label}
             </Link>
@@ -186,7 +186,7 @@ export default async function CategoryPage(props: {
         </div>
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background via-background/80 to-transparent sm:hidden"
+          className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-background sm:hidden"
         />
       </div>
 
@@ -204,7 +204,7 @@ export default async function CategoryPage(props: {
             <StaggerItem key={occ.id}>
               <Link
                 href={`/occupation/${occ.slug}`}
-                className="group flex items-center justify-between rounded-xl border border-border bg-card p-4 hover:shadow-md hover:border-ring/40 transition-all"
+                className="group flex items-center justify-between border border-border bg-card p-4 hover:border-foreground/30 transition-all"
               >
                 <div className="min-w-0 flex-1">
                   <div
@@ -222,7 +222,7 @@ export default async function CategoryPage(props: {
                 <div className="flex items-center gap-3 ml-3 shrink-0">
                   {occ.minutes !== null && (
                     <div className="text-right">
-                      <div className="font-heading text-lg font-bold text-accent">
+                      <div className="font-mono text-lg font-bold tabular-nums text-accent">
                         {occ.minutes}
                       </div>
                       <div className="text-[10px] text-muted-foreground">min/day</div>

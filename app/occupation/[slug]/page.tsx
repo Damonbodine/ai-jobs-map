@@ -70,8 +70,7 @@ export default async function OccupationPage(props: {
   const aiTasks = tasks.filter((task) => task.ai_applicable)
   const { displayedMinutes, displayedLow, displayedHigh } = computeDisplayedTimeback(
     profile,
-    tasks,
-    blueprint?.totalMinutesSaved ?? 0
+    tasks
   )
   const archetypeMultiplier = inferArchetypeMultiplier(profile)
   // Headline claim is the central estimate — the same figure the homepage

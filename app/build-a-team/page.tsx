@@ -147,7 +147,7 @@ export default async function BuildATeamPage({
         const archetypeMultiplier = inferArchetypeMultiplier(roleData.profile)
         const aiTasks = roleData.tasks.filter(t => t.ai_applicable)
         const rawTotal = aiTasks.reduce((s, t) => s + estimateTaskMinutes(t) * archetypeMultiplier, 0)
-        const { displayedMinutes } = computeDisplayedTimeback(roleData.profile, roleData.tasks, rawTotal)
+        const { displayedMinutes } = computeDisplayedTimeback(roleData.profile, roleData.tasks)
 
         const taskItems = aiTasks.map(task => {
           const raw = estimateTaskMinutes(task) * archetypeMultiplier

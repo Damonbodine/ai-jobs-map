@@ -1,0 +1,8 @@
+{
+  "n": 200,
+  "score_spearman": 0.987,
+  "score_mae": 2.54,
+  "score_within_10_points_share": 0.975,
+  "blocker_agreement_share": 0.9,
+  "confidence_agreement_share": 0.9
+}

@@ -1,0 +1,381 @@
+{
+  "generated": "2026-07-10",
+  "n": 826,
+  "v1_distribution": {
+    "min": 40.2,
+    "mean": 53.311,
+    "median": 52.1,
+    "max": 74.1
+  },
+  "v2_distribution": {
+    "min": 9.167,
+    "mean": 46.331,
+    "median": 46.522,
+    "max": 75.444
+  },
+  "v1_v2_spearman": 0.338,
+  "largest_increases": [
+    {
+      "occupation_id": 296,
+      "slug": "media-and-communication-workers-all-other",
+      "title": "Media and communication workers all other",
+      "soc_code": "",
+      "composite_v1": 56.8,
+      "composite_v2": 70.778,
+      "delta": 13.978
+    },
+    {
+      "occupation_id": 89,
+      "slug": "data-scientists",
+      "title": "Data scientists",
+      "soc_code": "15-2051",
+      "composite_v1": 56.5,
+      "composite_v2": 69.389,
+      "delta": 12.889
+    },
+    {
+      "occupation_id": 792,
+      "slug": "motor-vehicle-operators-all-other",
+      "title": "Motor vehicle operators all other",
+      "soc_code": "",
+      "composite_v1": 58.8,
+      "composite_v2": 71.056,
+      "delta": 12.256
+    },
+    {
+      "occupation_id": 84,
+      "slug": "computer-occupations-all-other",
+      "title": "Computer occupations all other",
+      "soc_code": "",
+      "composite_v1": 63.4,
+      "composite_v2": 75.444,
+      "delta": 12.044
+    },
+    {
+      "occupation_id": 494,
+      "slug": "sales-and-related-workers-all-other",
+      "title": "Sales and related workers all other",
+      "soc_code": "",
+      "composite_v1": 55.6,
+      "composite_v2": 67.472,
+      "delta": 11.872
+    },
+    {
+      "occupation_id": 160,
+      "slug": "social-scientists-and-related-workers-all-other",
+      "title": "Social scientists and related workers all other",
+      "soc_code": "",
+      "composite_v1": 53.1,
+      "composite_v2": 62.722,
+      "delta": 9.622
+    },
+    {
+      "occupation_id": 52,
+      "slug": "compensation-benefits-and-job-analysis-specialists",
+      "title": "Compensation benefits and job analysis specialists",
+      "soc_code": "13-1141",
+      "composite_v1": 44.8,
+      "composite_v2": 54.118,
+      "delta": 9.318
+    },
+    {
+      "occupation_id": 83,
+      "slug": "web-and-digital-interface-designers",
+      "title": "Web and digital interface designers",
+      "soc_code": "15-1255",
+      "composite_v1": 51.6,
+      "composite_v2": 60.687,
+      "delta": 9.087
+    },
+    {
+      "occupation_id": 276,
+      "slug": "designers-all-other",
+      "title": "Designers all other",
+      "soc_code": "",
+      "composite_v1": 59.0,
+      "composite_v2": 67.528,
+      "delta": 8.528
+    },
+    {
+      "occupation_id": 219,
+      "slug": "social-sciences-teachers-postsecondary-all-other",
+      "title": "Social sciences teachers postsecondary all other",
+      "soc_code": "",
+      "composite_v1": 58.4,
+      "composite_v2": 66.556,
+      "delta": 8.156
+    },
+    {
+      "occupation_id": 188,
+      "slug": "community-and-social-service-specialists-all-other",
+      "title": "Community and social service specialists all other",
+      "soc_code": "",
+      "composite_v1": 51.4,
+      "composite_v2": 59.194,
+      "delta": 7.794
+    },
+    {
+      "occupation_id": 236,
+      "slug": "postsecondary-teachers-all-other",
+      "title": "Postsecondary teachers all other",
+      "soc_code": "",
+      "composite_v1": 56.9,
+      "composite_v2": 64.538,
+      "delta": 7.639
+    },
+    {
+      "occupation_id": 55,
+      "slug": "business-operations-specialists-all-other",
+      "title": "Business operations specialists all other",
+      "soc_code": "",
+      "composite_v1": 55.1,
+      "composite_v2": 62.59,
+      "delta": 7.49
+    },
+    {
+      "occupation_id": 482,
+      "slug": "securities-commodities-and-financial-services-sales-agents",
+      "title": "Securities commodities and financial services sales agents",
+      "soc_code": "41-3031",
+      "composite_v1": 52.1,
+      "composite_v2": 59.377,
+      "delta": 7.277
+    },
+    {
+      "occupation_id": 548,
+      "slug": "office-and-administrative-support-workers-all-other",
+      "title": "Office and administrative support workers all other",
+      "soc_code": "",
+      "composite_v1": 67.2,
+      "composite_v2": 74.389,
+      "delta": 7.189
+    },
+    {
+      "occupation_id": 7,
+      "slug": "public-relations-managers",
+      "title": "Public relations managers",
+      "soc_code": "11-2032",
+      "composite_v1": 52.9,
+      "composite_v2": 59.556,
+      "delta": 6.656
+    },
+    {
+      "occupation_id": 515,
+      "slug": "interviewers-except-eligibility-and-loan",
+      "title": "Interviewers except eligibility and loan",
+      "soc_code": "43-4111",
+      "composite_v1": 56.4,
+      "composite_v2": 62.952,
+      "delta": 6.552
+    },
+    {
+      "occupation_id": 69,
+      "slug": "financial-specialists-all-other",
+      "title": "Financial specialists all other",
+      "soc_code": "",
+      "composite_v1": 53.6,
+      "composite_v2": 60.139,
+      "delta": 6.539
+    },
+    {
+      "occupation_id": 394,
+      "slug": "first-line-supervisors-of-protective-service-workers-all-other",
+      "title": "First-line supervisors of protective service workers all other",
+      "soc_code": "",
+      "composite_v1": 60.6,
+      "composite_v2": 67.139,
+      "delta": 6.539
+    },
+    {
+      "occupation_id": 435,
+      "slug": "building-cleaning-workers-all-other",
+      "title": "Building cleaning workers all other",
+      "soc_code": "",
+      "composite_v1": 55.3,
+      "composite_v2": 61.708,
+      "delta": 6.408
+    }
+  ],
+  "largest_decreases": [
+    {
+      "occupation_id": 712,
+      "slug": "tool-grinders-filers-and-sharpeners",
+      "title": "Tool grinders filers and sharpeners",
+      "soc_code": "51-4194",
+      "composite_v1": 71.4,
+      "composite_v2": 25.889,
+      "delta": -45.511
+    },
+    {
+      "occupation_id": 430,
+      "slug": "food-preparation-and-serving-related-workers-all-other",
+      "title": "Food preparation and serving related workers all other",
+      "soc_code": "",
+      "composite_v1": 70.8,
+      "composite_v2": 25.611,
+      "delta": -45.189
+    },
+    {
+      "occupation_id": 727,
+      "slug": "textile-winding-twisting-and-drawing-out-machine-setters-operators-and-tenders",
+      "title": "Textile winding twisting and drawing out machine setters operators and tenders",
+      "soc_code": "51-6064",
+      "composite_v1": 59.1,
+      "composite_v2": 15.095,
+      "delta": -44.005
+    },
+    {
+      "occupation_id": 750,
+      "slug": "crushing-grinding-and-polishing-machine-setters-operators-and-tenders",
+      "title": "Crushing grinding and polishing machine setters operators and tenders",
+      "soc_code": "51-9021",
+      "composite_v1": 74.1,
+      "composite_v2": 30.222,
+      "delta": -43.878
+    },
+    {
+      "occupation_id": 755,
+      "slug": "extruding-forming-pressing-and-compacting-machine-setters-operators-and-tenders",
+      "title": "Extruding forming pressing and compacting machine setters operators and tenders",
+      "soc_code": "51-9041",
+      "composite_v1": 70.6,
+      "composite_v2": 27.488,
+      "delta": -43.112
+    },
+    {
+      "occupation_id": 421,
+      "slug": "cooks-all-other",
+      "title": "Cooks all other",
+      "soc_code": "",
+      "composite_v1": 51.7,
+      "composite_v2": 9.167,
+      "delta": -42.533
+    },
+    {
+      "occupation_id": 416,
+      "slug": "cooks-fast-food",
+      "title": "Cooks fast food",
+      "soc_code": "35-2011",
+      "composite_v1": 70.0,
+      "composite_v2": 30.197,
+      "delta": -39.803
+    },
+    {
+      "occupation_id": 700,
+      "slug": "pourers-and-casters-metal",
+      "title": "Pourers and casters metal",
+      "soc_code": "51-4052",
+      "composite_v1": 60.5,
+      "composite_v2": 21.064,
+      "delta": -39.436
+    },
+    {
+      "occupation_id": 708,
+      "slug": "welding-soldering-and-brazing-machine-setters-operators-and-tenders",
+      "title": "Welding soldering and brazing machine setters operators and tenders",
+      "soc_code": "51-4122",
+      "composite_v1": 66.8,
+      "composite_v2": 29.382,
+      "delta": -37.418
+    },
+    {
+      "occupation_id": 763,
+      "slug": "coating-painting-and-spraying-machine-setters-operators-and-tenders",
+      "title": "Coating painting and spraying machine setters operators and tenders",
+      "soc_code": "51-9124",
+      "composite_v1": 63.5,
+      "composite_v2": 26.409,
+      "delta": -37.091
+    },
+    {
+      "occupation_id": 596,
+      "slug": "helpers-painters-paperhangers-plasterers-and-stucco-masons",
+      "title": "Helpers painters paperhangers plasterers and stucco masons",
+      "soc_code": "47-3014",
+      "composite_v1": 73.8,
+      "composite_v2": 37.017,
+      "delta": -36.783
+    },
+    {
+      "occupation_id": 453,
+      "slug": "locker-room-coatroom-and-dressing-room-attendants",
+      "title": "Locker room coatroom and dressing room attendants",
+      "soc_code": "39-3093",
+      "composite_v1": 67.0,
+      "composite_v2": 30.384,
+      "delta": -36.616
+    },
+    {
+      "occupation_id": 450,
+      "slug": "ushers-lobby-attendants-and-ticket-takers",
+      "title": "Ushers lobby attendants and ticket takers",
+      "soc_code": "39-3031",
+      "composite_v1": 68.4,
+      "composite_v2": 32.173,
+      "delta": -36.227
+    },
+    {
+      "occupation_id": 581,
+      "slug": "insulation-workers-floor-ceiling-and-wall",
+      "title": "Insulation workers floor ceiling and wall",
+      "soc_code": "47-2131",
+      "composite_v1": 66.3,
+      "composite_v2": 31.316,
+      "delta": -34.984
+    },
+    {
+      "occupation_id": 597,
+      "slug": "helpers-pipelayers-plumbers-pipefitters-and-steamfitters",
+      "title": "Helpers pipelayers plumbers pipefitters and steamfitters",
+      "soc_code": "47-3015",
+      "composite_v1": 68.0,
+      "composite_v2": 33.046,
+      "delta": -34.954
+    },
+    {
+      "occupation_id": 825,
+      "slug": "tank-car-truck-and-ship-loaders",
+      "title": "Tank car truck and ship loaders",
+      "soc_code": "53-7121",
+      "composite_v1": 64.1,
+      "composite_v2": 29.56,
+      "delta": -34.54
+    },
+    {
+      "occupation_id": 704,
+      "slug": "molding-coremaking-and-casting-machine-setters-operators-and-tenders-metal-and-plastic",
+      "title": "Molding coremaking and casting machine setters operators and tenders metal and plastic",
+      "soc_code": "51-4072",
+      "composite_v1": 64.3,
+      "composite_v2": 30.152,
+      "delta": -34.148
+    },
+    {
+      "occupation_id": 594,
+      "slug": "helpers-carpenters",
+      "title": "Helpers carpenters",
+      "soc_code": "47-3012",
+      "composite_v1": 62.2,
+      "composite_v2": 28.069,
+      "delta": -34.131
+    },
+    {
+      "occupation_id": 718,
+      "slug": "pressers-textile-garment-and-related-materials",
+      "title": "Pressers textile garment and related materials",
+      "soc_code": "51-6021",
+      "composite_v1": 63.6,
+      "composite_v2": 29.711,
+      "delta": -33.889
+    },
+    {
+      "occupation_id": 373,
+      "slug": "home-health-and-personal-care-aides",
+      "title": "Home health and personal care aides",
+      "soc_code": "31-1122",
+      "composite_v1": 66.7,
+      "composite_v2": 32.913,
+      "delta": -33.787
+    }
+  ]
+}

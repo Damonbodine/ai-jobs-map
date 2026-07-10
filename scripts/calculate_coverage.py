@@ -162,7 +162,10 @@ def calculate_occupation_coverage(occupation_id=None):
                 aw.base_price,
                 aw.estimated_time_saved_per_day
             FROM automation_workflows aw
-            WHERE aw.id IN (
+            -- Workflows bundle actions via their action_ids array; matching
+            -- must be array overlap, not workflow-id-equals-action-id (the
+            -- old join compared IDs from two unrelated sequences).
+            WHERE aw.action_ids && ARRAY(
                 SELECT DISTINCT ttm.action_id
                 FROM task_to_action_mapping ttm
                 JOIN automation_actions aa ON ttm.action_id = aa.id

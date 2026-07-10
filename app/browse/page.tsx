@@ -1,18 +1,83 @@
 export const dynamic = "force-dynamic"
 
 import Link from "next/link"
+import { unstable_cache } from "next/cache"
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
 import { db } from "@/lib/db/client"
 import { occupations, occupationAutomationProfile, jobMicroTasks } from "@/lib/db/schema"
-import { eq, inArray, sql } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { CATEGORIES } from "@/lib/categories"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 import { BrowseFilters } from "./filters"
 import { computeDisplayedTimeback } from "@/lib/timeback"
-import { generateBlueprint } from "@/lib/blueprint"
-import type { AutomationProfile, MicroTask, Occupation } from "@/types"
+import { filterSortPage, type BrowseOccupation } from "@/lib/browse"
+import type { AutomationProfile, MicroTask } from "@/types"
 
 const PAGE_SIZE = 24
+
+// Canonical estimates for every occupation, refreshed hourly. Sorting by
+// time back must rank the WHOLE catalog before paginating — sorting a single
+// alphabetical page (the old behavior) produced a factually wrong "top"
+// list. One cached pass over all occupations also replaces the per-request
+// blueprint + timeback computation for the 24 visible cards.
+const getBrowseList = unstable_cache(
+  async (): Promise<BrowseOccupation[]> => {
+    const [occs, profiles, taskRows] = await Promise.all([
+      db
+        .select({
+          id: occupations.id,
+          title: occupations.title,
+          slug: occupations.slug,
+          major_category: occupations.majorCategory,
+        })
+        .from(occupations),
+      db
+        .select({
+          occupation_id: occupationAutomationProfile.occupationId,
+          composite_score: occupationAutomationProfile.compositeScore,
+          time_range_low: occupationAutomationProfile.timeRangeLow,
+          time_range_high: occupationAutomationProfile.timeRangeHigh,
+          physical_ability_avg: occupationAutomationProfile.physicalAbilityAvg,
+        })
+        .from(occupationAutomationProfile),
+      db
+        .select({
+          occupation_id: jobMicroTasks.occupationId,
+          frequency: jobMicroTasks.frequency,
+          ai_applicable: jobMicroTasks.aiApplicable,
+          ai_impact_level: jobMicroTasks.aiImpactLevel,
+          ai_effort_to_implement: jobMicroTasks.aiEffortToImplement,
+        })
+        .from(jobMicroTasks)
+        .where(eq(jobMicroTasks.aiApplicable, true)),
+    ])
+
+    const profileMap = new Map(
+      (profiles ?? []).map((p) => [p.occupation_id, p as unknown as AutomationProfile])
+    )
+    const tasksByOccupation = new Map<number, MicroTask[]>()
+    for (const t of (taskRows ?? []) as unknown as MicroTask[]) {
+      const existing = tasksByOccupation.get(t.occupation_id) ?? []
+      existing.push(t)
+      tasksByOccupation.set(t.occupation_id, existing)
+    }
+
+    return (occs ?? []).map((occ) => {
+      const { displayedMinutes } = computeDisplayedTimeback(
+        profileMap.get(occ.id) ?? null,
+        tasksByOccupation.get(occ.id) ?? []
+      )
+      return {
+        ...occ,
+        // Occupations with no estimate show no number (composite_score is a
+        // unitless index, never a minutes fallback).
+        minutes: displayedMinutes > 0 ? displayedMinutes : null,
+      }
+    })
+  },
+  ["browse-occupation-estimates"],
+  { revalidate: 3600 }
+)
 
 export default async function BrowsePage(props: {
   searchParams: Promise<{ page?: string; sort?: string; category?: string }>
@@ -26,122 +91,21 @@ export default async function BrowsePage(props: {
     ? CATEGORIES.find((c) => c.slug === categorySlug)?.dbValue ?? null
     : null
 
-  let results: any[] = []
-  let totalCount = 0
-  let tasksByOccupation = new Map<number, MicroTask[]>()
-
-  try {
-    const from = (page - 1) * PAGE_SIZE
-
-    // Count query
-    const countQuery = db
-      .select({ count: sql<number>`count(*)` })
-      .from(occupations)
-
-    const countResult = category
-      ? await countQuery.where(eq(occupations.majorCategory, category))
-      : await countQuery
-
-    totalCount = Number(countResult[0]?.count || 0)
-
-    // Results query
-    let queryResults = db
-      .select({
-        id: occupations.id,
-        title: occupations.title,
-        slug: occupations.slug,
-        major_category: occupations.majorCategory,
-        // Full profile column set — must match the homepage/category selects so
-        // computeDisplayedTimeback yields the same figure on every surface.
-        occupation_automation_profile: {
-          composite_score: occupationAutomationProfile.compositeScore,
-          work_activity_automation_potential:
-            occupationAutomationProfile.workActivityAutomationPotential,
-          time_range_low: occupationAutomationProfile.timeRangeLow,
-          time_range_high: occupationAutomationProfile.timeRangeHigh,
-          time_range_by_block: occupationAutomationProfile.timeRangeByBlock,
-          block_example_tasks: occupationAutomationProfile.blockExampleTasks,
-          top_automatable_activities:
-            occupationAutomationProfile.topAutomatableActivities,
-          top_blocking_abilities:
-            occupationAutomationProfile.topBlockingAbilities,
-          physical_ability_avg: occupationAutomationProfile.physicalAbilityAvg,
-        }
-      })
-      .from(occupations)
-      .leftJoin(
-        occupationAutomationProfile,
-        eq(occupations.id, occupationAutomationProfile.occupationId)
-      )
-
-    const finalQuery = category
-      ? queryResults.where(eq(occupations.majorCategory, category))
-      : queryResults
-
-    results = await finalQuery
-      .orderBy(occupations.title)
-      .limit(PAGE_SIZE)
-      .offset(from)
-
-    const occupationIds = results
-      .map((occupation) => occupation.id)
-      .filter((id): id is number => typeof id === "number")
-
-    if (occupationIds.length > 0) {
-      const taskRows = await db
-        .select({
-          id: jobMicroTasks.id,
-          occupation_id: jobMicroTasks.occupationId,
-          task_name: jobMicroTasks.taskName,
-          task_description: jobMicroTasks.taskDescription,
-          frequency: jobMicroTasks.frequency,
-          ai_applicable: jobMicroTasks.aiApplicable,
-          ai_how_it_helps: jobMicroTasks.aiHowItHelps,
-          ai_impact_level: jobMicroTasks.aiImpactLevel,
-          ai_effort_to_implement: jobMicroTasks.aiEffortToImplement,
-          ai_category: jobMicroTasks.aiCategory,
-          ai_tools: jobMicroTasks.aiTools,
-        })
-        .from(jobMicroTasks)
-        .where(inArray(jobMicroTasks.occupationId, occupationIds))
-
-      tasksByOccupation = new Map<number, MicroTask[]>()
-      for (const task of (taskRows ?? []) as unknown as MicroTask[]) {
-        const existing = tasksByOccupation.get(task.occupation_id) ?? []
-        existing.push(task)
-        tasksByOccupation.set(task.occupation_id, existing)
-      }
-    }
-  } catch (err) {
-    console.error("[BrowsePage] fetch error:", err)
-    // silently fall back to empty results if DB unavailable
-  }
+  // A DB failure here throws to error.tsx — an outage must never render as
+  // "No occupations found".
+  const list = await getBrowseList()
+  const { rows: results, totalCount } = filterSortPage(list, {
+    sort,
+    category,
+    page,
+    pageSize: PAGE_SIZE,
+  })
 
   const browseEstimates = new Map<number, number>()
   for (const occupation of results) {
-    const profileRaw = occupation.occupation_automation_profile
-    const profile = (Array.isArray(profileRaw)
-      ? profileRaw[0]
-      : profileRaw) as AutomationProfile | null
-    const tasks = tasksByOccupation.get(occupation.id) ?? []
-    const blueprint = generateBlueprint(occupation as Occupation, tasks, profile)
-    const { displayedMinutes } = computeDisplayedTimeback(
-      profile,
-      tasks,
-      blueprint.totalMinutesSaved
-    )
-
-    browseEstimates.set(
-      occupation.id,
-      displayedMinutes || Math.round(profile?.time_range_high ?? profile?.composite_score ?? 0)
-    )
-  }
-
-  // Client-side sort by time saved when requested
-  if (sort === "time_back") {
-    results = [...results].sort((a, b) => {
-      return (browseEstimates.get(b.id) ?? 0) - (browseEstimates.get(a.id) ?? 0)
-    })
+    if (occupation.minutes !== null) {
+      browseEstimates.set(occupation.id, occupation.minutes)
+    }
   }
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE)

@@ -57,8 +57,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
   const blueprint = generateBlueprint(occupation, tasks, profile ?? null)
   const { displayedMinutes, displayedLow, displayedHigh } = computeDisplayedTimeback(
     profile ?? null,
-    tasks,
-    blueprint.totalMinutesSaved
+    tasks
   )
   const blueprintScale = blueprint.totalMinutesSaved > 0 ? displayedMinutes / blueprint.totalMinutesSaved : 1
 

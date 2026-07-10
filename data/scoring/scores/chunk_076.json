@@ -1,0 +1,2002 @@
+[
+  {
+    "id": 4688,
+    "kind": "micro",
+    "score": 88,
+    "blocker": "data_access",
+    "recoverable_share": 0.65,
+    "confidence": "high"
+  },
+  {
+    "id": 5184,
+    "kind": "onet",
+    "score": 40,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.2,
+    "confidence": "high"
+  },
+  {
+    "id": 8876,
+    "kind": "micro",
+    "score": 95,
+    "blocker": "none",
+    "recoverable_share": 0.82,
+    "confidence": "high"
+  },
+  {
+    "id": 1065,
+    "kind": "micro",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.72,
+    "confidence": "high"
+  },
+  {
+    "id": 13159,
+    "kind": "onet",
+    "score": 5,
+    "blocker": "physical",
+    "recoverable_share": 0.02,
+    "confidence": "high"
+  },
+  {
+    "id": 2549,
+    "kind": "micro",
+    "score": 95,
+    "blocker": "none",
+    "recoverable_share": 0.8,
+    "confidence": "high"
+  },
+  {
+    "id": 7982,
+    "kind": "micro",
+    "score": 80,
+    "blocker": "judgment",
+    "recoverable_share": 0.55,
+    "confidence": "high"
+  },
+  {
+    "id": 5467,
+    "kind": "onet",
+    "score": 8,
+    "blocker": "physical",
+    "recoverable_share": 0.03,
+    "confidence": "medium"
+  },
+  {
+    "id": 5474,
+    "kind": "micro",
+    "score": 92,
+    "blocker": "none",
+    "recoverable_share": 0.76,
+    "confidence": "high"
+  },
+  {
+    "id": 13995,
+    "kind": "onet",
+    "score": 75,
+    "blocker": "data_access",
+    "recoverable_share": 0.5,
+    "confidence": "medium"
+  },
+  {
+    "id": 15032,
+    "kind": "onet",
+    "score": 30,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.14,
+    "confidence": "high"
+  },
+  {
+    "id": 11730,
+    "kind": "onet",
+    "score": 1,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 3420,
+    "kind": "micro",
+    "score": 85,
+    "blocker": "data_access",
+    "recoverable_share": 0.6,
+    "confidence": "high"
+  },
+  {
+    "id": 3458,
+    "kind": "onet",
+    "score": 15,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.05,
+    "confidence": "high"
+  },
+  {
+    "id": 13605,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 2817,
+    "kind": "micro",
+    "score": 95,
+    "blocker": "none",
+    "recoverable_share": 0.81,
+    "confidence": "high"
+  },
+  {
+    "id": 2826,
+    "kind": "micro",
+    "score": 88,
+    "blocker": "none",
+    "recoverable_share": 0.68,
+    "confidence": "high"
+  },
+  {
+    "id": 5863,
+    "kind": "onet",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.73,
+    "confidence": "high"
+  },
+  {
+    "id": 3206,
+    "kind": "micro",
+    "score": 7,
+    "blocker": "physical",
+    "recoverable_share": 0.03,
+    "confidence": "high"
+  },
+  {
+    "id": 8152,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 1770,
+    "kind": "micro",
+    "score": 70,
+    "blocker": "data_access",
+    "recoverable_share": 0.45,
+    "confidence": "medium"
+  },
+  {
+    "id": 9129,
+    "kind": "micro",
+    "score": 78,
+    "blocker": "data_access",
+    "recoverable_share": 0.52,
+    "confidence": "medium"
+  },
+  {
+    "id": 6209,
+    "kind": "onet",
+    "score": 15,
+    "blocker": "physical",
+    "recoverable_share": 0.06,
+    "confidence": "high"
+  },
+  {
+    "id": 12627,
+    "kind": "onet",
+    "score": 1,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 1949,
+    "kind": "micro",
+    "score": 48,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.25,
+    "confidence": "medium"
+  },
+  {
+    "id": 7570,
+    "kind": "onet",
+    "score": 3,
+    "blocker": "physical",
+    "recoverable_share": 0.01,
+    "confidence": "high"
+  },
+  {
+    "id": 3317,
+    "kind": "onet",
+    "score": 55,
+    "blocker": "judgment",
+    "recoverable_share": 0.3,
+    "confidence": "high"
+  },
+  {
+    "id": 3183,
+    "kind": "onet",
+    "score": 72,
+    "blocker": "judgment",
+    "recoverable_share": 0.47,
+    "confidence": "high"
+  },
+  {
+    "id": 1550,
+    "kind": "micro",
+    "score": 70,
+    "blocker": "judgment",
+    "recoverable_share": 0.44,
+    "confidence": "high"
+  },
+  {
+    "id": 7075,
+    "kind": "onet",
+    "score": 15,
+    "blocker": "physical",
+    "recoverable_share": 0.06,
+    "confidence": "medium"
+  },
+  {
+    "id": 5995,
+    "kind": "micro",
+    "score": 92,
+    "blocker": "none",
+    "recoverable_share": 0.75,
+    "confidence": "high"
+  },
+  {
+    "id": 5764,
+    "kind": "micro",
+    "score": 92,
+    "blocker": "none",
+    "recoverable_share": 0.76,
+    "confidence": "high"
+  },
+  {
+    "id": 2307,
+    "kind": "onet",
+    "score": 5,
+    "blocker": "physical",
+    "recoverable_share": 0.02,
+    "confidence": "high"
+  },
+  {
+    "id": 1333,
+    "kind": "onet",
+    "score": 45,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.23,
+    "confidence": "high"
+  },
+  {
+    "id": 1862,
+    "kind": "micro",
+    "score": 38,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.18,
+    "confidence": "high"
+  },
+  {
+    "id": 8711,
+    "kind": "onet",
+    "score": 2,
+    "blocker": "physical",
+    "recoverable_share": 0.01,
+    "confidence": "high"
+  },
+  {
+    "id": 1911,
+    "kind": "onet",
+    "score": 55,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.31,
+    "confidence": "high"
+  },
+  {
+    "id": 7537,
+    "kind": "micro",
+    "score": 82,
+    "blocker": "data_access",
+    "recoverable_share": 0.58,
+    "confidence": "high"
+  },
+  {
+    "id": 4597,
+    "kind": "micro",
+    "score": 70,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.42,
+    "confidence": "medium"
+  },
+  {
+    "id": 2813,
+    "kind": "micro",
+    "score": 84,
+    "blocker": "judgment",
+    "recoverable_share": 0.58,
+    "confidence": "high"
+  },
+  {
+    "id": 11827,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 1990,
+    "kind": "onet",
+    "score": 68,
+    "blocker": "judgment",
+    "recoverable_share": 0.43,
+    "confidence": "high"
+  },
+  {
+    "id": 9492,
+    "kind": "micro",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.72,
+    "confidence": "high"
+  },
+  {
+    "id": 2621,
+    "kind": "onet",
+    "score": 35,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.17,
+    "confidence": "high"
+  },
+  {
+    "id": 630,
+    "kind": "micro",
+    "score": 92,
+    "blocker": "none",
+    "recoverable_share": 0.75,
+    "confidence": "high"
+  },
+  {
+    "id": 6840,
+    "kind": "onet",
+    "score": 1,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 429,
+    "kind": "onet",
+    "score": 55,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.3,
+    "confidence": "medium"
+  },
+  {
+    "id": 2323,
+    "kind": "onet",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.72,
+    "confidence": "high"
+  },
+  {
+    "id": 7233,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 12005,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 1609,
+    "kind": "onet",
+    "score": 58,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.33,
+    "confidence": "high"
+  },
+  {
+    "id": 7599,
+    "kind": "micro",
+    "score": 45,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.24,
+    "confidence": "medium"
+  },
+  {
+    "id": 1758,
+    "kind": "micro",
+    "score": 85,
+    "blocker": "judgment",
+    "recoverable_share": 0.6,
+    "confidence": "medium"
+  },
+  {
+    "id": 581,
+    "kind": "micro",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.73,
+    "confidence": "high"
+  },
+  {
+    "id": 12734,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 3238,
+    "kind": "micro",
+    "score": 5,
+    "blocker": "physical",
+    "recoverable_share": 0.02,
+    "confidence": "high"
+  },
+  {
+    "id": 1043,
+    "kind": "onet",
+    "score": 62,
+    "blocker": "judgment",
+    "recoverable_share": 0.38,
+    "confidence": "high"
+  },
+  {
+    "id": 3236,
+    "kind": "onet",
+    "score": 38,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.18,
+    "confidence": "high"
+  },
+  {
+    "id": 9354,
+    "kind": "micro",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 432,
+    "kind": "micro",
+    "score": 82,
+    "blocker": "none",
+    "recoverable_share": 0.58,
+    "confidence": "high"
+  },
+  {
+    "id": 9221,
+    "kind": "micro",
+    "score": 55,
+    "blocker": "judgment",
+    "recoverable_share": 0.31,
+    "confidence": "medium"
+  },
+  {
+    "id": 7032,
+    "kind": "micro",
+    "score": 55,
+    "blocker": "judgment",
+    "recoverable_share": 0.3,
+    "confidence": "high"
+  },
+  {
+    "id": 1025,
+    "kind": "onet",
+    "score": 58,
+    "blocker": "judgment",
+    "recoverable_share": 0.33,
+    "confidence": "high"
+  },
+  {
+    "id": 5854,
+    "kind": "onet",
+    "score": 5,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.02,
+    "confidence": "high"
+  },
+  {
+    "id": 7359,
+    "kind": "micro",
+    "score": 88,
+    "blocker": "none",
+    "recoverable_share": 0.68,
+    "confidence": "high"
+  },
+  {
+    "id": 1435,
+    "kind": "onet",
+    "score": 72,
+    "blocker": "judgment",
+    "recoverable_share": 0.47,
+    "confidence": "high"
+  },
+  {
+    "id": 2185,
+    "kind": "onet",
+    "score": 70,
+    "blocker": "judgment",
+    "recoverable_share": 0.44,
+    "confidence": "high"
+  },
+  {
+    "id": 1672,
+    "kind": "micro",
+    "score": 84,
+    "blocker": "judgment",
+    "recoverable_share": 0.58,
+    "confidence": "high"
+  },
+  {
+    "id": 3155,
+    "kind": "onet",
+    "score": 3,
+    "blocker": "physical",
+    "recoverable_share": 0.01,
+    "confidence": "high"
+  },
+  {
+    "id": 3620,
+    "kind": "onet",
+    "score": 75,
+    "blocker": "judgment",
+    "recoverable_share": 0.5,
+    "confidence": "high"
+  },
+  {
+    "id": 10553,
+    "kind": "onet",
+    "score": 3,
+    "blocker": "physical",
+    "recoverable_share": 0.01,
+    "confidence": "high"
+  },
+  {
+    "id": 13429,
+    "kind": "onet",
+    "score": 7,
+    "blocker": "physical",
+    "recoverable_share": 0.03,
+    "confidence": "high"
+  },
+  {
+    "id": 10571,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 9278,
+    "kind": "onet",
+    "score": 92,
+    "blocker": "none",
+    "recoverable_share": 0.76,
+    "confidence": "high"
+  },
+  {
+    "id": 6343,
+    "kind": "micro",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.74,
+    "confidence": "high"
+  },
+  {
+    "id": 2598,
+    "kind": "micro",
+    "score": 65,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.38,
+    "confidence": "medium"
+  },
+  {
+    "id": 831,
+    "kind": "micro",
+    "score": 68,
+    "blocker": "judgment",
+    "recoverable_share": 0.43,
+    "confidence": "high"
+  },
+  {
+    "id": 7766,
+    "kind": "micro",
+    "score": 2,
+    "blocker": "physical",
+    "recoverable_share": 0.01,
+    "confidence": "high"
+  },
+  {
+    "id": 6222,
+    "kind": "onet",
+    "score": 60,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.34,
+    "confidence": "high"
+  },
+  {
+    "id": 12698,
+    "kind": "onet",
+    "score": 45,
+    "blocker": "judgment",
+    "recoverable_share": 0.23,
+    "confidence": "high"
+  },
+  {
+    "id": 2188,
+    "kind": "micro",
+    "score": 92,
+    "blocker": "none",
+    "recoverable_share": 0.75,
+    "confidence": "high"
+  },
+  {
+    "id": 4857,
+    "kind": "micro",
+    "score": 3,
+    "blocker": "physical",
+    "recoverable_share": 0.01,
+    "confidence": "medium"
+  },
+  {
+    "id": 10509,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 7825,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 11931,
+    "kind": "onet",
+    "score": 5,
+    "blocker": "physical",
+    "recoverable_share": 0.02,
+    "confidence": "high"
+  },
+  {
+    "id": 614,
+    "kind": "onet",
+    "score": 65,
+    "blocker": "judgment",
+    "recoverable_share": 0.4,
+    "confidence": "medium"
+  },
+  {
+    "id": 6080,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 12421,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 8807,
+    "kind": "micro",
+    "score": 82,
+    "blocker": "judgment",
+    "recoverable_share": 0.55,
+    "confidence": "high"
+  },
+  {
+    "id": 24,
+    "kind": "onet",
+    "score": 70,
+    "blocker": "judgment",
+    "recoverable_share": 0.44,
+    "confidence": "high"
+  },
+  {
+    "id": 14880,
+    "kind": "onet",
+    "score": 88,
+    "blocker": "none",
+    "recoverable_share": 0.68,
+    "confidence": "high"
+  },
+  {
+    "id": 12030,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 2275,
+    "kind": "micro",
+    "score": 60,
+    "blocker": "data_access",
+    "recoverable_share": 0.36,
+    "confidence": "medium"
+  },
+  {
+    "id": 4045,
+    "kind": "micro",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.73,
+    "confidence": "high"
+  },
+  {
+    "id": 9065,
+    "kind": "micro",
+    "score": 50,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.27,
+    "confidence": "high"
+  },
+  {
+    "id": 14726,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 5080,
+    "kind": "onet",
+    "score": 95,
+    "blocker": "none",
+    "recoverable_share": 0.8,
+    "confidence": "high"
+  },
+  {
+    "id": 8981,
+    "kind": "micro",
+    "score": 92,
+    "blocker": "none",
+    "recoverable_share": 0.76,
+    "confidence": "high"
+  },
+  {
+    "id": 2257,
+    "kind": "onet",
+    "score": 12,
+    "blocker": "physical",
+    "recoverable_share": 0.05,
+    "confidence": "medium"
+  },
+  {
+    "id": 5255,
+    "kind": "onet",
+    "score": 20,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.08,
+    "confidence": "high"
+  },
+  {
+    "id": 2698,
+    "kind": "micro",
+    "score": 60,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.35,
+    "confidence": "medium"
+  },
+  {
+    "id": 9022,
+    "kind": "onet",
+    "score": 35,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.17,
+    "confidence": "high"
+  },
+  {
+    "id": 15349,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 10607,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 11393,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 2341,
+    "kind": "micro",
+    "score": 95,
+    "blocker": "none",
+    "recoverable_share": 0.8,
+    "confidence": "high"
+  },
+  {
+    "id": 6116,
+    "kind": "onet",
+    "score": 70,
+    "blocker": "judgment",
+    "recoverable_share": 0.44,
+    "confidence": "high"
+  },
+  {
+    "id": 6508,
+    "kind": "micro",
+    "score": 82,
+    "blocker": "none",
+    "recoverable_share": 0.58,
+    "confidence": "high"
+  },
+  {
+    "id": 6219,
+    "kind": "onet",
+    "score": 58,
+    "blocker": "judgment",
+    "recoverable_share": 0.32,
+    "confidence": "high"
+  },
+  {
+    "id": 587,
+    "kind": "micro",
+    "score": 70,
+    "blocker": "judgment",
+    "recoverable_share": 0.44,
+    "confidence": "high"
+  },
+  {
+    "id": 2312,
+    "kind": "micro",
+    "score": 88,
+    "blocker": "none",
+    "recoverable_share": 0.68,
+    "confidence": "high"
+  },
+  {
+    "id": 9658,
+    "kind": "onet",
+    "score": 55,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.31,
+    "confidence": "high"
+  },
+  {
+    "id": 5098,
+    "kind": "micro",
+    "score": 35,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.16,
+    "confidence": "high"
+  },
+  {
+    "id": 14337,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 430,
+    "kind": "micro",
+    "score": 92,
+    "blocker": "none",
+    "recoverable_share": 0.74,
+    "confidence": "high"
+  },
+  {
+    "id": 1294,
+    "kind": "onet",
+    "score": 45,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.23,
+    "confidence": "high"
+  },
+  {
+    "id": 4452,
+    "kind": "micro",
+    "score": 82,
+    "blocker": "data_access",
+    "recoverable_share": 0.58,
+    "confidence": "high"
+  },
+  {
+    "id": 4283,
+    "kind": "micro",
+    "score": 70,
+    "blocker": "data_access",
+    "recoverable_share": 0.45,
+    "confidence": "medium"
+  },
+  {
+    "id": 11737,
+    "kind": "onet",
+    "score": 10,
+    "blocker": "physical",
+    "recoverable_share": 0.04,
+    "confidence": "high"
+  },
+  {
+    "id": 12379,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 8150,
+    "kind": "micro",
+    "score": 95,
+    "blocker": "none",
+    "recoverable_share": 0.8,
+    "confidence": "high"
+  },
+  {
+    "id": 6324,
+    "kind": "onet",
+    "score": 3,
+    "blocker": "physical",
+    "recoverable_share": 0.01,
+    "confidence": "high"
+  },
+  {
+    "id": 14376,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 11381,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 2824,
+    "kind": "micro",
+    "score": 95,
+    "blocker": "none",
+    "recoverable_share": 0.81,
+    "confidence": "high"
+  },
+  {
+    "id": 10379,
+    "kind": "onet",
+    "score": 55,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.31,
+    "confidence": "high"
+  },
+  {
+    "id": 7625,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 513,
+    "kind": "micro",
+    "score": 82,
+    "blocker": "judgment",
+    "recoverable_share": 0.56,
+    "confidence": "high"
+  },
+  {
+    "id": 4124,
+    "kind": "onet",
+    "score": 68,
+    "blocker": "judgment",
+    "recoverable_share": 0.43,
+    "confidence": "high"
+  },
+  {
+    "id": 3520,
+    "kind": "onet",
+    "score": 85,
+    "blocker": "none",
+    "recoverable_share": 0.62,
+    "confidence": "high"
+  },
+  {
+    "id": 2103,
+    "kind": "micro",
+    "score": 72,
+    "blocker": "judgment",
+    "recoverable_share": 0.47,
+    "confidence": "high"
+  },
+  {
+    "id": 5044,
+    "kind": "onet",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.73,
+    "confidence": "high"
+  },
+  {
+    "id": 11650,
+    "kind": "onet",
+    "score": 15,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.05,
+    "confidence": "medium"
+  },
+  {
+    "id": 1959,
+    "kind": "onet",
+    "score": 60,
+    "blocker": "judgment",
+    "recoverable_share": 0.36,
+    "confidence": "high"
+  },
+  {
+    "id": 3922,
+    "kind": "micro",
+    "score": 10,
+    "blocker": "physical",
+    "recoverable_share": 0.04,
+    "confidence": "medium"
+  },
+  {
+    "id": 4150,
+    "kind": "micro",
+    "score": 12,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.04,
+    "confidence": "high"
+  },
+  {
+    "id": 2996,
+    "kind": "onet",
+    "score": 12,
+    "blocker": "physical",
+    "recoverable_share": 0.05,
+    "confidence": "medium"
+  },
+  {
+    "id": 909,
+    "kind": "micro",
+    "score": 72,
+    "blocker": "judgment",
+    "recoverable_share": 0.47,
+    "confidence": "high"
+  },
+  {
+    "id": 5168,
+    "kind": "onet",
+    "score": 60,
+    "blocker": "data_access",
+    "recoverable_share": 0.36,
+    "confidence": "medium"
+  },
+  {
+    "id": 8151,
+    "kind": "onet",
+    "score": 4,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.01,
+    "confidence": "high"
+  },
+  {
+    "id": 2933,
+    "kind": "onet",
+    "score": 84,
+    "blocker": "judgment",
+    "recoverable_share": 0.58,
+    "confidence": "high"
+  },
+  {
+    "id": 3728,
+    "kind": "micro",
+    "score": 40,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.2,
+    "confidence": "high"
+  },
+  {
+    "id": 5079,
+    "kind": "onet",
+    "score": 55,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.31,
+    "confidence": "high"
+  },
+  {
+    "id": 101,
+    "kind": "micro",
+    "score": 58,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.33,
+    "confidence": "high"
+  },
+  {
+    "id": 3568,
+    "kind": "micro",
+    "score": 72,
+    "blocker": "judgment",
+    "recoverable_share": 0.47,
+    "confidence": "high"
+  },
+  {
+    "id": 1377,
+    "kind": "onet",
+    "score": 75,
+    "blocker": "judgment",
+    "recoverable_share": 0.5,
+    "confidence": "high"
+  },
+  {
+    "id": 293,
+    "kind": "onet",
+    "score": 70,
+    "blocker": "judgment",
+    "recoverable_share": 0.44,
+    "confidence": "high"
+  },
+  {
+    "id": 7966,
+    "kind": "onet",
+    "score": 10,
+    "blocker": "physical",
+    "recoverable_share": 0.04,
+    "confidence": "high"
+  },
+  {
+    "id": 5260,
+    "kind": "micro",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.72,
+    "confidence": "high"
+  },
+  {
+    "id": 3921,
+    "kind": "onet",
+    "score": 70,
+    "blocker": "judgment",
+    "recoverable_share": 0.44,
+    "confidence": "high"
+  },
+  {
+    "id": 9048,
+    "kind": "onet",
+    "score": 92,
+    "blocker": "none",
+    "recoverable_share": 0.75,
+    "confidence": "high"
+  },
+  {
+    "id": 5485,
+    "kind": "onet",
+    "score": 15,
+    "blocker": "physical",
+    "recoverable_share": 0.06,
+    "confidence": "medium"
+  },
+  {
+    "id": 494,
+    "kind": "onet",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.72,
+    "confidence": "high"
+  },
+  {
+    "id": 10634,
+    "kind": "onet",
+    "score": 35,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.17,
+    "confidence": "high"
+  },
+  {
+    "id": 14227,
+    "kind": "onet",
+    "score": 5,
+    "blocker": "physical",
+    "recoverable_share": 0.02,
+    "confidence": "high"
+  },
+  {
+    "id": 7733,
+    "kind": "onet",
+    "score": 25,
+    "blocker": "judgment",
+    "recoverable_share": 0.1,
+    "confidence": "high"
+  },
+  {
+    "id": 4861,
+    "kind": "micro",
+    "score": 55,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.31,
+    "confidence": "high"
+  },
+  {
+    "id": 7137,
+    "kind": "onet",
+    "score": 50,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.27,
+    "confidence": "high"
+  },
+  {
+    "id": 8867,
+    "kind": "micro",
+    "score": 5,
+    "blocker": "physical",
+    "recoverable_share": 0.02,
+    "confidence": "high"
+  },
+  {
+    "id": 6012,
+    "kind": "micro",
+    "score": 82,
+    "blocker": "judgment",
+    "recoverable_share": 0.56,
+    "confidence": "high"
+  },
+  {
+    "id": 6512,
+    "kind": "onet",
+    "score": 45,
+    "blocker": "judgment",
+    "recoverable_share": 0.22,
+    "confidence": "high"
+  },
+  {
+    "id": 9792,
+    "kind": "onet",
+    "score": 82,
+    "blocker": "none",
+    "recoverable_share": 0.58,
+    "confidence": "high"
+  },
+  {
+    "id": 296,
+    "kind": "micro",
+    "score": 75,
+    "blocker": "judgment",
+    "recoverable_share": 0.5,
+    "confidence": "high"
+  },
+  {
+    "id": 8757,
+    "kind": "micro",
+    "score": 7,
+    "blocker": "physical",
+    "recoverable_share": 0.03,
+    "confidence": "high"
+  },
+  {
+    "id": 8158,
+    "kind": "micro",
+    "score": 85,
+    "blocker": "judgment",
+    "recoverable_share": 0.6,
+    "confidence": "high"
+  },
+  {
+    "id": 1597,
+    "kind": "micro",
+    "score": 65,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.38,
+    "confidence": "medium"
+  },
+  {
+    "id": 2536,
+    "kind": "micro",
+    "score": 95,
+    "blocker": "none",
+    "recoverable_share": 0.8,
+    "confidence": "high"
+  },
+  {
+    "id": 1383,
+    "kind": "onet",
+    "score": 78,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.52,
+    "confidence": "high"
+  },
+  {
+    "id": 5198,
+    "kind": "onet",
+    "score": 88,
+    "blocker": "none",
+    "recoverable_share": 0.68,
+    "confidence": "high"
+  },
+  {
+    "id": 10587,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 10228,
+    "kind": "onet",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.72,
+    "confidence": "high"
+  },
+  {
+    "id": 4146,
+    "kind": "micro",
+    "score": 55,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.31,
+    "confidence": "high"
+  },
+  {
+    "id": 21,
+    "kind": "micro",
+    "score": 65,
+    "blocker": "judgment",
+    "recoverable_share": 0.4,
+    "confidence": "high"
+  },
+  {
+    "id": 6831,
+    "kind": "onet",
+    "score": 2,
+    "blocker": "physical",
+    "recoverable_share": 0.01,
+    "confidence": "high"
+  },
+  {
+    "id": 1604,
+    "kind": "micro",
+    "score": 92,
+    "blocker": "none",
+    "recoverable_share": 0.76,
+    "confidence": "high"
+  },
+  {
+    "id": 3079,
+    "kind": "onet",
+    "score": 55,
+    "blocker": "judgment",
+    "recoverable_share": 0.3,
+    "confidence": "medium"
+  },
+  {
+    "id": 6950,
+    "kind": "micro",
+    "score": 82,
+    "blocker": "data_access",
+    "recoverable_share": 0.58,
+    "confidence": "high"
+  },
+  {
+    "id": 6527,
+    "kind": "onet",
+    "score": 30,
+    "blocker": "judgment",
+    "recoverable_share": 0.12,
+    "confidence": "high"
+  },
+  {
+    "id": 1099,
+    "kind": "onet",
+    "score": 60,
+    "blocker": "judgment",
+    "recoverable_share": 0.36,
+    "confidence": "high"
+  },
+  {
+    "id": 8100,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 14515,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 12610,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 8158,
+    "kind": "onet",
+    "score": 2,
+    "blocker": "physical",
+    "recoverable_share": 0.01,
+    "confidence": "high"
+  },
+  {
+    "id": 3997,
+    "kind": "onet",
+    "score": 50,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.27,
+    "confidence": "high"
+  },
+  {
+    "id": 414,
+    "kind": "onet",
+    "score": 65,
+    "blocker": "judgment",
+    "recoverable_share": 0.4,
+    "confidence": "high"
+  },
+  {
+    "id": 4655,
+    "kind": "micro",
+    "score": 85,
+    "blocker": "data_access",
+    "recoverable_share": 0.6,
+    "confidence": "medium"
+  },
+  {
+    "id": 8195,
+    "kind": "onet",
+    "score": 10,
+    "blocker": "physical",
+    "recoverable_share": 0.04,
+    "confidence": "high"
+  },
+  {
+    "id": 6298,
+    "kind": "onet",
+    "score": 15,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.05,
+    "confidence": "high"
+  },
+  {
+    "id": 5951,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 7548,
+    "kind": "micro",
+    "score": 5,
+    "blocker": "physical",
+    "recoverable_share": 0.02,
+    "confidence": "high"
+  },
+  {
+    "id": 7047,
+    "kind": "micro",
+    "score": 85,
+    "blocker": "judgment",
+    "recoverable_share": 0.6,
+    "confidence": "high"
+  },
+  {
+    "id": 8587,
+    "kind": "micro",
+    "score": 78,
+    "blocker": "judgment",
+    "recoverable_share": 0.52,
+    "confidence": "high"
+  },
+  {
+    "id": 12859,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 8733,
+    "kind": "onet",
+    "score": 35,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.17,
+    "confidence": "high"
+  },
+  {
+    "id": 1837,
+    "kind": "onet",
+    "score": 85,
+    "blocker": "judgment",
+    "recoverable_share": 0.6,
+    "confidence": "high"
+  },
+  {
+    "id": 4788,
+    "kind": "onet",
+    "score": 5,
+    "blocker": "physical",
+    "recoverable_share": 0.02,
+    "confidence": "high"
+  },
+  {
+    "id": 2629,
+    "kind": "onet",
+    "score": 58,
+    "blocker": "judgment",
+    "recoverable_share": 0.33,
+    "confidence": "medium"
+  },
+  {
+    "id": 10822,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 6832,
+    "kind": "micro",
+    "score": 80,
+    "blocker": "data_access",
+    "recoverable_share": 0.55,
+    "confidence": "medium"
+  },
+  {
+    "id": 15195,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 12170,
+    "kind": "onet",
+    "score": 40,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.2,
+    "confidence": "high"
+  },
+  {
+    "id": 859,
+    "kind": "micro",
+    "score": 88,
+    "blocker": "judgment",
+    "recoverable_share": 0.64,
+    "confidence": "high"
+  },
+  {
+    "id": 10210,
+    "kind": "onet",
+    "score": 70,
+    "blocker": "data_access",
+    "recoverable_share": 0.45,
+    "confidence": "medium"
+  },
+  {
+    "id": 13771,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 11204,
+    "kind": "onet",
+    "score": 5,
+    "blocker": "physical",
+    "recoverable_share": 0.02,
+    "confidence": "high"
+  },
+  {
+    "id": 7117,
+    "kind": "onet",
+    "score": 12,
+    "blocker": "physical",
+    "recoverable_share": 0.05,
+    "confidence": "high"
+  },
+  {
+    "id": 701,
+    "kind": "micro",
+    "score": 88,
+    "blocker": "none",
+    "recoverable_share": 0.68,
+    "confidence": "high"
+  },
+  {
+    "id": 483,
+    "kind": "onet",
+    "score": 55,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.3,
+    "confidence": "high"
+  },
+  {
+    "id": 4938,
+    "kind": "onet",
+    "score": 5,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.02,
+    "confidence": "high"
+  },
+  {
+    "id": 2956,
+    "kind": "onet",
+    "score": 65,
+    "blocker": "judgment",
+    "recoverable_share": 0.4,
+    "confidence": "high"
+  },
+  {
+    "id": 9574,
+    "kind": "micro",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.72,
+    "confidence": "high"
+  },
+  {
+    "id": 269,
+    "kind": "onet",
+    "score": 30,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.14,
+    "confidence": "high"
+  },
+  {
+    "id": 14367,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 3863,
+    "kind": "micro",
+    "score": 58,
+    "blocker": "judgment",
+    "recoverable_share": 0.33,
+    "confidence": "high"
+  },
+  {
+    "id": 8821,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 9245,
+    "kind": "onet",
+    "score": 45,
+    "blocker": "judgment",
+    "recoverable_share": 0.23,
+    "confidence": "high"
+  },
+  {
+    "id": 3352,
+    "kind": "onet",
+    "score": 20,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.08,
+    "confidence": "high"
+  },
+  {
+    "id": 6093,
+    "kind": "onet",
+    "score": 40,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.2,
+    "confidence": "high"
+  },
+  {
+    "id": 726,
+    "kind": "onet",
+    "score": 60,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.34,
+    "confidence": "high"
+  },
+  {
+    "id": 2057,
+    "kind": "micro",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.73,
+    "confidence": "high"
+  },
+  {
+    "id": 5185,
+    "kind": "micro",
+    "score": 88,
+    "blocker": "none",
+    "recoverable_share": 0.68,
+    "confidence": "high"
+  },
+  {
+    "id": 4986,
+    "kind": "onet",
+    "score": 45,
+    "blocker": "judgment",
+    "recoverable_share": 0.23,
+    "confidence": "high"
+  },
+  {
+    "id": 8869,
+    "kind": "micro",
+    "score": 88,
+    "blocker": "none",
+    "recoverable_share": 0.68,
+    "confidence": "high"
+  },
+  {
+    "id": 4827,
+    "kind": "micro",
+    "score": 3,
+    "blocker": "physical",
+    "recoverable_share": 0.01,
+    "confidence": "high"
+  },
+  {
+    "id": 6154,
+    "kind": "onet",
+    "score": 45,
+    "blocker": "data_access",
+    "recoverable_share": 0.24,
+    "confidence": "medium"
+  },
+  {
+    "id": 649,
+    "kind": "micro",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.72,
+    "confidence": "high"
+  },
+  {
+    "id": 8918,
+    "kind": "onet",
+    "score": 2,
+    "blocker": "physical",
+    "recoverable_share": 0.01,
+    "confidence": "high"
+  },
+  {
+    "id": 14837,
+    "kind": "onet",
+    "score": 95,
+    "blocker": "none",
+    "recoverable_share": 0.81,
+    "confidence": "high"
+  },
+  {
+    "id": 6279,
+    "kind": "micro",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.73,
+    "confidence": "high"
+  },
+  {
+    "id": 3617,
+    "kind": "onet",
+    "score": 55,
+    "blocker": "judgment",
+    "recoverable_share": 0.31,
+    "confidence": "high"
+  },
+  {
+    "id": 9490,
+    "kind": "onet",
+    "score": 50,
+    "blocker": "judgment",
+    "recoverable_share": 0.27,
+    "confidence": "high"
+  },
+  {
+    "id": 4477,
+    "kind": "onet",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.73,
+    "confidence": "high"
+  },
+  {
+    "id": 5978,
+    "kind": "onet",
+    "score": 30,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.14,
+    "confidence": "high"
+  },
+  {
+    "id": 2244,
+    "kind": "onet",
+    "score": 82,
+    "blocker": "judgment",
+    "recoverable_share": 0.56,
+    "confidence": "high"
+  },
+  {
+    "id": 6161,
+    "kind": "onet",
+    "score": 35,
+    "blocker": "judgment",
+    "recoverable_share": 0.16,
+    "confidence": "high"
+  },
+  {
+    "id": 13531,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 8809,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 6799,
+    "kind": "micro",
+    "score": 55,
+    "blocker": "judgment",
+    "recoverable_share": 0.31,
+    "confidence": "medium"
+  },
+  {
+    "id": 9329,
+    "kind": "onet",
+    "score": 82,
+    "blocker": "none",
+    "recoverable_share": 0.58,
+    "confidence": "high"
+  },
+  {
+    "id": 8909,
+    "kind": "onet",
+    "score": 55,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.31,
+    "confidence": "high"
+  },
+  {
+    "id": 8753,
+    "kind": "micro",
+    "score": 55,
+    "blocker": "judgment",
+    "recoverable_share": 0.31,
+    "confidence": "medium"
+  },
+  {
+    "id": 7850,
+    "kind": "onet",
+    "score": 10,
+    "blocker": "physical",
+    "recoverable_share": 0.04,
+    "confidence": "high"
+  },
+  {
+    "id": 13836,
+    "kind": "onet",
+    "score": 88,
+    "blocker": "none",
+    "recoverable_share": 0.68,
+    "confidence": "high"
+  },
+  {
+    "id": 2596,
+    "kind": "onet",
+    "score": 72,
+    "blocker": "judgment",
+    "recoverable_share": 0.47,
+    "confidence": "high"
+  },
+  {
+    "id": 4942,
+    "kind": "micro",
+    "score": 95,
+    "blocker": "none",
+    "recoverable_share": 0.81,
+    "confidence": "high"
+  },
+  {
+    "id": 7229,
+    "kind": "onet",
+    "score": 45,
+    "blocker": "interpersonal",
+    "recoverable_share": 0.23,
+    "confidence": "high"
+  },
+  {
+    "id": 5490,
+    "kind": "micro",
+    "score": 90,
+    "blocker": "none",
+    "recoverable_share": 0.73,
+    "confidence": "high"
+  },
+  {
+    "id": 12771,
+    "kind": "onet",
+    "score": 0,
+    "blocker": "physical",
+    "recoverable_share": 0,
+    "confidence": "high"
+  },
+  {
+    "id": 5351,
+    "kind": "onet",
+    "score": 65,
+    "blocker": "judgment",
+    "recoverable_share": 0.4,
+    "confidence": "medium"
+  },
+  {
+    "id": 8189,
+    "kind": "onet",
+    "score": 5,
+    "blocker": "physical",
+    "recoverable_share": 0.02,
+    "confidence": "high"
+  }
+]

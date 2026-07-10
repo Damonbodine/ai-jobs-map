@@ -9,7 +9,6 @@ import { CATEGORIES } from "@/lib/categories"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 import { LandingSearch } from "@/app/landing-search"
 import { computeDisplayedTimeback } from "@/lib/timeback"
-import { generateBlueprint } from "@/lib/blueprint"
 import type { Occupation, MicroTask, AutomationProfile } from "@/types"
 import { Suspense } from "react"
 import { DemoTeaser } from "@/components/demo/DemoTeaser"
@@ -122,8 +121,7 @@ export default async function HomePage() {
           if (!occ) return null
           const profile = profileMap.get(occ.id) ?? null
           const occTasks = taskMap.get(occ.id) ?? []
-          const blueprint = generateBlueprint(occ as unknown as Occupation, occTasks, profile)
-          const { displayedMinutes } = computeDisplayedTimeback(profile, occTasks, blueprint.totalMinutesSaved)
+          const { displayedMinutes } = computeDisplayedTimeback(profile, occTasks)
           return { title: occ.title, slug: occ.slug, minutes: displayedMinutes }
         })
         .filter((o): o is { title: string; slug: string; minutes: number } => o !== null)
@@ -196,8 +194,7 @@ export default async function HomePage() {
           .where(eq(jobMicroTasks.occupationId, occ.id))
 
         const prof = profiles.length > 0 ? (profiles[0] as unknown as AutomationProfile) : null
-        const bp = generateBlueprint(occ as unknown as Occupation, (tsk ?? []) as unknown as MicroTask[], prof)
-        const { displayedMinutes } = computeDisplayedTimeback(prof, (tsk ?? []) as unknown as MicroTask[], bp.totalMinutesSaved)
+        const { displayedMinutes } = computeDisplayedTimeback(prof, (tsk ?? []) as unknown as MicroTask[])
         featuredExample = { title: occ.title, slug: occ.slug, minutes: displayedMinutes, topAreas: pick.areas }
       }
     }

@@ -32,71 +32,74 @@ def aggregate_occupation_profiles():
     
     processed = 0
     for occ_id in occupation_ids:
-        # Get all skills for this occupation's tasks
+        # Get all skills for this occupation's tasks. Columns must match what
+        # decompose_tasks / decompose_tasks_v2 actually write: micro_skills
+        # has `category` (no skill_type / base_automation_potential), and
+        # task_skill_mapping has skill_proficiency_level / ai_dependence_score
+        # / is_differentiator_skill. The previous version selected columns no
+        # writer populates and could never have run against this schema.
         cur.execute("""
-            SELECT 
+            SELECT
                 ms.id,
                 ms.skill_name,
-                ms.skill_category,
-                ms.skill_type,
-                ms.base_automation_potential,
-                tsm.importance,
-                tsm.complexity,
-                tsm.ai_automation_potential,
-                tsm.is_differentiator,
+                ms.category,
+                tsm.skill_proficiency_level,
+                tsm.ai_dependence_score,
+                tsm.is_differentiator_skill,
                 COUNT(DISTINCT tsm.onet_task_id) as used_in_tasks
             FROM task_skill_mapping tsm
             JOIN micro_skills ms ON tsm.micro_skill_id = ms.id
             JOIN onet_tasks ot ON tsm.onet_task_id = ot.id
             WHERE ot.occupation_id = %s
-            GROUP BY ms.id, ms.skill_name, ms.skill_category, ms.skill_type, 
-                     ms.base_automation_potential, tsm.importance, tsm.complexity,
-                     tsm.ai_automation_potential, tsm.is_differentiator
+            GROUP BY ms.id, ms.skill_name, ms.category,
+                     tsm.skill_proficiency_level, tsm.ai_dependence_score,
+                     tsm.is_differentiator_skill
         """, (occ_id,))
-        
+
         skills = cur.fetchall()
         if not skills:
             continue
-        
-        # Calculate aggregates
+
+        # ai_dependence_score is 0–1; the profile stores a 0–100 potential
+        def automation_pct(s):
+            return float(s['ai_dependence_score'] or 0) * 100
+
         total_skills = len(skills)
-        avg_automation = sum(float(s['ai_automation_potential']) for s in skills) / total_skills
-        
-        hard_skills = [s for s in skills if s['skill_type'] == 'hard_skill']
-        soft_skills = [s for s in skills if s['skill_type'] == 'soft_skill']
-        tools = [s for s in skills if s['skill_type'] == 'tool']
-        
+        avg_automation = sum(automation_pct(s) for s in skills) / total_skills
+
         # Differentiator skills (humans win)
         differentiators = [
-            {'name': s['skill_name'], 'potential': float(s['ai_automation_potential']), 'importance': s['importance']}
-            for s in skills if s['is_differentiator'] or float(s['ai_automation_potential']) < 30
+            {'name': s['skill_name'], 'potential': automation_pct(s), 'proficiency': s['skill_proficiency_level']}
+            for s in skills if s['is_differentiator_skill'] or automation_pct(s) < 30
         ]
-        differentiators.sort(key=lambda x: x['importance'], reverse=True)
-        
+        differentiators.sort(key=lambda x: x['proficiency'] or 0, reverse=True)
+
         # High automation skills (AI wins)
         high_automation = [
-            {'name': s['skill_name'], 'potential': float(s['ai_automation_potential']), 'importance': s['importance']}
-            for s in skills if float(s['ai_automation_potential']) >= 70
+            {'name': s['skill_name'], 'potential': automation_pct(s), 'proficiency': s['skill_proficiency_level']}
+            for s in skills if automation_pct(s) >= 70
         ]
         high_automation.sort(key=lambda x: x['potential'], reverse=True)
-        
+
         # Skill breakdown by category
         breakdown = {}
         for s in skills:
-            cat = s['skill_category']
+            cat = s['category']
             if cat not in breakdown:
                 breakdown[cat] = {'count': 0, 'avg_automation': 0, 'skills': []}
             breakdown[cat]['count'] += 1
-            breakdown[cat]['avg_automation'] += float(s['ai_automation_potential'])
+            breakdown[cat]['avg_automation'] += automation_pct(s)
             breakdown[cat]['skills'].append(s['skill_name'])
-        
+
         for cat in breakdown:
             breakdown[cat]['avg_automation'] = round(breakdown[cat]['avg_automation'] / breakdown[cat]['count'], 1)
-        
-        # Upsert profile
+
+        # Upsert profile. hard/soft/tool counts are NULL: the writers no
+        # longer record a skill_type, and fabricating zeros would read as
+        # "counted and found none" rather than "not classified".
         cur.execute("""
             INSERT INTO occupation_skill_profile
-            (occupation_id, total_micro_skills, avg_automation_potential, 
+            (occupation_id, total_micro_skills, avg_automation_potential,
              hard_skills_count, soft_skills_count, tools_count,
              differentiator_skills, high_automation_skills, skill_breakdown, updated_at)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
@@ -114,9 +117,9 @@ def aggregate_occupation_profiles():
             occ_id,
             total_skills,
             round(avg_automation, 2),
-            len(hard_skills),
-            len(soft_skills),
-            len(tools),
+            None,
+            None,
+            None,
             json.dumps(differentiators[:10]),
             json.dumps(high_automation[:10]),
             json.dumps(breakdown),

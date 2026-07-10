@@ -79,13 +79,7 @@ export function computeRoleSections(
     // This reflects the role's full time budget and serves as the denominator for
     // proportional scaling of selected tasks, ensuring consistent visualization across
     // different selection sizes.
-    const { displayedMinutes } = computeDisplayedTimeback(
-      data.profile,
-      data.tasks,
-      data.tasks.filter(t => t.ai_applicable).reduce(
-        (sum, t) => sum + estimateTaskMinutes(t) * archetypeMultiplier, 0
-      )
-    )
+    const { displayedMinutes } = computeDisplayedTimeback(data.profile, data.tasks)
 
     // Build TaskWithTimes for each selected task, scaling to displayedMinutes
     const tasksWithTimes: TaskWithTimes[] = selectedTasks.map(t => {

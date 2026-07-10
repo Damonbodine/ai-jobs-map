@@ -29,10 +29,15 @@ export function inferArchetypeMultiplier(profile: AutomationProfile | null) {
   return 1
 }
 
+// The single displayed estimate every surface derives from. The formula is
+// deliberately small: the task-level model (spread by composite_score),
+// floored by the profile's optimistic bound when one exists, capped at 180.
+// The previous weighted "blend" could never exceed the max() of its own
+// inputs and was dead code; blueprint minutes are no longer an input because
+// they now derive from the same task model (see lib/blueprint.ts).
 export function computeDisplayedTimeback(
   profile: AutomationProfile | null,
-  tasks: MicroTask[],
-  blueprintMinutes: number
+  tasks: MicroTask[]
 ) {
   const aiTasks = tasks.filter((task) => task.ai_applicable)
   const archetypeMultiplier = inferArchetypeMultiplier(profile)
@@ -41,9 +46,6 @@ export function computeDisplayedTimeback(
     0
   )
   const modeledTaskMinutes = Math.round(modeledTaskMinutesRaw * archetypeMultiplier)
-  const optimisticBlueprintMinutes = blueprintMinutes
-    ? Math.round(blueprintMinutes * 1.15)
-    : 0
   const profileMidMinutes = profile
     ? Math.round(((profile.time_range_low ?? 0) + (profile.time_range_high ?? 0)) / 2)
     : 0
@@ -61,23 +63,7 @@ export function computeDisplayedTimeback(
   const scaledTaskMinutes = Math.round(modeledTaskMinutes * scoreMultiplier)
 
   const displayedMinutes = Math.round(
-    clamp(
-      Math.max(
-        profileMidMinutes > 0
-          ? profileMidMinutes * 0.3 +
-              optimisticProfileMinutes * 0.2 +
-              scaledTaskMinutes * 0.35 +
-              optimisticBlueprintMinutes * 0.15
-          : scaledTaskMinutes * 0.55 +
-              optimisticBlueprintMinutes * 0.25 +
-              (profile?.composite_score ?? 50) * 0.2,
-        scaledTaskMinutes,
-        optimisticProfileMinutes,
-        optimisticBlueprintMinutes
-      ),
-      0,
-      180
-    )
+    clamp(Math.max(scaledTaskMinutes, optimisticProfileMinutes), 0, 180)
   )
 
   const profileLow = profile?.time_range_low ?? 0

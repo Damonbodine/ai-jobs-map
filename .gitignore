@@ -53,3 +53,4 @@ backups/
 # Generated visual-review artifacts
 output/
 tmp/pdfs/
+__pycache__/

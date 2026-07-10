@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og"
 import { SITE, AGENCY } from "@/lib/site"
+import { BRAND } from "@/lib/brand"
 
 export const alt = `${SITE.name} — ${SITE.tagline}`
 export const size = { width: 1200, height: 630 }
@@ -16,8 +17,8 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "72px 80px",
-          backgroundColor: "#fbfaf6",
-          color: "#211d19",
+          backgroundColor: BRAND.background,
+          color: BRAND.foreground,
         }}
       >
         <div
@@ -31,9 +32,8 @@ export default function OpenGraphImage() {
             style={{
               width: 56,
               height: 56,
-              borderRadius: 12,
-              backgroundColor: "#3b82f6",
-              color: "#ffffff",
+              backgroundColor: BRAND.cyan,
+              color: BRAND.foreground,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -56,7 +56,7 @@ export default function OpenGraphImage() {
           <div style={{ fontSize: 64, fontWeight: 700, lineHeight: 1.1, maxWidth: 980 }}>
             See exactly how much time AI gives back — role by role.
           </div>
-          <div style={{ fontSize: 30, color: "#6b6459" }}>
+          <div style={{ fontSize: 30, color: BRAND.mutedForeground }}>
             800+ occupations, mapped task by task.
           </div>
         </div>
@@ -67,11 +67,11 @@ export default function OpenGraphImage() {
             justifyContent: "space-between",
             alignItems: "center",
             fontSize: 24,
-            color: "#6b6459",
+            color: BRAND.mutedForeground,
           }}
         >
           <div>{`A project by ${AGENCY.name}`}</div>
-          <div style={{ color: "#3b82f6", fontWeight: 600 }}>
+          <div style={{ color: BRAND.accent, fontWeight: 600 }}>
             {SITE.url.replace("https://", "")}
           </div>
         </div>

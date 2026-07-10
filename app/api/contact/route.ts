@@ -5,6 +5,7 @@ import { db } from "@/lib/db/client"
 import { contactMessages } from "@/lib/db/schema"
 import { CONTACT, AGENCY, SITE } from "@/lib/site"
 import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
+import { EMAIL_STYLES } from "@/lib/email/brand"
 
 export const runtime = "nodejs"
 
@@ -105,15 +106,15 @@ export async function POST(request: Request) {
       replyTo: email,
       subject: `New contact: ${name}${company ? ` (${company})` : ""}`,
       html: `
-<div style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px;">
+<div style="${EMAIL_STYLES.shell}">
   <h2 style="font-size: 18px; margin: 0 0 12px;">New contact form submission</h2>
   <p style="margin: 0 0 8px;"><strong>From:</strong> ${safeName} &lt;${safeEmail}&gt;</p>
   ${safeCompany ? `<p style="margin: 0 0 8px;"><strong>Company:</strong> ${safeCompany}</p>` : ""}
   <p style="margin: 16px 0 8px;"><strong>Message:</strong></p>
-  <div style="padding: 12px; background: #f7f5f0; border-radius: 8px; border-left: 3px solid #2563eb;">
+  <div style="${EMAIL_STYLES.panel}">
     ${safeMessage}
   </div>
-  <p style="margin: 24px 0 0; font-size: 12px; color: #777;">
+  <p style="margin: 24px 0 0; font-size: 12px; ${EMAIL_STYLES.muted}">
     Submitted via ${SITE.name} — ${AGENCY.name}
   </p>
 </div>
@@ -143,11 +144,11 @@ Submitted via ${SITE.name} — ${AGENCY.name}`,
       replyTo: CONTACT.replyTo,
       subject: `Got your note — ${AGENCY.name}`,
       html: `
-<div style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px;">
+<div style="${EMAIL_STYLES.shell}">
   <p style="margin: 0 0 12px;">Thanks — I read every message personally and reply within one business day, usually much faster.</p>
   <p style="margin: 0 0 12px;">Want to skip ahead? Start with an audit — we'll prove the numbers on your actual workflow:</p>
-  <p style="margin: 0 0 16px;"><a href="${AGENCY.enquireUrl}" style="color:#2563eb;">${AGENCY.enquireUrl}</a></p>
-  <p style="margin: 24px 0 0;">— Damon<br/><span style="font-size: 12px; color: #777;">${AGENCY.name}</span></p>
+  <p style="margin: 0 0 16px;"><a href="${AGENCY.enquireUrl}" style="${EMAIL_STYLES.link}">${AGENCY.enquireUrl}</a></p>
+  <p style="margin: 24px 0 0;">— Damon<br/><span style="font-size: 12px; ${EMAIL_STYLES.muted}">${AGENCY.name}</span></p>
 </div>
       `.trim(),
       text: `Thanks — I read every message personally and reply within one business day, usually much faster.

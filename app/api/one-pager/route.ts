@@ -15,7 +15,8 @@ import {
 import { computeAnnualValue } from "@/lib/pricing"
 import { getBlockForTask } from "@/lib/blueprint"
 import { MODULE_REGISTRY } from "@/lib/modules"
-import { PDF_MODULE_ACCENTS } from "@/lib/pdf/styles"
+import { PDF_COLORS, PDF_MODULE_ACCENTS } from "@/lib/pdf/styles"
+import { EMAIL_STYLES } from "@/lib/email/brand"
 import type { AutomationProfile, MicroTask } from "@/types"
 
 export const runtime = "nodejs"
@@ -159,7 +160,7 @@ export async function POST(request: Request) {
     .map(([moduleKey, data]) => ({
       moduleKey,
       label: MODULE_REGISTRY[moduleKey as keyof typeof MODULE_REGISTRY]?.label ?? moduleKey,
-      accentColor: PDF_MODULE_ACCENTS[moduleKey] ?? "#6b7280",
+      accentColor: PDF_MODULE_ACCENTS[moduleKey] ?? PDF_COLORS.muted,
       // Scale raw minutes proportionally to displayedMinutes
       minutesPerDay: totalBlueprintMinutes > 0
         ? Math.max(1, Math.round((data.rawMinutes / totalBlueprintMinutes) * displayedMinutes))
@@ -241,10 +242,10 @@ export async function POST(request: Request) {
       to: email,
       subject: `AI Time-Back One-Pager · ${occupation.title}`,
       html: `
-<div style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px; color:#221f1c;">
+<div style="${EMAIL_STYLES.shell}">
   <h2 style="font-size: 20px; margin: 0 0 12px;">Your one-pager is attached.</h2>
   <p>Thanks for your interest in the ${escapeHtml(SITE.name)} analysis for <strong>${safeOccupation}</strong>. The attached PDF summarizes the top automation opportunities and the time-back potential for this role &mdash; share it with your team.</p>
-  <p>If the numbers make sense and you'd like to talk about a real build, start with an audit at <a href="${AGENCY.enquireUrl}" style="color:#2563eb;">${AGENCY.enquireUrl}</a>.</p>
+  <p>If the numbers make sense and you'd like to talk about a real build, start with an audit at <a href="${AGENCY.enquireUrl}" style="${EMAIL_STYLES.link}">${AGENCY.enquireUrl}</a>.</p>
   <p style="margin-top:24px;">&mdash; ${escapeHtml(AGENCY.name)}</p>
 </div>`.trim(),
       text: `Your one-pager is attached.

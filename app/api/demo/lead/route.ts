@@ -12,6 +12,7 @@ import { sendEmail } from "@/lib/resend"
 import { CONTACT, AGENCY, SITE } from "@/lib/site"
 import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
 import type { DemoRoleData } from "@/lib/demo/types"
+import { EMAIL_STYLES } from "@/lib/email/brand"
 
 function escapeHtml(value: string): string {
   return value
@@ -97,15 +98,15 @@ export async function POST(request: Request) {
       replyTo: email,
       subject: `New demo lead: ${email}${safeContext ? ` (${safeContext})` : ""}`,
       html: `
-<div style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px;">
+<div style="${EMAIL_STYLES.shell}">
   <h2 style="font-size: 18px; margin: 0 0 12px;">Custom demo lead</h2>
   <p style="margin: 0 0 8px;"><strong>Email:</strong> ${safeEmail}</p>
   ${safeContext ? `<p style="margin: 0 0 8px;"><strong>Role:</strong> ${safeContext}</p>` : ""}
   <p style="margin: 16px 0 8px;"><strong>Task they described:</strong></p>
-  <div style="padding: 12px; background: #f7f5f0; border-radius: 8px; border-left: 3px solid #2563eb;">
+  <div style="${EMAIL_STYLES.panel}">
     ${safeTask}
   </div>
-  <p style="margin: 24px 0 0; font-size: 12px; color: #777;">
+  <p style="margin: 24px 0 0; font-size: 12px; ${EMAIL_STYLES.muted}">
     Submitted via ${SITE.name} /demo/try — ${AGENCY.name}
   </p>
 </div>
@@ -153,10 +154,10 @@ Submitted via ${SITE.name} /demo/try — ${AGENCY.name}`,
         ? role.agents
             .map(
               (a) => `
-  <div style="padding: 12px; background: #f7f5f0; border-radius: 8px; margin: 0 0 8px;">
+  <div style="${EMAIL_STYLES.card} margin: 0 0 8px;">
     <p style="margin: 0; font-weight: 600;">${escapeHtml(a.agentName)} — ${escapeHtml(a.label)}</p>
-    <p style="margin: 4px 0 0; font-size: 14px; color: #444;">${escapeHtml(a.narrative)}</p>
-    <p style="margin: 6px 0 0; font-size: 13px; color: #2563eb;">${a.beforeMinutes} min → ${a.afterMinutes} min</p>
+    <p style="margin: 4px 0 0; font-size: 14px; ${EMAIL_STYLES.muted}">${escapeHtml(a.narrative)}</p>
+    <p style="margin: 6px 0 0; font-size: 13px; ${EMAIL_STYLES.link}">${a.beforeMinutes} min → ${a.afterMinutes} min</p>
   </div>`
             )
             .join("")
@@ -177,10 +178,10 @@ Submitted via ${SITE.name} /demo/try — ${AGENCY.name}`,
       replyTo: CONTACT.replyTo,
       subject: `Your custom AI agent demo — ${SITE.name}`,
       html: `
-<div style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px;">
+<div style="${EMAIL_STYLES.shell}">
   <h2 style="font-size: 18px; margin: 0 0 12px;">Here's the agent we sketched for your task</h2>
   <p style="margin: 0 0 8px;"><strong>You described:</strong></p>
-  <div style="padding: 12px; background: #f7f5f0; border-radius: 8px; border-left: 3px solid #2563eb; margin: 0 0 16px;">
+  <div style="${EMAIL_STYLES.panel} margin: 0 0 16px;">
     ${safeTask}
   </div>
   ${agentHtml}
@@ -190,8 +191,8 @@ Submitted via ${SITE.name} /demo/try — ${AGENCY.name}`,
       : ""
   }
   <p style="margin: 16px 0 8px;">We'll follow up personally within a day. If you'd like to move faster, start with an audit — ${AGENCY.name} proves these numbers on your actual workflow:</p>
-  <p style="margin: 0 0 16px;"><a href="${AGENCY.enquireUrl}" style="color:#2563eb;">${AGENCY.enquireUrl}</a></p>
-  <p style="margin: 24px 0 0; font-size: 12px; color: #777;">
+  <p style="margin: 0 0 16px;"><a href="${AGENCY.enquireUrl}" style="${EMAIL_STYLES.link}">${AGENCY.enquireUrl}</a></p>
+  <p style="margin: 24px 0 0; font-size: 12px; ${EMAIL_STYLES.muted}">
     ${SITE.name} — a project by ${AGENCY.name}
   </p>
 </div>

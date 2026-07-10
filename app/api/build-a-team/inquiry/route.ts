@@ -10,6 +10,7 @@ import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
 import { AGENCY, CONTACT, SITE } from "@/lib/site"
 import { computeDepartmentTotals, type RoleData } from "@/lib/build-a-team/compute"
 import { PRICING_TIERS } from "@/lib/pricing"
+import { EMAIL_STYLES } from "@/lib/email/brand"
 
 export const runtime = "nodejs"
 
@@ -200,10 +201,10 @@ export async function POST(request: Request) {
       to: input.contactEmail,
       subject: `Your AI Team Blueprint — ${AGENCY.name}`,
       html: `
-<div style="font-family:-apple-system,system-ui,sans-serif;max-width:560px;color:#221f1c;">
+<div style="${EMAIL_STYLES.shell}">
   <h2 style="font-size:20px;margin:0 0 12px;">Your team blueprint is attached.</h2>
   <p>Thanks for using the team builder, ${safeName}. The PDF summarises the compounded AI value for your ${totals.totalPeople}-person team — ${totals.fteEquivalents} FTE-equivalents of time reclaimed per day.</p>
-  <p>We'll be in touch shortly to talk through the build. If you'd like to move faster, start with an audit at <a href="${AGENCY.enquireUrl}" style="color:#2563eb;">${AGENCY.enquireUrl}</a>.</p>
+  <p>We'll be in touch shortly to talk through the build. If you'd like to move faster, start with an audit at <a href="${AGENCY.enquireUrl}" style="${EMAIL_STYLES.link}">${AGENCY.enquireUrl}</a>.</p>
   <p style="margin-top:24px;">&mdash; ${escapeHtml(AGENCY.name)}</p>
 </div>`.trim(),
       text: `Your team blueprint is attached.\n\nThanks ${input.contactName ?? input.contactEmail}. The PDF covers your ${totals.totalPeople}-person team (${totals.fteEquivalents} FTEs reclaimed/day).\n\nStart with an audit: ${AGENCY.enquireUrl}\n\n— ${AGENCY.name}`,

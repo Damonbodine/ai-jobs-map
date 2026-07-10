@@ -14,6 +14,7 @@ import {
   inferArchetypeMultiplier,
 } from "@/lib/timeback"
 import type { AutomationProfile, MicroTask } from "@/types"
+import { EMAIL_STYLES } from "@/lib/email/brand"
 
 export const runtime = "nodejs"
 
@@ -255,12 +256,12 @@ export async function POST(request: Request) {
       to: input.contactEmail,
       subject: `Your AI Blueprint for ${occupation.title}`,
       html: `
-<div style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px; color:#221f1c;">
+<div style="${EMAIL_STYLES.shell}">
   <h2 style="font-size: 20px; margin: 0 0 12px;">Your AI Blueprint is attached${safeName ? ", " + safeName : ""}.</h2>
   <p>Thanks for trying the ${escapeHtml(SITE.name)} builder. Your custom blueprint for <strong>${safeOccupation}</strong> is attached as a PDF &mdash; share it with your team, push back on the numbers, and let us know what would make it fit your reality better.</p>
   <p><strong>What happens next:</strong> we'll review your submission personally and reply within one business day with an honest take on whether this is something we can help you build.</p>
   <p style="margin-top:24px;">&mdash; ${escapeHtml(AGENCY.name)}<br/>
-  <a href="${SITE.url}" style="color:#2563eb;">${SITE.url}</a></p>
+  <a href="${SITE.url}" style="${EMAIL_STYLES.link}">${SITE.url}</a></p>
 </div>`.trim(),
       text: `Your AI Blueprint is attached${input.contactName ? ", " + input.contactName : ""}.
 
@@ -302,7 +303,7 @@ ${SITE.url}`,
       replyTo: input.contactEmail,
       subject: `New builder inquiry: ${input.contactName || input.contactEmail} - ${occupation.title}`,
       html: `
-<div style="font-family: -apple-system, system-ui, sans-serif; max-width: 560px; color:#221f1c;">
+<div style="${EMAIL_STYLES.shell}">
   <h2 style="font-size: 18px; margin: 0 0 12px;">New builder inquiry</h2>
   <p><strong>Lead:</strong> ${safeName} &lt;${safeEmail}&gt;</p>
   <p><strong>Occupation:</strong> ${safeOccupation}</p>

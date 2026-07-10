@@ -172,7 +172,7 @@ export default async function OccupationPage(props: {
               </a>
               <a
                 href="https://clearroadlabs.com/sample-audit"
-                className="inline-flex items-center justify-center border border-border px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-secondary"
+                className="inline-flex items-center justify-center whitespace-nowrap border border-border px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-foreground transition-colors hover:bg-secondary sm:px-6 sm:text-xs sm:tracking-[0.14em]"
               >
                 See what the full audit looks like →
               </a>

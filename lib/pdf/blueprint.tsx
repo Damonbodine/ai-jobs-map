@@ -8,15 +8,15 @@ import {
 } from "@react-pdf/renderer"
 
 // PDF intentionally uses react-pdf's built-in Helvetica family rather
-// than registering Newsreader / Manrope from a CDN. Google Fonts'
+// than registering Geist / Geist Mono from a CDN. Google Fonts'
 // gstatic URLs are versioned and unstable for hardcoded use, and a
 // 404 on font fetch fails the entire renderToBuffer call — losing the
 // PDF attachment for an otherwise-successful submission. The two-
 // writes-no-silent-failure pattern catches it (the lead row still
 // lands), but the user gets an email with no attachment.
 //
-// TODO (future plan): vendor TTFs of Newsreader (heading) + Manrope
-// (body) into /public/fonts and Font.register from local file:// or
+// TODO (future plan): vendor Geist + Geist Mono TTFs into /public/fonts
+// and Font.register from local file:// or
 // imported binary URLs. Then we can match the site's brand typography
 // in the PDF without depending on a third-party CDN at runtime.
 
@@ -65,7 +65,6 @@ const styles = StyleSheet.create({
   statCard: {
     flex: 1,
     backgroundColor: COLORS.cardBg,
-    borderRadius: 10,
     padding: 14,
     border: `1 solid ${COLORS.border}`,
   },
@@ -112,7 +111,6 @@ const styles = StyleSheet.create({
   moduleCard: {
     backgroundColor: COLORS.cardBg,
     border: `1 solid ${COLORS.border}`,
-    borderRadius: 8,
     padding: 12,
     marginBottom: 8,
   },
@@ -127,7 +125,6 @@ const styles = StyleSheet.create({
   },
   calloutCard: {
     backgroundColor: COLORS.accentSoft,
-    borderRadius: 10,
     padding: 16,
     marginBottom: 20,
   },
@@ -159,11 +156,9 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: COLORS.cardBg,
     border: `1 solid ${COLORS.border}`,
-    borderRadius: 6,
   },
   page2Callout: {
     backgroundColor: COLORS.accentSoft,
-    borderRadius: 8,
     padding: 14,
     marginTop: 24,
   },

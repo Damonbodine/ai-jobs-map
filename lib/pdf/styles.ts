@@ -4,25 +4,46 @@
  * roles) import from here so brand colors stay in lock-step.
  */
 
+import { BRAND, DATA_SERIES } from "@/lib/brand"
+
+function withAlpha(hex: string, alpha: number): string {
+  const value = hex.replace("#", "")
+  const red = Number.parseInt(value.slice(0, 2), 16)
+  const green = Number.parseInt(value.slice(2, 4), 16)
+  const blue = Number.parseInt(value.slice(4, 6), 16)
+  return `rgba(${red},${green},${blue},${alpha})`
+}
+
 export const PDF_COLORS = {
-  bg: "#fafaf7",
-  fg: "#221f1c",
-  muted: "#6b6661",
-  accent: "#2563eb",
-  accentSoft: "#eff6ff",
-  border: "#e5e0d8",
-  cardBg: "#ffffff",
+  bg: BRAND.background,
+  fg: BRAND.foreground,
+  muted: BRAND.mutedForeground,
+  accent: BRAND.accent,
+  cyan: BRAND.cyan,
+  accentSoft: withAlpha(BRAND.accent, 0.1),
+  secondary: BRAND.secondary,
+  border: withAlpha(BRAND.foreground, 0.14),
+  cardBg: BRAND.card,
+  success: BRAND.success,
+  successSoft: withAlpha(BRAND.success, 0.1),
+  destructive: BRAND.destructive,
+  terminal: BRAND.terminal,
+  terminalForeground: BRAND.terminalForeground,
+  terminalMuted: withAlpha(BRAND.terminalForeground, 0.7),
+  terminalDim: withAlpha(BRAND.terminalForeground, 0.4),
+  terminalSubtle: withAlpha(BRAND.terminalForeground, 0.08),
+  terminalHairline: withAlpha(BRAND.terminalForeground, 0.15),
 } as const
 
 export const PDF_MODULE_ACCENTS: Record<string, string> = {
-  intake: "#06b6d4",
-  analysis: "#6366f1",
-  documentation: "#8b5cf6",
-  coordination: "#10b981",
-  exceptions: "#f59e0b",
-  learning: "#f43f5e",
-  research: "#14b8a6",
-  compliance: "#ef4444",
-  communication: "#f97316",
-  data_reporting: "#0ea5e9",
+  intake: DATA_SERIES[0],
+  analysis: DATA_SERIES[3],
+  documentation: DATA_SERIES[1],
+  coordination: DATA_SERIES[2],
+  exceptions: DATA_SERIES[4],
+  learning: DATA_SERIES[5],
+  research: DATA_SERIES[0],
+  compliance: DATA_SERIES[3],
+  communication: DATA_SERIES[1],
+  data_reporting: DATA_SERIES[2],
 }

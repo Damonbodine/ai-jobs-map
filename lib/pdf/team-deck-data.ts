@@ -3,7 +3,7 @@ import { estimateTaskMinutes, inferArchetypeMultiplier, computeDisplayedTimeback
 import { getBlockForTask } from "@/lib/blueprint"
 import { MODULE_REGISTRY } from "@/lib/modules"
 import { computeAnnualValue } from "@/lib/pricing"
-import { PDF_MODULE_ACCENTS } from "./styles"
+import { PDF_COLORS, PDF_MODULE_ACCENTS } from "./styles"
 import type { RoleData } from "@/lib/build-a-team/compute"
 
 /**
@@ -122,7 +122,7 @@ export function computeRoleSections(
       modules.push({
         moduleKey,
         label: def?.label ?? moduleKey,
-        accentColor: PDF_MODULE_ACCENTS[moduleKey] ?? "#6b7280",
+        accentColor: PDF_MODULE_ACCENTS[moduleKey] ?? PDF_COLORS.muted,
         minutesPerDay: Math.round(minutesPerDay),
         topTasks: [...moduleTasks].sort((a, b) => b.beforeMinutes - a.beforeMinutes).slice(0, 4),
       })

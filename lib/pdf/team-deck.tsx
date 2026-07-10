@@ -23,7 +23,7 @@ export type TeamDeckProps = {
 const s = StyleSheet.create({
   // ── Shared ──
   page: { backgroundColor: C.bg, padding: 48, fontSize: 10, color: C.fg, lineHeight: 1.5 },
-  darkPage: { backgroundColor: C.fg, padding: 48, fontSize: 10, color: C.bg, lineHeight: 1.5 },
+  darkPage: { backgroundColor: C.terminal, padding: 48, fontSize: 10, color: C.terminalForeground, lineHeight: 1.5 },
   footer: {
     position: "absolute", bottom: 32, left: 48, right: 48,
     borderTop: `1 solid ${C.border}`, paddingTop: 10,
@@ -31,11 +31,11 @@ const s = StyleSheet.create({
   },
   darkFooter: {
     position: "absolute", bottom: 32, left: 48, right: 48,
-    borderTop: "1 solid rgba(255,255,255,0.15)", paddingTop: 10,
-    fontSize: 8, color: "rgba(255,255,255,0.4)", flexDirection: "row", justifyContent: "space-between",
+    borderTop: `1 solid ${C.terminalHairline}`, paddingTop: 10,
+    fontSize: 8, color: C.terminalDim, flexDirection: "row", justifyContent: "space-between",
   },
   kicker: { fontSize: 8, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6, fontWeight: 600 },
-  darkKicker: { fontSize: 8, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6, fontWeight: 600, color: "rgba(255,255,255,0.45)" },
+  darkKicker: { fontSize: 8, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6, fontWeight: 600, color: C.terminalDim },
   h1: { fontSize: 28, fontWeight: 700, lineHeight: 1.2, marginBottom: 12 },
   h2: { fontSize: 18, fontWeight: 700, marginBottom: 16 },
   h3: { fontSize: 13, fontWeight: 700, marginBottom: 8 },
@@ -43,7 +43,7 @@ const s = StyleSheet.create({
   section: { marginBottom: 24 },
   // ── Stats ──
   statsRow: { flexDirection: "row", marginBottom: 24 },
-  statCard: { flex: 1, backgroundColor: C.cardBg, border: `1 solid ${C.border}`, borderRadius: 8, padding: 12, marginRight: 10 },
+  statCard: { flex: 1, backgroundColor: C.cardBg, border: `1 solid ${C.border}`, padding: 12, marginRight: 10 },
   statLabel: { fontSize: 7, letterSpacing: 0.8, textTransform: "uppercase", color: C.muted, marginBottom: 3 },
   statValue: { fontSize: 22, fontWeight: 700 },
   statUnit: { fontSize: 10, color: C.muted },
@@ -55,9 +55,9 @@ const s = StyleSheet.create({
   bulletDot: { width: 16, color: C.accent, fontWeight: 700 },
   bulletBody: { flex: 1 },
   // ── Module row ──
-  moduleRow: { flexDirection: "row", alignItems: "center", marginBottom: 8, padding: 10, backgroundColor: C.cardBg, border: `1 solid ${C.border}`, borderRadius: 6 },
+  moduleRow: { flexDirection: "row", alignItems: "center", marginBottom: 8, padding: 10, backgroundColor: C.cardBg, border: `1 solid ${C.border}` },
   // ── Callout ──
-  callout: { backgroundColor: C.accentSoft, borderRadius: 8, padding: 14, marginBottom: 16 },
+  callout: { backgroundColor: C.accentSoft, padding: 14, marginBottom: 16 },
 })
 
 function Footer({ agencyName, siteUrl, page, dark }: { agencyName: string; siteUrl: string; page: number; dark?: boolean }) {
@@ -76,21 +76,21 @@ function CoverPage({ props }: { props: TeamDeckProps }) {
     <Page size="LETTER" style={s.darkPage}>
       <View style={{ flex: 1, justifyContent: "center" }}>
         <Text style={s.darkKicker}>Timeback · Team Blueprint</Text>
-        <Text style={[s.h1, { color: C.bg, marginBottom: 6 }]}>
+        <Text style={[s.h1, { color: C.terminalForeground, marginBottom: 6 }]}>
           Your team reclaims{"\n"}
-          <Text style={{ color: "#60a5fa" }}>{hoursPerYear.toLocaleString()} hours</Text>
+          <Text style={{ color: C.cyan }}>{hoursPerYear.toLocaleString()} hours</Text>
           {"\n"}every year.
         </Text>
         <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 16 }}>
           {props.roles.map(r => (
-            <View key={r.slug} style={{ backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 4, paddingHorizontal: 8, paddingVertical: 3, marginRight: 6, marginBottom: 6 }}>
-              <Text style={{ fontSize: 9, color: "rgba(255,255,255,0.7)" }}>{r.title} ×{r.count}</Text>
+            <View key={r.slug} style={{ backgroundColor: C.terminalSubtle, paddingHorizontal: 8, paddingVertical: 3, marginRight: 6, marginBottom: 6 }}>
+              <Text style={{ fontSize: 9, color: C.terminalMuted }}>{r.title} ×{r.count}</Text>
             </View>
           ))}
         </View>
       </View>
-      <View style={{ borderTop: "1 solid rgba(255,255,255,0.12)", paddingTop: 16 }}>
-        <Text style={{ fontSize: 8, color: "rgba(255,255,255,0.4)" }}>
+      <View style={{ borderTop: `1 solid ${C.terminalHairline}`, paddingTop: 16 }}>
+        <Text style={{ fontSize: 8, color: C.terminalDim }}>
           Prepared by {props.agencyName} · {props.generatedAt}
         </Text>
       </View>
@@ -165,7 +165,7 @@ function MethodologyPage({ props }: { props: TeamDeckProps }) {
       <View style={s.section}>
         {steps.map(step => (
           <View key={step.n} style={[s.bullet, { marginBottom: 14 }]}>
-            <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: C.fg, marginRight: 10, alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <View style={{ width: 22, height: 22, backgroundColor: C.fg, marginRight: 10, alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <Text style={{ fontSize: 9, fontWeight: 700, color: C.bg }}>{step.n}</Text>
             </View>
             <Text style={[s.bulletBody, { paddingTop: 3 }]}>{step.text}</Text>
@@ -187,7 +187,7 @@ function RoleSectionPage({ role, pageNum, props }: { role: RoleDeckSection; page
   return (
     <Page size="LETTER" style={s.page}>
       <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 20 }}>
-        <View style={{ width: 6, height: 36, borderRadius: 3, backgroundColor: C.accent, marginRight: 12 }} />
+        <View style={{ width: 6, height: 36, backgroundColor: C.accent, marginRight: 12 }} />
         <View>
           <Text style={[s.h2, { marginBottom: 2 }]}>{role.title}</Text>
           <Text style={s.muted}>{role.count} {role.count === 1 ? "person" : "people"} · {role.minutesPerPerson} min/day · ${Math.round(role.annualValuePerPerson * role.count).toLocaleString()}/yr total</Text>
@@ -201,7 +201,7 @@ function RoleSectionPage({ role, pageNum, props }: { role: RoleDeckSection; page
             <Text style={{ fontSize: 10, fontWeight: 600 }}>{mod.label}</Text>
             <Text style={s.muted}>{mod.topTasks.slice(0, 2).map(t => t.name).join(" · ")}</Text>
           </View>
-          <Text style={{ fontSize: 13, fontWeight: 700, color: mod.accentColor }}>{mod.minutesPerDay} min</Text>
+          <Text style={{ fontSize: 13, fontWeight: 700, color: C.fg }}>{mod.minutesPerDay} min</Text>
         </View>
       ))}
 
@@ -220,7 +220,7 @@ function RoleSectionPage({ role, pageNum, props }: { role: RoleDeckSection; page
               <Text style={[s.muted, { fontSize: 8 }]}>{t.howItHelps.slice(0, 80)}{t.howItHelps.length > 80 ? "…" : ""}</Text>
             </View>
             <Text style={{ flex: 1, textAlign: "center", fontSize: 9 }}>{t.beforeMinutes}m</Text>
-            <Text style={{ flex: 1, textAlign: "center", fontSize: 9, color: "#16a34a", fontWeight: 600 }}>{t.afterMinutes}m</Text>
+            <Text style={{ flex: 1, textAlign: "center", fontSize: 9, color: C.success, fontWeight: 600 }}>{t.afterMinutes}m</Text>
             <Text style={{ flex: 1.5, fontSize: 8, color: C.muted }}>{t.tools.split(",")[0]}</Text>
           </View>
         ))}
@@ -236,8 +236,8 @@ function ModuleDeepDivePage({ mod, pageNum, props }: { mod: ModuleBreakdown; pag
   return (
     <Page size="LETTER" style={s.page}>
       <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 6 }}>
-        <View style={{ width: 14, height: 14, borderRadius: 3, backgroundColor: mod.accentColor, marginRight: 8 }} />
-        <Text style={[s.kicker, { color: mod.accentColor, marginBottom: 0 }]}>{mod.label} Module</Text>
+        <View style={{ width: 14, height: 14, backgroundColor: mod.accentColor, marginRight: 8 }} />
+        <Text style={[s.kicker, { color: C.accent, marginBottom: 0 }]}>{mod.label} Module</Text>
       </View>
       <Text style={s.h2}>{mod.minutesPerDay} minutes reclaimed daily across your team</Text>
 
@@ -258,7 +258,7 @@ function ModuleDeepDivePage({ mod, pageNum, props }: { mod: ModuleBreakdown; pag
           <Text style={{ flex: 1, fontSize: 8, color: C.muted }}>{t.frequency}</Text>
           <Text style={{ flex: 1, textAlign: "center", fontSize: 9 }}>{"●".repeat(t.impactLevel)}</Text>
           <Text style={{ flex: 1, textAlign: "center", fontSize: 9 }}>{t.beforeMinutes}m</Text>
-          <Text style={{ flex: 1, textAlign: "center", fontSize: 9, color: "#16a34a", fontWeight: 600 }}>{t.afterMinutes}m</Text>
+          <Text style={{ flex: 1, textAlign: "center", fontSize: 9, color: C.success, fontWeight: 600 }}>{t.afterMinutes}m</Text>
           <Text style={{ flex: 1.5, fontSize: 8, color: C.muted }}>{t.tools.split(",")[0]}</Text>
         </View>
       ))}
@@ -270,22 +270,22 @@ function ModuleDeepDivePage({ mod, pageNum, props }: { mod: ModuleBreakdown; pag
 // ── Roadmap Page ───────────────────────────────────────────────
 function RoadmapPage({ phases, pageNum, props }: { phases: PhasedRoadmap; pageNum: number; props: TeamDeckProps }) {
   const phaseConfig = [
-    { key: "phase1" as const, label: "Phase 1 — Weeks 1–4", subtitle: "Quick wins: low effort, high impact", color: "#dcfce7", textColor: "#166534" },
-    { key: "phase2" as const, label: "Phase 2 — Month 2–3", subtitle: "Medium lift: moderate setup required", color: "#eff6ff", textColor: "#1d4ed8" },
-    { key: "phase3" as const, label: "Phase 3 — Month 4+", subtitle: "Heavy lift: deep integrations", color: "#faf5ff", textColor: "#7e22ce" },
+    { key: "phase1" as const, label: "Phase 1 — Weeks 1–4", subtitle: "Quick wins: low effort, high impact", color: C.successSoft, textColor: C.success },
+    { key: "phase2" as const, label: "Phase 2 — Month 2–3", subtitle: "Medium lift: moderate setup required", color: C.accentSoft, textColor: C.accent },
+    { key: "phase3" as const, label: "Phase 3 — Month 4+", subtitle: "Heavy lift: deep integrations", color: C.secondary, textColor: C.muted },
   ]
   return (
     <Page size="LETTER" style={s.page}>
       <Text style={[s.kicker, { color: C.accent }]}>Implementation</Text>
       <Text style={s.h2}>Phased rollout — ordered by effort</Text>
       {phaseConfig.map(({ key, label, subtitle, color, textColor }) => (
-        <View key={key} style={{ backgroundColor: color, borderRadius: 8, padding: 14, marginBottom: 12 }}>
+        <View key={key} style={{ backgroundColor: color, padding: 14, marginBottom: 12 }}>
           <Text style={{ fontSize: 11, fontWeight: 700, color: textColor, marginBottom: 2 }}>{label}</Text>
           <Text style={{ fontSize: 8, color: textColor, opacity: 0.8, marginBottom: 8 }}>{subtitle}</Text>
           {phases[key].slice(0, 5).map((t, i) => (
             <View key={i} style={[s.bullet, { marginBottom: 3 }]}>
               <Text style={[s.bulletDot, { color: textColor }]}>·</Text>
-              <Text style={{ flex: 1, fontSize: 9, color: "#1a1a1a" }}>
+              <Text style={{ flex: 1, fontSize: 9, color: C.fg }}>
                 {t.name}
                 <Text style={{ color: C.muted }}>{" — "}{t.beforeMinutes}m → {t.afterMinutes}m</Text>
               </Text>
@@ -309,18 +309,18 @@ function CtaPage({ props }: { props: TeamDeckProps }) {
     <Page size="LETTER" style={s.darkPage}>
       <View style={{ flex: 1, justifyContent: "center" }}>
         <Text style={s.darkKicker}>Next step</Text>
-        <Text style={[s.h1, { color: C.bg, marginBottom: 16 }]}>
+        <Text style={[s.h1, { color: C.terminalForeground, marginBottom: 16 }]}>
           Start with{"\n"}an audit.
         </Text>
-        <Text style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, maxWidth: 400 }}>
+        <Text style={{ fontSize: 11, color: C.terminalMuted, lineHeight: 1.6, maxWidth: 400 }}>
           These numbers are estimates. The audit proves them on your workflow — two weeks, a ranked build plan. Engagements run through {AGENCY.name}.
         </Text>
       </View>
-      <View style={{ backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 8, padding: 16 }}>
-        <Text style={{ fontSize: 8, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>Prepared by</Text>
-        <Text style={{ fontSize: 10, color: C.bg }}>{props.agencyName}</Text>
-        <Text style={{ fontSize: 10, color: "#60a5fa", marginTop: 2 }}>{props.contactEmail}</Text>
-        <Text style={{ fontSize: 10, color: "#60a5fa" }}>{AGENCY.enquireUrl}</Text>
+      <View style={{ backgroundColor: C.terminalSubtle, padding: 16 }}>
+        <Text style={{ fontSize: 8, color: C.terminalDim, marginBottom: 4 }}>Prepared by</Text>
+        <Text style={{ fontSize: 10, color: C.terminalForeground }}>{props.agencyName}</Text>
+        <Text style={{ fontSize: 10, color: C.cyan, marginTop: 2 }}>{props.contactEmail}</Text>
+        <Text style={{ fontSize: 10, color: C.cyan }}>{AGENCY.enquireUrl}</Text>
       </View>
     </Page>
   )

@@ -11,7 +11,7 @@ import { AGENCY } from "@/lib/site"
 
 // Same Helvetica fallback rationale as blueprint.tsx — see that
 // file's header for the full explanation. TODO in a future plan to
-// vendor real Newsreader + Manrope TTFs.
+// vendor real Geist + Geist Mono TTFs.
 
 const styles = StyleSheet.create({
   page: {
@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
   statCard: {
     flexBasis: "48%",
     backgroundColor: COLORS.cardBg,
-    borderRadius: 10,
     padding: 14,
     border: `1 solid ${COLORS.border}`,
   },

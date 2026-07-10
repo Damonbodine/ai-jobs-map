@@ -165,7 +165,7 @@ export type DepartmentPdfProps = {
 export function DepartmentPdf(props: DepartmentPdfProps) {
   return (
     <Document
-      title={`AI Department Blueprint — ${props.teamLabel || "Custom team"}`}
+      title={`AI Department Blueprint - ${props.teamLabel || "Custom team"}`}
       author={props.agencyName}
     >
       <Page size="LETTER" style={styles.page}>
@@ -242,7 +242,7 @@ export function DepartmentPdf(props: DepartmentPdfProps) {
             <Text style={styles.bulletDot}>1.</Text>
             <Text style={styles.bulletBody}>
               Review this with your team. The numbers come from public BLS
-              data — your lived reality will refine them in either direction.
+              data - your lived reality will refine them in either direction.
             </Text>
           </View>
           <View style={styles.bullet}>

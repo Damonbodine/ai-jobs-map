@@ -37,7 +37,7 @@ const s = StyleSheet.create({
   kicker: { fontSize: 8, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6, fontWeight: 600 },
   darkKicker: { fontSize: 8, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 6, fontWeight: 600, color: C.terminalDim },
   h1: { fontSize: 28, fontWeight: 700, lineHeight: 1.2, marginBottom: 12 },
-  h2: { fontSize: 18, fontWeight: 700, marginBottom: 16 },
+  h2: { fontSize: 18, fontWeight: 700, lineHeight: 1.2, marginBottom: 16 },
   h3: { fontSize: 13, fontWeight: 700, marginBottom: 8 },
   muted: { fontSize: 9, color: C.muted },
   section: { marginBottom: 24 },
@@ -104,7 +104,7 @@ function OverviewPage({ props }: { props: TeamDeckProps }) {
   return (
     <Page size="LETTER" style={s.page}>
       <Text style={[s.kicker, { color: C.accent }]}>Team at a Glance</Text>
-      <Text style={s.h2}>What AI gives back — across your whole team</Text>
+      <Text style={s.h2}>What AI gives back - across your whole team</Text>
       <View style={s.statsRow}>
         <View style={s.statCard}>
           <Text style={s.statLabel}>Hours reclaimed / year</Text>
@@ -154,9 +154,9 @@ function OverviewPage({ props }: { props: TeamDeckProps }) {
 function MethodologyPage({ props }: { props: TeamDeckProps }) {
   const steps = [
     { n: "1", text: "Bureau of Labor Statistics + O*NET occupational task data was loaded for each role in your team." },
-    { n: "2", text: "Each task was scored for AI impact (1–5) based on task description, frequency, and category. Tasks requiring physical presence, creative judgment, or human empathy were scored lower." },
+    { n: "2", text: "Each task was scored for AI impact (1-5) based on task description, frequency, and category. Tasks requiring physical presence, creative judgment, or human empathy were scored lower." },
     { n: "3", text: "Tasks were grouped into AI agent modules (Documentation, Intake, Coordination, etc.) by their primary work function." },
-    { n: "4", text: "Your task selections were applied as the filter — only the tasks you chose to include appear in this blueprint." },
+    { n: "4", text: "Your task selections were applied as the filter - only the tasks you chose to include appear in this blueprint." },
   ]
   return (
     <Page size="LETTER" style={s.page}>
@@ -206,7 +206,7 @@ function RoleSectionPage({ role, pageNum, props }: { role: RoleDeckSection; page
       ))}
 
       <View style={{ marginTop: 20 }}>
-        <Text style={s.h3}>Top tasks — before & after AI</Text>
+        <Text style={s.h3}>Top tasks - before & after AI</Text>
         <View style={s.tableHeader}>
           <Text style={{ flex: 3 }}>Task</Text>
           <Text style={{ flex: 1, textAlign: "center" }}>Before</Text>
@@ -242,7 +242,7 @@ function ModuleDeepDivePage({ mod, pageNum, props }: { mod: ModuleBreakdown; pag
       <Text style={s.h2}>{mod.minutesPerDay} minutes reclaimed daily across your team</Text>
 
       <View style={s.tableHeader}>
-        <Text style={{ flex: 3 }}>Task</Text>
+        <Text style={{ flex: 3, paddingRight: 8 }}>Task</Text>
         <Text style={{ flex: 1 }}>Freq</Text>
         <Text style={{ flex: 1, textAlign: "center" }}>Impact</Text>
         <Text style={{ flex: 1, textAlign: "center" }}>Before</Text>
@@ -251,12 +251,12 @@ function ModuleDeepDivePage({ mod, pageNum, props }: { mod: ModuleBreakdown; pag
       </View>
       {mod.topTasks.map((t, i) => (
         <View key={i} style={s.tableRow}>
-          <View style={{ flex: 3 }}>
+          <View style={{ flex: 3, paddingRight: 8 }}>
             <Text style={{ fontSize: 9, fontWeight: 600 }}>{t.name}</Text>
             <Text style={[s.muted, { fontSize: 8 }]}>{t.howItHelps.slice(0, 70)}{t.howItHelps.length > 70 ? "…" : ""}</Text>
           </View>
           <Text style={{ flex: 1, fontSize: 8, color: C.muted }}>{t.frequency}</Text>
-          <Text style={{ flex: 1, textAlign: "center", fontSize: 9 }}>{"●".repeat(t.impactLevel)}</Text>
+          <Text style={{ flex: 1, textAlign: "center", fontSize: 9 }}>{t.impactLevel}/5</Text>
           <Text style={{ flex: 1, textAlign: "center", fontSize: 9 }}>{t.beforeMinutes}m</Text>
           <Text style={{ flex: 1, textAlign: "center", fontSize: 9, color: C.success, fontWeight: 600 }}>{t.afterMinutes}m</Text>
           <Text style={{ flex: 1.5, fontSize: 8, color: C.muted }}>{t.tools.split(",")[0]}</Text>
@@ -270,14 +270,14 @@ function ModuleDeepDivePage({ mod, pageNum, props }: { mod: ModuleBreakdown; pag
 // ── Roadmap Page ───────────────────────────────────────────────
 function RoadmapPage({ phases, pageNum, props }: { phases: PhasedRoadmap; pageNum: number; props: TeamDeckProps }) {
   const phaseConfig = [
-    { key: "phase1" as const, label: "Phase 1 — Weeks 1–4", subtitle: "Quick wins: low effort, high impact", color: C.successSoft, textColor: C.success },
-    { key: "phase2" as const, label: "Phase 2 — Month 2–3", subtitle: "Medium lift: moderate setup required", color: C.accentSoft, textColor: C.accent },
-    { key: "phase3" as const, label: "Phase 3 — Month 4+", subtitle: "Heavy lift: deep integrations", color: C.secondary, textColor: C.muted },
+    { key: "phase1" as const, label: "Phase 1 - Weeks 1-4", subtitle: "Quick wins: low effort, high impact", color: C.successSoft, textColor: C.success },
+    { key: "phase2" as const, label: "Phase 2 - Month 2-3", subtitle: "Medium lift: moderate setup required", color: C.accentSoft, textColor: C.accent },
+    { key: "phase3" as const, label: "Phase 3 - Month 4+", subtitle: "Heavy lift: deep integrations", color: C.secondary, textColor: C.muted },
   ]
   return (
     <Page size="LETTER" style={s.page}>
       <Text style={[s.kicker, { color: C.accent }]}>Implementation</Text>
-      <Text style={s.h2}>Phased rollout — ordered by effort</Text>
+      <Text style={s.h2}>Phased rollout - ordered by effort</Text>
       {phaseConfig.map(({ key, label, subtitle, color, textColor }) => (
         <View key={key} style={{ backgroundColor: color, padding: 14, marginBottom: 12 }}>
           <Text style={{ fontSize: 11, fontWeight: 700, color: textColor, marginBottom: 2 }}>{label}</Text>
@@ -287,7 +287,7 @@ function RoadmapPage({ phases, pageNum, props }: { phases: PhasedRoadmap; pageNu
               <Text style={[s.bulletDot, { color: textColor }]}>·</Text>
               <Text style={{ flex: 1, fontSize: 9, color: C.fg }}>
                 {t.name}
-                <Text style={{ color: C.muted }}>{" — "}{t.beforeMinutes}m → {t.afterMinutes}m</Text>
+                <Text style={{ color: C.muted }}>{" - "}{t.beforeMinutes}m to {t.afterMinutes}m</Text>
               </Text>
             </View>
           ))}
@@ -313,7 +313,7 @@ function CtaPage({ props }: { props: TeamDeckProps }) {
           Start with{"\n"}an audit.
         </Text>
         <Text style={{ fontSize: 11, color: C.terminalMuted, lineHeight: 1.6, maxWidth: 400 }}>
-          These numbers are estimates. The audit proves them on your workflow — two weeks, a ranked build plan. Engagements run through {AGENCY.name}.
+          These numbers are estimates. The audit proves them on your workflow - two weeks, a ranked build plan. Engagements run through {AGENCY.name}.
         </Text>
       </View>
       <View style={{ backgroundColor: C.terminalSubtle, padding: 16 }}>
@@ -331,7 +331,7 @@ export function TeamDeckPdf(props: TeamDeckProps) {
   const moduleStart = roleStart + props.roles.length
   const roadmapPageNum = moduleStart + props.topModules.length
   return (
-    <Document title={`AI Team Blueprint — ${props.teamLabel}`} author={props.agencyName}>
+    <Document title={`AI Team Blueprint - ${props.teamLabel}`} author={props.agencyName}>
       <CoverPage props={props} />
       <OverviewPage props={props} />
       <MethodologyPage props={props} />

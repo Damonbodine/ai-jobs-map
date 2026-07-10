@@ -59,4 +59,8 @@ describe("non-CSS brand surfaces", () => {
   it("keeps email panels square", () => {
     expect(Object.values(EMAIL_STYLES).join(" ")).not.toMatch(/border-radius/i)
   })
+
+  it("keeps the email shell safe inside double-quoted style attributes", () => {
+    expect(EMAIL_STYLES.shell).not.toContain('"')
+  })
 })

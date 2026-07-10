@@ -6,12 +6,18 @@
 
 import { BRAND, DATA_SERIES } from "@/lib/brand"
 
-function withAlpha(hex: string, alpha: number): string {
-  const value = hex.replace("#", "")
-  const red = Number.parseInt(value.slice(0, 2), 16)
-  const green = Number.parseInt(value.slice(2, 4), 16)
-  const blue = Number.parseInt(value.slice(4, 6), 16)
-  return `rgba(${red},${green},${blue},${alpha})`
+function mixHex(foreground: string, background: string, opacity: number): string {
+  const readChannel = (hex: string, start: number) =>
+    Number.parseInt(hex.replace("#", "").slice(start, start + 2), 16)
+  const mixed = [0, 2, 4].map((start) =>
+    Math.round(
+      readChannel(foreground, start) * opacity +
+        readChannel(background, start) * (1 - opacity)
+    )
+      .toString(16)
+      .padStart(2, "0")
+  )
+  return `#${mixed.join("")}`
 }
 
 export const PDF_COLORS = {
@@ -20,19 +26,19 @@ export const PDF_COLORS = {
   muted: BRAND.mutedForeground,
   accent: BRAND.accent,
   cyan: BRAND.cyan,
-  accentSoft: withAlpha(BRAND.accent, 0.1),
+  accentSoft: mixHex(BRAND.accent, BRAND.background, 0.1),
   secondary: BRAND.secondary,
-  border: withAlpha(BRAND.foreground, 0.14),
+  border: mixHex(BRAND.foreground, BRAND.background, 0.14),
   cardBg: BRAND.card,
   success: BRAND.success,
-  successSoft: withAlpha(BRAND.success, 0.1),
+  successSoft: mixHex(BRAND.success, BRAND.background, 0.1),
   destructive: BRAND.destructive,
   terminal: BRAND.terminal,
   terminalForeground: BRAND.terminalForeground,
-  terminalMuted: withAlpha(BRAND.terminalForeground, 0.7),
-  terminalDim: withAlpha(BRAND.terminalForeground, 0.4),
-  terminalSubtle: withAlpha(BRAND.terminalForeground, 0.08),
-  terminalHairline: withAlpha(BRAND.terminalForeground, 0.15),
+  terminalMuted: mixHex(BRAND.terminalForeground, BRAND.terminal, 0.7),
+  terminalDim: mixHex(BRAND.terminalForeground, BRAND.terminal, 0.4),
+  terminalSubtle: mixHex(BRAND.terminalForeground, BRAND.terminal, 0.08),
+  terminalHairline: mixHex(BRAND.terminalForeground, BRAND.terminal, 0.15),
 } as const
 
 export const PDF_MODULE_ACCENTS: Record<string, string> = {

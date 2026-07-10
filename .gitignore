@@ -49,3 +49,7 @@ drizzle.config.ts
 .playwright-mcp/
 .env*.local
 backups/
+
+# Generated visual-review artifacts
+output/
+tmp/pdfs/

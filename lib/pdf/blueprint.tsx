@@ -50,12 +50,14 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: 700,
     color: COLORS.fg,
-    marginBottom: 8,
+    lineHeight: 1.15,
+    marginBottom: 10,
   },
   subtitle: {
     fontSize: 11,
     color: COLORS.muted,
     lineHeight: 1.4,
+    marginTop: 2,
   },
   statsRow: {
     flexDirection: "row",
@@ -214,7 +216,7 @@ export function BlueprintPdf(props: BlueprintPdfProps) {
 
   return (
     <Document
-      title={`AI Blueprint — ${props.occupation.title}`}
+      title={`AI Blueprint - ${props.occupation.title}`}
       author={props.agencyName}
     >
       <Page size="LETTER" style={styles.page}>
@@ -276,7 +278,7 @@ export function BlueprintPdf(props: BlueprintPdfProps) {
               <Text style={styles.bulletBody}>
                 {task.name}{" "}
                 <Text style={{ color: COLORS.muted }}>
-                  — {task.minutesPerDay} min/day
+                  - {task.minutesPerDay} min/day
                 </Text>
               </Text>
             </View>
@@ -314,7 +316,7 @@ export function BlueprintPdf(props: BlueprintPdfProps) {
           <View style={styles.bullet}>
             <Text style={styles.bulletDot}>1.</Text>
             <Text style={styles.bulletBody}>
-              Review this blueprint with your team — it&apos;s meant to be
+              Review this blueprint with your team - it&apos;s meant to be
               shared, annotated, and pushed back on.
             </Text>
           </View>
@@ -331,7 +333,7 @@ export function BlueprintPdf(props: BlueprintPdfProps) {
           <View style={styles.bullet}>
             <Text style={styles.bulletDot}>3.</Text>
             <Text style={styles.bulletBody}>
-              If this looks wrong for your role — tell us. The numbers are
+              If this looks wrong for your role - tell us. The numbers are
               derived from public data; your lived reality is better.
             </Text>
           </View>
@@ -363,7 +365,7 @@ export function BlueprintPdf(props: BlueprintPdfProps) {
                   <Text style={styles.moduleName}>{mod.label}</Text>
                   <Text style={styles.moduleBlurb}>{mod.topTaskNames.join(" · ")}</Text>
                 </View>
-                <Text style={{ fontSize: 13, fontWeight: 700, color: mod.accentColor }}>
+                <Text style={{ fontSize: 13, fontWeight: 700, color: COLORS.fg }}>
                   {mod.minutesPerDay} min/day
                 </Text>
               </View>
@@ -375,7 +377,7 @@ export function BlueprintPdf(props: BlueprintPdfProps) {
               Want this built for your team?
             </Text>
             <Text style={styles.calloutBody}>
-              {props.siteUrl}/build-a-team — configure your team, select the modules that matter, and receive a full blueprint like this one for every role.
+              {props.siteUrl}/build-a-team - configure your team, select the modules that matter, and receive a full blueprint like this one for every role.
             </Text>
           </View>
 

@@ -29,13 +29,13 @@ export function AgentExpandedView({ agent }: Props) {
               style={{ backgroundColor: agent.accentColor }}
             />
             <span
-              className="text-[9px] font-bold tracking-widest uppercase"
+              className="eyebrow text-[9px]"
               style={{ color: agent.accentColor }}
             >
               {agent.label}
             </span>
           </div>
-          <h2 className="text-xl font-black text-foreground leading-tight">{agent.agentName}</h2>
+          <h2 className="text-xl font-bold text-foreground leading-tight">{agent.agentName}</h2>
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-lg">
             {agent.narrative}
           </p>
@@ -56,20 +56,20 @@ export function AgentExpandedView({ agent }: Props) {
 
         {/* Before / After */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-red-50 dark:bg-red-950/30 rounded-lg p-3 border border-red-100 dark:border-red-900/30">
-            <div className="text-[8px] font-bold tracking-wider text-red-600 dark:text-red-400 mb-2 uppercase">
+          <div className="bg-destructive/10 p-3 border border-destructive/20">
+            <div className="text-[8px] font-bold tracking-wider text-destructive mb-2 uppercase">
               Before
             </div>
-            <div className="text-2xl font-black text-red-600 dark:text-red-400">
+            <div className="font-mono text-2xl font-bold tabular-nums text-destructive">
               {agent.beforeMinutes} min
             </div>
-            <div className="text-[9px] text-red-500/70 mt-0.5">manual work</div>
+            <div className="text-[9px] text-destructive/70 mt-0.5">manual work</div>
           </div>
-          <div className="bg-success/10 dark:bg-success/20 rounded-lg p-3 border border-success/20 dark:border-success/30">
-            <div className="text-[8px] font-bold tracking-wider text-success dark:text-success mb-2 uppercase">
+          <div className="bg-success/10 p-3 border border-success/20">
+            <div className="text-[8px] font-bold tracking-wider text-success mb-2 uppercase">
               After
             </div>
-            <div className="text-2xl font-black text-success dark:text-success">
+            <div className="font-mono text-2xl font-bold tabular-nums text-success">
               {agent.afterMinutes} min
             </div>
             <div className="text-[9px] text-success/70 mt-0.5">to review &amp; approve</div>

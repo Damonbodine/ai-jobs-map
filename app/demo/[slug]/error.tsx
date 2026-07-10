@@ -16,7 +16,7 @@ export default function DemoSlugError({
   return (
     <main className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center max-w-md px-4">
-        <p className="text-sm font-semibold text-red-500 uppercase tracking-widest mb-2">
+        <p className="eyebrow mb-2" style={{ color: "var(--color-destructive)" }}>
           Demo Unavailable
         </p>
         <h1 className="text-2xl font-bold text-foreground mb-3">
@@ -27,7 +27,7 @@ export default function DemoSlugError({
         </p>
         <button
           onClick={reset}
-          className="px-5 py-2.5 bg-foreground text-background rounded-lg text-sm font-medium hover:bg-foreground/80 transition-colors"
+          className="px-5 py-2.5 bg-foreground text-background text-sm font-medium hover:bg-foreground/80 transition-colors"
         >
           Try again
         </button>

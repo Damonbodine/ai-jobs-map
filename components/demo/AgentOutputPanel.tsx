@@ -55,15 +55,15 @@ export function AgentOutputPanel({ output, agentName }: Props) {
   }
 
   return (
-    <div className="rounded-xl overflow-hidden bg-terminal border border-white/8">
+    <div className="overflow-hidden bg-terminal border border-terminal-foreground/15">
       {/* Header bar */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/8">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-terminal-foreground/15">
         <div className="flex items-center gap-2">
-          <span className="text-[9px] font-bold tracking-widest text-white/40">
+          <span className="text-[9px] font-bold tracking-widest text-terminal-foreground/40">
             {output.label}
           </span>
           {output.format === "code" && output.language && (
-            <span className="text-[8px] bg-white/10 text-white/50 px-1.5 py-0.5 rounded font-mono">
+            <span className="text-[8px] bg-terminal-foreground/10 text-terminal-foreground/50 px-1.5 py-0.5 font-mono">
               {output.language}
             </span>
           )}
@@ -72,7 +72,7 @@ export function AgentOutputPanel({ output, agentName }: Props) {
           {!isDone && showSkip && (
             <button
               onClick={skip}
-              className="text-[9px] text-white/40 hover:text-white/70 transition-colors"
+              className="text-[9px] text-terminal-foreground/40 hover:text-terminal-foreground/70 transition-colors"
             >
               Skip to end →
             </button>
@@ -86,14 +86,14 @@ export function AgentOutputPanel({ output, agentName }: Props) {
       {/* Content */}
       <div className="p-4 max-h-60 overflow-y-auto">
         {output.format === "code" || output.format === "table" ? (
-          <pre className="text-[10px] font-mono text-white/70 whitespace-pre-wrap leading-relaxed">
+          <pre className="text-[10px] font-mono text-terminal-foreground/70 whitespace-pre-wrap leading-relaxed">
             {displayedText}
-            {!isDone && <span className="animate-pulse text-white/50">▌</span>}
+            {!isDone && <span className="animate-pulse text-terminal-foreground/50">▌</span>}
           </pre>
         ) : (
-          <p className="text-[11px] text-white/70 whitespace-pre-wrap leading-relaxed">
+          <p className="text-[11px] text-terminal-foreground/70 whitespace-pre-wrap leading-relaxed">
             {displayedText}
-            {!isDone && <span className="animate-pulse text-white/50">▌</span>}
+            {!isDone && <span className="animate-pulse text-terminal-foreground/50">▌</span>}
           </p>
         )}
       </div>

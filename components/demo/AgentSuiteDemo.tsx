@@ -108,7 +108,7 @@ export function AgentSuiteDemo({ roles, occupationTitle }: Props) {
     : "Build this for my team"
 
   return (
-    <div ref={containerRef} className="rounded-2xl border border-border overflow-hidden bg-background shadow-sm">
+    <div ref={containerRef} className="border border-border overflow-hidden bg-background">
       {/* Demo header bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-muted/30">
         <div className="flex items-center gap-2">
@@ -130,7 +130,7 @@ export function AgentSuiteDemo({ roles, occupationTitle }: Props) {
             <button
               key={agent.moduleKey}
               onClick={() => handleAgentSelect(i)}
-              className={`flex items-center gap-1.5 shrink-0 text-[11px] font-semibold px-3 py-1.5 rounded-full transition-colors ${
+              className={`flex items-center gap-1.5 shrink-0 text-[11px] font-semibold px-3 py-1.5 transition-colors ${
                 isActive
                   ? "bg-foreground text-background"
                   : "text-muted-foreground hover:text-foreground"
@@ -180,13 +180,13 @@ export function AgentSuiteDemo({ roles, occupationTitle }: Props) {
         <div className="flex items-center gap-3">
           <a
             href={AGENCY.enquireUrl}
-            className="text-xs text-muted-foreground border border-border rounded-full px-4 py-2 hover:bg-muted transition-colors"
+            className="text-xs text-muted-foreground border border-border px-4 py-2 hover:bg-muted transition-colors"
           >
             Start with an audit
           </a>
           <Link
             href="/build-a-team"
-            className="flex items-center gap-1.5 text-xs font-semibold bg-foreground text-background rounded-full px-4 py-2 hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
           >
             {ctaLabel}
             <ArrowRight className="w-3 h-3" />

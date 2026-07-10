@@ -29,7 +29,7 @@ export default function CustomDemoTryPage() {
 
         <FadeIn>
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <div className="inline-block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 border border-border rounded-full px-3 py-1">
+            <div className="eyebrow inline-block border border-border bg-card px-3 py-1 mb-3">
               Live Custom Demo
             </div>
             <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight leading-tight text-balance mb-4">

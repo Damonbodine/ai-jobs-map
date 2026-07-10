@@ -60,15 +60,15 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
     PHASES.indexOf(phase) >= PHASES.indexOf(p) || phase === "pause"
 
   return (
-    <div className="relative rounded-xl overflow-hidden bg-terminal border border-white/8">
+    <div className="relative overflow-hidden bg-terminal border border-terminal-foreground/15">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
-        <span className="text-xs font-medium text-white/50">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-terminal-foreground/15">
+        <span className="text-xs font-medium text-terminal-foreground/50">
           {agentName} is processing
         </span>
         <button
           onClick={() => setPaused((p) => !p)}
-          className="text-xs text-white/40 hover:text-white/70 transition-colors px-2 py-1 rounded"
+          className="text-xs text-terminal-foreground/40 hover:text-terminal-foreground/70 transition-colors px-2 py-1"
         >
           {paused ? "▶ Resume" : "⏸ Pause"}
         </button>
@@ -92,7 +92,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
                 isActive("inputs") ? { opacity: 1, y: 0 } : { opacity: 0, y: 4 }
               }
               transition={{ delay: i * 0.3, duration: 0.35 }}
-              className="text-[10px] text-white/60 leading-snug py-0.5"
+              className="text-[10px] text-terminal-foreground/60 leading-snug py-0.5"
             >
               {item}
             </motion.div>
@@ -105,7 +105,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
         {/* AI Processes */}
         <LoopBox
           active={isActive("ai")}
-          accentColor="#ffffff"
+          accentColor="#e3ecf4"
           label="AI PROCESSES"
           phase="ai"
           currentPhase={phase}
@@ -119,7 +119,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
                 isActive("ai") ? { opacity: 1 } : { opacity: 0 }
               }
               transition={{ delay: i * 0.4, duration: 0.3 }}
-              className="text-[10px] text-white/60 leading-snug py-0.5"
+              className="text-[10px] text-terminal-foreground/60 leading-snug py-0.5"
             >
               {item}
             </motion.div>
@@ -132,7 +132,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
                 : { scale: 1, opacity: 0.2 }
             }
             transition={{ repeat: Infinity, duration: 1.2 }}
-            className="absolute inset-0 rounded-lg border border-white/20 pointer-events-none"
+            className="absolute inset-0 border border-terminal-foreground/20 pointer-events-none"
           />
         </LoopBox>
 
@@ -142,7 +142,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
         {/* Outputs */}
         <LoopBox
           active={isActive("outputs")}
-          accentColor="#10b981"
+          accentColor="#6fd4ec"
           label="OUTPUTS"
           phase="outputs"
           currentPhase={phase}
@@ -160,7 +160,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
               {isActive("outputs") && (
                 <Check className="w-2.5 h-2.5 text-success shrink-0 mt-0.5" />
               )}
-              <span className="text-[10px] text-white/60 leading-snug">{item}</span>
+              <span className="text-[10px] text-terminal-foreground/60 leading-snug">{item}</span>
             </motion.div>
           ))}
         </LoopBox>
@@ -171,14 +171,14 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
         {/* Human Reviews */}
         <LoopBox
           active={isActive("human")}
-          accentColor="#ffffff"
+          accentColor="#e3ecf4"
           label="HUMAN REVIEWS"
           phase="human"
           currentPhase={phase}
           dashed
           humanBox
         >
-          <span className="text-[8px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-white/60 inline-flex items-center gap-1 mb-1">
+          <span className="text-[8px] font-bold px-2 py-0.5 bg-terminal-foreground/10 text-terminal-foreground/70 inline-flex items-center gap-1 mb-1">
             <ShieldCheck className="w-2.5 h-2.5" />
             Your approval required
           </span>
@@ -186,7 +186,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
             initial={{ opacity: 0 }}
             animate={isActive("human") ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="text-[10px] text-white/50 leading-relaxed"
+            className="text-[10px] text-terminal-foreground/50 leading-relaxed"
           >
             {loop.humanAction}
           </motion.p>
@@ -197,7 +197,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ delay: 0.5 }}
-                className="mt-2 inline-flex items-center gap-1 bg-success/20 text-success text-[9px] font-bold px-2 py-0.5 rounded-full"
+                className="mt-2 inline-flex items-center gap-1 bg-success/20 text-success text-[9px] font-bold px-2 py-0.5"
               >
                 <Check className="w-2 h-2" /> Done
               </motion.div>
@@ -210,7 +210,7 @@ export function AgentLoopDiagram({ loop, agentName, accentColor }: Props) {
       <motion.div
         animate={{ opacity: [0.03, 0.07, 0.03] }}
         transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-        className="absolute inset-0 pointer-events-none rounded-xl"
+        className="absolute inset-0 pointer-events-none"
         style={{ background: `radial-gradient(ellipse at center, ${accentColor}22, transparent 70%)` }}
       />
     </div>
@@ -237,32 +237,32 @@ function LoopBox({
   humanBox?: boolean
 }) {
   const borderColor = humanBox && active
-    ? "rgba(255,255,255,0.55)"
+    ? "rgba(227,236,244,0.55)"
     : active
     ? `${accentColor}66`
-    : "rgba(255,255,255,0.08)"
+    : "rgba(227,236,244,0.12)"
 
   return (
     <motion.div
       animate={{ opacity: active ? 1 : 0.35 }}
       transition={{ duration: 0.4 }}
-      className="relative flex flex-col gap-1 p-3 rounded-lg min-h-[100px]"
+      className="relative flex flex-col gap-1 p-3 min-h-[100px]"
       style={{
-        background: isAi ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.03)",
+        background: isAi ? "rgba(227,236,244,0.06)" : "rgba(227,236,244,0.04)",
         border: `1px ${dashed ? "dashed" : "solid"} ${borderColor}`,
       }}
     >
       {isAi && (
         <div
-          className="absolute -top-2 left-1/2 -translate-x-1/2 text-[8px] font-bold px-2 py-0.5 rounded-full"
-          style={{ background: accentColor === "#ffffff" ? "#3b82f6" : accentColor, color: "white" }}
+          className="absolute -top-2 left-1/2 -translate-x-1/2 text-[8px] font-bold px-2 py-0.5"
+          style={{ background: accentColor === "#e3ecf4" ? "#6fd4ec" : accentColor, color: "#0a1420" }}
         >
           AI
         </div>
       )}
       <span
-        className="text-[8px] font-bold tracking-widest mb-1"
-        style={{ color: active ? accentColor : "rgba(255,255,255,0.3)" }}
+        className="font-mono text-[8px] font-bold tracking-widest mb-1"
+        style={{ color: active ? accentColor : "rgba(227,236,244,0.35)" }}
       >
         {label}
       </span>
@@ -275,7 +275,7 @@ function Arrow({ active }: { active: boolean }) {
   return (
     <motion.div
       animate={{ opacity: active ? 0.7 : 0.2 }}
-      className="flex items-center justify-center text-white/40 text-lg pb-6"
+      className="flex items-center justify-center text-terminal-foreground/40 text-lg pb-6"
     >
       →
     </motion.div>

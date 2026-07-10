@@ -134,7 +134,7 @@ export function CustomDemoForm() {
           rows={4}
           disabled={disabled}
           maxLength={800}
-          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/40 disabled:opacity-60 resize-none"
+          className="w-full border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/40 disabled:opacity-60 resize-none"
         />
         <div className="mt-1 text-xs text-muted-foreground text-right">
           {taskDescription.length} / 800
@@ -157,18 +157,18 @@ export function CustomDemoForm() {
           placeholder="e.g. Dental office manager"
           maxLength={120}
           disabled={disabled}
-          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/40 disabled:opacity-60"
+          className="w-full border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/40 disabled:opacity-60"
         />
       </div>
 
       {stage === "error" && errorMessage && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {errorMessage}
         </div>
       )}
 
       {stage === "generating" ? (
-        <div className="rounded-xl border border-foreground/10 bg-muted/30 px-4 py-4 flex items-center gap-3">
+        <div className="border border-foreground/10 bg-muted/30 px-4 py-4 flex items-center gap-3">
           <div className="flex gap-1">
             <span className="w-2 h-2 rounded-full bg-foreground animate-pulse" />
             <span className="w-2 h-2 rounded-full bg-foreground animate-pulse [animation-delay:120ms]" />
@@ -180,7 +180,7 @@ export function CustomDemoForm() {
         <button
           type="submit"
           disabled={disabled || taskDescription.trim().length < 12}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-foreground px-6 py-3 text-sm font-semibold text-background hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full inline-flex items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <Sparkles className="h-4 w-4" />
           Build my agent demo
@@ -189,7 +189,7 @@ export function CustomDemoForm() {
       )}
 
       {stage === "idle" && errorMessage && (
-        <div className="text-xs text-red-700">{errorMessage}</div>
+        <div className="text-xs text-destructive">{errorMessage}</div>
       )}
     </form>
   )

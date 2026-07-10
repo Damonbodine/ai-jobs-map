@@ -34,7 +34,7 @@ export function DemoTimeline({
             key={role.slug}
             onClick={() => onRoleChange(role.slug)}
             className={cn(
-              "text-[10px] font-semibold px-2.5 py-1 rounded-full border transition-colors",
+              "text-[10px] font-semibold px-2.5 py-1 border transition-colors",
               role.slug === activeRoleSlug
                 ? "bg-foreground text-background border-foreground"
                 : "bg-transparent text-muted-foreground border-border hover:border-foreground/40"
@@ -47,7 +47,7 @@ export function DemoTimeline({
 
       {/* Agent list */}
       <div className="flex-1 overflow-y-auto py-3">
-        <div className="px-3 pb-2 text-[9px] font-bold tracking-widest text-muted-foreground uppercase">
+        <div className="eyebrow px-3 pb-2 text-[9px]">
           {activeRole.displayName}&apos;s day
         </div>
 
@@ -61,11 +61,11 @@ export function DemoTimeline({
                 initial={false}
                 animate={isActive ? { backgroundColor: "var(--color-foreground)" } : { backgroundColor: "transparent" }}
                 className={cn(
-                  "relative w-full text-left rounded-lg px-3 py-2.5 transition-colors overflow-hidden",
+                  "relative w-full text-left px-3 py-2.5 transition-colors overflow-hidden",
                   isActive ? "text-background" : "hover:bg-muted/50"
                 )}
               >
-                <div className="text-[9px] mb-1" style={{ color: isActive ? "rgba(255,255,255,0.5)" : "#999" }}>
+                <div className="text-[9px] mb-1" style={{ color: isActive ? "rgba(242,246,249,0.6)" : "var(--color-muted-foreground)" }}>
                   {agent.timeOfDay}
                 </div>
                 <div className="flex items-center gap-2">
@@ -73,11 +73,11 @@ export function DemoTimeline({
                     className="w-1.5 h-1.5 rounded-full shrink-0"
                     style={{ backgroundColor: agent.accentColor }}
                   />
-                  <span className={cn("text-[11px] font-bold", isActive ? "text-white" : "text-foreground")}>
+                  <span className={cn("text-[11px] font-bold", isActive ? "text-background" : "text-foreground")}>
                     {agent.agentName}
                   </span>
                 </div>
-                <div className="text-[9px] mt-0.5 pl-3.5" style={{ color: isActive ? "rgba(255,255,255,0.45)" : "#aaa" }}>
+                <div className="text-[9px] mt-0.5 pl-3.5" style={{ color: isActive ? "rgba(242,246,249,0.6)" : "var(--color-muted-foreground)" }}>
                   {agent.label}
                 </div>
                 {isActive && (
@@ -92,7 +92,7 @@ export function DemoTimeline({
                     initial={{ width: "0%" }}
                     animate={{ width: "100%" }}
                     transition={{ duration: autoAdvanceInterval / 1000, ease: "linear" }}
-                    className="absolute bottom-0 left-0 h-[2px] rounded-b-lg"
+                    className="absolute bottom-0 left-0 h-[2px]"
                     style={{ backgroundColor: agent.accentColor }}
                   />
                 )}
@@ -104,14 +104,14 @@ export function DemoTimeline({
 
       {/* Summary footer */}
       <div className="p-3 border-t border-border">
-        <div className="bg-accent/10 dark:bg-accent/20 rounded-lg p-3 border border-accent/20 dark:border-accent/30">
-          <div className="text-[8px] font-bold tracking-wider text-accent dark:text-accent/80 mb-1 uppercase">
+        <div className="bg-accent/10 p-3 border border-accent/20">
+          <div className="text-[8px] font-bold tracking-wider text-accent mb-1 uppercase">
             Total reclaimed
           </div>
-          <div className="text-xl font-black text-accent dark:text-accent/70">
+          <div className="font-mono text-xl font-bold tabular-nums text-accent">
             {activeRole.totalBeforeMinutes - activeRole.totalAfterMinutes} min
           </div>
-          <div className="text-[9px] text-accent dark:text-accent/80">every single day</div>
+          <div className="text-[9px] text-accent">every single day</div>
         </div>
       </div>
     </div>

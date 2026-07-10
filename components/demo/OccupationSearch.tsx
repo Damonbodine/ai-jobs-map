@@ -41,7 +41,7 @@ export function OccupationSearch() {
 
   return (
     <div className="relative w-full max-w-lg mx-auto">
-      <div className="flex items-center gap-3 bg-white border border-border rounded-xl px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-accent/50 focus-within:border-accent/50 transition-all">
+      <div className="flex items-center gap-3 bg-background border border-border px-4 py-3 focus-within:ring-2 focus-within:ring-accent/50 focus-within:border-accent/50 transition-all">
         <svg className="w-4 h-4 text-muted-foreground flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
@@ -63,7 +63,7 @@ export function OccupationSearch() {
       {open && (
         <ul
           role="listbox"
-          className="absolute z-10 top-full mt-1 w-full bg-white border border-border rounded-xl shadow-lg overflow-hidden"
+          className="absolute z-10 top-full mt-1 w-full bg-card border border-border shadow-lg overflow-hidden"
         >
           {results.map((r) => (
             <li key={r.slug}>

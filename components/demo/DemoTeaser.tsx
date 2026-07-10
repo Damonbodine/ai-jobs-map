@@ -16,7 +16,7 @@ export async function DemoTeaser() {
   const minutesSaved = defaultRole.totalBeforeMinutes - defaultRole.totalAfterMinutes
 
   return (
-    <section className="border border-border rounded-2xl overflow-hidden bg-muted/10">
+    <section className="border border-border overflow-hidden bg-muted/10">
       {/* Header */}
       <div className="px-5 py-4 border-b border-border flex items-center justify-between">
         <div>
@@ -39,7 +39,7 @@ export async function DemoTeaser() {
           <Link
             key={role.slug}
             href="/demo"
-            className={`text-[10px] font-semibold px-2.5 py-1 rounded-full border transition-colors ${
+            className={`text-[10px] font-semibold px-2.5 py-1 border transition-colors ${
               i === 0
                 ? "bg-foreground text-background border-foreground"
                 : "bg-transparent text-muted-foreground border-border hover:border-foreground/40"
@@ -65,7 +65,7 @@ export async function DemoTeaser() {
                   <span className="text-[10px] text-muted-foreground ml-1.5">{agent.label}</span>
                 </div>
               </div>
-              <div className="text-[10px] font-semibold text-success dark:text-success">
+              <div className="text-[10px] font-semibold text-success">
                 {agent.beforeMinutes} min → {agent.afterMinutes} min
               </div>
             </div>
@@ -75,18 +75,18 @@ export async function DemoTeaser() {
 
       {/* Summary stat + CTA */}
       <div className="px-4 pb-4">
-        <div className="flex items-center justify-between bg-accent/10 dark:bg-accent/20 rounded-xl p-3 border border-accent/20 dark:border-accent/20">
+        <div className="flex items-center justify-between bg-accent/10 p-3 border border-accent/20">
           <div>
-            <div className="text-lg font-black text-accent dark:text-accent/70">
+            <div className="font-mono text-lg font-bold tabular-nums text-accent">
               {minutesSaved} min/day
             </div>
-            <div className="text-[9px] text-accent dark:text-accent/80">
+            <div className="text-[9px] text-accent">
               ${defaultRole.annualValueDollars.toLocaleString()}/yr per person
             </div>
           </div>
           <Link
             href="/demo"
-            className="flex items-center gap-1.5 text-xs font-bold bg-accent text-white rounded-full px-4 py-2 hover:bg-accent/90 transition-colors"
+            className="inline-flex items-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
           >
             See full demo <ArrowRight className="w-3 h-3" />
           </Link>

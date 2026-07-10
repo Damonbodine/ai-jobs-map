@@ -1,5 +1,6 @@
 // lib/demo/demo-scripts.ts
 import type { AgentLoopContent, AgentOutput } from "./types"
+import { MODULE_ACCENTS } from "@/lib/modules"
 
 type AgentScript = {
   moduleKey: string
@@ -30,7 +31,7 @@ export const DEMO_ROLE_SCRIPTS: RoleScript[] = [
         moduleKey: "intake",
         agentName: "Scout",
         label: "Intake & Triage",
-        accentColor: "#06b6d4",
+        accentColor: MODULE_ACCENTS.intake,
         timeOfDay: "8:00 AM",
         narrative:
           "Mark used to start every morning triaging 30+ emails and Slack threads. Now Scout pre-sorts overnight. By the time he opens his laptop, the day is already organized.",
@@ -74,7 +75,7 @@ Your first decision: Vendor escalation. See the full brief below.`,
         moduleKey: "coordination",
         agentName: "Cal",
         label: "Coordination",
-        accentColor: "#10b981",
+        accentColor: MODULE_ACCENTS.coordination,
         timeOfDay: "10:30 AM",
         narrative:
           "Scheduling a cross-functional meeting used to mean 45 minutes of back-and-forth. Cal finds the slot, drafts the invite, and books the room before Mark finishes his coffee.",
@@ -129,7 +130,7 @@ Mark`,
         moduleKey: "exceptions",
         agentName: "Reed",
         label: "Exceptions",
-        accentColor: "#f59e0b",
+        accentColor: MODULE_ACCENTS.exceptions,
         timeOfDay: "2:00 PM",
         narrative:
           "A vendor delivery is 2 days late. Normally Mark would spend an hour chasing it manually. Reed identifies the downstream impact, drafts the escalation, and gives him two options before he's even read the alert.",
@@ -189,7 +190,7 @@ Recommendation: Option B preserves relationships and margin. Option A if launch 
         moduleKey: "documentation",
         agentName: "Quill",
         label: "Documentation",
-        accentColor: "#8b5cf6",
+        accentColor: MODULE_ACCENTS.documentation,
         timeOfDay: "4:00 PM",
         narrative:
           "End-of-day status updates used to eat 30 minutes of writing from scratch. Quill was in every meeting — it already knows what happened. Mark's job is to read it, not write it.",
@@ -244,7 +245,7 @@ RISKS
         moduleKey: "data_reporting",
         agentName: "Lex",
         label: "Data & Reporting",
-        accentColor: "#0ea5e9",
+        accentColor: MODULE_ACCENTS.data_reporting,
         timeOfDay: "5:00 PM",
         narrative:
           "The weekly ops dashboard used to be a manual spreadsheet pull followed by 20 minutes of narrative writing. Lex ran it overnight. Mark's job is to check the anomalies and share.",
@@ -303,7 +304,7 @@ Solid week operationally despite the Atlas vendor issue. Task completion and bud
         moduleKey: "analysis",
         agentName: "Iris",
         label: "Analysis",
-        accentColor: "#6366f1",
+        accentColor: MODULE_ACCENTS.analysis,
         timeOfDay: "9:00 AM",
         narrative:
           "Priya's quarterly variance analysis used to take two full days. Iris ran it overnight on the Q3 actuals. She opens her laptop to a finished draft — her job is to validate the flags, not find them.",
@@ -357,7 +358,7 @@ FLAGGED ANOMALIES (4):
         moduleKey: "data_reporting",
         agentName: "Lex",
         label: "Data & Reporting",
-        accentColor: "#0ea5e9",
+        accentColor: MODULE_ACCENTS.data_reporting,
         timeOfDay: "10:30 AM",
         narrative:
           "Building the exec dashboard used to mean a full morning in Excel followed by manual narrative writing. Lex aggregated everything overnight. Priya's job is to check one metric label.",
@@ -411,7 +412,7 @@ KEY MESSAGES
         moduleKey: "compliance",
         agentName: "Nora",
         label: "Compliance",
-        accentColor: "#ef4444",
+        accentColor: MODULE_ACCENTS.compliance,
         timeOfDay: "1:00 PM",
         narrative:
           "Regulatory filing cross-checks used to require a manual policy review taking most of an afternoon. Nora scanned the draft against the current SOX checklist and flagged the gaps before Priya even opened the document.",
@@ -465,7 +466,7 @@ Recommend: Confirm with external counsel whether August migration requires expli
         moduleKey: "research",
         agentName: "Wren",
         label: "Research",
-        accentColor: "#14b8a6",
+        accentColor: MODULE_ACCENTS.research,
         timeOfDay: "2:30 PM",
         narrative:
           "Competitive benchmarking used to be a half-day web research sprint. Wren read every earnings transcript, pulled every ratio, and wrote the talking points. Priya's job is to add one observation she already knows.",
@@ -520,7 +521,7 @@ TALKING POINTS FOR BOARD:
         moduleKey: "documentation",
         agentName: "Quill",
         label: "Documentation",
-        accentColor: "#8b5cf6",
+        accentColor: MODULE_ACCENTS.documentation,
         timeOfDay: "4:30 PM",
         narrative:
           "Writing the investment memo narrative used to be the last thing standing between Priya and the weekend. Quill drafted it from the analysis outputs. She edits 2 paragraphs and it's done.",
@@ -586,7 +587,7 @@ Next steps: Finalize Q4 budget model by April 21. Submit 10-Q draft to outside c
         moduleKey: "research",
         agentName: "Wren",
         label: "Research",
-        accentColor: "#14b8a6",
+        accentColor: MODULE_ACCENTS.research,
         timeOfDay: "9:30 AM",
         narrative:
           "Before starting a new feature, Alex would spend an hour reading docs and Stack Overflow. Wren read React Query v5's full changelog, found 2 prior examples in the codebase, and summarized the tradeoffs. Alex chooses an approach in 3 minutes.",
@@ -647,7 +648,7 @@ See: lib/hooks/useOccupationSearch.ts:23 for the updated pattern.`,
         moduleKey: "documentation",
         agentName: "Quill",
         label: "Documentation",
-        accentColor: "#8b5cf6",
+        accentColor: MODULE_ACCENTS.documentation,
         timeOfDay: "12:00 PM",
         narrative:
           "Writing PR descriptions used to be the last thing anyone wanted to do. Quill read the diff, the Jira ticket, and the test files. Alex adds one screenshot and opens the PR.",
@@ -700,7 +701,7 @@ None. The API contract is unchanged. Old offset-based endpoints still work.
         moduleKey: "analysis",
         agentName: "Iris",
         label: "Analysis",
-        accentColor: "#6366f1",
+        accentColor: MODULE_ACCENTS.analysis,
         timeOfDay: "2:00 PM",
         narrative:
           "Debugging a performance regression meant manually reading through profiler output for an hour. Iris traced it to a specific commit in 3 minutes. Alex picks a fix and implements.",
@@ -757,7 +758,7 @@ Recommendation: Fix A now (ship the perf fix today), Fix B in a cleanup PR next 
         moduleKey: "coordination",
         agentName: "Cal",
         label: "Coordination",
-        accentColor: "#10b981",
+        accentColor: MODULE_ACCENTS.coordination,
         timeOfDay: "3:30 PM",
         narrative:
           "Sprint planning prep used to mean manually pulling Jira stats and writing a team update. Cal pulled the last 3 sprints, identified blockers, and drafted the email. Alex sends it without editing.",
@@ -815,7 +816,7 @@ Alex`,
         moduleKey: "communication",
         agentName: "Cleo",
         label: "Communication",
-        accentColor: "#f97316",
+        accentColor: MODULE_ACCENTS.communication,
         timeOfDay: "5:00 PM",
         narrative:
           "Explaining a technical decision to a non-technical stakeholder used to take careful drafting and second-guessing every word. Cleo translated the ADR into plain language. Alex reviews and hits send.",

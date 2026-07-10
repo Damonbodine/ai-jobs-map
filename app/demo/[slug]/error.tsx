@@ -27,7 +27,7 @@ export default function DemoSlugError({
         </p>
         <button
           onClick={reset}
-          className="px-5 py-2.5 bg-foreground text-background text-sm font-medium hover:bg-foreground/80 transition-colors"
+          className="bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
         >
           Try again
         </button>

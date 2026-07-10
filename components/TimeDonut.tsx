@@ -29,6 +29,11 @@ interface TimeDonutProps {
   blueprintScale: number
 }
 
+// React compares server-rendered SVG attributes as strings during hydration.
+// Round calculated geometry so tiny runtime-specific float serialization
+// differences cannot produce false hydration mismatches.
+const stableSvgNumber = (value: number) => Math.round(value * 1_000_000) / 1_000_000
+
 export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprintScale }: TimeDonutProps) {
   const [activeSlice, setActiveSlice] = useState<string | null>(null)
 
@@ -59,8 +64,8 @@ export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprin
   const arcs = slices.map((slice) => {
     const startPercent = cumulativePercent
     cumulativePercent += slice.percentage
-    const offset = circumference * (1 - slice.percentage / 100)
-    const rotation = (startPercent / 100) * 360 - 90
+    const offset = stableSvgNumber(circumference * (1 - slice.percentage / 100))
+    const rotation = stableSvgNumber((startPercent / 100) * 360 - 90)
     return { ...slice, offset, rotation }
   })
 
@@ -98,10 +103,10 @@ export function TimeDonut({ agents, capabilitiesByModule, totalMinutes, blueprin
                 return (
                   <line
                     key={`sep-${arc.blockName}`}
-                    x1={center + inner * Math.sin(angle)}
-                    y1={center - inner * Math.cos(angle)}
-                    x2={center + outer * Math.sin(angle)}
-                    y2={center - outer * Math.cos(angle)}
+                    x1={stableSvgNumber(center + inner * Math.sin(angle))}
+                    y1={stableSvgNumber(center - inner * Math.cos(angle))}
+                    x2={stableSvgNumber(center + outer * Math.sin(angle))}
+                    y2={stableSvgNumber(center - outer * Math.cos(angle))}
                     stroke="var(--color-card)"
                     strokeWidth={2}
                     pointerEvents="none"

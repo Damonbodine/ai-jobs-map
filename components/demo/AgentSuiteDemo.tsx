@@ -170,17 +170,17 @@ export function AgentSuiteDemo({ roles, occupationTitle }: Props) {
       {/* CTA footer */}
       <div className="border-t border-border px-5 py-4 bg-muted/20 flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <div className="text-sm font-bold text-foreground">
+          <div className="font-mono text-sm font-bold tabular-nums text-foreground">
             {minutesSaved} minutes back every day.
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="font-mono text-xs tabular-nums text-muted-foreground">
             ${activeRole.annualValueDollars.toLocaleString()} per year, per person.
           </div>
         </div>
         <div className="flex items-center gap-3">
           <a
             href={AGENCY.enquireUrl}
-            className="text-xs text-muted-foreground border border-border px-4 py-2 hover:bg-muted transition-colors"
+            className="inline-flex items-center justify-center border border-border px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-secondary"
           >
             Start with an audit
           </a>

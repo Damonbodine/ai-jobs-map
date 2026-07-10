@@ -53,13 +53,13 @@ export default async function DemoSlugPage({ params }: Props) {
             <div className="flex flex-col sm:flex-row gap-3 shrink-0 w-full sm:w-auto">
               <Link
                 href={`/build-a-team?roles=${slug}:1`}
-                className="inline-flex items-center justify-center px-5 py-2.5 border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors whitespace-nowrap"
+                className="inline-flex items-center justify-center border border-border px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-secondary whitespace-nowrap"
               >
                 Add to my team
               </Link>
               <a
                 href={AGENCY.enquireUrl}
-                className="inline-flex items-center justify-center px-5 py-2.5 bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
+                className="inline-flex items-center justify-center bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80 whitespace-nowrap"
               >
                 Start with an audit
               </a>

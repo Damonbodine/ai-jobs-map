@@ -79,14 +79,14 @@ export function EmailCaptureCard({ taskDescription, occupationContext, generatio
           <div className="flex flex-col sm:flex-row gap-2">
             <Link
               href="/build-a-team"
-              className="inline-flex items-center justify-center gap-1.5 border border-border bg-secondary px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 border border-border px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-secondary"
             >
               Plan my whole team
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
             <a
               href={AGENCY.enquireUrl}
-              className="inline-flex items-center justify-center gap-1.5 bg-foreground px-4 py-2 text-sm font-semibold text-background hover:opacity-90 transition-opacity"
+              className="inline-flex items-center justify-center gap-1.5 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
             >
               Start with an audit
               <ArrowRight className="h-3.5 w-3.5" />

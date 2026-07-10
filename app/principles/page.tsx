@@ -35,7 +35,7 @@ export default function PrinciplesPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">
       <FadeIn>
-        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-3">
+        <p className="eyebrow mb-3">
           Principles
         </p>
         <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-4">
@@ -103,13 +103,13 @@ export default function PrinciplesPage() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <a
             href={AGENCY.auditUrl}
-            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
+            className="inline-flex items-center justify-center gap-2 border border-border px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-secondary"
           >
             How the audit works
           </a>
           <a
             href={AGENCY.enquireUrl}
-            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity"
+            className="inline-flex items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
           >
             Start with an audit
             <ArrowRight className="h-4 w-4" />

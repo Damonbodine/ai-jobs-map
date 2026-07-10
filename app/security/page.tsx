@@ -37,7 +37,7 @@ export default function SecurityPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">
       <FadeIn>
-        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-accent font-semibold mb-3">
+        <div className="flex items-center gap-2 eyebrow mb-3" style={{ color: "var(--color-accent)" }}>
           <Shield className="h-3.5 w-3.5" />
           Trust &amp; Security
         </div>
@@ -212,7 +212,7 @@ export default function SecurityPage() {
           </div>
           <Link
             href="/contact"
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
+            className="inline-flex items-center justify-center bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80 whitespace-nowrap shrink-0"
           >
             Start a conversation
           </Link>

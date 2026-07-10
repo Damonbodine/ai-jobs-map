@@ -38,7 +38,7 @@ export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">
       <FadeIn>
-        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground mb-3">
+        <p className="eyebrow mb-3">
           A project by {AGENCY.name}
         </p>
         <h1 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-4">
@@ -66,7 +66,7 @@ export default function AboutPage() {
 
       <FadeIn delay={0.15}>
         <div className="rounded-2xl border border-accent/30 bg-accent/5 p-6 mb-12">
-          <p className="text-xs uppercase tracking-[0.14em] text-accent font-semibold mb-2">
+          <p className="eyebrow mb-2" style={{ color: "var(--color-accent)" }}>
             Recent work
           </p>
           <p className="font-heading text-lg font-semibold mb-1">
@@ -113,6 +113,7 @@ export default function AboutPage() {
 
       <FadeIn delay={0.5}>
         <div className="rounded-2xl border border-border bg-card p-8 mb-10">
+          <div className="eyebrow mb-2">SEC 01 · Our Methodology</div>
           <h2 className="font-heading text-xl font-semibold mb-3">
             Our Methodology
           </h2>
@@ -140,6 +141,7 @@ export default function AboutPage() {
 
       <FadeIn delay={0.6}>
         <div className="rounded-2xl border border-border bg-card p-8 mb-10">
+          <div className="eyebrow mb-2">SEC 02 · How we work</div>
           <h2 className="font-heading text-xl font-semibold mb-3">
             How we work
           </h2>
@@ -171,13 +173,13 @@ export default function AboutPage() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             href="/browse"
-            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
+            className="inline-flex items-center justify-center gap-2 border border-border px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-secondary"
           >
             Explore Occupations
           </Link>
           <a
             href={AGENCY.enquireUrl}
-            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 transition-opacity"
+            className="inline-flex items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
           >
             Start with an audit
             <ArrowRight className="h-4 w-4" />

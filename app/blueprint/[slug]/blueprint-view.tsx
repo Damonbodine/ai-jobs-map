@@ -27,7 +27,7 @@ import type {
   ModuleCapability,
 } from "@/types"
 
-import { MODULE_LABELS as BLOCK_LABELS, MODULE_DESCRIPTIONS as REGISTRY_DESCRIPTIONS, MODULE_COLORS } from "@/lib/modules"
+import { MODULE_LABELS as BLOCK_LABELS, MODULE_DESCRIPTIONS as REGISTRY_DESCRIPTIONS } from "@/lib/modules"
 import { TimeDonut } from "@/components/TimeDonut"
 import { track } from "@/lib/analytics"
 
@@ -235,13 +235,13 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 mb-8">
             <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
               <div className="text-xs text-muted-foreground mb-1">Estimated time back:</div>
-              <div className="font-heading text-2xl font-bold text-accent">
+              <div className="font-mono text-2xl font-bold tabular-nums text-accent">
                 {displayedMinutes} min/day
               </div>
             </div>
             <div className="rounded-xl border border-border bg-card p-4">
               <div className="text-xs text-muted-foreground mb-1">Potential annual value:</div>
-              <div className="font-heading text-2xl font-bold">
+              <div className="font-mono text-2xl font-bold tabular-nums">
                 ${annualValue.toLocaleString()}
               </div>
             </div>
@@ -284,8 +284,8 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
           <div id="assistant-builder" className="rounded-2xl border border-border bg-card p-5 sm:p-6">
             {submitted ? (
               <div className="py-4 text-center sm:text-left">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 mb-4">
-                  <Check className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-success/10 mb-4">
+                  <Check className="h-5 w-5 text-success" />
                 </div>
                 <h2 className="font-heading text-2xl font-semibold tracking-tight mb-2">
                   We received your plan request
@@ -295,7 +295,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                 </p>
 
                 <div className="rounded-xl border border-border bg-secondary/20 p-4 mb-6 text-left">
-                  <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                  <div className="eyebrow mb-3">
                     What you requested
                   </div>
                   <div className="space-y-3 text-sm">
@@ -304,7 +304,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                       <span className="font-medium">{occupation.title}</span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Modules ({selectedModules.length}):</span>{" "}
+                      <span className="text-muted-foreground">Modules (<span className="font-mono tabular-nums">{selectedModules.length}</span>):</span>{" "}
                       <span className="font-medium">{selectedModules.map((k) => BLOCK_LABELS[k] ?? k).join(", ")}</span>
                     </div>
                     <div>
@@ -319,7 +319,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                     )}
                     <div>
                       <span className="text-muted-foreground">Estimated time back:</span>{" "}
-                      <span className="font-medium">{selectedMinutes} min/day</span>
+                      <span className="font-mono tabular-nums font-medium">{selectedMinutes} min/day</span>
                     </div>
                   </div>
                 </div>
@@ -350,7 +350,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
 
                 {/* Module toggle grid — 3 column cards */}
                 <div className="mb-6">
-                  <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                  <div className="eyebrow mb-3">
                     Module Shots
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -394,7 +394,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
 
                 {/* Custom requests */}
                 <div className="mb-6">
-                  <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">
+                  <div className="eyebrow mb-2">
                     Anything else?
                   </div>
                   <div className="flex gap-2">
@@ -428,7 +428,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                       {customRequests.map((request, index) => (
                         <span
                           key={`${request}-${index}`}
-                          className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs"
+                          className="inline-flex items-center gap-1 bg-secondary/60 text-foreground border border-border px-3 py-1 text-xs"
                         >
                           {request}
                           <button
@@ -453,7 +453,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
 
                 {/* Scope tiers */}
                 <div className="mb-6">
-                  <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                  <div className="eyebrow mb-3">
                     Build scope
                   </div>
                   <div className="grid grid-cols-3 gap-2">
@@ -468,7 +468,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                         )}
                       >
                         <div className="font-heading text-sm font-bold mb-0.5">{tier.label}</div>
-                        <div className="text-[10px] text-muted-foreground">
+                        <div className="font-mono tabular-nums text-[10px] text-muted-foreground">
                           {tier.key === "starter" ? "≤3 modules" : tier.key === "recommended" ? "4–7 modules" : "8+ modules"}
                         </div>
                       </div>
@@ -481,7 +481,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                   <div className="rounded-xl border border-border bg-secondary/20 p-4">
                     <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
                       <div>
-                        <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Name</label>
+                        <label className="eyebrow">Name</label>
                         <input
                           value={contactName}
                           onChange={(e) => setContactName(e.target.value)}
@@ -490,7 +490,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Email</label>
+                        <label className="eyebrow">Email</label>
                         <input
                           value={contactEmail}
                           onChange={(e) => setContactEmail(e.target.value)}
@@ -502,7 +502,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                         type="button"
                         onClick={submitAssistantRequest}
                         disabled={submitting || !contactEmail.trim()}
-                        className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-lg bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity whitespace-nowrap"
+                        className="inline-flex items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80 disabled:opacity-50 whitespace-nowrap"
                       >
                         {submitting ? "Submitting..." : "Request plan"}
                         {!submitting && <ArrowRight className="h-3.5 w-3.5" />}
@@ -521,10 +521,10 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
             <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                 <span>
-                  Selected: <span className="font-semibold">{selectedModules.length} of {allModuleKeys.length}</span> modules
+                  Selected: <span className="font-mono tabular-nums font-semibold">{selectedModules.length} of {allModuleKeys.length}</span> modules
                 </span>
                 <span>
-                  Total Time: <span className="font-semibold">{selectedMinutes} min</span>
+                  Total Time: <span className="font-mono tabular-nums font-semibold">{selectedMinutes} min</span>
                 </span>
                 <span>
                   Scope: <span className="font-semibold text-accent">{currentTier.label}</span>
@@ -543,7 +543,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
                   }
                 }}
                 disabled={submitting || (showContactForm && !contactEmail.trim())}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50 transition-opacity w-full sm:w-auto"
+                className="inline-flex items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80 disabled:opacity-50 w-full sm:w-auto"
               >
                 {submitting ? "Submitting..." : "Request Your Custom AI Assistant Plan"}
                 {!submitting && <ArrowRight className="h-4 w-4" />}

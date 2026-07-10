@@ -34,15 +34,10 @@ export default async function ProductsPage() {
       {/* ── Section 1: Support Systems ────────────────────────── */}
       <FadeIn delay={0.1}>
         <div className="mb-12">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              What we build
-            </h2>
-          </div>
-          <h3 className="font-heading text-xl sm:text-2xl font-bold mb-2">
+          <div className="eyebrow mb-2">SEC 01 · What we build</div>
+          <h2 className="font-heading text-xl sm:text-2xl font-bold mb-2">
             Support modules that handle your routine work
-          </h3>
+          </h2>
           <p className="text-sm text-muted-foreground mb-6 max-w-2xl">
             Every assistant system is assembled from these modules. Each module contains
             specific capabilities — named agents that handle defined categories of work.
@@ -70,7 +65,7 @@ export default async function ProductsPage() {
                     {caps.map((cap: ModuleCapability) => (
                       <span
                         key={cap.capability_key}
-                        className="text-[10px] font-medium bg-white/60 dark:bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-full"
+                        className="text-[10px] font-medium bg-secondary/60 text-foreground border border-border px-2 py-0.5"
                         title={cap.description}
                       >
                         {cap.capability_name}
@@ -87,15 +82,10 @@ export default async function ProductsPage() {
       {/* ── Section 2: Engagement Tiers ───────────────────────── */}
       <FadeIn delay={0.15}>
         <div className="mb-8">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              How it scales
-            </h2>
-          </div>
-          <h3 className="font-heading text-xl sm:text-2xl font-bold mb-2">
+          <div className="eyebrow mb-2">SEC 02 · How it scales</div>
+          <h2 className="font-heading text-xl sm:text-2xl font-bold mb-2">
             Three ways to start
-          </h3>
+          </h2>
           <p className="text-sm text-muted-foreground mb-6 max-w-2xl">
             Your recommended tier depends on how many support areas your role needs.
             The app figures this out from your occupation data.
@@ -131,10 +121,10 @@ export default async function ProductsPage() {
         </StaggerItem>
 
         <StaggerItem>
-          <div className="rounded-xl border border-accent bg-accent/[0.03] shadow-lg shadow-accent/5 p-5 h-full flex flex-col">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-accent mb-2">Most common</div>
+          <div className="border border-accent bg-accent/[0.03] p-5 h-full flex flex-col">
+            <div className="eyebrow mb-2" style={{ color: "var(--color-accent)" }}>Most common</div>
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-lg bg-accent text-white flex items-center justify-center">
+              <div className="w-9 h-9 rounded-lg bg-accent text-foreground flex items-center justify-center">
                 <Workflow className="h-4 w-4" />
               </div>
               <div>
@@ -187,15 +177,10 @@ export default async function ProductsPage() {
       {/* ── Section 3: How It Works ───────────────────────────── */}
       <FadeIn delay={0.2}>
         <div className="mb-8">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              How it works
-            </h2>
-          </div>
-          <h3 className="font-heading text-xl sm:text-2xl font-bold mb-6">
+          <div className="eyebrow mb-2">SEC 03 · How it works</div>
+          <h2 className="font-heading text-xl sm:text-2xl font-bold mb-6">
             From your role to a working system
-          </h3>
+          </h2>
         </div>
       </FadeIn>
 
@@ -229,7 +214,7 @@ export default async function ProductsPage() {
           <StaggerItem key={s.step}>
             <div className="rounded-xl border border-border bg-card p-4 h-full">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs font-bold">
+                <div className="w-7 h-7 bg-accent/10 text-accent flex items-center justify-center text-xs font-bold font-mono tabular-nums">
                   {s.step}
                 </div>
                 <s.icon className="h-3.5 w-3.5 text-muted-foreground" />
@@ -244,67 +229,62 @@ export default async function ProductsPage() {
       {/* ── Section 3.5: Worked Example ─────────────────────── */}
       <FadeIn delay={0.22}>
         <div className="mb-14">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Example
-            </h2>
-          </div>
-          <h3 className="font-heading text-xl sm:text-2xl font-bold mb-6">
+          <div className="eyebrow mb-2">SEC 04 · Example</div>
+          <h2 className="font-heading text-xl sm:text-2xl font-bold mb-6">
             What a system looks like in practice
-          </h3>
+          </h2>
 
           <div className="rounded-xl border border-border bg-card p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4 mb-5">
               <div>
-                <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">Clinic Operations Manager</div>
+                <div className="eyebrow mb-1">Clinic Operations Manager</div>
                 <h4 className="font-heading text-lg font-semibold">Workflow Bundle — 4 modules, 2-week build</h4>
               </div>
               <div className="text-right flex-shrink-0">
-                <div className="font-heading text-2xl font-bold text-accent">52</div>
+                <div className="font-mono text-2xl font-bold tabular-nums text-accent">52</div>
                 <div className="text-[10px] text-muted-foreground">min/day back</div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
               <div>
-                <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">Before</div>
+                <div className="eyebrow mb-2" style={{ color: "var(--color-destructive)" }}>Before</div>
                 <div className="space-y-1.5 text-xs text-muted-foreground">
                   <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-orange-400 flex-shrink-0 mt-1" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-destructive flex-shrink-0 mt-1" />
                     45 min/day on patient scheduling changes and follow-ups
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-orange-400 flex-shrink-0 mt-1" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-destructive flex-shrink-0 mt-1" />
                     30 min/day drafting shift reports and status updates
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-orange-400 flex-shrink-0 mt-1" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-destructive flex-shrink-0 mt-1" />
                     20 min/day chasing compliance documentation
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-orange-400 flex-shrink-0 mt-1" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-destructive flex-shrink-0 mt-1" />
                     Staff spending time on data entry instead of patient care
                   </div>
                 </div>
               </div>
               <div>
-                <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">After</div>
+                <div className="eyebrow mb-2" style={{ color: "var(--color-success)" }}>After</div>
                 <div className="space-y-1.5 text-xs text-muted-foreground">
                   <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-success flex-shrink-0 mt-1" />
                     Scheduling Assistant handles rebooking and reminders automatically
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-success flex-shrink-0 mt-1" />
                     Report Drafting agent prepares shift summaries by end of day
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-success flex-shrink-0 mt-1" />
                     Audit Prep assistant keeps compliance docs organized continuously
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0 mt-1" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-success flex-shrink-0 mt-1" />
                     Manager reviews and approves — doesn't assemble from scratch
                   </div>
                 </div>
@@ -313,7 +293,7 @@ export default async function ProductsPage() {
 
             <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
               {["Coordination & Scheduling", "Documentation", "Compliance & Policy", "Data & Reporting"].map((mod) => (
-                <span key={mod} className="text-[11px] font-medium px-2.5 py-1 rounded-full border border-border bg-secondary/30">
+                <span key={mod} className="text-[11px] font-medium px-2.5 py-1 border border-border bg-secondary/60 text-foreground">
                   {mod}
                 </span>
               ))}
@@ -367,14 +347,14 @@ export default async function ProductsPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="/browse"
-              className="flex items-center gap-2 bg-foreground text-background px-6 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
+              className="flex items-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
             >
               Browse occupations
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
             <Link
               href="/"
-              className="flex items-center gap-2 border border-border px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary/50 transition-colors"
+              className="flex items-center gap-2 border border-border px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-secondary"
             >
               Search for your role
               <ChevronRight className="h-3.5 w-3.5" />

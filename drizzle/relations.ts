@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { occupations, jobMicroTasks, aiOpportunities, skillRecommendations, onetTasks, tasksToDwas, smartWorkflows, smartWorkflowInternalMappings, smartWorkflowOccupationMappings, occupationAutomationProfile, onetAbilities, onetKnowledge, onetWorkActivities, automationBenchmarks, moduleCapabilities, taskCapabilityMappings, assistantInquiries, demoAgentContent, demoAgentContentV2 } from "./schema";
+import { occupations, jobMicroTasks, aiOpportunities, skillRecommendations, onetTasks, tasksToDwas, smartWorkflows, smartWorkflowInternalMappings, smartWorkflowOccupationMappings, occupationAutomationProfile, onetAbilities, onetKnowledge, onetWorkActivities, automationBenchmarks, moduleCapabilities, taskCapabilityMappings, assistantInquiries, demoAgentContent, demoAgentContentV2 } from "../lib/db/schema";
 
 export const jobMicroTasksRelations = relations(jobMicroTasks, ({one, many}) => ({
 	occupation: one(occupations, {

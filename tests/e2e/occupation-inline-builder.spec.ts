@@ -1,5 +1,18 @@
 import { expect, test } from "@playwright/test"
 
+test("occupation page bridges to the full Clear Road Labs sample audit", async ({ page }) => {
+  await page.goto("/occupation/financial-managers")
+
+  const sampleAuditLink = page.getByRole("link", {
+    name: "See what the full audit looks like →",
+  })
+  await expect(sampleAuditLink).toBeVisible()
+  await expect(sampleAuditLink).toHaveAttribute(
+    "href",
+    "https://clearroadlabs.com/sample-audit"
+  )
+})
+
 test("occupation page supports inline builder flow", async ({ page }) => {
   await page.goto("/occupation/financial-managers")
 

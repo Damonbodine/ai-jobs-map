@@ -1,9 +1,14 @@
 /**
  * Live QA test against production — actually submits forms and checks results.
- * Run with: npx playwright test tests/e2e/live-qa.spec.ts --headed
+ * Run with: RUN_LIVE_QA=1 npx playwright test tests/e2e/live-qa.spec.ts --headed
  */
 
 import { test, expect } from "@playwright/test"
+
+test.skip(
+  process.env.RUN_LIVE_QA !== "1",
+  "Set RUN_LIVE_QA=1 to opt into production-writing QA"
+)
 
 const BASE = "https://timeback.clearroadlabs.com"
 const TEST_EMAIL = "damon@clearroadlabs.com"

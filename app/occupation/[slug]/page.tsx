@@ -162,13 +162,19 @@ export default async function OccupationPage(props: {
               </p>
               <EstimateInfo low={displayedLow} high={displayedHigh} />
             </div>
-            <div className="mt-6 flex justify-center">
+            <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <a
                 href={AGENCY.enquireUrl}
                 className="inline-flex items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
               >
                 Start with an audit
                 <ArrowRight className="h-4 w-4" />
+              </a>
+              <a
+                href="https://clearroadlabs.com/sample-audit"
+                className="inline-flex items-center justify-center border border-border px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-secondary"
+              >
+                See what the full audit looks like →
               </a>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">

@@ -187,7 +187,7 @@ export function BlueprintView({ occupation, profile, tasks, slug, capabilitiesBy
       }
 
       setSubmitted(true)
-      track("inquiry_submitted", { source: "blueprint" })
+      track("lead_submitted", { lead_type: "inquiry", source: "blueprint" })
     } catch (err) {
       console.error("[blueprint] submit failed", err)
       toast.error(

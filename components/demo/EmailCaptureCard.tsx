@@ -46,7 +46,7 @@ export function EmailCaptureCard({ taskDescription, occupationContext, generatio
       }
 
       setStatus("success")
-      track("demo_lead_captured", { source: "demo_try" })
+      track("lead_submitted", { lead_type: "demo", source: "demo_try" })
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unexpected error."
       setErrorMessage(message)

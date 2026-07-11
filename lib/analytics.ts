@@ -9,6 +9,7 @@
  * see the funnel taxonomy in the launch plan.
  */
 import { sendGAEvent } from "@next/third-parties/google"
+import posthog from "posthog-js"
 
 export function track(
   name: string,
@@ -17,6 +18,7 @@ export function track(
   if (!process.env.NEXT_PUBLIC_GA_ID) return
   try {
     sendGAEvent("event", name, params ?? {})
+    if (posthog.__loaded && posthog.has_opted_in_capturing()) posthog.capture(name, params ?? {})
   } catch {
     // Analytics must never break the app.
   }

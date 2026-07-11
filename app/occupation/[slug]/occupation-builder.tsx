@@ -231,7 +231,7 @@ export function OccupationBuilder({
       }
 
       setPhase("done")
-      track("inquiry_submitted", { source: "builder" })
+      track("lead_submitted", { lead_type: "inquiry", source: "builder" })
     } catch (err) {
       console.error("[builder] submit failed", err)
       toast.error(

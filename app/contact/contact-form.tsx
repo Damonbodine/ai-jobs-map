@@ -97,7 +97,7 @@ export function ContactForm() {
       }
 
       setStatus("success")
-      track("contact_submitted")
+      track("lead_submitted", { lead_type: "contact", source: "contact_form" })
     } catch {
       setErrorMessage(
         "Network error. Please check your connection and try again."

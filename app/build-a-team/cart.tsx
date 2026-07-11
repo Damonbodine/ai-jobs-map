@@ -190,7 +190,7 @@ export function Cart({
     setDoneTotalPeople(totalPeople)
     setDoneMinutesPerDay(totalMinutesPerDay)
     setPhase("done")
-    track("team_inquiry_submitted", { role_count: cart.length })
+    track("lead_submitted", { lead_type: "team_inquiry", source: "team_builder", role_count: cart.length })
   }
 
   // ── Done phase ──

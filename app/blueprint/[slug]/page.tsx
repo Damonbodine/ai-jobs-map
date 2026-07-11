@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import type { Metadata } from "next"
 import { BlueprintView } from "./blueprint-view"
 import { getAllCapabilities } from "@/lib/capabilities"
 import {
@@ -8,6 +9,11 @@ import {
 } from "@/lib/occupation-data"
 
 export const dynamic = "force-dynamic"
+
+export const metadata: Metadata = {
+  title: "Custom AI Blueprint",
+  robots: { index: false, follow: true },
+}
 
 export default async function BlueprintPage(props: {
   params: Promise<{ slug: string }>
@@ -33,4 +39,3 @@ export default async function BlueprintPage(props: {
     />
   )
 }
-

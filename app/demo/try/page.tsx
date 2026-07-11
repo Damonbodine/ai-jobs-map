@@ -8,6 +8,7 @@ import { CustomDemoForm } from "@/components/demo/CustomDemoForm"
 export const metadata: Metadata = {
   title: "Try a Custom AI Agent Demo",
   description: "Describe a task you spend too much time on. We'll generate a custom AI agent demo for it in seconds.",
+  robots: { index: false, follow: true },
 }
 
 export default function CustomDemoTryPage() {

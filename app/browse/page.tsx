@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic"
 
+import type { Metadata } from "next"
 import Link from "next/link"
 import { unstable_cache } from "next/cache"
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
@@ -12,6 +13,13 @@ import { BrowseFilters } from "./filters"
 import { computeDisplayedTimeback } from "@/lib/timeback"
 import { filterSortPage, type BrowseOccupation } from "@/lib/browse"
 import type { AutomationProfile, MicroTask } from "@/types"
+import { SITE } from "@/lib/site"
+
+export const metadata: Metadata = {
+  title: "Browse AI Time Savings by Occupation",
+  description: "Explore task-level AI time-savings estimates across more than 800 occupations.",
+  alternates: { canonical: `${SITE.url}/browse` },
+}
 
 const PAGE_SIZE = 24
 

@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${role.displayName} AI Demo`,
     description: role.tagline,
+    robots: { index: false, follow: true },
   }
 }
 

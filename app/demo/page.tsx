@@ -7,10 +7,12 @@ import { DemoTeaser } from "@/components/demo/DemoTeaser"
 import { OccupationSearch } from "@/components/demo/OccupationSearch"
 import Link from "next/link"
 import type { Metadata } from "next"
+import { SITE } from "@/lib/site"
 
 export const metadata: Metadata = {
   title: "AI Agent Suite Demo",
   description: "See how AI agents transform a full workday for any job role.",
+  alternates: { canonical: `${SITE.url}/demo` },
 }
 
 const FEATURED_SLUGS = [

@@ -20,6 +20,7 @@ import { computeAnnualValue } from "@/lib/pricing"
 import { Cart } from "./cart"
 import { Results } from "./results"
 import { TemplatePicker } from "./template-picker"
+import { SITE } from "@/lib/site"
 
 export const dynamic = "force-dynamic"
 
@@ -27,6 +28,7 @@ export const metadata: Metadata = {
   title: "Build a Team",
   description:
     "What would your team look like with AI? Pick the roles, set the headcounts, and see the compounded time-back instantly. For founders, COOs, and ops leads designing a new function.",
+  alternates: { canonical: `${SITE.url}/build-a-team` },
 }
 
 type SearchParams = {

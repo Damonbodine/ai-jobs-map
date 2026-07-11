@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic"
 
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Clock, Cpu, Users } from "lucide-react"
 import { db } from "@/lib/db/client"
@@ -12,6 +13,11 @@ import { computeDisplayedTimeback } from "@/lib/timeback"
 import type { Occupation, MicroTask, AutomationProfile } from "@/types"
 import { Suspense } from "react"
 import { DemoTeaser } from "@/components/demo/DemoTeaser"
+import { SITE } from "@/lib/site"
+
+export const metadata: Metadata = {
+  alternates: { canonical: SITE.url },
+}
 
 const POPULAR_SLUGS = [
   "software-developers",

@@ -15,6 +15,7 @@ import { getCategoryBySlug, CATEGORIES } from "@/lib/categories"
 import { FadeIn, Stagger, StaggerItem } from "@/components/FadeIn"
 import { computeDisplayedTimeback } from "@/lib/timeback"
 import type { AutomationProfile, MicroTask, Occupation } from "@/types"
+import { SITE } from "@/lib/site"
 
 export async function generateStaticParams() {
   return CATEGORIES.map((c) => ({ category: c.slug }))
@@ -29,6 +30,9 @@ export async function generateMetadata(props: {
   return {
     title: `${cat.label} Occupations`,
     description: `Explore AI time-savings potential for ${cat.label} occupations.`,
+    alternates: {
+      canonical: `${SITE.url}/category/${cat.slug}`,
+    },
   }
 }
 

@@ -1,6 +1,7 @@
 export const revalidate = 3600
 
 import { Suspense } from "react"
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight, ChevronRight } from "lucide-react"
@@ -14,7 +15,7 @@ import { computeDisplayedTimeback, estimateTaskMinutes, inferArchetypeMultiplier
 import { getBlockForTask } from "@/lib/blueprint"
 import { computeAnnualValue } from "@/lib/pricing"
 import { getAllCapabilities } from "@/lib/capabilities"
-import { AGENCY } from "@/lib/site"
+import { AGENCY, SITE } from "@/lib/site"
 import {
   getOccupationBySlug,
   getOccupationProfile,
@@ -28,6 +29,27 @@ import { OccupationDonut } from "./occupation-donut"
 import { OccupationBuilder } from "./occupation-builder"
 import { OnePagerButton } from "./one-pager-button"
 import { OccupationDemoSection, OccupationDemoSectionSkeleton } from "@/components/demo/OccupationDemoSection"
+
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await props.params
+  const occupation = await getOccupationBySlug(slug)
+
+  if (!occupation) return {}
+
+  const title = `${occupation.title} AI Time Savings & Task Analysis`
+  const description = `See which ${occupation.title.toLowerCase()} tasks AI can assist with, estimated daily time savings, implementation ideas, and the underlying BLS and O*NET data.`
+  const url = `${SITE.url}/occupation/${occupation.slug}`
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: { title, description, url, type: "article" },
+    twitter: { title, description },
+  }
+}
 
 export async function generateStaticParams() {
   // Build-time pg/Drizzle fetch is best-effort: if env vars aren't available in

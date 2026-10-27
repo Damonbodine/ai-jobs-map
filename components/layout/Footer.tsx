@@ -59,6 +59,12 @@ export function Footer() {
               >
                 What We Build
               </Link>
+              <a
+                href={AGENCY.sampleAuditUrl}
+                className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Sample Audit
+              </a>
             </div>
           </div>
 

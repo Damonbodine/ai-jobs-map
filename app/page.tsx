@@ -13,7 +13,7 @@ import { computeDisplayedTimeback } from "@/lib/timeback"
 import type { Occupation, MicroTask, AutomationProfile } from "@/types"
 import { Suspense } from "react"
 import { DemoTeaser } from "@/components/demo/DemoTeaser"
-import { SITE } from "@/lib/site"
+import { AGENCY, SITE } from "@/lib/site"
 
 export const metadata: Metadata = {
   alternates: { canonical: SITE.url },
@@ -350,6 +350,28 @@ export default async function HomePage() {
         <Suspense fallback={<div className="h-64 bg-muted/10 border border-border animate-pulse" />}>
           <DemoTeaser />
         </Suspense>
+      </section>
+
+      <section className="container mx-auto px-4 py-8" aria-labelledby="sample-audit-heading">
+        <div className="border border-border bg-card p-6 sm:p-8 sm:flex sm:items-center sm:justify-between sm:gap-8">
+          <div className="max-w-xl">
+            <p className="eyebrow mb-3">Inside a workflow audit</p>
+            <h2 id="sample-audit-heading" className="font-heading text-2xl font-semibold text-foreground">
+              From time estimates to a concrete build plan.
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Timeback maps the opportunity in a role. See how a Clear Road Labs
+              audit examines one workflow: what AI can handle, what stays human,
+              and what to build first. Explore the method with an illustrative company.
+            </p>
+          </div>
+          <a
+            href={AGENCY.sampleAuditUrl}
+            className="mt-5 inline-flex items-center justify-center border border-border px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-secondary sm:mt-0 sm:shrink-0"
+          >
+            See the sample audit →
+          </a>
+        </div>
       </section>
 
       {/* Browse by Category */}

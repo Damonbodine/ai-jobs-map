@@ -10,8 +10,8 @@ import { generateCustomDemo } from "@/lib/demo/generate-custom-demo"
 import { getClientIp, hashIp, isRateLimited } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
-// OpenRouter calls can take 3–8 seconds. Default (10s) is tight.
-export const maxDuration = 30
+// Allow two bounded 20s provider attempts plus generation logging.
+export const maxDuration = 60
 
 const requestSchema = z.object({
   taskDescription: z.string().trim().min(12, "Describe the task in a bit more detail").max(800),

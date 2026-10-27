@@ -81,16 +81,9 @@ Respond ONLY with valid JSON, no markdown fences, in this exact shape:
 }`
 }
 
-// Free-tier models only (":free" variants cost $0). Ordered by capability;
-// OpenRouter's `models` fallback routing tries each in turn when the free
-// pool for one is saturated. Caveat: free variants share an account-level
-// daily request cap (50/day, or 1000/day once the account has bought $10 of
-// credits) — fine at current traffic with the 5/day/IP route limit.
-const FREE_MODELS = [
-  "openai/gpt-oss-120b:free",
-  "qwen/qwen3-next-80b-a3b-instruct:free",
-  "meta-llama/llama-3.3-70b-instruct:free",
-]
+// Route to the currently available free pool instead of pinning retired variants.
+// JSON mode also lets the router select a model that supports the required output.
+const DEMO_MODEL = "openrouter/free"
 
 async function callOpenRouter(prompt: string): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY
@@ -98,16 +91,17 @@ async function callOpenRouter(prompt: string): Promise<string> {
 
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
+    signal: AbortSignal.timeout(20_000),
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
       "HTTP-Referer": SITE.url,
     },
     body: JSON.stringify({
-      // models-array-only is OpenRouter's fallback-routing form; adding a
-      // `model` field alongside it pins the request to that model and a
-      // transient 429 kills the whole call instead of falling back.
-      models: FREE_MODELS,
+      model: DEMO_MODEL,
+      provider: { require_parameters: true },
+      response_format: { type: "json_object" },
+      reasoning: { enabled: false },
       messages: [{ role: "user", content: prompt }],
       max_tokens: 1500,
       temperature: 0.7,

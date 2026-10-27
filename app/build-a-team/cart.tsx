@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useOptimistic, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Minus, X, Link2, Mail, Check, ChevronDown, ChevronUp, ArrowRight } from "lucide-react"
 import {
@@ -41,23 +41,24 @@ export function Cart({
   capabilitiesByModule: Record<string, ModuleCapability[]>
 }) {
   const router = useRouter()
-  const [cart, setCart] = useState<CartRow[]>(initialCart)
+  // The URL is authoritative; optimistic edits last only until navigation resolves.
+  const [cart, setCart] = useOptimistic(initialCart)
   const [pending, startTransition] = useTransition()
   const [copied, setCopied] = useState(false)
   const [pdfOpen, setPdfOpen] = useState(false)
   const [phase, setPhase] = useState<Phase>("configure")
   const [expandedRoles, setExpandedRoles] = useState<Set<string>>(new Set())
 
-  // Per-role selected task IDs — default: all tasks selected
+  // Store only explicit edits. Roles arriving after navigation default to all tasks.
   const [selectedTasksBySlug, setSelectedTasksBySlug] = useState<Map<string, Set<number>>>(
-    () => {
-      const m = new Map<string, Set<number>>()
-      for (const rd of roleTaskData) {
-        m.set(rd.slug, new Set(rd.tasks.map(t => t.id)))
-      }
-      return m
-    }
+    () => new Map()
   )
+
+  function selectedTasks(slug: string, overrides = selectedTasksBySlug): Set<number> {
+    return overrides.get(slug) ?? new Set(
+      roleTaskData.find(role => role.slug === slug)?.tasks.map(task => task.id) ?? []
+    )
+  }
 
   // Contact form result (set when done)
   const [doneEmail, setDoneEmail] = useState("")
@@ -65,10 +66,12 @@ export function Cart({
   const [doneMinutesPerDay, setDoneMinutesPerDay] = useState(0)
 
   function commit(next: CartRow[]) {
-    setCart(next)
     const encoded = encodeCart(next)
     const url = encoded ? `/build-a-team?roles=${encoded}` : "/build-a-team"
-    startTransition(() => { router.replace(url, { scroll: false }) })
+    startTransition(() => {
+      setCart(next)
+      router.replace(url, { scroll: false })
+    })
   }
 
   function handleAdd(slug: string, _title: string) {
@@ -102,7 +105,7 @@ export function Cart({
 
   function handleToggleModule(slug: string, moduleKey: string, taskIds: number[]) {
     setSelectedTasksBySlug(prev => {
-      const current = new Set(prev.get(slug) ?? [])
+      const current = new Set(selectedTasks(slug, prev))
       const allSelected = taskIds.every(id => current.has(id))
       if (allSelected) {
         taskIds.forEach(id => current.delete(id))
@@ -117,7 +120,7 @@ export function Cart({
 
   function handleToggleTask(slug: string, taskId: number) {
     setSelectedTasksBySlug(prev => {
-      const current = new Set(prev.get(slug) ?? [])
+      const current = new Set(selectedTasks(slug, prev))
       current.has(taskId) ? current.delete(taskId) : current.add(taskId)
       const next = new Map(prev)
       next.set(slug, current)
@@ -128,7 +131,7 @@ export function Cart({
   // Compute total selected modules across all roles (for tier pricing)
   const allSelectedModules = new Set<string>()
   for (const rd of roleTaskData) {
-    const selected = selectedTasksBySlug.get(rd.slug) ?? new Set()
+    const selected = selectedTasks(rd.slug)
     for (const task of rd.tasks) {
       if (selected.has(task.id)) allSelectedModules.add(task.moduleKey)
     }
@@ -143,7 +146,7 @@ export function Cart({
   }) {
     const roles = cart.map(cartRow => {
       const rd = roleTaskData.find(r => r.slug === cartRow.slug)
-      const selected = selectedTasksBySlug.get(cartRow.slug) ?? new Set()
+      const selected = selectedTasks(cartRow.slug)
       const selectedTaskIds = Array.from(selected)
       const selectedModules = Array.from(
         new Set(
@@ -234,7 +237,7 @@ export function Cart({
           <ul className="space-y-2 mb-5">
             {cart.map(row => {
               const rd = roleTaskData.find(r => r.slug === row.slug)
-              const selected = selectedTasksBySlug.get(row.slug) ?? new Set()
+              const selected = selectedTasks(row.slug)
               const isExpanded = expandedRoles.has(row.slug)
               const selectedCount = rd ? rd.tasks.filter(t => selected.has(t.id)).length : 0
               const totalCount = rd?.tasks.length ?? 0
@@ -334,6 +337,7 @@ export function Cart({
           </button>
           <button
             type="button"
+            disabled={pending}
             onClick={() => setPdfOpen(true)}
             className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-foreground/20 text-foreground text-sm font-semibold hover:bg-foreground/5 transition-colors"
           >
@@ -342,6 +346,7 @@ export function Cart({
           </button>
           <button
             type="button"
+            disabled={pending}
             onClick={() => setPhase("contact")}
             className="sm:ml-auto inline-flex items-center justify-center gap-2 bg-cyan px-6 py-3 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-cyan/80"
           >

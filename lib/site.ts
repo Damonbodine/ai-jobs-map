@@ -26,6 +26,8 @@ export const AGENCY = {
   enquireUrl: "https://clearroadlabs.com/enquire",
   /** Learn-intent handoff — how the audit works. */
   auditUrl: "https://clearroadlabs.com/services#audit",
+  /** Published example — the workflow, time ledger, and ranked build plan. */
+  sampleAuditUrl: "https://www.clearroadlabs.com/sample-audit",
   tagline: "We build custom AI systems for knowledge-work teams.",
 } as const
 

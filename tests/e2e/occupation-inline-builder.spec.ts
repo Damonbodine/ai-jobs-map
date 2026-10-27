@@ -9,7 +9,7 @@ test("occupation page bridges to the full Clear Road Labs sample audit", async (
   await expect(sampleAuditLink).toBeVisible()
   await expect(sampleAuditLink).toHaveAttribute(
     "href",
-    "https://clearroadlabs.com/sample-audit"
+    "https://www.clearroadlabs.com/sample-audit"
   )
 })
 
